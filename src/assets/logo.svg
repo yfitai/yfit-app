@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#4F46E5" stroke="#312E81" stroke-width="3"/>
+  
+  <!-- Inner circle for depth -->
+  <circle cx="100" cy="100" r="85" fill="#5B21B6" opacity="0.3"/>
+  
+  <!-- YFIT Text -->
+  <text x="100" y="110" text-anchor="middle" fill="white" font-size="52" font-weight="bold" font-family="Arial, sans-serif" letter-spacing="2">
+    YFIT
+  </text>
+  
+  <!-- Fitness icon - dumbbell -->
+  <g transform="translate(100, 145)">
+    <rect x="-25" y="-3" width="50" height="6" fill="white" rx="2"/>
+    <circle cx="-25" cy="0" r="8" fill="white"/>
+    <circle cx="25" cy="0" r="8" fill="white"/>
+  </g>
+</svg>
+
