@@ -326,6 +326,26 @@ export async function getRecentFoods(userId, limit = 10) {
 }
 
 /**
+ * Get user's favorite foods
+ */
+export async function getFavoriteFoods(userId, limit = 10) {
+  try {
+    const { data, error } = await supabase
+      .from('favorite_foods')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data?.map(item => item.food_data) || []
+  } catch (error) {
+    console.error('Error fetching favorite foods:', error)
+    return []
+  }
+}
+
+/**
  * Remove duplicate foods from results
  */
 function deduplicateFoods(foods) {
@@ -367,6 +387,7 @@ export default {
   lookupBarcode,
   saveRecentFood,
   getRecentFoods,
+  getFavoriteFoods,
   getFoodDetails
 }
 
