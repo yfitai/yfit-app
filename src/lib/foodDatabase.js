@@ -346,6 +346,73 @@ export async function getFavoriteFoods(userId, limit = 10) {
 }
 
 /**
+ * Get food by barcode (alias for lookupBarcode)
+ */
+export async function getFoodByBarcode(barcode) {
+  return await lookupBarcode(barcode)
+}
+
+/**
+ * Update recent food timestamp
+ */
+export async function updateRecentFood(userId, foodId) {
+  try {
+    const { error } = await supabase
+      .from('recent_foods')
+      .update({ last_used: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('food_id', foodId)
+
+    if (error) throw error
+    return true
+  } catch (error) {
+    console.error('Error updating recent food:', error)
+    return false
+  }
+}
+
+/**
+ * Add food to favorites
+ */
+export async function addFavoriteFood(userId, food) {
+  try {
+    const { error } = await supabase
+      .from('favorite_foods')
+      .insert({
+        user_id: userId,
+        food_id: food.id,
+        food_data: food,
+        created_at: new Date().toISOString()
+      })
+
+    if (error) throw error
+    return true
+  } catch (error) {
+    console.error('Error adding favorite food:', error)
+    return false
+  }
+}
+
+/**
+ * Remove food from favorites
+ */
+export async function removeFavoriteFood(userId, foodId) {
+  try {
+    const { error } = await supabase
+      .from('favorite_foods')
+      .delete()
+      .eq('user_id', userId)
+      .eq('food_id', foodId)
+
+    if (error) throw error
+    return true
+  } catch (error) {
+    console.error('Error removing favorite food:', error)
+    return false
+  }
+}
+
+/**
  * Remove duplicate foods from results
  */
 function deduplicateFoods(foods) {
@@ -385,9 +452,13 @@ export async function getFoodDetails(foodId) {
 export default {
   searchFoods,
   lookupBarcode,
+  getFoodByBarcode,
   saveRecentFood,
   getRecentFoods,
   getFavoriteFoods,
+  updateRecentFood,
+  addFavoriteFood,
+  removeFavoriteFood,
   getFoodDetails
 }
 
