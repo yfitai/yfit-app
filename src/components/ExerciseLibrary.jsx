@@ -50,7 +50,7 @@ const ExerciseLibrary = () => {
       const { data: equipmentData } = await supabase
         .from('equipment_types')
         .select('*')
-        .order('is_common DESC, name');
+        .order('name');
       setEquipmentTypes(equipmentData || []);
 
       // Fetch exercises with related data
@@ -64,6 +64,7 @@ const ExerciseLibrary = () => {
         `)
         .order('name');
 
+      console.log('Loaded exercises:', exercisesData?.slice(0, 2)); // Debug: show first 2 exercises
       setExercises(exercisesData || []);
       setFilteredExercises(exercisesData || []);
     } catch (error) {
