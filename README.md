@@ -18,3 +18,4 @@
 - `VITE_SUPABASE_ANON_KEY` - Your Supabase anon key
 - `VITE_USDA_API_KEY` - Your USDA FoodData Central API key
 
+
