@@ -66,11 +66,11 @@ async function searchUSDA(query, limit) {
       },
       body: JSON.stringify({
         query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)'],
-        pageSize: limit,
+        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],
+        pageSize: limit * 2, // Get more results for better filtering
         pageNumber: 1,
-        sortBy: 'dataType.keyword',
-        sortOrder: 'asc'
+        sortBy: 'score',
+        sortOrder: 'desc'
       })
     })
 
@@ -89,7 +89,41 @@ async function searchUSDA(query, limit) {
       return []
     }
 
-    return data.foods.map(food => transformUSDAFood(food))
+    // Filter and rank results by relevance
+    const queryLower = query.toLowerCase()
+    const results = data.foods
+      .map(food => {
+        const nameLower = (food.description || '').toLowerCase()
+        const brandLower = (food.brandName || food.brandOwner || '').toLowerCase()
+        
+        // Calculate relevance score
+        let relevanceScore = 0
+        
+        // Exact match gets highest score
+        if (nameLower === queryLower) relevanceScore += 100
+        
+        // Starts with query gets high score
+        if (nameLower.startsWith(queryLower)) relevanceScore += 50
+        
+        // Contains all query words
+        const queryWords = queryLower.split(' ')
+        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
+        relevanceScore += (matchedWords / queryWords.length) * 30
+        
+        // Brand match bonus
+        if (brandLower.includes(queryLower)) relevanceScore += 10
+        
+        return {
+          food,
+          relevanceScore
+        }
+      })
+      .filter(item => item.relevanceScore > 10) // Filter out very low relevance
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, limit)
+      .map(item => transformUSDAFood(item.food))
+    
+    return results
   } catch (error) {
     console.error('Error searching USDA:', error)
     return []

@@ -204,7 +204,7 @@ export default function Dashboard({ user }) {
               </Button>
 
               <Button 
-                onClick={() => alert('Workout tracking coming in Phase 4!')}
+                onClick={() => navigate('/fitness')}
                 className="h-auto py-6 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
               >
                 <Dumbbell className="h-6 w-6" />
@@ -212,7 +212,7 @@ export default function Dashboard({ user }) {
               </Button>
 
               <Button 
-                onClick={() => alert('Medication tracking coming soon!')}
+                onClick={() => navigate('/medications')}
                 className="h-auto py-6 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
               >
                 <Pill className="h-6 w-6" />
