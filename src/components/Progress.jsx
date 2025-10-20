@@ -35,26 +35,21 @@ export default function Progress({ user: propUser }) {
       if (currentUser) {
         setUser(currentUser)
         
-        // Use demo data for now (tables may not exist yet)
-        setWeightData(generateDemoWeightData())
-        setBodyFatData(generateDemoBodyFatData())
-        setMeasurementsData(generateDemoMeasurementsData())
-        setHealthMetricsData(generateDemoHealthMetrics())
-        setNutritionComplianceData(generateDemoNutritionCompliance())
-        setFitnessData(generateDemoFitnessData())
-        setCurrentMetrics({
-          weight: 180,
-          bodyFat: 18,
-          bmi: 24.5
-        })
-        setGoalMetrics({
-          weight: 170,
-          bodyFat: 15,
-          bmi: 23
-        })
+        // Try to load real data, fall back to empty arrays
+        await Promise.all([
+          loadWeightProgress(currentUser.id),
+          loadBodyCompositionProgress(currentUser.id),
+          loadMeasurementsProgress(currentUser.id),
+          loadHealthMetrics(currentUser.id),
+          loadNutritionCompliance(currentUser.id),
+          loadFitnessProgress(currentUser.id),
+          loadGoals(currentUser.id)
+        ])
         
-        // Calculate predictions
-        calculatePredictions()
+        // Calculate predictions if we have data
+        if (weightData.length > 0) {
+          calculatePredictions()
+        }
       }
     } catch (error) {
       console.error('Error loading progress data:', error)
@@ -81,8 +76,8 @@ export default function Progress({ user: propUser }) {
         .order('logged_at', { ascending: true })
 
       if (error) {
-        console.log('Weight logs table not available, using demo data')
-        setWeightData(generateDemoWeightData())
+        console.log('Weight logs table not available')
+        setWeightData([])
         return
       }
 
@@ -93,11 +88,11 @@ export default function Progress({ user: propUser }) {
           timestamp: d.logged_at
         })))
       } else {
-        setWeightData(generateDemoWeightData())
+        setWeightData([])
       }
     } catch (error) {
-      console.log('Error loading weight data, using demo data')
-      setWeightData(generateDemoWeightData())
+      console.log('Error loading weight data')
+      setWeightData([])
     }
   }
 

@@ -4,7 +4,7 @@ import Auth from './components/Auth'
 import Dashboard from './components/Dashboard'
 import Goals from './components/Goals'
 import NutritionUnified from './components/NutritionUnified'
-import Progress from './components/Progress'
+import ProgressSimple from './components/ProgressSimple'
 import Fitness from './components/Fitness'
 import Medications from './components/Medications'
 import Navigation from './components/Navigation'
@@ -85,7 +85,7 @@ function App() {
             <Route path="/nutrition" element={<NutritionUnified user={user} />} />
             <Route path="/fitness" element={<Fitness user={user} />} />
               <Route path="/medications" element={<Medications user={user} />} />
-            <Route path="/progress" element={<Progress user={user} />} />
+            <Route path="/progress" element={<ProgressSimple user={user} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
