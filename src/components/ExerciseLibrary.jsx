@@ -279,8 +279,8 @@ const ExerciseLibrary = () => {
             >
               {/* Exercise Image Placeholder */}
               <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                {exercise.thumbnail_url ? (
-                  <img src={exercise.thumbnail_url} alt={exercise.name} className="w-full h-full object-cover" />
+                {exercise.image_url ? (
+                  <img src={exercise.image_url} alt={exercise.name} className="w-full h-full object-cover" />
                 ) : (
                   <Dumbbell className="w-16 h-16 text-white opacity-50" />
                 )}
