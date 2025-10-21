@@ -1,0 +1,14 @@
+{
+  "name": "yfit-exercise-importer",
+  "version": "1.0.0",
+  "description": "Import ExerciseDB exercises to Supabase",
+  "type": "module",
+  "scripts": {
+    "import": "node import-exercises.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "node-fetch": "^3.3.2"
+  }
+}
+

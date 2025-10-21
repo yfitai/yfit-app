@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { getExerciseById } from '../services/exerciseDBService';
+import { supabase } from '../config/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -25,7 +25,13 @@ export default function FormAnalysis() {
       }
 
       try {
-        const data = await getExerciseById(exerciseId);
+        const { data, error: fetchError } = await supabase
+          .from('exercises')
+          .select('*')
+          .eq('id', exerciseId)
+          .single();
+        
+        if (fetchError) throw fetchError;
         setExercise(data);
       } catch (err) {
         setError('Failed to load exercise details');
