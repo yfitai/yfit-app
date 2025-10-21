@@ -16,7 +16,6 @@ import {
 import { Activity, Target, TrendingUp, User } from 'lucide-react'
 import { calculateAllMetrics } from '../lib/calculations'
 import GoalsResults from './GoalsResults'
-import GoalsEnhancement from './GoalsEnhancement'
 import { getUserProfile } from '../lib/supabase'
 
 export default function Goals({ user: propUser }) {
@@ -38,21 +37,6 @@ export default function Goals({ user: propUser }) {
   const [activityLevel, setActivityLevel] = useState('moderate')
   const [goalType, setGoalType] = useState('lose_weight')
   const [weightChangeRate, setWeightChangeRate] = useState('1') // lbs per week
-  
-  // Goals Enhancement - Starting Point & Targets
-  const [enhancedGoals, setEnhancedGoals] = useState({
-    starting_weight_kg: null,
-    target_weight_kg: null,
-    starting_body_fat_percentage: null,
-    target_body_fat_percentage: null,
-    target_date: null,
-    weekly_goal_kg: 0.5,
-    fiber_goal_g: 25,
-    sugar_goal_g: 50,
-    sodium_goal_mg: 2300,
-    water_goal_ml: 2000,
-    steps_goal: 10000
-  })
   
   // Manual Override Options
   const [useManualBodyFat, setUseManualBodyFat] = useState(false)
@@ -129,21 +113,6 @@ export default function Goals({ user: propUser }) {
       setGender(goalsData.gender)
       setActivityLevel(goalsData.activity_level)
       setGoalType(goalsData.goal_type)
-      
-      // Load enhanced goals
-      setEnhancedGoals({
-        starting_weight_kg: goalsData.starting_weight_kg,
-        target_weight_kg: goalsData.target_weight_kg,
-        starting_body_fat_percentage: goalsData.starting_body_fat_percentage,
-        target_body_fat_percentage: goalsData.target_body_fat_percentage,
-        target_date: goalsData.target_date,
-        weekly_goal_kg: goalsData.weekly_goal_kg || 0.5,
-        fiber_goal_g: goalsData.fiber_goal_g || 25,
-        sugar_goal_g: goalsData.sugar_goal_g || 50,
-        sodium_goal_mg: goalsData.sodium_goal_mg || 2300,
-        water_goal_ml: goalsData.water_goal_ml || 2000,
-        steps_goal: goalsData.steps_goal || 10000
-      })
     }
 
     // Load existing measurements if any
@@ -220,10 +189,6 @@ export default function Goals({ user: propUser }) {
       ...prev,
       [field]: value
     }))
-  }
-
-  const handleGoalsChange = (goals) => {
-    setEnhancedGoals(goals)
   }
 
   const handleSave = async () => {
@@ -380,18 +345,6 @@ export default function Goals({ user: propUser }) {
             gender,
             activity_level: activityLevel,
             goal_type: goalType,
-            // Enhanced Goals fields
-            starting_weight_kg: enhancedGoals.starting_weight_kg,
-            target_weight_kg: enhancedGoals.target_weight_kg,
-            starting_body_fat_percentage: enhancedGoals.starting_body_fat_percentage,
-            target_body_fat_percentage: enhancedGoals.target_body_fat_percentage,
-            target_date: enhancedGoals.target_date,
-            weekly_goal_kg: enhancedGoals.weekly_goal_kg,
-            fiber_goal_g: enhancedGoals.fiber_goal_g,
-            sugar_goal_g: enhancedGoals.sugar_goal_g,
-            sodium_goal_mg: enhancedGoals.sodium_goal_mg,
-            water_goal_ml: enhancedGoals.water_goal_ml,
-            steps_goal: enhancedGoals.steps_goal,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'user_id'
@@ -1030,16 +983,6 @@ export default function Goals({ user: propUser }) {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Goals Enhancement - Starting Point & Targets */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <GoalsEnhancement
-            currentWeight={weight}
-            currentBodyFat={calculatedMetrics?.bodyFatPercentage}
-            goalType={goalType}
-            onGoalsChange={handleGoalsChange}
-          />
         </div>
 
         {/* Save Button */}
