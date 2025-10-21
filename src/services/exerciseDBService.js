@@ -4,7 +4,7 @@
  * API Documentation: https://www.exercisedb.dev/docs
  */
 
-const EXERCISEDB_BASE_URL = 'https://www.exercisedb.dev/api/v1';
+const EXERCISEDB_BASE_URL = 'https://exercisedb.dev/api/v1';
 
 /**
  * Fetch all exercises from ExerciseDB
