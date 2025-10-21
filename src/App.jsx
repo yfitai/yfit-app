@@ -7,6 +7,7 @@ import NutritionUnified from './components/NutritionUnified'
 import ProgressSimple from './components/ProgressSimple'
 import Fitness from './components/Fitness'
 import Medications from './components/Medications'
+import FormAnalysis from './pages/FormAnalysis'
 import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
@@ -84,7 +85,8 @@ function App() {
             <Route path="/goals" element={<Goals user={user} />} />
             <Route path="/nutrition" element={<NutritionUnified user={user} />} />
             <Route path="/fitness" element={<Fitness user={user} />} />
-              <Route path="/medications" element={<Medications user={user} />} />
+            <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
+            <Route path="/medications" element={<Medications user={user} />} />
             <Route path="/progress" element={<ProgressSimple user={user} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

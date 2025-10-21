@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Search, Filter, X, ChevronRight, Dumbbell, Target, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { getAllExercises, transformExerciseToYFITFormat, cacheExercises, getCachedExercises } from '../services/exerciseDBService';
+import { Search, Filter, X, ChevronRight, Dumbbell, Target, Zap, ExternalLink } from 'lucide-react';
 
 const ExerciseLibrary = () => {
+  const navigate = useNavigate();
   const [exercises, setExercises] = useState([]);
   const [filteredExercises, setFilteredExercises] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [muscleGroups, setMuscleGroups] = useState([]);
-  const [equipmentTypes, setEquipmentTypes] = useState([]);
   
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedMuscle, setSelectedMuscle] = useState('all');
+  const [selectedBodyPart, setSelectedBodyPart] = useState('all');
   const [selectedEquipment, setSelectedEquipment] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,57 +17,111 @@ const ExerciseLibrary = () => {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all data on component mount
+  // Categories based on YFIT structure
+  const categories = [
+    { name: 'All Categories', value: 'all' },
+    { name: 'Push', value: 'Push' },
+    { name: 'Pull', value: 'Pull' },
+    { name: 'Legs', value: 'Legs' },
+    { name: 'Core', value: 'Core' },
+    { name: 'Cardio', value: 'Cardio' },
+    { name: 'Full Body', value: 'Full Body' }
+  ];
+
+  // Body parts from ExerciseDB
+  const bodyParts = [
+    { name: 'All Body Parts', value: 'all' },
+    { name: 'Back', value: 'back' },
+    { name: 'Cardio', value: 'cardio' },
+    { name: 'Chest', value: 'chest' },
+    { name: 'Lower Arms', value: 'lower arms' },
+    { name: 'Lower Legs', value: 'lower legs' },
+    { name: 'Neck', value: 'neck' },
+    { name: 'Shoulders', value: 'shoulders' },
+    { name: 'Upper Arms', value: 'upper arms' },
+    { name: 'Upper Legs', value: 'upper legs' },
+    { name: 'Waist', value: 'waist' }
+  ];
+
+  // Equipment types from ExerciseDB
+  const equipmentOptions = [
+    { name: 'All Equipment', value: 'all' },
+    { name: 'Assisted', value: 'assisted' },
+    { name: 'Band', value: 'band' },
+    { name: 'Barbell', value: 'barbell' },
+    { name: 'Body Weight', value: 'body weight' },
+    { name: 'Bosu Ball', value: 'bosu ball' },
+    { name: 'Cable', value: 'cable' },
+    { name: 'Dumbbell', value: 'dumbbell' },
+    { name: 'Elliptical Machine', value: 'elliptical machine' },
+    { name: 'EZ Barbell', value: 'ez barbell' },
+    { name: 'Hammer', value: 'hammer' },
+    { name: 'Kettlebell', value: 'kettlebell' },
+    { name: 'Leverage Machine', value: 'leverage machine' },
+    { name: 'Medicine Ball', value: 'medicine ball' },
+    { name: 'Olympic Barbell', value: 'olympic barbell' },
+    { name: 'Resistance Band', value: 'resistance band' },
+    { name: 'Roller', value: 'roller' },
+    { name: 'Rope', value: 'rope' },
+    { name: 'Skierg Machine', value: 'skierg machine' },
+    { name: 'Sled Machine', value: 'sled machine' },
+    { name: 'Smith Machine', value: 'smith machine' },
+    { name: 'Stability Ball', value: 'stability ball' },
+    { name: 'Stationary Bike', value: 'stationary bike' },
+    { name: 'Stepmill Machine', value: 'stepmill machine' },
+    { name: 'Tire', value: 'tire' },
+    { name: 'Trap Bar', value: 'trap bar' },
+    { name: 'Upper Body Ergometer', value: 'upper body ergometer' },
+    { name: 'Weighted', value: 'weighted' },
+    { name: 'Wheel Roller', value: 'wheel roller' }
+  ];
+
+  const difficultyLevels = [
+    { name: 'All Levels', value: 'all' },
+    { name: 'Beginner', value: 'beginner' },
+    { name: 'Intermediate', value: 'intermediate' },
+    { name: 'Advanced', value: 'advanced' }
+  ];
+
+  // Fetch exercises on component mount
   useEffect(() => {
-    fetchAllData();
+    fetchExercises();
   }, []);
 
   // Apply filters whenever they change
   useEffect(() => {
     applyFilters();
-  }, [exercises, selectedCategory, selectedMuscle, selectedEquipment, selectedDifficulty, searchQuery]);
+  }, [exercises, selectedCategory, selectedBodyPart, selectedEquipment, selectedDifficulty, searchQuery]);
 
-  const fetchAllData = async () => {
+  const fetchExercises = async () => {
     try {
       setLoading(true);
 
-      // Fetch categories
-      const { data: categoriesData } = await supabase
-        .from('exercise_categories')
-        .select('*')
-        .order('display_order');
-      setCategories(categoriesData || []);
+      // Try to get cached exercises first
+      const cached = getCachedExercises();
+      if (cached && cached.length > 0) {
+        console.log('Using cached exercises:', cached.length);
+        setExercises(cached);
+        setFilteredExercises(cached);
+        setLoading(false);
+        return;
+      }
 
-      // Fetch muscle groups
-      const { data: musclesData } = await supabase
-        .from('muscle_groups')
-        .select('*')
-        .order('name');
-      setMuscleGroups(musclesData || []);
-
-      // Fetch equipment types
-      const { data: equipmentData } = await supabase
-        .from('equipment_types')
-        .select('*')
-        .order('name');
-      setEquipmentTypes(equipmentData || []);
-
-      // Fetch exercises with related data
-      const { data: exercisesData } = await supabase
-        .from('exercises')
-        .select(`
-          *,
-          category:exercise_categories(name),
-          primary_muscle:muscle_groups!exercises_primary_muscle_group_id_fkey(name),
-          primary_equipment:equipment_types!exercises_primary_equipment_id_fkey(name)
-        `)
-        .order('name');
-
-      console.log('Loaded exercises:', exercisesData?.slice(0, 2)); // Debug: show first 2 exercises
-      setExercises(exercisesData || []);
-      setFilteredExercises(exercisesData || []);
+      // Fetch from ExerciseDB API
+      console.log('Fetching exercises from ExerciseDB API...');
+      const data = await getAllExercises(1500); // Get up to 1500 exercises
+      
+      // Transform to YFIT format
+      const transformedExercises = data.map(transformExerciseToYFITFormat);
+      
+      console.log('Loaded exercises from API:', transformedExercises.length);
+      setExercises(transformedExercises);
+      setFilteredExercises(transformedExercises);
+      
+      // Cache for future use
+      cacheExercises(transformedExercises);
     } catch (error) {
-      console.error('Error fetching exercise data:', error);
+      console.error('Error fetching exercises:', error);
     } finally {
       setLoading(false);
     }
@@ -79,30 +132,35 @@ const ExerciseLibrary = () => {
 
     // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(ex => ex.category?.name === selectedCategory);
+      filtered = filtered.filter(ex => ex.category === selectedCategory);
     }
 
-    // Muscle group filter
-    if (selectedMuscle !== 'all') {
-      filtered = filtered.filter(ex => ex.primary_muscle?.name === selectedMuscle);
+    // Body part filter
+    if (selectedBodyPart !== 'all') {
+      filtered = filtered.filter(ex => 
+        ex.bodyParts?.some(bp => bp.toLowerCase() === selectedBodyPart.toLowerCase())
+      );
     }
 
     // Equipment filter
     if (selectedEquipment !== 'all') {
-      filtered = filtered.filter(ex => ex.primary_equipment?.name === selectedEquipment);
+      filtered = filtered.filter(ex => 
+        ex.equipment?.toLowerCase() === selectedEquipment.toLowerCase()
+      );
     }
 
     // Difficulty filter
     if (selectedDifficulty !== 'all') {
-      filtered = filtered.filter(ex => ex.difficulty_level === selectedDifficulty);
+      filtered = filtered.filter(ex => ex.difficulty === selectedDifficulty);
     }
 
     // Search filter
-    if (searchQuery) {
+    if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(ex =>
         ex.name.toLowerCase().includes(query) ||
-        ex.description?.toLowerCase().includes(query)
+        ex.description?.toLowerCase().includes(query) ||
+        ex.targetMuscles?.some(m => m.toLowerCase().includes(query))
       );
     }
 
@@ -111,388 +169,337 @@ const ExerciseLibrary = () => {
 
   const clearFilters = () => {
     setSelectedCategory('all');
-    setSelectedMuscle('all');
+    setSelectedBodyPart('all');
     setSelectedEquipment('all');
     setSelectedDifficulty('all');
     setSearchQuery('');
   };
 
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'beginner': return 'bg-green-100 text-green-800';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const activeFiltersCount = () => {
+    let count = 0;
+    if (selectedCategory !== 'all') count++;
+    if (selectedBodyPart !== 'all') count++;
+    if (selectedEquipment !== 'all') count++;
+    if (selectedDifficulty !== 'all') count++;
+    return count;
   };
 
-  const getExerciseTypeIcon = (type) => {
-    switch (type) {
-      case 'strength': return <Dumbbell className="w-4 h-4" />;
-      case 'cardio': return <Zap className="w-4 h-4" />;
-      default: return <Target className="w-4 h-4" />;
-    }
+  const handleExerciseClick = (exercise) => {
+    setSelectedExercise(exercise);
+  };
+
+  const handleViewFormAnalysis = (exercise) => {
+    navigate(exercise.formAnalysisUrl);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Exercise Library...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading exercises from ExerciseDB...</p>
+          <p className="text-sm text-muted-foreground mt-2">This may take a moment on first load</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Exercise Library</h1>
-          <p className="text-gray-600">
-            Browse {exercises.length} exercises to build your perfect workout
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Exercise Library</h2>
+          <p className="text-muted-foreground mt-1">
+            {filteredExercises.length} exercises available
           </p>
         </div>
+      </div>
 
-        {/* Search and Filter Bar */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search exercises..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Filter Toggle */}
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Search */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <input
+            type="text"
+            placeholder="Search exercises..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          {searchQuery && (
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
-              <Filter className="w-5 h-5" />
-              Filters
-              {(selectedCategory !== 'all' || selectedMuscle !== 'all' || selectedEquipment !== 'all' || selectedDifficulty !== 'all') && (
-                <span className="bg-white text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                  {[selectedCategory, selectedMuscle, selectedEquipment, selectedDifficulty].filter(f => f !== 'all').length}
-                </span>
-              )}
+              <X className="h-4 w-4" />
             </button>
+          )}
+        </div>
 
-            {/* Clear Filters */}
-            {(selectedCategory !== 'all' || selectedMuscle !== 'all' || selectedEquipment !== 'all' || selectedDifficulty !== 'all' || searchQuery) && (
+        {/* Filter Toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2 px-4 py-2 border border-input rounded-md hover:bg-accent transition-colors"
+        >
+          <Filter className="h-4 w-4" />
+          <span>Filters</span>
+          {activeFiltersCount() > 0 && (
+            <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+              {activeFiltersCount()}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="bg-muted/50 border border-border rounded-lg p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Filter Exercises</h3>
+            {activeFiltersCount() > 0 && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="text-sm text-primary hover:underline"
               >
-                <X className="w-5 h-5" />
-                Clear
+                Clear all filters
               </button>
             )}
           </div>
 
-          {/* Filter Options */}
-          {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Muscle Group Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Muscle Group</label>
-                <select
-                  value={selectedMuscle}
-                  onChange={(e) => setSelectedMuscle(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Muscles</option>
-                  {muscleGroups.map(muscle => (
-                    <option key={muscle.id} value={muscle.name}>{muscle.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Equipment Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Equipment</label>
-                <select
-                  value={selectedEquipment}
-                  onChange={(e) => setSelectedEquipment(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Equipment</option>
-                  {equipmentTypes.map(eq => (
-                    <option key={eq.id} value={eq.name}>{eq.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Difficulty Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Levels</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Category Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Category</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.name}</option>
+                ))}
+              </select>
             </div>
-          )}
-        </div>
 
-        {/* Results Count */}
-        <div className="mb-4">
-          <p className="text-gray-600">
-            Showing <span className="font-semibold text-gray-900">{filteredExercises.length}</span> exercise{filteredExercises.length !== 1 ? 's' : ''}
+            {/* Body Part Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Body Part</label>
+              <select
+                value={selectedBodyPart}
+                onChange={(e) => setSelectedBodyPart(e.target.value)}
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {bodyParts.map(bp => (
+                  <option key={bp.value} value={bp.value}>{bp.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Equipment Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Equipment</label>
+              <select
+                value={selectedEquipment}
+                onChange={(e) => setSelectedEquipment(e.target.value)}
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {equipmentOptions.map(eq => (
+                  <option key={eq.value} value={eq.value}>{eq.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Difficulty Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Difficulty</label>
+              <select
+                value={selectedDifficulty}
+                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {difficultyLevels.map(diff => (
+                  <option key={diff.value} value={diff.value}>{diff.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Exercise Grid */}
+      {filteredExercises.length === 0 ? (
+        <div className="text-center py-12">
+          <Dumbbell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No exercises found</h3>
+          <p className="text-muted-foreground mb-4">
+            Try adjusting your filters or search query
           </p>
+          <button
+            onClick={clearFilters}
+            className="text-primary hover:underline"
+          >
+            Clear all filters
+          </button>
         </div>
-
-        {/* Exercise Grid */}
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredExercises.map(exercise => (
+          {filteredExercises.map((exercise) => (
             <div
               key={exercise.id}
-              onClick={() => setSelectedExercise(exercise)}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+              className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => handleExerciseClick(exercise)}
             >
-              {/* Exercise Image Placeholder */}
-              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                {exercise.image_url ? (
-                  <img src={exercise.image_url} alt={exercise.name} className="w-full h-full object-cover" />
+              {/* Exercise GIF */}
+              <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
+                {exercise.gifUrl ? (
+                  <img
+                    src={exercise.gifUrl}
+                    alt={exercise.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 ) : (
-                  <Dumbbell className="w-16 h-16 text-white opacity-50" />
+                  <Dumbbell className="h-12 w-12 text-muted-foreground" />
                 )}
               </div>
 
               {/* Exercise Info */}
               <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 flex-1">{exercise.name}</h3>
-                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" />
-                </div>
-
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                  {exercise.description}
-                </p>
-
-                {/* Tags */}
+                <h3 className="font-semibold text-lg mb-2 capitalize line-clamp-2">
+                  {exercise.name}
+                </h3>
+                
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(exercise.difficulty_level)}`}>
-                    {exercise.difficulty_level}
-                  </span>
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex items-center gap-1">
-                    {getExerciseTypeIcon(exercise.exercise_type)}
-                    {exercise.exercise_type}
-                  </span>
+                  {exercise.category && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {exercise.category}
+                    </span>
+                  )}
+                  {exercise.equipment && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground capitalize">
+                      {exercise.equipment}
+                    </span>
+                  )}
                 </div>
 
-                {/* Details */}
-                <div className="space-y-1 text-sm">
-                  {exercise.primary_muscle && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Target className="w-4 h-4" />
-                      <span>{exercise.primary_muscle.name}</span>
-                    </div>
-                  )}
-                  {exercise.primary_equipment && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Dumbbell className="w-4 h-4" />
-                      <span>{exercise.primary_equipment.name}</span>
-                    </div>
-                  )}
-                </div>
+                {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground mb-3">
+                    <Target className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span className="capitalize">
+                      {exercise.targetMuscles.join(', ')}
+                    </span>
+                  </div>
+                )}
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewFormAnalysis(exercise);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Form Analysis
+                </button>
               </div>
             </div>
           ))}
         </div>
-
-        {/* No Results */}
-        {filteredExercises.length === 0 && (
-          <div className="text-center py-12">
-            <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No exercises found</h3>
-            <p className="text-gray-600 mb-4">Try adjusting your filters or search query</p>
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Exercise Detail Modal */}
       {selectedExercise && (
-        <ExerciseDetailModal
-          exercise={selectedExercise}
-          onClose={() => setSelectedExercise(null)}
-        />
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedExercise(null)}
+        >
+          <div
+            className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <h2 className="text-2xl font-bold capitalize">{selectedExercise.name}</h2>
+                <button
+                  onClick={() => setSelectedExercise(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Exercise GIF */}
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-4">
+                {selectedExercise.gifUrl ? (
+                  <img
+                    src={selectedExercise.gifUrl}
+                    alt={selectedExercise.name}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Dumbbell className="h-16 w-16 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+
+              {/* Exercise Details */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Target Muscles</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedExercise.targetMuscles?.map((muscle, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm capitalize"
+                      >
+                        {muscle}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedExercise.secondaryMuscles && selectedExercise.secondaryMuscles.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Secondary Muscles</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedExercise.secondaryMuscles.map((muscle, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm capitalize"
+                        >
+                          {muscle}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => handleViewFormAnalysis(selectedExercise)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View Form Analysis
+                  </button>
+                  <button
+                    onClick={() => setSelectedExercise(null)}
+                    className="px-4 py-2 border border-input rounded-md hover:bg-accent transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
-// Exercise Detail Modal Component
-const ExerciseDetailModal = ({ exercise, onClose }) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{exercise.name}</h2>
-            <div className="flex gap-2 mt-2">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                exercise.difficulty_level === 'beginner' ? 'bg-green-100 text-green-800' :
-                exercise.difficulty_level === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {exercise.difficulty_level}
-              </span>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {exercise.exercise_type}
-              </span>
-              {exercise.is_compound && (
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                  Compound
-                </span>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Video/Image */}
-          {exercise.video_url || exercise.image_url ? (
-            <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-              {exercise.video_url ? (
-                <video src={exercise.video_url} controls className="w-full h-full" />
-              ) : (
-                <img src={exercise.image_url} alt={exercise.name} className="w-full h-full object-cover" />
-              )}
-            </div>
-          ) : (
-            <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Dumbbell className="w-24 h-24 text-white opacity-50" />
-            </div>
-          )}
-
-          {/* Description */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-            <p className="text-gray-700">{exercise.description}</p>
-          </div>
-
-          {/* Target Muscles & Equipment */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-600" />
-                Target Muscles
-              </h4>
-              <p className="text-gray-700">{exercise.primary_muscle?.name || 'Not specified'}</p>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-purple-600" />
-                Equipment Needed
-              </h4>
-              <p className="text-gray-700">{exercise.primary_equipment?.name || 'Not specified'}</p>
-            </div>
-          </div>
-
-          {/* Instructions */}
-          {exercise.instructions && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Instructions</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700 whitespace-pre-line">{exercise.instructions}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Form Cues */}
-          {exercise.form_cues && exercise.form_cues.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Form Cues</h3>
-              <ul className="space-y-2">
-                {exercise.form_cues.map((cue, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-green-600 mt-1">✓</span>
-                    <span className="text-gray-700">{cue}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Common Mistakes */}
-          {exercise.common_mistakes && exercise.common_mistakes.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Common Mistakes</h3>
-              <ul className="space-y-2">
-                {exercise.common_mistakes.map((mistake, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-red-600 mt-1">✗</span>
-                    <span className="text-gray-700">{mistake}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Safety Tips */}
-          {exercise.safety_tips && (
-            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Safety Tips</h3>
-              <p className="text-gray-700">{exercise.safety_tips}</p>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-              Add to Workout
-            </button>
-            <button className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
-              Start Form Analysis
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default ExerciseLibrary;
+
