@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Target, Activity, Heart, Droplet, Moon, Apple
 import { supabase, getCurrentUser } from '../lib/supabase'
 import ProgressPhotos from './Progress/ProgressPhotos'
 import WorkoutAnalyticsDashboard from './WorkoutAnalyticsDashboard'
+import FormAnalysisHistory from './FormAnalysisHistory'
 
 export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -593,6 +594,11 @@ export default function Progress({ user: propUser }) {
 
       {/* Workout Analytics Dashboard */}
       {user && <WorkoutAnalyticsDashboard userId={user.id} />}
+
+      {/* Form Analysis History */}
+      <div className="mt-8">
+        {user && <FormAnalysisHistory />}
+      </div>
       
       {/* Progress Photos */}
       {user && <ProgressPhotos userId={user.id} />}
