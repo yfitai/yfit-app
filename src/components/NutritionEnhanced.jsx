@@ -9,6 +9,7 @@ import WaterTracker from './WaterTracker'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
 import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus } from 'lucide-react'
+import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -31,6 +32,11 @@ export default function NutritionEnhanced({ user: propUser }) {
   const [proteinTarget, setProteinTarget] = useState(null)
   const [carbsTarget, setCarbsTarget] = useState(null)
   const [fatTarget, setFatTarget] = useState(null)
+  
+  // Nutrition goals from user_goals
+  const [fiberGoal, setFiberGoal] = useState(25) // default 25g
+  const [sugarGoal, setSugarGoal] = useState(50) // default 50g
+  const [sodiumGoal, setSodiumGoal] = useState(2300) // default 2300mg
   
   // UI state
   const [showFoodSearch, setShowFoodSearch] = useState(false)
@@ -105,10 +111,10 @@ export default function NutritionEnhanced({ user: propUser }) {
           console.log('No metrics data found - user needs to complete Goals page')
         }
 
-        // Load goal type from user_goals
+        // Load goal type and nutrition goals from user_goals
         const { data: goalsData } = await supabase
           .from('user_goals')
-          .select('goal_type')
+          .select('goal_type, fiber_goal_g, sugar_goal_g, sodium_goal_mg')
           .eq('user_id', currentUser.id)
           .order('created_at', { ascending: false })
           .limit(1)
@@ -116,6 +122,9 @@ export default function NutritionEnhanced({ user: propUser }) {
 
         if (goalsData) {
           setGoalType(goalsData.goal_type)
+          setFiberGoal(goalsData.fiber_goal_g || 25)
+          setSugarGoal(goalsData.sugar_goal_g || 50)
+          setSodiumGoal(goalsData.sodium_goal_mg || 2300)
         }
 
         // Load today's meals
@@ -529,33 +538,39 @@ export default function NutritionEnhanced({ user: propUser }) {
             </div>
           </div>
 
-          {/* Micronutrients */}
+          {/* Micronutrients with Progress Tracking */}
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Micronutrients</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Daily Nutrition Goals</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Fiber */}
-              <div className="text-center p-3 bg-green-50 rounded-lg">
-                <p className="text-lg font-bold text-green-600">{Math.round(totalFiber)}g</p>
-                <p className="text-xs text-gray-600">Fiber</p>
-                <p className="text-xs text-gray-500">Goal: 25-30g</p>
-                {totalFiber < 25 && <p className="text-xs text-orange-600 mt-1">⚠️ Low</p>}
-              </div>
+              <NutrientProgressCard
+                name="Fiber"
+                current={totalFiber}
+                goal={fiberGoal}
+                unit="g"
+                type="target"
+                color="green"
+              />
 
               {/* Sugar */}
-              <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                <p className="text-lg font-bold text-yellow-600">{Math.round(totalSugar)}g</p>
-                <p className="text-xs text-gray-600">Sugar</p>
-                <p className="text-xs text-gray-500">Limit: 50g</p>
-                {totalSugar > 50 && <p className="text-xs text-red-600 mt-1">⚠️ High</p>}
-              </div>
+              <NutrientProgressCard
+                name="Sugar"
+                current={totalSugar}
+                goal={sugarGoal}
+                unit="g"
+                type="limit"
+                color="yellow"
+              />
 
               {/* Sodium */}
-              <div className="text-center p-3 bg-red-50 rounded-lg">
-                <p className="text-lg font-bold text-red-600">{Math.round(totalSodium)}mg</p>
-                <p className="text-xs text-gray-600">Sodium</p>
-                <p className="text-xs text-gray-500">Limit: 2300mg</p>
-                {totalSodium > 2300 && <p className="text-xs text-red-600 mt-1">⚠️ High</p>}
-              </div>
+              <NutrientProgressCard
+                name="Sodium"
+                current={totalSodium}
+                goal={sodiumGoal}
+                unit="mg"
+                type="limit"
+                color="red"
+              />
             </div>
           </div>
         </div>
