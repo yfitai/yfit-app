@@ -29,6 +29,7 @@ const FormAnalysisHistory = () => {
   };
 
   const loadFormAnalysisHistory = async () => {
+    console.log('📊 Loading Form Analysis History for user:', user?.id);
     setLoading(true);
     try {
       let query = supabase
@@ -45,13 +46,15 @@ const FormAnalysisHistory = () => {
 
       if (error) throw error;
       
+      console.log('✅ Form Analysis History loaded:', data?.length || 0, 'videos');
       setVideos(data || []);
 
       // Get unique exercises for filter
       const uniqueExercises = [...new Set(data.map(v => ({ id: v.exercise_id, name: v.exercise_name })))];
       setExercises(uniqueExercises);
     } catch (error) {
-      console.error('Error loading form analysis history:', error);
+      console.error('❌ Error loading form analysis history:', error);
+      setVideos([]);
     } finally {
       setLoading(false);
     }

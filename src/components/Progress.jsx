@@ -596,7 +596,7 @@ export default function Progress({ user: propUser }) {
       {user && <WorkoutAnalyticsDashboard userId={user.id} />}
 
       {/* Form Analysis History */}
-      <div className="mt-8">
+      <div className="mt-8 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         {user && <FormAnalysisHistory />}
       </div>
       
