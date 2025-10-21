@@ -53,8 +53,8 @@ const VideoFormAnalysis = ({ exerciseId, exerciseName, onAnalysisComplete }) => 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
-      if (file.size > 100 * 1024 * 1024) { // 100MB limit
-        alert('File size must be less than 100MB');
+      if (file.size > 50 * 1024 * 1024) { // 50MB limit
+        alert('File size must be less than 50MB');
         return;
       }
       
@@ -390,7 +390,7 @@ const VideoFormAnalysis = ({ exerciseId, exerciseName, onAnalysisComplete }) => 
                     <li>Record from the front for bench press, overhead press</li>
                     <li>Ensure good lighting and full body is visible</li>
                     <li>Perform 3-8 reps for accurate analysis</li>
-                    <li>Maximum file size: 100MB</li>
+                    <li>Maximum file size: 50MB</li>
                   </ul>
                 </div>
               </div>
