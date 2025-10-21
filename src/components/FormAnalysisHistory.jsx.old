@@ -3,56 +3,6 @@ import { Video, TrendingUp, Award, Calendar, Eye, Filter } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import FormAnalysisResults from './FormAnalysisResults';
 
-// Demo data for demo mode
-const DEMO_VIDEOS = [
-  {
-    id: 'demo-video-1',
-    user_id: 'demo-user-id',
-    exercise_id: '0001',
-    exercise_name: 'Barbell Squat',
-    exercise_gif: 'https://static.exercisedb.dev/media/7aoIH9D.gif',
-    overall_score: 85,
-    form_grade: 'Good',
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  },
-  {
-    id: 'demo-video-2',
-    user_id: 'demo-user-id',
-    exercise_id: '0002',
-    exercise_name: 'Bench Press',
-    exercise_gif: 'https://static.exercisedb.dev/media/1aL2Qbz.gif',
-    overall_score: 92,
-    form_grade: 'Excellent',
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  },
-  {
-    id: 'demo-video-3',
-    user_id: 'demo-user-id',
-    exercise_id: '0003',
-    exercise_name: 'Deadlift',
-    exercise_gif: 'https://static.exercisedb.dev/media/2VoqHJv.gif',
-    overall_score: 78,
-    form_grade: 'Fair',
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  }
-];
-
-const DEMO_STATS = {
-  totalVideos: 3,
-  avgScore: '85.0',
-  recentAvg: '85.0',
-  improvement: '+2.5',
-  gradeCounts: {
-    'Excellent': 1,
-    'Good': 1,
-    'Fair': 1,
-    'Needs Improvement': 0
-  }
-};
-
 const FormAnalysisHistory = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +11,6 @@ const FormAnalysisHistory = () => {
   const [filterExercise, setFilterExercise] = useState('all');
   const [exercises, setExercises] = useState([]);
   const [stats, setStats] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     initializeUser();
@@ -69,19 +18,8 @@ const FormAnalysisHistory = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.id === 'demo-user-id') {
-        // Demo mode - use sample data
-        console.log('📊 Demo Mode: Loading sample form analysis data');
-        setIsDemoMode(true);
-        setVideos(DEMO_VIDEOS);
-        setStats(DEMO_STATS);
-        setExercises(DEMO_VIDEOS.map(v => ({ id: v.exercise_id, name: v.exercise_name })));
-        setLoading(false);
-      } else {
-        // Real user - load from database
-        loadFormAnalysisHistory();
-        loadStats();
-      }
+      loadFormAnalysisHistory();
+      loadStats();
     }
   }, [user, filterExercise]);
 
@@ -205,9 +143,7 @@ const FormAnalysisHistory = () => {
             <Video className="text-purple-600" size={28} />
             Form Analysis History
           </h2>
-          <p className="text-gray-600 mt-1">
-            {isDemoMode ? 'Sample form analysis data (Demo Mode)' : 'Track your form improvement over time'}
-          </p>
+          <p className="text-gray-600 mt-1">Track your form improvement over time</p>
         </div>
       </div>
 
@@ -308,10 +244,8 @@ const FormAnalysisHistory = () => {
           {videos.map((video) => (
             <div
               key={video.id}
-              onClick={() => !isDemoMode && setSelectedVideo(video)}
-              className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${
-                !isDemoMode ? 'hover:border-blue-300 hover:shadow-md transition-all cursor-pointer' : ''
-              }`}
+              onClick={() => setSelectedVideo(video)}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
             >
               {/* Video Thumbnail */}
               <div className="aspect-video bg-gray-100 relative">
@@ -337,7 +271,7 @@ const FormAnalysisHistory = () => {
                 {video.overall_score && (
                   <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 shadow-lg">
                     <span className="text-lg font-bold text-gray-900">
-                      {video.overall_score.toFixed ? video.overall_score.toFixed(0) : video.overall_score}
+                      {video.overall_score.toFixed(0)}
                     </span>
                   </div>
                 )}
@@ -365,18 +299,49 @@ const FormAnalysisHistory = () => {
                   </div>
                 )}
 
-                {/* Date */}
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar size={16} />
-                  {new Date(video.created_at).toLocaleDateString()}
-                </div>
-
-                {/* Demo Mode Notice */}
-                {isDemoMode && (
-                  <div className="mt-3 text-xs text-gray-500 italic">
-                    Sample data - Sign in to upload your own videos
+                {/* Metrics */}
+                {video.reps_detected && (
+                  <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                    <div className="bg-gray-50 rounded px-2 py-1">
+                      <span className="text-gray-600">Reps:</span>
+                      <span className="font-semibold text-gray-900 ml-1">{video.reps_detected}</span>
+                    </div>
+                    {video.depth_score && (
+                      <div className="bg-gray-50 rounded px-2 py-1">
+                        <span className="text-gray-600">Depth:</span>
+                        <span className="font-semibold text-gray-900 ml-1">{video.depth_score.toFixed(0)}</span>
+                      </div>
+                    )}
                   </div>
                 )}
+
+                {/* Feedback Count */}
+                {(video.error_count > 0 || video.warning_count > 0) && (
+                  <div className="flex items-center gap-3 text-sm mb-3">
+                    {video.error_count > 0 && (
+                      <span className="text-red-600">
+                        {video.error_count} error{video.error_count !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {video.warning_count > 0 && (
+                      <span className="text-yellow-600">
+                        {video.warning_count} warning{video.warning_count !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Date */}
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Calendar size={14} />
+                    <span>{new Date(video.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                    <Eye size={14} />
+                    View
+                  </button>
+                </div>
               </div>
             </div>
           ))}
