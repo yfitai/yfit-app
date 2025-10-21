@@ -597,7 +597,7 @@ export default function Progress({ user: propUser }) {
 
       {/* Form Analysis History */}
       <div className="mt-8 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        {user && <FormAnalysisHistory />}
+        {user && <FormAnalysisHistory user={user} />}
       </div>
       
       {/* Progress Photos */}

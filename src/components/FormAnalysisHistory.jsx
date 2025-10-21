@@ -53,8 +53,8 @@ const DEMO_STATS = {
   }
 };
 
-const FormAnalysisHistory = () => {
-  const [user, setUser] = useState(null);
+const FormAnalysisHistory = ({ user: propUser }) => {
+  const [user, setUser] = useState(propUser || null);
   const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -64,8 +64,12 @@ const FormAnalysisHistory = () => {
   const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
-    initializeUser();
-  }, []);
+    if (propUser) {
+      setUser(propUser);
+    } else {
+      initializeUser();
+    }
+  }, [propUser]);
 
   useEffect(() => {
     if (user) {
