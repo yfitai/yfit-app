@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts'
 import { TrendingUp, TrendingDown, Target, Activity, Heart, Droplet, Moon, Apple, Dumbbell, Calendar, Award, Zap } from 'lucide-react'
 import { supabase, getCurrentUser } from '../lib/supabase'
-//import ProgressPhotos from './Progress/ProgressPhotos'
+import ProgressPhotos from './Progress/ProgressPhotos'
+import WorkoutAnalyticsDashboard from './WorkoutAnalyticsDashboard'
 
 export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -590,8 +591,11 @@ export default function Progress({ user: propUser }) {
         </ChartCard>
       )}
 
-      {/* Progress Photos - Coming Soon */}
-      {/* <ProgressPhotos userId={user?.id || 'demo-user-id'} /> */}
+      {/* Workout Analytics Dashboard */}
+      {user && <WorkoutAnalyticsDashboard userId={user.id} />}
+      
+      {/* Progress Photos */}
+      {user && <ProgressPhotos userId={user.id} />}
     </div>
   )
 }
