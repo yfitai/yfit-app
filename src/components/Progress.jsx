@@ -5,6 +5,7 @@ import { supabase, getCurrentUser } from '../lib/supabase'
 import ProgressPhotos from './Progress/ProgressPhotos'
 import WorkoutAnalyticsDashboard from './WorkoutAnalyticsDashboard'
 import FormAnalysisHistory from './FormAnalysisHistory'
+import NutritionProgressCharts from './NutritionProgressCharts'
 
 export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -598,6 +599,11 @@ export default function Progress({ user: propUser }) {
       {/* Form Analysis History */}
       <div className="mt-8 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         {user && <FormAnalysisHistory user={user} />}
+      </div>
+      
+      {/* Nutrition Progress Charts */}
+      <div className="mt-8">
+        {user && <NutritionProgressCharts user={user} />}
       </div>
       
       {/* Progress Photos */}
