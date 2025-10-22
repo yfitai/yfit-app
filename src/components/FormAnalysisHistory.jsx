@@ -151,8 +151,8 @@ const FormAnalysisHistory = ({ user: propUser }) => {
 
         setStats({
           totalVideos: data.length,
-          avgScore: avgScore.toFixed(1),
-          recentAvg: recentAvg.toFixed(1),
+          avgScore: avgScore.toFixed(0),
+          recentAvg: recentAvg.toFixed(0),
           improvement: improvement.toFixed(1),
           gradeCounts
         });
