@@ -5,7 +5,7 @@ import { Apple, Candy, Droplet } from 'lucide-react'
 
 /**
  * NutritionProgressCharts Component
- * Displays historical charts for Fiber, Sugar, and Sodium intake
+ * Displays a COMBINED chart for Fiber, Sugar, and Sodium intake (like Protein/Carbs/Fat)
  */
 export default function NutritionProgressCharts({ user }) {
   const [nutritionData, setNutritionData] = useState([])
@@ -86,7 +86,11 @@ export default function NutritionProgressCharts({ user }) {
       // Convert to array and format dates
       const formattedData = Object.values(groupedData).map(item => ({
         ...item,
-        dateLabel: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        dateLabel: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        // Round to 1 decimal place
+        fiber: parseFloat(item.fiber.toFixed(1)),
+        sugar: parseFloat(item.sugar.toFixed(1)),
+        sodium: parseFloat(item.sodium.toFixed(1))
       }))
 
       setNutritionData(formattedData)
@@ -98,7 +102,7 @@ export default function NutritionProgressCharts({ user }) {
   }
 
   const loadDemoData = () => {
-    // Generate demo data for the last 30 days
+    // Generate demo data for the selected time range
     const demoData = []
     const today = new Date()
     
@@ -109,14 +113,31 @@ export default function NutritionProgressCharts({ user }) {
       demoData.push({
         date: date.toISOString().split('T')[0],
         dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fiber: Math.round(15 + Math.random() * 20), // 15-35g
-        sugar: Math.round(30 + Math.random() * 40), // 30-70g
-        sodium: Math.round(1500 + Math.random() * 1500) // 1500-3000mg
+        fiber: parseFloat((15 + Math.random() * 20).toFixed(1)), // 15-35g
+        sugar: parseFloat((30 + Math.random() * 40).toFixed(1)), // 30-70g
+        sodium: parseFloat((1500 + Math.random() * 1500).toFixed(1)) // 1500-3000mg
       })
     }
     
     setNutritionData(demoData)
     setLoading(false)
+  }
+
+  // Custom tooltip to show all three nutrients with proper formatting
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+          <p className="font-semibold text-gray-800 mb-2">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {entry.value.toFixed(1)}{entry.name.includes('Sodium') ? 'mg' : 'g'}
+            </p>
+          ))}
+        </div>
+      )
+    }
+    return null
   }
 
   if (loading) {
@@ -143,12 +164,20 @@ export default function NutritionProgressCharts({ user }) {
     )
   }
 
+  // Calculate averages with 1 decimal place
+  const avgFiber = (nutritionData.reduce((sum, d) => sum + d.fiber, 0) / nutritionData.length).toFixed(1)
+  const avgSugar = (nutritionData.reduce((sum, d) => sum + d.sugar, 0) / nutritionData.length).toFixed(1)
+  const avgSodium = (nutritionData.reduce((sum, d) => sum + d.sodium, 0) / nutritionData.length).toFixed(1)
+
   return (
     <div className="space-y-6">
-      {/* Time Range Selector */}
+      {/* Combined Chart */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Nutrition Progress</h3>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Micronutrient Progress</h3>
+            <p className="text-sm text-gray-600">Fiber, Sugar & Sodium Tracking</p>
+          </div>
           <div className="flex gap-2">
             {['7', '14', '30', '90'].map(days => (
               <button
@@ -166,64 +195,71 @@ export default function NutritionProgressCharts({ user }) {
           </div>
         </div>
 
-        {/* Fiber Chart */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <Apple className="w-5 h-5 text-green-600" />
-            <h4 className="text-md font-semibold text-gray-800">Fiber Intake</h4>
-            <span className="text-sm text-gray-600">(Goal: {goals.fiber}g)</span>
-          </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={nutritionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="dateLabel" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <ReferenceLine y={goals.fiber} stroke="#10b981" strokeDasharray="3 3" label="Goal" />
-              <Line type="monotone" dataKey="fiber" stroke="#10b981" strokeWidth={2} name="Fiber (g)" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Combined Chart - All Three Nutrients */}
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart data={nutritionData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="dateLabel" />
+            <YAxis yAxisId="left" label={{ value: 'Grams (g)', angle: -90, position: 'insideLeft' }} />
+            <YAxis yAxisId="right" orientation="right" label={{ value: 'Sodium (mg)', angle: 90, position: 'insideRight' }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            
+            {/* Fiber Line (Green) */}
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              dataKey="fiber" 
+              stroke="#10b981" 
+              strokeWidth={2} 
+              name="Fiber (g)"
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+            
+            {/* Sugar Line (Yellow) */}
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              dataKey="sugar" 
+              stroke="#f59e0b" 
+              strokeWidth={2} 
+              name="Sugar (g)"
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+            
+            {/* Sodium Line (Red) - Uses right Y-axis */}
+            <Line 
+              yAxisId="right"
+              type="monotone" 
+              dataKey="sodium" 
+              stroke="#ef4444" 
+              strokeWidth={2} 
+              name="Sodium (mg)"
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
 
-        {/* Sugar Chart */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <Candy className="w-5 h-5 text-yellow-600" />
-            <h4 className="text-md font-semibold text-gray-800">Sugar Intake</h4>
-            <span className="text-sm text-gray-600">(Limit: {goals.sugar}g)</span>
+        {/* Goals Reference */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs text-gray-600 mb-2">Daily Goals:</p>
+          <div className="flex gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-gray-700">Fiber: {goals.fiber}g</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <span className="text-gray-700">Sugar Limit: {goals.sugar}g</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-gray-700">Sodium Limit: {goals.sodium}mg</span>
+            </div>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={nutritionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="dateLabel" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <ReferenceLine y={goals.sugar} stroke="#f59e0b" strokeDasharray="3 3" label="Limit" />
-              <Line type="monotone" dataKey="sugar" stroke="#f59e0b" strokeWidth={2} name="Sugar (g)" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Sodium Chart */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Droplet className="w-5 h-5 text-red-600" />
-            <h4 className="text-md font-semibold text-gray-800">Sodium Intake</h4>
-            <span className="text-sm text-gray-600">(Limit: {goals.sodium}mg)</span>
-          </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={nutritionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="dateLabel" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <ReferenceLine y={goals.sodium} stroke="#ef4444" strokeDasharray="3 3" label="Limit" />
-              <Line type="monotone" dataKey="sodium" stroke="#ef4444" strokeWidth={2} name="Sodium (mg)" />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
       </div>
 
@@ -234,9 +270,7 @@ export default function NutritionProgressCharts({ user }) {
           {/* Fiber Average */}
           <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
             <Apple className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-600">
-              {Math.round(nutritionData.reduce((sum, d) => sum + d.fiber, 0) / nutritionData.length)}g
-            </p>
+            <p className="text-2xl font-bold text-green-600">{avgFiber}g</p>
             <p className="text-xs text-gray-600 mt-1">Avg Fiber</p>
             <p className="text-xs text-gray-500">Goal: {goals.fiber}g</p>
           </div>
@@ -244,9 +278,7 @@ export default function NutritionProgressCharts({ user }) {
           {/* Sugar Average */}
           <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
             <Candy className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-yellow-600">
-              {Math.round(nutritionData.reduce((sum, d) => sum + d.sugar, 0) / nutritionData.length)}g
-            </p>
+            <p className="text-2xl font-bold text-yellow-600">{avgSugar}g</p>
             <p className="text-xs text-gray-600 mt-1">Avg Sugar</p>
             <p className="text-xs text-gray-500">Limit: {goals.sugar}g</p>
           </div>
@@ -254,9 +286,7 @@ export default function NutritionProgressCharts({ user }) {
           {/* Sodium Average */}
           <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
             <Droplet className="w-6 h-6 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-red-600">
-              {Math.round(nutritionData.reduce((sum, d) => sum + d.sodium, 0) / nutritionData.length)}mg
-            </p>
+            <p className="text-2xl font-bold text-red-600">{avgSodium}mg</p>
             <p className="text-xs text-gray-600 mt-1">Avg Sodium</p>
             <p className="text-xs text-gray-500">Limit: {goals.sodium}mg</p>
           </div>
