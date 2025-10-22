@@ -291,7 +291,7 @@ export default function Progress({ user: propUser }) {
     for (let i = 0; i < days; i += Math.ceil(days / 20)) {
       data.push({
         date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        weight: startWeight - (i / days) * 15 + (Math.random() - 0.5) * 2
+        weight: parseFloat((startWeight - (i / days) * 15 + (Math.random() - 0.5) * 2).toFixed(1))
       })
     }
     return data
@@ -304,8 +304,8 @@ export default function Progress({ user: propUser }) {
     for (let i = 0; i < days; i += Math.ceil(days / 20)) {
       data.push({
         date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        bodyFat: startBF - (i / days) * 5 + (Math.random() - 0.5) * 0.5,
-        bmi: 28 - (i / days) * 3 + (Math.random() - 0.5) * 0.3
+        bodyFat: parseFloat((startBF - (i / days) * 5 + (Math.random() - 0.5) * 0.5).toFixed(1)),
+        bmi: parseFloat((28 - (i / days) * 3 + (Math.random() - 0.5) * 0.3).toFixed(1))
       })
     }
     return data
@@ -327,10 +327,10 @@ export default function Progress({ user: propUser }) {
     for (let i = 0; i < days; i += Math.ceil(days / 15)) {
       data.push({
         date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        systolic: 125 + (Math.random() - 0.5) * 10,
-        diastolic: 80 + (Math.random() - 0.5) * 8,
-        glucose: 95 + (Math.random() - 0.5) * 15,
-        sleep: 7 + (Math.random() - 0.5) * 2
+        systolic: parseFloat((125 + (Math.random() - 0.5) * 10).toFixed(0)),
+        diastolic: parseFloat((80 + (Math.random() - 0.5) * 8).toFixed(0)),
+        glucose: parseFloat((95 + (Math.random() - 0.5) * 15).toFixed(0)),
+        sleep: parseFloat((7 + (Math.random() - 0.5) * 2).toFixed(1))
       })
     }
     return data
@@ -342,9 +342,9 @@ export default function Progress({ user: propUser }) {
     for (let i = 0; i < days; i += Math.ceil(days / 20)) {
       data.push({
         date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        protein: 140 + (Math.random() - 0.5) * 30,
-        carbs: 180 + (Math.random() - 0.5) * 40,
-        fat: 50 + (Math.random() - 0.5) * 15,
+        protein: parseFloat((140 + (Math.random() - 0.5) * 30).toFixed(1)),
+        carbs: parseFloat((180 + (Math.random() - 0.5) * 40).toFixed(1)),
+        fat: parseFloat((50 + (Math.random() - 0.5) * 15).toFixed(1)),
         proteinTarget: 150,
         carbsTarget: 180,
         fatTarget: 50
@@ -361,8 +361,8 @@ export default function Progress({ user: propUser }) {
         data.push({
           date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           workouts: 1,
-          duration: 45 + Math.random() * 30,
-          calories_burned: 300 + Math.random() * 200
+          duration: parseFloat((45 + Math.random() * 30).toFixed(0)),
+          calories_burned: parseFloat((300 + Math.random() * 200).toFixed(0))
         })
       }
     }
