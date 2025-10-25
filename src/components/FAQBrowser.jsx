@@ -41,6 +41,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
         .order('display_order')
 
       if (error) throw error
+      console.log('Loaded categories:', data)
       setCategories(data || [])
     } catch (err) {
       console.error('Error loading categories:', err)
@@ -57,6 +58,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
         .order('display_order')
 
       if (error) throw error
+      console.log('Loaded articles:', data)
       setArticles(data || [])
       setFilteredArticles(data || [])
     } catch (err) {
