@@ -202,7 +202,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       </div>
 
       {/* Articles List */}
-      <ScrollArea className="flex-1 p-4">
+      <div className="flex-1 overflow-y-auto p-4">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             Loading FAQ articles...
@@ -294,7 +294,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
             })}
           </div>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Footer */}
       <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
