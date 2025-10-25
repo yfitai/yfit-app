@@ -161,7 +161,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Search Bar */}
       <div className="p-4 border-b">
         <div className="relative">

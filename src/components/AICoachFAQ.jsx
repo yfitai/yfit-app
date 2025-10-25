@@ -54,7 +54,7 @@ export default function AICoachFAQ({ userId }) {
             </div>
           </TabsContent>
 
-          <TabsContent value="faq" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden">
+          <TabsContent value="faq" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden overflow-hidden">
             <FAQBrowser userId={userId} onAskAICoach={handleAskAICoach} />
           </TabsContent>
         </Tabs>
