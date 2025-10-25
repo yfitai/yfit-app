@@ -1,4 +1,4 @@
-import { Home, Target, Utensils, Dumbbell, Pill, TrendingUp, LogOut } from 'lucide-react'
+import { Home, Target, Utensils, Dumbbell, Pill, TrendingUp, MessageCircle, LogOut } from 'lucide-react'
 import { signOut } from '../lib/supabase'
 import { NavLink } from 'react-router-dom'
 export default function Navigation({ user }) {
@@ -14,6 +14,7 @@ export default function Navigation({ user }) {
     { path: '/fitness', label: 'Fitness', icon: Dumbbell },
     { path: '/medications', label: 'Medications', icon: Pill },
     { path: '/progress', label: 'Progress', icon: TrendingUp },
+    { path: '/ai-coach-faq', label: 'AI Coach', icon: MessageCircle },
   ]
 
   return (

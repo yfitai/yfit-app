@@ -1,0 +1,59 @@
+import { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Card } from './ui/card'
+import AICoach from './AICoach'
+import FAQBrowser from './FAQBrowser'
+import { MessageCircle, BookOpen } from 'lucide-react'
+
+export default function AICoachFAQ({ userId }) {
+  const [activeTab, setActiveTab] = useState('ai-coach')
+
+  const handleAskAICoach = () => {
+    setActiveTab('ai-coach')
+  }
+
+  return (
+    <div className="container mx-auto p-4 h-screen flex flex-col">
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          AI Coach & FAQ
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          Get instant answers to your fitness and nutrition questions
+        </p>
+      </div>
+
+      <Card className="flex-1 overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="ai-coach" className="gap-2">
+              <MessageCircle className="h-4 w-4" />
+              AI Coach
+            </TabsTrigger>
+            <TabsTrigger value="faq" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              FAQ
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="ai-coach" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden">
+            <AICoach userId={userId} />
+          </TabsContent>
+
+          <TabsContent value="faq" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden">
+            <FAQBrowser userId={userId} onAskAICoach={handleAskAICoach} />
+          </TabsContent>
+        </Tabs>
+      </Card>
+
+      {/* Help Text */}
+      <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <p className="text-sm text-blue-800 dark:text-blue-200">
+          <strong>💡 Tip:</strong> Start with the FAQ for quick answers to common questions. 
+          For personalized advice or complex questions, chat with the AI Coach!
+        </p>
+      </div>
+    </div>
+  )
+}
+

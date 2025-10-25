@@ -9,6 +9,7 @@ import Fitness from './components/Fitness'
 import Medications from './components/Medications'
 import FormAnalysis from './pages/FormAnalysis'
 import WorkoutSessionTracker from './components/WorkoutSessionTracker'
+import AICoachFAQ from './components/AICoachFAQ'
 import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
@@ -90,6 +91,7 @@ function App() {
             <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
             <Route path="/medications" element={<Medications user={user} />} />
             <Route path="/progress" element={<Progress user={user} />} />
+            <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
