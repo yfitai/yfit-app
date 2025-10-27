@@ -50,6 +50,8 @@ function App() {
       },
       created_at: new Date().toISOString()
     }
+    // Set demo mode in localStorage so getCurrentUser() can detect it
+    localStorage.setItem('demoMode', 'true')
     setUser(demoUser)
     setDemoMode(true)
   }
