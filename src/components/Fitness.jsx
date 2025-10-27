@@ -6,6 +6,7 @@ import ExerciseLibrary from './ExerciseLibrary';
 import WorkoutBuilder from './WorkoutBuilder';
 import WorkoutLogger from './WorkoutLogger';
 import FormAnalysis from './FormAnalysis';
+import FormAnalysisLive from './FormAnalysisLive';
 import FitnessProgress from './FitnessProgress';
 
 const Fitness = () => {
@@ -15,6 +16,7 @@ const Fitness = () => {
     { id: 'library', name: 'Exercise Library', icon: BookOpen },
     { id: 'builder', name: 'Create Workout', icon: Plus },
     { id: 'logger', name: 'Log Workout', icon: Play },
+    { id: 'form-live', name: 'Live Form Analysis', icon: Camera },
     { id: 'form', name: 'Form Analysis', icon: Camera },
     { id: 'progress', name: 'Progress', icon: TrendingUp }
   ];
@@ -27,6 +29,8 @@ const Fitness = () => {
         return <WorkoutBuilder />;
       case 'logger':
         return <WorkoutLogger onNavigateToBuilder={() => setActiveTab('builder')} />;
+      case 'form-live':
+        return <FormAnalysisLive />;
       case 'form':
         return <FormAnalysis />;
       case 'progress':
