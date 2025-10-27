@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles } from 'lucide-react'
+import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles, RefreshCw } from 'lucide-react'
 
 export default function AICoach({ userId }) {
   const [messages, setMessages] = useState([])
@@ -184,16 +184,54 @@ export default function AICoach({ userId }) {
     }
   }
 
+  const startNewConversation = async () => {
+    try {
+      // Create a new conversation
+      const { data: newConversation, error: createError } = await supabase
+        .from('ai_conversations')
+        .insert([{
+          user_id: userId,
+          title: 'New Conversation',
+          status: 'active'
+        }])
+        .select()
+        .single()
+
+      if (createError) throw createError
+
+      // Clear messages and set new conversation ID
+      setMessages([])
+      setConversationId(newConversation.id)
+      setError(null)
+    } catch (err) {
+      console.error('Error starting new conversation:', err)
+      setError('Failed to start new conversation. Please try again.')
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
       <div className="p-6 pb-4 border-b">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-purple-500" />
-          AI Coach
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Ask me anything about fitness, nutrition, or using YFIT
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-500" />
+              AI Coach
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Ask me anything about fitness, nutrition, or using YFIT
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={startNewConversation}
+            className="gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            New Conversation
+          </Button>
+        </div>
       </div>
       
       <div className="flex-1 flex flex-col overflow-hidden">
