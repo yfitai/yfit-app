@@ -5,7 +5,7 @@ import {
   Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save
 } from 'lucide-react';
 
-const WorkoutLogger = () => {
+const WorkoutLogger = ({ onNavigateToBuilder }) => {
   const [user, setUser] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
   const [workouts, setWorkouts] = useState([]);
@@ -209,7 +209,7 @@ const WorkoutLogger = () => {
         .update({
           end_time: new Date().toISOString(),
           duration_seconds: sessionStats.duration,
-          total_exercises: selectedWorkout.workout_exercises.length,
+          total_exercises: selectedWorkout?.workout_exercises?.length || 0,
           total_sets: sessionStats.totalSets,
           total_reps: sessionStats.totalReps,
           total_volume: sessionStats.totalVolume,
@@ -221,6 +221,7 @@ const WorkoutLogger = () => {
       resetSession();
     } catch (error) {
       console.error('Error completing workout:', error);
+      alert('Error completing workout. Please try again.');
     }
   };
 
@@ -322,7 +323,10 @@ const WorkoutLogger = () => {
               <div className="bg-white rounded-lg p-8 text-center">
                 <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No saved workouts yet</p>
-                <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button 
+                  onClick={onNavigateToBuilder}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Create Your First Workout
                 </button>
               </div>
