@@ -19,6 +19,8 @@ const FormAnalysisLive = () => {
   const cameraRef = useRef(null);
   const isAnalyzingRef = useRef(false);
   const selectedExerciseRef = useRef(null);
+  const repStateRef = useRef('up'); // Track rep state: 'up', 'down', 'transition'
+  const lastRepTimeRef = useRef(0); // Prevent double counting
 
   // Exercise options (starting with MVP 3)
   const exercises = [
@@ -114,15 +116,33 @@ const FormAnalysisLive = () => {
 
     // Calculate knee angle
     const kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
-    console.log('Squat knee angle:', kneeAngle);
+    console.log('Knee angle:', kneeAngle.toFixed(1), '| State:', repStateRef.current);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Standing position (knee angle > 160)
+    if (kneeAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      // Coming up from squat - count rep!
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+      console.log('Rep counted! Total:', repCount + 1);
+    }
+    // Squatting position (knee angle < 100)
+    else if (kneeAngle < 100 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+      console.log('Squat down detected');
+    }
     
     // Check squat depth (knee angle should be < 90 degrees for proper depth)
-    if (kneeAngle > 90) {
+    if (kneeAngle > 90 && kneeAngle < 160) {
       feedback.push({
         type: 'warning',
         message: 'Go deeper - aim for thighs parallel to ground'
       });
-    } else {
+    } else if (kneeAngle <= 90) {
       feedback.push({
         type: 'success',
         message: 'Good depth!'
@@ -137,7 +157,6 @@ const FormAnalysisLive = () => {
       });
     }
 
-    console.log('Squat feedback:', feedback);
     return feedback;
   };
 
@@ -150,6 +169,27 @@ const FormAnalysisLive = () => {
     const leftWrist = landmarks[15];
     const leftHip = landmarks[23];
     const leftKnee = landmarks[25];
+
+    // Check elbow angle for depth
+    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Up position (elbow angle > 160)
+    if (elbowAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      // Coming up from push-up - count rep!
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+      console.log('Push-up rep counted! Total:', repCount + 1);
+    }
+    // Down position (elbow angle < 100)
+    else if (elbowAngle < 100 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+      console.log('Push-up down detected');
+    }
 
     // Check body alignment (plank position)
     const bodyAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
@@ -165,16 +205,13 @@ const FormAnalysisLive = () => {
         message: 'Good body alignment!'
       });
     }
-
-    // Check elbow angle for depth
-    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
     
-    if (elbowAngle < 90) {
+    if (elbowAngle < 100) {
       feedback.push({
         type: 'success',
         message: 'Good depth!'
       });
-    } else if (elbowAngle > 160) {
+    } else if (elbowAngle > 140 && elbowAngle < 160) {
       feedback.push({
         type: 'info',
         message: 'Lower your chest closer to the ground'
@@ -238,6 +275,8 @@ const FormAnalysisLive = () => {
     selectedExerciseRef.current = selectedExercise;
     setFormFeedback([]);
     setRepCount(0);
+    repStateRef.current = 'up';
+    lastRepTimeRef.current = 0;
     console.log('Started analysis for:', selectedExercise.name);
 
     // Start camera
