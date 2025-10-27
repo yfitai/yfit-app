@@ -17,6 +17,8 @@ const FormAnalysisLive = () => {
   const [cameraError, setCameraError] = useState(null);
   const poseRef = useRef(null);
   const cameraRef = useRef(null);
+  const isAnalyzingRef = useRef(false);
+  const selectedExerciseRef = useRef(null);
 
   // Exercise options (starting with MVP 3)
   const exercises = [
@@ -76,9 +78,10 @@ const FormAnalysisLive = () => {
 
     ctx.restore();
 
-    // Analyze form based on selected exercise
-    if (isAnalyzing && selectedExercise) {
-      analyzeForm(results.poseLandmarks, selectedExercise.id);
+    // Analyze form based on selected exercise (using refs to get current values)
+    if (isAnalyzingRef.current && selectedExerciseRef.current) {
+      console.log('Analyzing form for:', selectedExerciseRef.current.id);
+      analyzeForm(results.poseLandmarks, selectedExerciseRef.current.id);
     }
   };
 
@@ -111,6 +114,7 @@ const FormAnalysisLive = () => {
 
     // Calculate knee angle
     const kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
+    console.log('Squat knee angle:', kneeAngle);
     
     // Check squat depth (knee angle should be < 90 degrees for proper depth)
     if (kneeAngle > 90) {
@@ -133,6 +137,7 @@ const FormAnalysisLive = () => {
       });
     }
 
+    console.log('Squat feedback:', feedback);
     return feedback;
   };
 
@@ -229,8 +234,11 @@ const FormAnalysisLive = () => {
     }
 
     setIsAnalyzing(true);
+    isAnalyzingRef.current = true;
+    selectedExerciseRef.current = selectedExercise;
     setFormFeedback([]);
     setRepCount(0);
+    console.log('Started analysis for:', selectedExercise.name);
 
     // Start camera
     if (webcamRef.current && webcamRef.current.video && poseRef.current) {
@@ -251,7 +259,10 @@ const FormAnalysisLive = () => {
 
   const stopAnalysis = () => {
     setIsAnalyzing(false);
+    isAnalyzingRef.current = false;
+    selectedExerciseRef.current = null;
     setFormFeedback([]);
+    console.log('Stopped analysis');
     
     if (cameraRef.current) {
       cameraRef.current.stop();
