@@ -359,6 +359,67 @@ const WorkoutLogger = () => {
   // Active Workout View
   const currentExercise = selectedWorkout?.workout_exercises?.[currentExerciseIndex];
 
+  // If empty workout (no exercises), show add exercise UI
+  if (!currentExercise && activeSession) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Quick Workout</h1>
+                <p className="text-sm text-gray-600">Freestyle session</p>
+              </div>
+              <button
+                onClick={cancelWorkout}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Session Stats */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{formatTime(sessionStats.duration)}</div>
+                <div className="text-xs text-gray-600">Duration</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
+                <div className="text-xs text-gray-600">Sets</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
+                <div className="text-xs text-gray-600">Reps</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
+                <div className="text-xs text-gray-600">Volume (lbs)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Empty Workout</h2>
+            <p className="text-gray-600 mb-6">Add exercises as you go or complete this freestyle session</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={completeWorkout}
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+              >
+                <Check className="w-5 h-5" />
+                Complete Workout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Stats */}
