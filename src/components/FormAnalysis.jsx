@@ -47,10 +47,7 @@ const FormAnalysis = () => {
     try {
       const { data } = await supabase
         .from('exercises')
-        .select(`
-          *,
-          primary_muscle:muscle_groups!exercises_primary_muscle_group_id_fkey(name)
-        `)
+        .select('*')
         .order('name');
       setExercises(data || []);
     } catch (error) {

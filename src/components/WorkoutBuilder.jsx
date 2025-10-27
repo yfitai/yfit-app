@@ -40,15 +40,10 @@ const WorkoutBuilder = () => {
         .order('display_order');
       setCategories(categoriesData || []);
 
-      // Fetch exercises
+      // Fetch exercises (using simple query without joins since table uses arrays)
       const { data: exercisesData } = await supabase
         .from('exercises')
-        .select(`
-          *,
-          category:exercise_categories(name),
-          primary_muscle:muscle_groups!exercises_primary_muscle_group_id_fkey(name),
-          primary_equipment:equipment_types!exercises_primary_equipment_id_fkey(name)
-        `)
+        .select('*')
         .order('name');
       setExercises(exercisesData || []);
     } catch (error) {
