@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { ScrollArea } from './ui/scroll-area'
 import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles } from 'lucide-react'
 
 export default function AICoach({ userId }) {
@@ -187,20 +185,20 @@ export default function AICoach({ userId }) {
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div className="h-full flex flex-col">
+      <div className="p-6 pb-4 border-b">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-purple-500" />
           AI Coach
-        </CardTitle>
-        <CardDescription>
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           Ask me anything about fitness, nutrition, or using YFIT
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
       
-      <CardContent className="flex-1 flex flex-col p-0">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Messages Area */}
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div
@@ -254,7 +252,7 @@ export default function AICoach({ userId }) {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Error message */}
         {error && (
@@ -264,7 +262,7 @@ export default function AICoach({ userId }) {
         )}
 
         {/* Input Area */}
-        <div className="p-4 border-t">
+        <div className="p-4 border-t bg-white dark:bg-gray-900">
           <div className="flex gap-2">
             <Input
               value={inputMessage}
@@ -290,8 +288,8 @@ export default function AICoach({ userId }) {
             The AI Coach provides general information and is not a substitute for professional medical advice.
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 

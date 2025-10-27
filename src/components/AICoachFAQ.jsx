@@ -42,16 +42,8 @@ export default function AICoachFAQ({ userId }) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ai-coach" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden flex-col">
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>⚠️ Note:</strong> AI Coach requires Supabase Edge Function setup to connect to OpenAI. 
-                FAQ is fully functional and ready to use!
-              </p>
-            </div>
-            <div className="flex-1">
-              <AICoach userId={userId} />
-            </div>
+          <TabsContent value="ai-coach" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden flex-col overflow-hidden">
+            <AICoach userId={userId} />
           </TabsContent>
 
           <TabsContent value="faq" className="flex-1 mt-0 data-[state=active]:flex data-[state=inactive]:hidden overflow-hidden">
