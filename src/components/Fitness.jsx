@@ -16,8 +16,7 @@ const Fitness = () => {
     { id: 'library', name: 'Exercise Library', icon: BookOpen },
     { id: 'builder', name: 'Create Workout', icon: Plus },
     { id: 'logger', name: 'Log Workout', icon: Play },
-    { id: 'form-live', name: 'Live Form Analysis', icon: Camera },
-    { id: 'form', name: 'Form Analysis', icon: Camera },
+    { id: 'form-live', name: 'Form Analysis', icon: Camera },
     { id: 'progress', name: 'Progress', icon: TrendingUp }
   ];
 
@@ -31,8 +30,6 @@ const Fitness = () => {
         return <WorkoutLogger onNavigateToBuilder={() => setActiveTab('builder')} />;
       case 'form-live':
         return <FormAnalysisLive />;
-      case 'form':
-        return <FormAnalysis />;
       case 'progress':
         return <FitnessProgress />;
       default:
