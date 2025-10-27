@@ -14,6 +14,9 @@ const WorkoutBuilder = () => {
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterEquipment, setFilterEquipment] = useState('all');
+  const [filterTargetMuscle, setFilterTargetMuscle] = useState('all');
 
   useEffect(() => {
     initializeUser();
@@ -181,9 +184,23 @@ const WorkoutBuilder = () => {
     setSelectedExercises([]);
   };
 
-  const filteredExercises = exercises.filter(ex =>
-    ex.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredExercises = exercises.filter(ex => {
+    // Search filter
+    const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Category filter
+    const matchesCategory = filterCategory === 'all' || ex.category === filterCategory;
+    
+    // Equipment filter
+    const matchesEquipment = filterEquipment === 'all' || 
+      (ex.equipment && ex.equipment.some(eq => eq.toLowerCase() === filterEquipment.toLowerCase()));
+    
+    // Target muscle filter
+    const matchesTargetMuscle = filterTargetMuscle === 'all' || 
+      (ex.target_muscles && ex.target_muscles.some(muscle => muscle.toLowerCase() === filterTargetMuscle.toLowerCase()));
+    
+    return matchesSearch && matchesCategory && matchesEquipment && matchesTargetMuscle;
+  });
 
   if (loading) {
     return (
@@ -423,7 +440,7 @@ const WorkoutBuilder = () => {
               </div>
 
               {/* Search */}
-              <div className="relative">
+              <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
@@ -432,6 +449,60 @@ const WorkoutBuilder = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Category Filter */}
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Chest">Chest</option>
+                  <option value="Back">Back</option>
+                  <option value="Legs">Legs</option>
+                  <option value="Shoulders">Shoulders</option>
+                  <option value="Arms">Arms</option>
+                  <option value="Core">Core</option>
+                  <option value="Cardio">Cardio</option>
+                </select>
+
+                {/* Equipment Filter */}
+                <select
+                  value={filterEquipment}
+                  onChange={(e) => setFilterEquipment(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="all">All Equipment</option>
+                  <option value="barbell">Barbell</option>
+                  <option value="dumbbell">Dumbbell</option>
+                  <option value="body weight">Body Weight</option>
+                  <option value="cable">Cable</option>
+                  <option value="machine">Machine</option>
+                  <option value="kettlebell">Kettlebell</option>
+                  <option value="band">Band</option>
+                </select>
+
+                {/* Target Muscle Filter */}
+                <select
+                  value={filterTargetMuscle}
+                  onChange={(e) => setFilterTargetMuscle(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="all">All Muscles</option>
+                  <option value="pecs">Chest</option>
+                  <option value="lats">Back</option>
+                  <option value="quads">Quads</option>
+                  <option value="hamstrings">Hamstrings</option>
+                  <option value="glutes">Glutes</option>
+                  <option value="delts">Shoulders</option>
+                  <option value="biceps">Biceps</option>
+                  <option value="triceps">Triceps</option>
+                  <option value="abs">Abs</option>
+                  <option value="calves">Calves</option>
+                </select>
               </div>
             </div>
 
