@@ -122,8 +122,25 @@ export default function FormAnalysis() {
                   loading="lazy"
                 />
               ) : (
-                <div className="text-center text-muted-foreground">
-                  <p>No demonstration available</p>
+                <div className="text-center py-8 px-4">
+                  <div className="max-w-md mx-auto">
+                    <div className="mb-4">
+                      <svg className="w-16 h-16 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Upload Your Workout Video</h3>
+                    <p className="text-gray-600 mb-4">
+                      Record yourself performing this exercise and upload it below for AI-powered form analysis. 
+                      Our system will analyze your movement patterns and provide personalized feedback.
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-blue-800">
+                        <strong>🎯 Standout Feature:</strong> Get instant, professional-grade form analysis powered by AI - 
+                        a feature typically only available with personal trainers!
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
