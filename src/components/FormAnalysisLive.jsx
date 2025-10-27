@@ -14,6 +14,7 @@ const FormAnalysisLive = () => {
   const [formFeedback, setFormFeedback] = useState([]);
   const [repCount, setRepCount] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
   const poseRef = useRef(null);
   const cameraRef = useRef(null);
 
@@ -281,7 +282,14 @@ const FormAnalysisLive = () => {
                     height: 480,
                     facingMode: 'user'
                   }}
-                  onUserMedia={() => setCameraReady(true)}
+                  onUserMedia={() => {
+                    setCameraReady(true);
+                    setCameraError(null);
+                  }}
+                  onUserMediaError={(error) => {
+                    console.error('Camera error:', error);
+                    setCameraError('Camera access denied or not available. Please allow camera access and refresh.');
+                  }}
                   className="w-full h-full object-cover"
                 />
                 
@@ -292,11 +300,27 @@ const FormAnalysisLive = () => {
                   className="absolute top-0 left-0 w-full h-full"
                 />
 
-                {!cameraReady && (
+                {!cameraReady && !cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
                     <div className="text-center text-white">
                       <CameraIcon className="w-16 h-16 mx-auto mb-4 animate-pulse" />
-                      <p>Initializing camera...</p>
+                      <p>Requesting camera access...</p>
+                      <p className="text-sm mt-2 opacity-75">Please allow camera permissions</p>
+                    </div>
+                  </div>
+                )}
+
+                {cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+                    <div className="text-center text-white max-w-md px-4">
+                      <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+                      <p className="mb-4">{cameraError}</p>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Refresh Page
+                      </button>
                     </div>
                   </div>
                 )}
