@@ -26,7 +26,7 @@ const Fitness = () => {
       case 'builder':
         return <WorkoutBuilder />;
       case 'logger':
-        return <WorkoutLogger />;
+        return <WorkoutLogger onNavigateToBuilder={() => setActiveTab('builder')} />;
       case 'form':
         return <FormAnalysis />;
       case 'progress':
