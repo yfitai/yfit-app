@@ -85,21 +85,34 @@ function App() {
               🧪 Demo Mode Active
             </div>
           )}
-
           <Routes>
-            <Route path="/" element={<Dashboard user={user} />} />
-            <Route path="/goals" element={<Goals user={user} />} />
-            <Route path="/nutrition" element={<NutritionUnified user={user} />} />
-            <Route path="/fitness" element={<Fitness user={user} />} />
-            <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
-            <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
-            <Route path="/medications" element={<Medications user={user} />} />
-            <Route path="/progress" element={<Progress user={user} />} />
-            <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
-   <Route path="/predictions" element={<PredictionsDashboard user={user} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Public Routes - No login required */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/legal" element={<Legal />} />
+
+            {/* Protected Routes - Login required */}
+            {user ? (
+              <>
+                <Route path="/dashboard" element={<Dashboard user={user} />} />
+                <Route path="/goals" element={<Goals user={user} />} />
+                <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                <Route path="/fitness" element={<Fitness user={user} />} />
+                <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
+                <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
+                <Route path="/medications" element={<Medications user={user} />} />
+                <Route path="/progress" element={<Progress user={user} />} />
+                <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
+                <Route path="/predictions" element={<PredictionsDashboard user={user} />} />
+              </>
+            ) : (
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            )}
           </Routes>
         <Footer />
+
+       
         </div>
       </BrowserRouter>
     </UnitPreferenceProvider>
