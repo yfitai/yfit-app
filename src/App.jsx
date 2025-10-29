@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Auth from './components/Auth'
+import LandingPage from './pages/LandingPage'
 import Dashboard from './components/Dashboard'
 import Goals from './components/Goals'
 import NutritionUnified from './components/NutritionUnified'
