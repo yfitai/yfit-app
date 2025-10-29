@@ -13,6 +13,7 @@ import AICoachFAQ from './components/AICoachFAQ'
 import PredictionsDashboard from './components/PredictionsDashboard'
 import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
+import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import './App.css'
 
@@ -98,6 +99,7 @@ function App() {
    <Route path="/predictions" element={<PredictionsDashboard user={user} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+        <Footer />
         </div>
       </BrowserRouter>
     </UnitPreferenceProvider>
