@@ -10,6 +10,7 @@ import Medications from './components/Medications'
 import FormAnalysis from './pages/FormAnalysis'
 import WorkoutSessionTracker from './components/WorkoutSessionTracker'
 import AICoachFAQ from './components/AICoachFAQ'
+mport PredictionsDashboard from './components/PredictionsDashboard'
 import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
@@ -94,6 +95,7 @@ function App() {
             <Route path="/medications" element={<Medications user={user} />} />
             <Route path="/progress" element={<Progress user={user} />} />
             <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
+   <Route path="/predictions" element={<PredictionsDashboard user={user} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
