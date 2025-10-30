@@ -35,14 +35,26 @@ export async function searchFoods(query, options = {}) {
     }
 
     // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all' || source === 'custom') {
+    if (source === 'all' || source === 'whole') {
       try {
         const usdaResults = await searchUSDA(query, limit)
         results.push(...usdaResults)
       } catch (error) {
+        console.warn('USDA search failed, continuing with other sources:', error.message)
+      }
+    }
+
+    // Search Custom Foods (user-created)
+    if (source === 'all' || source === 'custom') {
+      try {
+        const customResults = await searchCustomFoods(query, limit)
+        results.push(...customResults)
+      } catch (error) {
         console.warn('Custom foods search failed:', error.message)
       }
     }
+
+
 
     // Remove duplicates (by name and brand)
     const uniqueResults = deduplicateFoods(results)
