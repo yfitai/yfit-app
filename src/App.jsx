@@ -86,11 +86,11 @@ function App() {
               🧪 Demo Mode Active
             </div>
           )}
-          <Routes>
+                 <Routes>
             {/* Public Routes - No login required */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/signup" element={<Auth />} />
             <Route path="/legal" element={<Legal />} />
 
             {/* Protected Routes - Login required */}
@@ -111,6 +111,7 @@ function App() {
               <Route path="*" element={<Navigate to="/login" replace />} />
             )}
           </Routes>
+
         <Footer />
 
        
