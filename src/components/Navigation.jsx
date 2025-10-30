@@ -23,14 +23,11 @@ export default function Navigation({ user }) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-              Y
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              YFIT AI
-            </span>
+                 {/* Logo */}
+          <div className="flex items-center">
+            <img src="/assets/yfit-logo.png" alt="YFIT Logo" className="h-12" />
           </div>
+
 
           {/* Navigation Links */}
           <div className="flex items-center gap-2">
