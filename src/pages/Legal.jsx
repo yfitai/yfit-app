@@ -3,6 +3,8 @@ import { FileText, Shield, Cookie, Heart } from 'lucide-react'
 
 export default function Legal() {
   const [activeTab, setActiveTab] = useState('privacy')
+   console.log('Current activeTab:', activeTab)
+
 
   const tabs = [
     { id: 'privacy', label: 'Privacy Policy', icon: Shield },
