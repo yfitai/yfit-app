@@ -68,7 +68,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
     try {
       const searchResults = await searchFoods(searchQuery, {
         limit: 20,
-        source: filter === 'all' ? 'all' : filter
+        source: filter === 'custom' ? 'custom' : filter
       })
       setResults(searchResults)
     } catch (error) {
