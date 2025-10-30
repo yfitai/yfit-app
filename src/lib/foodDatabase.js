@@ -506,6 +506,7 @@ export default {
   addFavoriteFood,
   removeFavoriteFood,
   getFoodDetails
+}
 /**
  * Search custom/user-created foods
  */
@@ -539,5 +540,5 @@ async function searchCustomFoods(query, limit) {
   }
 }
 
-}
+
 
