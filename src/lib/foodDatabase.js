@@ -35,12 +35,12 @@ export async function searchFoods(query, options = {}) {
     }
 
     // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all' || source === 'whole') {
+    if (source === 'all' || source === 'custom') {
       try {
         const usdaResults = await searchUSDA(query, limit)
         results.push(...usdaResults)
       } catch (error) {
-        console.warn('USDA search failed, continuing with other sources:', error.message)
+        console.warn('Custom foods search failed:', error.message)
       }
     }
 
@@ -494,5 +494,38 @@ export default {
   addFavoriteFood,
   removeFavoriteFood,
   getFoodDetails
+/**
+ * Search custom/user-created foods
+ */
+async function searchCustomFoods(query, limit) {
+  try {
+    const { data, error } = await supabase
+      .from('custom_foods')
+      .select('*')
+      .ilike('name', `%${query}%`)
+      .limit(limit)
+    
+    if (error) throw error
+    
+    return (data || []).map(food => ({
+      id: `custom_${food.id}`,
+      name: food.name,
+      brand: food.brand || 'Custom',
+      source: 'custom',
+      servingSize: food.serving_size || '100g',
+      calories: food.calories || 0,
+      protein: food.protein || 0,
+      carbs: food.carbs || 0,
+      fat: food.fat || 0,
+      fiber: food.fiber || 0,
+      sugar: food.sugar || 0,
+      sodium: food.sodium || 0
+    }))
+  } catch (error) {
+    console.error('Error searching custom foods:', error)
+    return []
+  }
+}
+
 }
 
