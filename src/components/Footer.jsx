@@ -8,10 +8,10 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Heart className="w-5 h-5 text-red-500" />
-              YFIT AI
-            </h3>
+                       <div className="mb-4">
+              <img src="/assets/yfit-logo.png" alt="YFIT Logo" className="h-10" />
+            </div>
+
             <p className="text-gray-400">
               Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.
             </p>

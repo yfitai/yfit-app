@@ -205,13 +205,11 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8 animate-fade-in">
-          <img src={logo} alt="YFIT AI" className="h-24 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-            YFIT AI
-          </h1>
+           <div className="text-center mb-8 animate-fade-in">
+          <img src="/assets/yfit-logo.png" alt="YFIT AI" className="h-24 mx-auto mb-4" />
           <p className="text-gray-600 mt-2">Your Intelligent Health Companion</p>
         </div>
+
 
         {/* Auth Tabs */}
         <Tabs defaultValue="login" className="w-full">
