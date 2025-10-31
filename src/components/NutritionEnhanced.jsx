@@ -845,9 +845,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
             </label>
             <div className="flex gap-2">
               {/* Quantity Input */}
-              <input
-                type="number"
-                value={servingQuantity}
+            
             <input
   type="number"
   value={servingQuantity}
@@ -864,10 +862,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 />
 
-                min="0.1"
-                step="0.1"
-                className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+                
               
               {/* Unit Dropdown */}
               <select
