@@ -81,23 +81,35 @@ async function searchUSDA(query, limit) {
   try {
     console.log('🥗 Searching USDA for:', query)
     
-    const { data, error } = await supabase
+    // Search by name
+    const { data: nameResults, error: nameError } = await supabase
       .from('food_items')
       .select('*')
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
       .eq('data_source', 'usda')
+      .ilike('name', `%${query}%`)
       .limit(limit)
     
-    console.log('🥗 USDA query result:', { data, error })
+    // Search by description
+    const { data: descResults, error: descError } = await supabase
+      .from('food_items')
+      .select('*')
+      .eq('data_source', 'usda')
+      .ilike('description', `%${query}%`)
+      .limit(limit)
     
-    if (error) {
-      console.error('🥗 USDA error:', error)
-      throw error
-    }
+    console.log('🥗 Name search:', nameResults?.length || 0, 'results')
+    console.log('🥗 Description search:', descResults?.length || 0, 'results')
     
-    console.log('🥗 USDA raw data:', data?.length || 0, 'rows')
+    if (nameError) console.error('🥗 Name search error:', nameError)
+    if (descError) console.error('🥗 Description search error:', descError)
     
-    return (data || []).map(food => ({
+    // Combine and deduplicate results
+    const allResults = [...(nameResults || []), ...(descResults || [])]
+    const uniqueResults = Array.from(new Map(allResults.map(item => [item.id, item])).values())
+    
+    console.log('🥗 Total unique USDA results:', uniqueResults.length)
+    
+    return uniqueResults.slice(0, limit).map(food => ({
       id: `usda_${food.fdc_id || food.id}`,
       fdcId: food.fdc_id,
       name: food.name,
@@ -118,6 +130,7 @@ async function searchUSDA(query, limit) {
     return []
   }
 }
+
 
 /**
  * Transform USDA food data to our standard format
