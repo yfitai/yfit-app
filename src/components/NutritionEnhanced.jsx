@@ -802,7 +802,24 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 
 // Serving Size Selector Component
 function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel }) {
-  const multiplier = servingQuantity
+  // Available units
+  const units = [
+    { value: 'g', label: 'Grams (g)', toGrams: 1 },
+    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+    { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
+    { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
+    { value: 'cup', label: 'Cups', toGrams: 240 },
+    { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
+    { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
+    { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
+  ]
+
+  // Calculate multiplier based on quantity and unit
+  const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
+  const totalGrams = servingQuantity * selectedUnit.toGrams
+  const multiplier = totalGrams / 100 // All nutrition is per 100g
+
   const displayCalories = Math.round((food.calories || 0) * multiplier)
   const displayProtein = Math.round((food.protein || 0) * multiplier)
   const displayCarbs = Math.round((food.carbs || 0) * multiplier)
@@ -822,19 +839,38 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
 
         {/* Content */}
         <div className="p-4">
-          {/* Serving Quantity */}
+          {/* Quantity and Unit */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Quantity
+              Quantity & Unit
             </label>
-            <input
-              type="number"
-              value={servingQuantity}
-              onChange={(e) => setServingQuantity(parseFloat(e.target.value) || 1)}
-              min="0.1"
-              step="0.1"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="flex gap-2">
+              {/* Quantity Input */}
+              <input
+                type="number"
+                value={servingQuantity}
+                onChange={(e) => setServingQuantity(parseFloat(e.target.value) || 1)}
+                min="0.1"
+                step="0.1"
+                className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              
+              {/* Unit Dropdown */}
+              <select
+                value={servingUnit}
+                onChange={(e) => setServingUnit(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              >
+                {units.map(unit => (
+                  <option key={unit.value} value={unit.value}>
+                    {unit.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              ≈ {totalGrams.toFixed(1)}g total
+            </p>
           </div>
 
           {/* Nutrition Summary */}
