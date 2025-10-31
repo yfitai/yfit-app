@@ -89,63 +89,82 @@ export async function searchFoods(query, options = {}) {
 }
 
 
-
 /**
- * Search local USDA food database (food_items table)
+ * Search USDA FoodData Central API
  */
 async function searchUSDA(query, limit) {
   try {
-    console.log('🥗 Searching USDA for:', query)
+    console.log('🥗 Searching USDA API for:', query)
     
-    // Search by name
-    const { data: nameResults, error: nameError } = await supabase
-      .from('food_items')
-      .select('*')
-      .eq('data_source', 'usda')
-      .ilike('name', `%${query}%`)
-      .limit(limit)
+    const response = await fetch(`${USDA_API_BASE}/foods/search?api_key=${USDA_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)'],  // Exclude branded foods from USDA
+        pageSize: limit * 2,
+        pageNumber: 1,
+        sortBy: 'score',
+        sortOrder: 'desc'
+      })
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.warn('USDA API: Invalid or missing API key')
+      } else if (response.status === 429) {
+        console.warn('USDA API: Rate limit exceeded')
+      }
+      throw new Error(`USDA API error: ${response.status}`)
+    }
+
+    const data = await response.json()
     
-    // Search by description
-    const { data: descResults, error: descError } = await supabase
-      .from('food_items')
-      .select('*')
-      .eq('data_source', 'usda')
-      .ilike('description', `%${query}%`)
-      .limit(limit)
+    if (!data.foods || data.foods.length === 0) {
+      console.log('🥗 USDA API returned 0 results')
+      return []
+    }
+
+    // Filter and rank results by relevance
+    const queryLower = query.toLowerCase()
+    const results = data.foods
+      .map(food => {
+        const nameLower = (food.description || '').toLowerCase()
+        
+        // Calculate relevance score
+        let relevanceScore = 0
+        
+        // Exact match gets highest score
+        if (nameLower === queryLower) relevanceScore += 100
+        
+        // Starts with query gets high score
+        if (nameLower.startsWith(queryLower)) relevanceScore += 50
+        
+        // Contains all query words
+        const queryWords = queryLower.split(' ')
+        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
+        relevanceScore += (matchedWords / queryWords.length) * 30
+        
+        return {
+          food,
+          relevanceScore
+        }
+      })
+      .filter(item => item.relevanceScore > 10)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, limit)
+      .map(item => transformUSDAFood(item.food))
     
-    console.log('🥗 Name search:', nameResults?.length || 0, 'results')
-    console.log('🥗 Description search:', descResults?.length || 0, 'results')
-    
-    if (nameError) console.error('🥗 Name search error:', nameError)
-    if (descError) console.error('🥗 Description search error:', descError)
-    
-    // Combine and deduplicate results
-    const allResults = [...(nameResults || []), ...(descResults || [])]
-    const uniqueResults = Array.from(new Map(allResults.map(item => [item.id, item])).values())
-    
-    console.log('🥗 Total unique USDA results:', uniqueResults.length)
-    
-    return uniqueResults.slice(0, limit).map(food => ({
-      id: `usda_${food.fdc_id || food.id}`,
-      fdcId: food.fdc_id,
-      name: food.name,
-      brand: 'USDA',
-      source: 'usda',
-      servingSize: food.default_serving_description || '100g',
-      servingGrams: food.default_serving_size || 100,
-      calories: food.calories_per_100g || 0,
-      protein: food.protein_per_100g || 0,
-      carbs: food.carbs_per_100g || 0,
-      fat: food.fat_per_100g || 0,
-      fiber: food.fiber_per_100g || 0,
-      sugar: food.sugar_per_100g || 0,
-      sodium: food.sodium_per_100g || 0
-    }))
+    console.log('🥗 USDA API found:', results.length, 'results')
+    return results
   } catch (error) {
-    console.error('Error searching USDA:', error)
+    console.error('Error searching USDA API:', error)
     return []
   }
 }
+
 
 
 /**
