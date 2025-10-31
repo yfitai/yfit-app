@@ -58,18 +58,19 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
     }
 
     // Debounce search by 300ms
-    searchTimeout.current = setTimeout(() => {
-      performSearch(value)
-    }, 300)
+  searchTimeout.current = setTimeout(() => {
+  performSearch(value, filter)  // Pass current filter
+}, 300)
   }
 
-  const performSearch = async (searchQuery) => {
-    setLoading(true)
-    try {
-  const searchResults = await searchFoods(searchQuery, {
-  limit: 40,
-  source: filter
-})
+ const performSearch = async (searchQuery, searchFilter) => {
+  setLoading(true)
+  try {
+    const searchResults = await searchFoods(searchQuery, {
+      limit: 40,
+      source: searchFilter || filter  // Use passed filter or current filter
+    })
+
 
       setResults(searchResults)
     } catch (error) {
@@ -86,13 +87,12 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
 
 const handleFilterChange = (newFilter) => {
   setFilter(newFilter)
-  setResults([])  // Clear old results immediately
-  setLoading(true)  // Show loading state
-  // Re-search if there's a query
+  setResults([])
+  setLoading(true)
   if (query.length >= 2) {
-    performSearch(query)
+    performSearch(query, newFilter)  // Pass the new filter directly
   } else {
-    setLoading(false)  // Stop loading if no query
+    setLoading(false)
   }
 }
 
