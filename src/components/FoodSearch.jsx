@@ -83,12 +83,16 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
     onSelectFood(food)
   }
 
-  const handleFilterChange = (newFilter) => {
-    setFilter(newFilter)
-    if (query.length >= 2) {
-      performSearch(query)
-    }
+const handleFilterChange = (newFilter) => {
+  setFilter(newFilter)
+  // Clear results when switching tabs
+  setResults([])
+  // Re-search if there's a query
+  if (query.length >= 2) {
+    performSearch(query)
   }
+}
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
