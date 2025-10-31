@@ -66,10 +66,11 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   const performSearch = async (searchQuery) => {
     setLoading(true)
     try {
-      const searchResults = await searchFoods(searchQuery, {
-        limit: 40,
-        source: filter 
-      })
+  const searchResults = await searchFoods(searchQuery, {
+  limit: 40,
+  source: filter
+})
+
       setResults(searchResults)
     } catch (error) {
       console.error('Search error:', error)
@@ -85,11 +86,13 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
 
 const handleFilterChange = (newFilter) => {
   setFilter(newFilter)
-  // Clear results when switching tabs
-  setResults([])
+  setResults([])  // Clear old results immediately
+  setLoading(true)  // Show loading state
   // Re-search if there's a query
   if (query.length >= 2) {
     performSearch(query)
+  } else {
+    setLoading(false)  // Stop loading if no query
   }
 }
 
