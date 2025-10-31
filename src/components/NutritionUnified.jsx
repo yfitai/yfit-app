@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Calendar, Apple, BookOpen } from 'lucide-react'
 import NutritionEnhanced from './NutritionEnhanced'
 import MealPlanner from './MealPlanner'
-//import MealTemplates from './MealPlanner/MealTemplates'
+import MealTemplates from './MealPlanner/MealTemplates'
 
 export default function NutritionUnified({ user }) {
   const [activeTab, setActiveTab] = useState('daily') // daily, weekly, templates
@@ -81,20 +81,28 @@ export default function NutritionUnified({ user }) {
           </div>
         )}
         
-        {activeTab === 'templates' && (
-          <div>
-            <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <p className="text-sm text-purple-800">
-                <strong>💡 Tip:</strong> Templates save time! Create templates from your favorite meals, then quickly add them to Daily Tracker or Weekly Planner.
-              </p>
-            </div>
-            <TemplatesView user={user} />
-          </div>
-        )}
-      </div>
+   
+       {activeTab === 'templates' && (
+  <div>
+    <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
+      <p className="text-sm text-purple-800">
+        <strong>💡 Tip:</strong> Templates save time! Create templates from your favorite meals, then quickly add them to Daily Tracker or Weekly Planner.
+      </p>
     </div>
-  )
-}
+    <MealTemplates 
+      user={user}
+      onSelectTemplate={(template) => {
+        console.log('Selected template:', template)
+        // TODO: Add template to today's meals
+      }}
+      onSaveTemplate={(templateData) => {
+        console.log('Saved template:', templateData)
+        // Reload templates
+      }}
+    />
+  </div>
+)}
+
 
 // Dedicated Templates View
 function TemplatesView({ user }) {
