@@ -29,13 +29,13 @@ export async function searchFoods(query, options = {}) {
     const results = []
 
     // Search Open Food Facts (branded foods)
-    if (source === 'all' || source === 'branded') {
+    if (source === 'all' ) {
       const offResults = await searchOpenFoodFacts(query, limit)
       results.push(...offResults)
     }
 
     // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all' || source === 'whole') {
+    if (source === 'all' ) {
       try {
         const usdaResults = await searchUSDA(query, limit)
         results.push(...usdaResults)
@@ -67,80 +67,41 @@ export async function searchFoods(query, options = {}) {
 }
 
 /**
- * Search USDA FoodData Central API
+ * Search local USDA food database (food_items table)
  */
 async function searchUSDA(query, limit) {
   try {
-    const response = await fetch(`${USDA_API_BASE}/foods/search?api_key=${USDA_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],
-        pageSize: limit * 2, // Get more results for better filtering
-        pageNumber: 1,
-        sortBy: 'score',
-        sortOrder: 'desc'
-      })
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        console.warn('USDA API: Invalid or missing API key')
-      } else if (response.status === 429) {
-        console.warn('USDA API: Rate limit exceeded')
-      }
-      throw new Error(`USDA API error: ${response.status}`)
-    }
-
-    const data = await response.json()
+    const { data, error } = await supabase
+      .from('food_items')
+      .select('*')
+      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+      .eq('data_source', 'usda')
+      .limit(limit)
     
-    if (!data.foods || data.foods.length === 0) {
-      return []
-    }
-
-    // Filter and rank results by relevance
-    const queryLower = query.toLowerCase()
-    const results = data.foods
-      .map(food => {
-        const nameLower = (food.description || '').toLowerCase()
-        const brandLower = (food.brandName || food.brandOwner || '').toLowerCase()
-        
-        // Calculate relevance score
-        let relevanceScore = 0
-        
-        // Exact match gets highest score
-        if (nameLower === queryLower) relevanceScore += 100
-        
-        // Starts with query gets high score
-        if (nameLower.startsWith(queryLower)) relevanceScore += 50
-        
-        // Contains all query words
-        const queryWords = queryLower.split(' ')
-        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
-        relevanceScore += (matchedWords / queryWords.length) * 30
-        
-        // Brand match bonus
-        if (brandLower.includes(queryLower)) relevanceScore += 10
-        
-        return {
-          food,
-          relevanceScore
-        }
-      })
-      .filter(item => item.relevanceScore > 10) // Filter out very low relevance
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, limit)
-      .map(item => transformUSDAFood(item.food))
+    if (error) throw error
     
-    return results
+    return (data || []).map(food => ({
+      id: `usda_${food.fdc_id || food.id}`,
+      fdcId: food.fdc_id,
+      name: food.name,
+      brand: 'USDA',
+      source: 'usda',
+      servingSize: food.default_serving_description || '100g',
+      servingGrams: food.default_serving_size || 100,
+      calories: food.calories_per_100g || 0,
+      protein: food.protein_per_100g || 0,
+      carbs: food.carbs_per_100g || 0,
+      fat: food.fat_per_100g || 0,
+      fiber: food.fiber_per_100g || 0,
+      sugar: food.sugar_per_100g || 0,
+      sodium: food.sodium_per_100g || 0
+    }))
   } catch (error) {
     console.error('Error searching USDA:', error)
     return []
   }
 }
+
 
 /**
  * Transform USDA food data to our standard format
