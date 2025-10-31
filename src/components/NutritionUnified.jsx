@@ -103,5 +103,11 @@ export default function NutritionUnified({ user }) {
   </div>
 )}
 
+      </div>
+    </div>
+  )
+}
+
+export default NutritionUnified
 
 
