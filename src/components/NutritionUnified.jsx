@@ -4,7 +4,7 @@ import NutritionEnhanced from './NutritionEnhanced'
 import MealPlanner from './MealPlanner'
 import MealTemplates from './MealPlanner/MealTemplates'
 
-export default function NutritionUnified({ user }) {
+ function NutritionUnified({ user }) {
   const [activeTab, setActiveTab] = useState('daily') // daily, weekly, templates
 
   return (
