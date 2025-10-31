@@ -817,9 +817,8 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
 
   // Calculate multiplier based on quantity and unit
   const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
-  const totalGrams = servingQuantity * selectedUnit.toGrams
+  const totalGrams = (servingQuantity || 0) * selectedUnit.toGrams
   const multiplier = totalGrams / 100 // All nutrition is per 100g
-
   const displayCalories = Math.round((food.calories || 0) * multiplier)
   const displayProtein = Math.round((food.protein || 0) * multiplier)
   const displayCarbs = Math.round((food.carbs || 0) * multiplier)
@@ -849,7 +848,22 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
               <input
                 type="number"
                 value={servingQuantity}
-                onChange={(e) => setServingQuantity(parseFloat(e.target.value) || 1)}
+            <input
+  type="number"
+  value={servingQuantity}
+  onChange={(e) => {
+    const value = e.target.value
+    if (value === '' || value === '0') {
+      setServingQuantity('')
+    } else {
+      setServingQuantity(parseFloat(value) || 1)
+    }
+  }}
+  min="0.1"
+  step="0.1"
+  className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+/>
+
                 min="0.1"
                 step="0.1"
                 className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
