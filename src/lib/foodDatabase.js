@@ -233,10 +233,8 @@ async function searchOpenFoodFacts(query, limit) {
       fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
       fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
       sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
-
-
-        sodium: Math.round(product.nutriments?.sodium_100g || 0),
-        imageUrl: product.image_url
+      sodium: Math.round(product.nutriments?.sodium_100g || 0),
+      imageUrl: product.image_url
       }))
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
@@ -277,15 +275,14 @@ export async function lookupBarcode(barcode) {
       brand: product.brands || 'Unknown',
       source: 'openfoodfacts',
       servingSize: product.serving_size || '100g',
-      calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),also arouned line
+      calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),
       protein: parseFloat((Number(product.nutriments?.proteins_100g) || 0).toFixed(1)),
      carbs: parseFloat((Number(product.nutriments?.carbohydrates_100g) || 0).toFixed(1)),
      fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
      fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
      sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
-
-      sodium: Math.round(product.nutriments?.sodium_100g || 0),
-      imageUrl: product.image_url
+     sodium: Math.round(product.nutriments?.sodium_100g || 0),
+     imageUrl: product.image_url
     }
   } catch (error) {
     console.error('Error looking up barcode:', error)
