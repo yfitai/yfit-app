@@ -510,35 +510,39 @@ export default {
 /**
  * Search custom/user-created foods
  */
+/**
+ * Search custom/user-created foods
+ */
 async function searchCustomFoods(query, limit) {
   try {
     const { data, error } = await supabase
       .from('custom_foods')
       .select('*')
-      .ilike('name', `%${query}%`)
+      .ilike('product_name', `%${query}%`)
       .limit(limit)
     
     if (error) throw error
     
     return (data || []).map(food => ({
       id: `custom_${food.id}`,
-      name: food.name,
+      name: food.product_name,
       brand: food.brand || 'Custom',
       source: 'custom',
       servingSize: food.serving_size || '100g',
-      calories: food.calories || 0,
-      protein: food.protein || 0,
-      carbs: food.carbs || 0,
-      fat: food.fat || 0,
-      fiber: food.fiber || 0,
-      sugar: food.sugar || 0,
-      sodium: food.sodium || 0
+      calories: food.calories_per_100g || 0,
+      protein: food.protein_per_100g || 0,
+      carbs: food.carbs_per_100g || 0,
+      fat: food.fat_per_100g || 0,
+      fiber: food.fiber_per_100g || 0,
+      sugar: food.sugar_per_100g || 0,
+      sodium: food.sodium_per_100g || 0
     }))
   } catch (error) {
     console.error('Error searching custom foods:', error)
     return []
   }
 }
+
 
 
 
