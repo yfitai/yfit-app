@@ -25,17 +25,21 @@ const USER_AGENT = 'YFIT/1.0 (contact@yfit.app)'
 export async function searchFoods(query, options = {}) {
   const { limit = 20, source = 'all' } = options
 
+  console.log('🔍 searchFoods called:', { query, source, limit })
+
   try {
     const results = []
 
     // Search Open Food Facts (branded foods)
     if (source === 'all' ) {
+      console.log('📦 Searching Open Food Facts...')
       const offResults = await searchOpenFoodFacts(query, limit)
       results.push(...offResults)
     }
 
     // Search USDA (whole foods) - NOW ENABLED
     if (source === 'all' ) {
+      const usdaResults = await searchUSDA(query, limit)
       try {
         const usdaResults = await searchUSDA(query, limit)
         results.push(...usdaResults)
@@ -46,6 +50,7 @@ export async function searchFoods(query, options = {}) {
 
     // Search Custom Foods (user-created)
     if (source === 'all' || source === 'custom') {
+      console.log('✏️ Custom Foods found:', customResults.length, 'results')
       try {
         const customResults = await searchCustomFoods(query, limit)
         results.push(...customResults)
@@ -58,7 +63,7 @@ export async function searchFoods(query, options = {}) {
 
     // Remove duplicates (by name and brand)
     const uniqueResults = deduplicateFoods(results)
-
+    console.log('✅ Final results:', uniqueResults.length)
     return uniqueResults.slice(0, limit)
   } catch (error) {
     console.error('Error searching foods:', error)
