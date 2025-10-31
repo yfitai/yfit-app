@@ -31,45 +31,48 @@ export async function searchFoods(query, options = {}) {
     const results = []
 
     // Search Open Food Facts (branded foods)
-    if (source === 'all' ) {
+    if (source === 'all') {
       console.log('📦 Searching Open Food Facts...')
       const offResults = await searchOpenFoodFacts(query, limit)
+      console.log('📦 Open Food Facts found:', offResults.length, 'results')
       results.push(...offResults)
     }
 
     // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all' ) {
-      const usdaResults = await searchUSDA(query, limit)
+    if (source === 'all') {
+      console.log('🥗 Searching USDA...')
       try {
         const usdaResults = await searchUSDA(query, limit)
+        console.log('🥗 USDA found:', usdaResults.length, 'results')
         results.push(...usdaResults)
       } catch (error) {
-        console.warn('USDA search failed, continuing with other sources:', error.message)
+        console.warn('USDA search failed:', error.message)
       }
     }
 
     // Search Custom Foods (user-created)
-    if (source === 'all' || source === 'custom') {
-      console.log('✏️ Custom Foods found:', customResults.length, 'results')
+    if (source === 'custom') {
+      console.log('✏️ Searching Custom Foods...')
       try {
         const customResults = await searchCustomFoods(query, limit)
+        console.log('✏️ Custom Foods found:', customResults.length, 'results')
         results.push(...customResults)
       } catch (error) {
         console.warn('Custom foods search failed:', error.message)
       }
     }
 
-
-
     // Remove duplicates (by name and brand)
     const uniqueResults = deduplicateFoods(results)
     console.log('✅ Final results:', uniqueResults.length)
+
     return uniqueResults.slice(0, limit)
   } catch (error) {
     console.error('Error searching foods:', error)
     return []
   }
 }
+
 
 /**
  * Search local USDA food database (food_items table)
