@@ -132,7 +132,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
 
           {/* Filter Chips */}
           <div className="flex gap-2 mt-3 flex-wrap">
-            {['all', 'branded', 'whole', 'custom'].map((filterOption) => (
+            {['all',  'custom'].map((filterOption) => (
               <button
                 key={filterOption}
                 onClick={() => handleFilterChange(filterOption)}
@@ -142,10 +142,9 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {filterOption === 'all' && '🔍 All Foods'}
-                {filterOption === 'branded' && '🏷️ Branded'}
-                {filterOption === 'whole' && '🥗 Whole Foods'}
-                {filterOption === 'custom' && '✏️ My Foods'}
+                 {filterOption === 'all' && '🔍 All Foods'}
+                {filterOption === 'custom' && '⭐ My Foods'}
+
               </button>
             ))}
           </div>
