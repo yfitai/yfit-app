@@ -79,14 +79,23 @@ export async function searchFoods(query, options = {}) {
  */
 async function searchUSDA(query, limit) {
   try {
+    console.log('🥗 Searching USDA for:', query)
+    
     const { data, error } = await supabase
       .from('food_items')
       .select('*')
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
       .eq('data_source', 'usda')
+      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
       .limit(limit)
     
-    if (error) throw error
+    console.log('🥗 USDA query result:', { data, error })
+    
+    if (error) {
+      console.error('🥗 USDA error:', error)
+      throw error
+    }
+    
+    console.log('🥗 USDA raw data:', data?.length || 0, 'rows')
     
     return (data || []).map(food => ({
       id: `usda_${food.fdc_id || food.id}`,
@@ -109,7 +118,6 @@ async function searchUSDA(query, limit) {
     return []
   }
 }
-
 
 /**
  * Transform USDA food data to our standard format
