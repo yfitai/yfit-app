@@ -67,7 +67,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
     setLoading(true)
     try {
       const searchResults = await searchFoods(searchQuery, {
-        limit: 20,
+        limit: 40,
         source: filter 
       })
       setResults(searchResults)

@@ -62,16 +62,32 @@ export async function searchFoods(query, options = {}) {
       }
     }
 
-    // Remove duplicates (by name and brand)
+        // Remove duplicates (by name and brand)
     const uniqueResults = deduplicateFoods(results)
-    console.log('✅ Final results:', uniqueResults.length)
 
-    return uniqueResults.slice(0, limit)
+    // Interleave results by source for better variety
+    const branded = uniqueResults.filter(f => f.source === 'openfoodfacts')
+    const usda = uniqueResults.filter(f => f.source === 'usda')
+    const custom = uniqueResults.filter(f => f.source === 'custom')
+
+    // Alternate between sources so USDA results appear throughout
+    const interleaved = []
+    const maxLength = Math.max(branded.length, usda.length, custom.length)
+    for (let i = 0; i < maxLength; i++) {
+      if (branded[i]) interleaved.push(branded[i])
+      if (usda[i]) interleaved.push(usda[i])
+      if (custom[i]) interleaved.push(custom[i])
+    }
+
+        console.log('✅ Final results:', interleaved.length, '(Branded:', branded.length, 'USDA:', usda.length, 'Custom:', custom.length, ')')
+
+    return interleaved.slice(0, limit)
   } catch (error) {
     console.error('Error searching foods:', error)
     return []
   }
 }
+
 
 
 /**
