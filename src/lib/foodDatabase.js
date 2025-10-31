@@ -448,13 +448,15 @@ export async function removeFavoriteFood(userId, foodId) {
   }
 }
 
+
 /**
  * Remove duplicate foods from results
  */
 function deduplicateFoods(foods) {
   const seen = new Set()
   return foods.filter(food => {
-    const key = `${food.name.toLowerCase()}_${(food.brand || '').toLowerCase()}`
+    // Include source in the key to prevent removing USDA foods that have same name as branded
+    const key = `${food.name.toLowerCase()}_${(food.brand || '').toLowerCase()}_${food.source || ''}`
     if (seen.has(key)) {
       return false
     }
@@ -462,6 +464,7 @@ function deduplicateFoods(foods) {
     return true
   })
 }
+
 
 /**
  * Get detailed food information by ID
