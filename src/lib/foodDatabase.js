@@ -84,8 +84,8 @@ async function searchUSDA(query, limit) {
     const { data, error } = await supabase
       .from('food_items')
       .select('*')
-      .eq('data_source', 'usda')
       .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+      .eq('data_source', 'usda')
       .limit(limit)
     
     console.log('🥗 USDA query result:', { data, error })
