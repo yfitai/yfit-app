@@ -228,11 +228,12 @@ async function searchOpenFoodFacts(query, limit) {
         source: 'openfoodfacts',
         servingSize: product.serving_size || '100g',
         calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),
-      protein: parseFloat((product.nutriments?.proteins_100g ?? 0).toFixed(1)),
-     carbs: parseFloat((product.nutriments?.carbohydrates_100g ?? 0).toFixed(1)),
-     fat: parseFloat((product.nutriments?.fat_100g ?? 0).toFixed(1)),
-     fiber: parseFloat((product.nutriments?.fiber_100g ?? 0).toFixed(1)),
-     sugar: parseFloat((product.nutriments?.sugars_100g ?? 0).toFixed(1)),
+       protein: parseFloat((Number(product.nutriments?.proteins_100g) || 0).toFixed(1)),
+      carbs: parseFloat((Number(product.nutriments?.carbohydrates_100g) || 0).toFixed(1)),
+      fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
+      fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
+      sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
+
 
         sodium: Math.round(product.nutriments?.sodium_100g || 0),
         imageUrl: product.image_url
@@ -276,12 +277,13 @@ export async function lookupBarcode(barcode) {
       brand: product.brands || 'Unknown',
       source: 'openfoodfacts',
       servingSize: product.serving_size || '100g',
-      calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),
-      protein: parseFloat((product.nutriments?.proteins_100g || 0).toFixed(1)),
-      carbs: parseFloat((product.nutriments?.carbohydrates_100g || 0).toFixed(1)),
-      fat: parseFloat((product.nutriments?.fat_100g || 0).toFixed(1)),
-      fiber: parseFloat((product.nutriments?.fiber_100g || 0).toFixed(1)),
-      sugar: parseFloat((product.nutriments?.sugars_100g || 0).toFixed(1)),
+      calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),also arouned line
+      protein: parseFloat((Number(product.nutriments?.proteins_100g) || 0).toFixed(1)),
+     carbs: parseFloat((Number(product.nutriments?.carbohydrates_100g) || 0).toFixed(1)),
+     fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
+     fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
+     sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
+
       sodium: Math.round(product.nutriments?.sodium_100g || 0),
       imageUrl: product.image_url
     }
