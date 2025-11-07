@@ -8,6 +8,8 @@ import { supabase } from '../lib/supabase'
 
  function NutritionUnified({ user }) {
   const [activeTab, setActiveTab] = useState('daily') // daily, weekly, templates
+  const [templateRefreshKey, setTemplateRefreshKey] = useState(0)
+
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
@@ -91,11 +93,11 @@ import { supabase } from '../lib/supabase'
         <strong>💡 Tip:</strong> Templates save time! Create templates from your favorite meals, then quickly add them to Daily Tracker or Weekly Planner.
       </p>
     </div>
- <MealTemplates 
+<MealTemplates 
+  key={templateRefreshKey}  // ← Make sure this is here
   user={user}
   onSelectTemplate={async (template) => {
     console.log('Selected template:', template)
-    // TODO: Add template to today's meals
     alert('Template selected! (Adding to daily tracker coming soon)')
   }}
   onSaveTemplate={async (templateData) => {
@@ -121,8 +123,8 @@ import { supabase } from '../lib/supabase'
         console.log('Template saved to localStorage:', newTemplate)
         alert('Template saved successfully!')
         
-        // Trigger reload
-        window.dispatchEvent(new Event('yfit-templates-updated'))
+        // Force refresh
+        setTemplateRefreshKey(prev => prev + 1)  // ← ADD THIS
         return
       }
       
@@ -169,14 +171,15 @@ import { supabase } from '../lib/supabase'
       console.log('Template saved to Supabase:', template)
       alert('Template saved successfully!')
       
-      // Trigger reload
-      window.dispatchEvent(new Event('yfit-templates-updated'))
+      // Force refresh
+      setTemplateRefreshKey(prev => prev + 1)  // ← ADD THIS
     } catch (error) {
       console.error('Error saving template:', error)
       alert('Failed to save template: ' + error.message)
     }
   }}
 />
+
 
   </div>
 )}
