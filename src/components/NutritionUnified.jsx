@@ -3,6 +3,8 @@ import { Calendar, Apple, BookOpen } from 'lucide-react'
 import NutritionEnhanced from './NutritionEnhanced'
 import MealPlanner from './MealPlanner'
 import MealTemplates from './MealPlanner/MealTemplates'
+import { supabase } from '../lib/supabase'
+
 
  function NutritionUnified({ user }) {
   const [activeTab, setActiveTab] = useState('daily') // daily, weekly, templates
@@ -89,17 +91,93 @@ import MealTemplates from './MealPlanner/MealTemplates'
         <strong>💡 Tip:</strong> Templates save time! Create templates from your favorite meals, then quickly add them to Daily Tracker or Weekly Planner.
       </p>
     </div>
-    <MealTemplates 
-      user={user}
-      onSelectTemplate={(template) => {
-        console.log('Selected template:', template)
-        // TODO: Add template to today's meals
-      }}
-      onSaveTemplate={(templateData) => {
-        console.log('Saved template:', templateData)
-        // Reload templates
-      }}
-    />
+ <MealTemplates 
+  user={user}
+  onSelectTemplate={async (template) => {
+    console.log('Selected template:', template)
+    // TODO: Add template to today's meals
+    alert('Template selected! (Adding to daily tracker coming soon)')
+  }}
+  onSaveTemplate={async (templateData) => {
+    console.log('Saving template:', templateData)
+    
+    try {
+      // Demo mode - save to localStorage
+      if (user.id === 'demo-user-id') {
+        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
+        
+        const newTemplate = {
+          id: `template_${Date.now()}`,
+          user_id: user.id,
+          ...templateData,
+          use_count: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        
+        demoTemplates.push(newTemplate)
+        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(demoTemplates))
+        
+        console.log('Template saved to localStorage:', newTemplate)
+        alert('Template saved successfully!')
+        
+        // Trigger reload
+        window.dispatchEvent(new Event('yfit-templates-updated'))
+        return
+      }
+      
+      // Real user - save to Supabase
+      const { data: template, error: templateError } = await supabase
+        .from('meal_templates')
+        .insert({
+          user_id: user.id,
+          template_name: templateData.template_name,
+          meal_type: templateData.meal_type,
+          description: templateData.description,
+          total_calories: templateData.total_calories,
+          total_protein: templateData.total_protein,
+          total_carbs: templateData.total_carbs,
+          total_fat: templateData.total_fat,
+          is_favorite: templateData.is_favorite,
+          use_count: 0
+        })
+        .select()
+        .single()
+      
+      if (templateError) throw templateError
+      
+      // Save template items
+      const items = templateData.meals.map(meal => ({
+        template_id: template.id,
+        food_id: meal.food_id,
+        food_name: meal.food_name,
+        brand: meal.brand,
+        serving_quantity: meal.serving_quantity,
+        serving_unit: meal.serving_unit,
+        calories: meal.calories,
+        protein: meal.protein,
+        carbs: meal.carbs,
+        fat: meal.fat
+      }))
+      
+      const { error: itemsError } = await supabase
+        .from('meal_template_items')
+        .insert(items)
+      
+      if (itemsError) throw itemsError
+      
+      console.log('Template saved to Supabase:', template)
+      alert('Template saved successfully!')
+      
+      // Trigger reload
+      window.dispatchEvent(new Event('yfit-templates-updated'))
+    } catch (error) {
+      console.error('Error saving template:', error)
+      alert('Failed to save template: ' + error.message)
+    }
+  }}
+/>
+
   </div>
 )}
 
