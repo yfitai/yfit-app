@@ -171,6 +171,9 @@ async function searchUSDA(query, limit) {
  * Transform USDA food data to our standard format
  */
 function transformUSDAFood(usdaFood) {
+  console.log('🥗 Transforming USDA food:', usdaFood.description)
+  console.log('🥗 Raw nutrients:', usdaFood.foodNutrients)
+  
   const nutrients = {}
   
   if (usdaFood.foodNutrients) {
@@ -179,12 +182,16 @@ function transformUSDAFood(usdaFood) {
       const value = nutrient.value || 0
       
       if (name.includes('energy') && name.includes('kcal')) {
+        console.log('✅ Found calories:', value, 'from nutrient:', nutrient.nutrientName)
         nutrients.calories = Math.round(value)
       } else if (name.includes('protein')) {
+        console.log('✅ Found protein:', value)
         nutrients.protein = parseFloat(value.toFixed(1))
       } else if (name.includes('carbohydrate')) {
+        console.log('✅ Found carbs:', value)
         nutrients.carbs = parseFloat(value.toFixed(1))
       } else if (name.includes('total lipid') || name.includes('fat, total')) {
+        console.log('✅ Found fat:', value)
         nutrients.fat = parseFloat(value.toFixed(1))
       } else if (name.includes('fiber')) {
         nutrients.fiber = parseFloat(value.toFixed(1))
@@ -195,25 +202,17 @@ function transformUSDAFood(usdaFood) {
       }
     })
   }
-
-  let servingSize = '100g'
-  let servingGrams = 100
   
-  if (usdaFood.servingSize && usdaFood.servingSizeUnit) {
-    servingSize = `${usdaFood.servingSize}${usdaFood.servingSizeUnit}`
-    if (usdaFood.servingSizeUnit === 'g') {
-      servingGrams = usdaFood.servingSize
-    }
-  }
+  console.log('🥗 Final nutrients:', nutrients)
 
   return {
     id: `usda_${usdaFood.fdcId}`,
     fdcId: usdaFood.fdcId,
-    name: usdaFood.description || 'Unknown Food',
+    name: usdaFood.description,
     brand: 'USDA',
     source: 'usda',
-    servingSize: servingSize,
-    servingGrams: servingGrams,
+    servingSize: '100g',
+    servingGrams: 100,
     calories: nutrients.calories || 0,
     protein: nutrients.protein || 0,
     carbs: nutrients.carbs || 0,
@@ -223,6 +222,7 @@ function transformUSDAFood(usdaFood) {
     sodium: nutrients.sodium || 0
   }
 }
+
 
 /**
  * Search Open Food Facts API
