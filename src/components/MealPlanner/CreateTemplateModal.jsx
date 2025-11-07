@@ -137,41 +137,52 @@ export default function CreateTemplateModal({ onSave, onClose }) {
           <div className="grid grid-cols-2 gap-6 flex-1 overflow-hidden">
             {/* Left Column - Template Info & Foods */}
             <div className="space-y-4 overflow-y-auto pr-2">
-              {/* Template Name */}
+
+                        {/* Template Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Template Name *
+                  Template Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="e.g., My Breakfast"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    templateName.trim() ? 'border-gray-300' : 'border-red-300 bg-red-50'
+                  }`}
                 />
+                {!templateName.trim() && (
+                  <p className="text-xs text-red-600 mt-1">⚠️ Template name is required</p>
+                )}
               </div>
 
-              {/* Meal Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Meal Type *
+
+                       {/* Meal Type */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Meal Type <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
                     <button
                       key={type}
                       onClick={() => setMealType(type)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                         mealType === type
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-blue-600 text-white shadow-lg scale-105'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                       }`}
                     >
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-blue-700 mt-2">
+                  ℹ️ Selected: <strong>{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</strong>
+                </p>
               </div>
+   
 
               {/* Description */}
               <div>
@@ -405,11 +416,18 @@ export default function CreateTemplateModal({ onSave, onClose }) {
             onClick={handleSave}
             disabled={!templateName.trim() || foods.length === 0}
             className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+ 
           >
-            Save Template
+            {!templateName.trim() 
+              ? '⚠️ Enter Template Name' 
+              : foods.length === 0 
+              ? '⚠️ Add Foods First'
+              : '✓ Save Template'}
           </button>
         </div>
-      </div>
+     </div>
     </div>
   )
 }
+ 
+
