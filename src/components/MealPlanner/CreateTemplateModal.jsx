@@ -15,6 +15,8 @@ export default function CreateTemplateModal({ onSave, onClose }) {
   const [searching, setSearching] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
   const [servingQuantity, setServingQuantity] = useState(1)
+  const [servingUnit, setServingUnit] = useState('serving')
+
 
   // Search for foods
   async function handleSearch(query) {
@@ -40,6 +42,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
     console.log('[CreateTemplate] Selecting food:', food)
     setSelectedFood(food)
     setServingQuantity(1)
+    setServingUnit('serving')   // Reset unit when selecting new food
     console.log('[CreateTemplate] Food selected, selectedFood state should update')
   }
 
@@ -47,7 +50,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
   function addFoodToTemplate() {
     console.log('[CreateTemplate] Adding food, selectedFood:', selectedFood)
     console.log('[CreateTemplate] Current foods:', foods)
-    
+
     if (!selectedFood) {
       console.log('[CreateTemplate] No food selected!')
       return
@@ -58,7 +61,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
       food_name: selectedFood.name,
       brand: selectedFood.brand,
       serving_quantity: servingQuantity,
-      serving_unit: selectedFood.serving_unit || 'serving',
+      serving_unit:  servingUnit,
       calories: Math.round(selectedFood.calories * servingQuantity),
       protein: Math.round(selectedFood.protein * servingQuantity * 10) / 10,
       carbs: Math.round(selectedFood.carbs * servingQuantity * 10) / 10,
@@ -327,44 +330,65 @@ export default function CreateTemplateModal({ onSave, onClose }) {
               )}
 
               {/* Selected Food - Serving Size */}
-              {selectedFood && (
-                <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 shadow-lg sticky bottom-0">
-                  {console.log('[CreateTemplate] Rendering selected food box for:', selectedFood)}
-                  <div className="font-medium text-sm text-gray-900 mb-2">
-                    {selectedFood.name}
-                  </div>
-                  
-                  <div className="flex items-center gap-3 mb-3">
-                    <label className="text-sm text-gray-700">Servings:</label>
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={servingQuantity}
-                      onChange={(e) => setServingQuantity(parseFloat(e.target.value) || 1)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
-                    />
-                    <span className="text-sm text-gray-600">
-                      {selectedFood.serving_unit || 'serving'}
-                    </span>
-                  </div>
+{selectedFood && (
+  <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 shadow-lg sticky bottom-0">
+    <div className="font-medium text-sm text-gray-900 mb-2">
+      {selectedFood.name}
+    </div>
+    
+    <div className="mb-3">
+      <label className="block text-sm text-gray-700 mb-1">Quantity & Unit:</label>
+      <div className="flex gap-2">
+        <input
+          type="number"
+          min="0.1"
+          step="0.1"
+          value={servingQuantity}
+          onChange={(e) => {
+            const value = e.target.value
+            if (value === '' || value === '0') {
+              setServingQuantity('')
+            } else {
+              setServingQuantity(parseFloat(value) || 1)
+            }
+          }}
+          className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+        />
+        <select
+          value={servingUnit}
+          onChange={(e) => setServingUnit(e.target.value)}
+          className="flex-1 px-2 py-1 border border-gray-300 rounded bg-white text-sm"
+        >
+          <option value="g">Grams (g)</option>
+          <option value="oz">Ounces (oz)</option>
+          <option value="lb">Pounds (lb)</option>
+          <option value="ml">Milliliters (ml)</option>
+          <option value="fl_oz">Fluid Ounces (fl oz)</option>
+          <option value="cup">Cups</option>
+          <option value="tbsp">Tablespoons (tbsp)</option>
+          <option value="tsp">Teaspoons (tsp)</option>
+          <option value="serving">Serving</option>
+        </select>
+      </div>
+    </div>
 
-                  <div className="text-xs text-gray-600 mb-3">
-                    {Math.round(selectedFood.calories * servingQuantity)} cal •
-                    P: {Math.round(selectedFood.protein * servingQuantity * 10) / 10}g •
-                    C: {Math.round(selectedFood.carbs * servingQuantity * 10) / 10}g •
-                    F: {Math.round(selectedFood.fat * servingQuantity * 10) / 10}g
-                  </div>
+    <div className="text-xs text-gray-600 mb-3">
+      {Math.round(selectedFood.calories * (servingQuantity || 0))} cal •
+      P: {Math.round(selectedFood.protein * (servingQuantity || 0) * 10) / 10}g •
+      C: {Math.round(selectedFood.carbs * (servingQuantity || 0) * 10) / 10}g •
+      F: {Math.round(selectedFood.fat * (servingQuantity || 0) * 10) / 10}g
+    </div>
 
-                  <button
-                    onClick={addFoodToTemplate}
-                    className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add to Template
-                  </button>
-                </div>
-              )}
+    <button
+      onClick={addFoodToTemplate}
+      className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+    >
+      <Plus className="w-4 h-4" />
+      Add to Template
+    </button>
+  </div>
+)}
+
             </div>
           </div>
         </div>
