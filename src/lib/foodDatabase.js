@@ -181,8 +181,8 @@ function transformUSDAFood(usdaFood) {
       const name = nutrient.nutrientName?.toLowerCase() || ''
       const value = nutrient.value || 0
       
-      if (name.includes('energy') && name.includes('kcal')) {
-        console.log('✅ Found calories:', value, 'from nutrient:', nutrient.nutrientName)
+    if (name.includes('energy') || name.includes('calorie')) {
+       console.log('✅ Found calories:', value, 'from nutrient:', nutrient.nutrientName)
         nutrients.calories = Math.round(value)
       } else if (name.includes('protein')) {
         console.log('✅ Found protein:', value)
