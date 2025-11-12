@@ -22,12 +22,20 @@ const FormAnalysisLive = () => {
   const repStateRef = useRef('up'); // Track rep state: 'up', 'down', 'transition'
   const lastRepTimeRef = useRef(0); // Prevent double counting
 
-  // Exercise options (starting with MVP 3)
+   // Exercise options (10 total exercises)
   const exercises = [
     { id: 'squat', name: 'Bodyweight Squat', description: 'Stand with feet shoulder-width apart' },
     { id: 'pushup', name: 'Push-Up', description: 'Start in plank position' },
-    { id: 'plank', name: 'Plank Hold', description: 'Hold plank position with proper form' }
+    { id: 'plank', name: 'Plank Hold', description: 'Hold plank position with proper form' },
+    { id: 'situp', name: 'Sit-Up', description: 'Lie on your back with knees bent' },
+    { id: 'deadlift', name: 'Deadlift', description: 'Stand with feet hip-width apart, barbell over mid-foot' },
+    { id: 'benchpress', name: 'Bench Press', description: 'Lie on bench with feet flat on floor' },
+    { id: 'lateralraise', name: 'Lateral Raise', description: 'Stand with dumbbells at sides' },
+    { id: 'preachercurl', name: 'Preacher Curl', description: 'Sit at preacher bench with arms extended' },
+    { id: 'bicepcurl', name: 'Bicep Curl', description: 'Stand with dumbbells at sides, palms forward' },
+    { id: 'bentoverrow', name: 'Dumbbell Bent Over Row', description: 'Bend at hips with back straight, dumbbells hanging' }
   ];
+
 
   useEffect(() => {
     // Initialize MediaPipe Pose
@@ -90,7 +98,7 @@ const FormAnalysisLive = () => {
   const analyzeForm = (landmarks, exerciseId) => {
     const feedback = [];
 
-    switch (exerciseId) {
+      switch (exerciseId) {
       case 'squat':
         feedback.push(...analyzeSquat(landmarks));
         break;
@@ -100,7 +108,29 @@ const FormAnalysisLive = () => {
       case 'plank':
         feedback.push(...analyzePlank(landmarks));
         break;
+      case 'situp':
+        feedback.push(...analyzeSitup(landmarks));
+        break;
+      case 'deadlift':
+        feedback.push(...analyzeDeadlift(landmarks));
+        break;
+      case 'benchpress':
+        feedback.push(...analyzeBenchPress(landmarks));
+        break;
+      case 'lateralraise':
+        feedback.push(...analyzeLateralRaise(landmarks));
+        break;
+      case 'preachercurl':
+        feedback.push(...analyzePreacherCurl(landmarks));
+        break;
+      case 'bicepcurl':
+        feedback.push(...analyzeBicepCurl(landmarks));
+        break;
+      case 'bentoverrow':
+        feedback.push(...analyzeBentOverRow(landmarks));
+        break;
     }
+
 
     setFormFeedback(feedback);
   };
@@ -246,6 +276,294 @@ const FormAnalysisLive = () => {
       feedback.push({
         type: 'warning',
         message: 'Hips sagging - engage your core'
+      });
+    }
+
+    return feedback;
+  };
+  const analyzeSitup = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftHip = landmarks[23];
+    const leftKnee = landmarks[25];
+
+    // Calculate torso angle
+    const torsoAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Up position (torso angle < 100)
+    if (torsoAngle < 100 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Down position (torso angle > 140)
+    else if (torsoAngle > 140 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Form feedback
+    if (torsoAngle < 100) {
+      feedback.push({
+        type: 'success',
+        message: 'Good range of motion!'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzeDeadlift = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftHip = landmarks[23];
+    const leftKnee = landmarks[25];
+    const leftAnkle = landmarks[27];
+
+    // Calculate hip angle
+    const hipAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Standing position (hip angle > 160)
+    if (hipAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 800) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Bent position (hip angle < 120)
+    else if (hipAngle < 120 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Check back alignment
+    const backAngle = calculateAngle(leftShoulder, leftHip, leftAnkle);
+    if (backAngle < 160) {
+      feedback.push({
+        type: 'warning',
+        message: 'Keep your back straight - engage your core'
+      });
+    } else {
+      feedback.push({
+        type: 'success',
+        message: 'Good back position!'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzeBenchPress = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftElbow = landmarks[13];
+    const leftWrist = landmarks[15];
+
+    // Calculate elbow angle
+    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Extended position (elbow angle > 160)
+    if (elbowAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 600) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Lowered position (elbow angle < 100)
+    else if (elbowAngle < 100 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Form feedback
+    if (elbowAngle < 100) {
+      feedback.push({
+        type: 'success',
+        message: 'Good depth - bar to chest!'
+      });
+    } else if (elbowAngle > 120 && elbowAngle < 160) {
+      feedback.push({
+        type: 'info',
+        message: 'Lower the bar closer to your chest'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzeLateralRaise = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftElbow = landmarks[13];
+    const leftWrist = landmarks[15];
+    const leftHip = landmarks[23];
+
+    // Calculate arm angle relative to body
+    const armAngle = calculateAngle(leftHip, leftShoulder, leftElbow);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Raised position (arm angle > 70)
+    if (armAngle > 70 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Lowered position (arm angle < 40)
+    else if (armAngle < 40 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Form feedback
+    if (armAngle > 90) {
+      feedback.push({
+        type: 'warning',
+        message: 'Don\'t raise too high - shoulder level is enough'
+      });
+    } else if (armAngle > 70) {
+      feedback.push({
+        type: 'success',
+        message: 'Perfect height!'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzePreacherCurl = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftElbow = landmarks[13];
+    const leftWrist = landmarks[15];
+
+    // Calculate elbow angle
+    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Curled position (elbow angle < 60)
+    if (elbowAngle < 60 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Extended position (elbow angle > 140)
+    else if (elbowAngle > 140 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Form feedback
+    if (elbowAngle < 60) {
+      feedback.push({
+        type: 'success',
+        message: 'Full contraction!'
+      });
+    } else if (elbowAngle > 140) {
+      feedback.push({
+        type: 'success',
+        message: 'Full extension!'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzeBicepCurl = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftElbow = landmarks[13];
+    const leftWrist = landmarks[15];
+
+    // Calculate elbow angle
+    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Curled position (elbow angle < 50)
+    if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Extended position (elbow angle > 150)
+    else if (elbowAngle > 150 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Form feedback
+    if (elbowAngle < 50) {
+      feedback.push({
+        type: 'success',
+        message: 'Full curl - squeeze at the top!'
+      });
+    }
+
+    return feedback;
+  };
+
+  const analyzeBentOverRow = (landmarks) => {
+    const feedback = [];
+    
+    // Get key landmarks
+    const leftShoulder = landmarks[11];
+    const leftElbow = landmarks[13];
+    const leftWrist = landmarks[15];
+    const leftHip = landmarks[23];
+
+    // Calculate elbow angle
+    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    
+    // Rep counting logic
+    const currentTime = Date.now();
+    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+    
+    // Pulled position (elbow angle < 70)
+    if (elbowAngle < 70 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+      setRepCount(prev => prev + 1);
+      repStateRef.current = 'up';
+      lastRepTimeRef.current = currentTime;
+    }
+    // Extended position (elbow angle > 140)
+    else if (elbowAngle > 140 && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+    }
+
+    // Check torso angle (should be bent forward)
+    const torsoAngle = calculateAngle(leftShoulder, leftHip, landmarks[25]);
+    if (torsoAngle > 120) {
+      feedback.push({
+        type: 'warning',
+        message: 'Bend forward more - torso should be near parallel'
+      });
+    } else {
+      feedback.push({
+        type: 'success',
+        message: 'Good torso position!'
       });
     }
 
