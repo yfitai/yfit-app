@@ -489,42 +489,46 @@ const FormAnalysisLive = () => {
     return feedback;
   };
 
-  const analyzeBicepCurl = (landmarks) => {
-    const feedback = [];
-    
-    // Get key landmarks
-    const leftShoulder = landmarks[11];
-    const leftElbow = landmarks[13];
-    const leftWrist = landmarks[15];
+const analyzeBicepCurl = (landmarks) => {
+  const feedback = [];
+  
+  // Get key landmarks
+  const leftShoulder = landmarks[11];
+  const leftElbow = landmarks[13];
+  const leftWrist = landmarks[15];
 
-    // Calculate elbow angle
-    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
-    
-    // Rep counting logic
-    const currentTime = Date.now();
-    const timeSinceLastRep = currentTime - lastRepTimeRef.current;
-    
-    // Curled position (elbow angle < 50)
-    if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
-      setRepCount(prev => prev + 1);
-      repStateRef.current = 'up';
-      lastRepTimeRef.current = currentTime;
-    }
-    // Extended position (elbow angle > 150)
-    else if (elbowAngle > 150 && repStateRef.current === 'up') {
-      repStateRef.current = 'down';
-    }
+  // Calculate elbow angle
+  const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+  console.log('Bicep Curl - Elbow angle:', elbowAngle.toFixed(1), '| State:', repStateRef.current);
+  
+  // Rep counting logic
+  const currentTime = Date.now();
+  const timeSinceLastRep = currentTime - lastRepTimeRef.current;
+  
+  // Curled position (elbow angle < 50)
+  if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    setRepCount(prev => prev + 1);
+    repStateRef.current = 'up';
+    lastRepTimeRef.current = currentTime;
+    console.log('Bicep curl rep counted! Total:', repCount + 1);
+  }
+  // Extended position (elbow angle > 150)
+  else if (elbowAngle > 150 && repStateRef.current === 'up') {
+    repStateRef.current = 'down';
+    console.log('Bicep curl extended - ready for next rep');
+  }
 
-    // Form feedback
-    if (elbowAngle < 50) {
-      feedback.push({
-        type: 'success',
-        message: 'Full curl - squeeze at the top!'
-      });
-    }
+  // Form feedback
+  if (elbowAngle < 50) {
+    feedback.push({
+      type: 'success',
+      message: 'Full curl - squeeze at the top!'
+    });
+  }
 
-    return feedback;
-  };
+  return feedback;
+};
+
 
   const analyzeBentOverRow = (landmarks) => {
     const feedback = [];
