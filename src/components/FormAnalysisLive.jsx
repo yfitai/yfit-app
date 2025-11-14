@@ -205,7 +205,7 @@ if (feedback.length > 0 && isAnalyzingRef.current) {
     return [...newFeedbackItems, ...prev].slice(0, 50); // Keep only last 50 items
   });
 }
-
+};
 
 const analyzeSquat = (landmarks) => {
 
