@@ -21,20 +21,73 @@ const FormAnalysisLive = () => {
   const selectedExerciseRef = useRef(null);
   const repStateRef = useRef('up'); // Track rep state: 'up', 'down', 'transition'
   const lastRepTimeRef = useRef(0); // Prevent double counting
+  const [feedbackHistory, setFeedbackHistory] = useState([]); // Persistent feedback list
+  const feedbackEndRef = useRef(null); // For auto-scroll
 
-   // Exercise options (10 total exercises)
-  const exercises = [
-    { id: 'squat', name: 'Bodyweight Squat', description: 'Stand with feet shoulder-width apart' },
-    { id: 'pushup', name: 'Push-Up', description: 'Start in plank position' },
-    { id: 'plank', name: 'Plank Hold', description: 'Hold plank position with proper form' },
-    { id: 'situp', name: 'Sit-Up', description: 'Lie on your back with knees bent' },
-    { id: 'deadlift', name: 'Deadlift', description: 'Stand with feet hip-width apart, barbell over mid-foot' },
-    { id: 'benchpress', name: 'Bench Press', description: 'Lie on bench with feet flat on floor' },
-    { id: 'lateralraise', name: 'Lateral Raise', description: 'Stand with dumbbells at sides' },
-    { id: 'preachercurl', name: 'Preacher Curl', description: 'Sit at preacher bench with arms extended' },
-    { id: 'bicepcurl', name: 'Bicep Curl', description: 'Stand with dumbbells at sides, palms forward' },
-    { id: 'bentoverrow', name: 'Dumbbell Bent Over Row', description: 'Bend at hips with back straight, dumbbells hanging' }
-  ];
+
+// Exercise options (10 total exercises)
+const exercises = [
+  { 
+    id: 'squat', 
+    name: 'Bodyweight Squat', 
+    description: 'Stand with feet shoulder-width apart',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'pushup', 
+    name: 'Push-Up', 
+    description: 'Start in plank position',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'plank', 
+    name: 'Plank Hold', 
+    description: 'Hold plank position with proper form',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'situp', 
+    name: 'Sit-Up', 
+    description: 'Lie on your back with knees bent',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'deadlift', 
+    name: 'Deadlift', 
+    description: 'Stand with feet hip-width apart, barbell over mid-foot',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'benchpress', 
+    name: 'Bench Press', 
+    description: 'Lie on bench with feet flat on floor',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'lateralraise', 
+    name: 'Lateral Raise', 
+    description: 'Stand with dumbbells at sides',
+    cameraAngle: '📸 Front view recommended'
+  },
+  { 
+    id: 'preachercurl', 
+    name: 'Preacher Curl', 
+    description: 'Sit at preacher bench with arms extended',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'bicepcurl', 
+    name: 'Bicep Curl', 
+    description: 'Stand with dumbbells at sides, palms forward',
+    cameraAngle: '📸 Side view recommended'
+  },
+  { 
+    id: 'bentoverrow', 
+    name: 'Dumbbell Bent Over Row', 
+    description: 'Bend at hips with back straight, dumbbells hanging',
+    cameraAngle: '📸 Side view recommended'
+  }
+];
 
 
   useEffect(() => {
@@ -131,9 +184,19 @@ const FormAnalysisLive = () => {
         break;
     }
 
+  setFormFeedback(feedback);
 
-    setFormFeedback(feedback);
-  };
+// Add to persistent feedback history with timestamp
+if (feedback.length > 0 && isAnalyzingRef.current) {
+  const timestamp = new Date().toLocaleTimeString();
+  const newFeedbackItems = feedback.map(item => ({
+    ...item,
+    timestamp,
+    id: Date.now() + Math.random() // Unique ID
+  }));
+  setFeedbackHistory(prev => [...newFeedbackItems, ...prev]); // New items at top
+}
+
 
   const analyzeSquat = (landmarks) => {
     const feedback = [];
@@ -641,166 +704,205 @@ const analyzeBicepCurl = (landmarks) => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Live Form Analysis</h1>
-          <p className="text-gray-600">Real-time AI-powered exercise form checking</p>
+const clearFeedback = () => {
+  setFeedbackHistory([]);
+};
+
+return (
+  <div className="min-h-screen bg-gray-50 p-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Live Form Analysis</h1>
+        <p className="text-gray-600">Real-time AI-powered exercise form checking</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Camera Feed */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Camera Feed</h2>
+            
+            {/* Camera Angle Instruction */}
+            {selectedExercise && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm font-medium text-blue-900">
+                  {selectedExercise.cameraAngle}
+                </p>
+              </div>
+            )}
+            
+            <div className="relative bg-black rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
+              <Webcam
+                ref={webcamRef}
+                audio={false}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{
+                  width: 640,
+                  height: 480,
+                  facingMode: 'user'
+                }}
+                onUserMedia={() => {
+                  setCameraReady(true);
+                  setCameraError(null);
+                }}
+                onUserMediaError={(error) => {
+                  console.error('Camera error:', error);
+                  setCameraError('Camera access denied or not available. Please allow camera access and refresh.');
+                }}
+                className="w-full h-full object-cover"
+              />
+              
+              <canvas
+                ref={canvasRef}
+                width={640}
+                height={480}
+                className="absolute top-0 left-0 w-full h-full"
+              />
+
+              {!cameraReady && !cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+                  <div className="text-center text-white">
+                    <CameraIcon className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+                    <p>Requesting camera access...</p>
+                    <p className="text-sm mt-2 opacity-75">Please allow camera permissions</p>
+                  </div>
+                </div>
+              )}
+
+              {cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+                  <div className="text-center text-white max-w-md px-4">
+                    <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+                    <p className="mb-4">{cameraError}</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Refresh Page
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Controls */}
+            <div className="mt-4 flex gap-4">
+              {!isAnalyzing ? (
+                <button
+                  onClick={startAnalysis}
+                  disabled={!cameraReady || !selectedExercise}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Play className="w-5 h-5" />
+                  Start Analysis
+                </button>
+              ) : (
+                <button
+                  onClick={stopAnalysis}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  <StopCircle className="w-5 h-5" />
+                  Stop Analysis
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Camera Feed */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Camera Feed</h2>
-              
-              <div className="relative bg-black rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                <Webcam
-                  ref={webcamRef}
-                  audio={false}
-                  screenshotFormat="image/jpeg"
-                  videoConstraints={{
-                    width: 640,
-                    height: 480,
-                    facingMode: 'user'
-                  }}
-                  onUserMedia={() => {
-                    setCameraReady(true);
-                    setCameraError(null);
-                  }}
-                  onUserMediaError={(error) => {
-                    console.error('Camera error:', error);
-                    setCameraError('Camera access denied or not available. Please allow camera access and refresh.');
-                  }}
-                  className="w-full h-full object-cover"
-                />
-                
-                <canvas
-                  ref={canvasRef}
-                  width={640}
-                  height={480}
-                  className="absolute top-0 left-0 w-full h-full"
-                />
+        {/* Exercise Selection & Feedback */}
+        <div className="space-y-6">
+          {/* Exercise Selection */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise</h2>
+            
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {exercises.map(exercise => (
+                <button
+                  key={exercise.id}
+                  onClick={() => setSelectedExercise(exercise)}
+                  disabled={isAnalyzing}
+                  className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
+                    selectedExercise?.id === exercise.id
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  } ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="font-semibold text-gray-900">{exercise.name}</div>
+                  <div className="text-sm text-gray-600 mt-1">{exercise.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
 
-                {!cameraReady && !cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
-                    <div className="text-center text-white">
-                      <CameraIcon className="w-16 h-16 mx-auto mb-4 animate-pulse" />
-                      <p>Requesting camera access...</p>
-                      <p className="text-sm mt-2 opacity-75">Please allow camera permissions</p>
-                    </div>
-                  </div>
-                )}
-
-                {cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
-                    <div className="text-center text-white max-w-md px-4">
-                      <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
-                      <p className="mb-4">{cameraError}</p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Refresh Page
-                      </button>
-                    </div>
-                  </div>
-                )}
+          {/* Rep Counter - Always Visible */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rep Count</h2>
+            <div className="text-center">
+              <div className={`text-6xl font-bold ${isAnalyzing ? 'text-blue-600' : 'text-gray-300'}`}>
+                {repCount}
               </div>
-
-              {/* Controls */}
-              <div className="mt-4 flex gap-4">
-                {!isAnalyzing ? (
-                  <button
-                    onClick={startAnalysis}
-                    disabled={!cameraReady || !selectedExercise}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <Play className="w-5 h-5" />
-                    Start Analysis
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopAnalysis}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  >
-                    <StopCircle className="w-5 h-5" />
-                    Stop Analysis
-                  </button>
-                )}
+              <div className="text-gray-600 mt-2">
+                {isAnalyzing ? 'Reps Completed' : 'Start analysis to begin'}
               </div>
             </div>
           </div>
 
-          {/* Exercise Selection & Feedback */}
-          <div className="space-y-6">
-            {/* Exercise Selection */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise</h2>
-              
-              <div className="space-y-3">
-                {exercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => setSelectedExercise(exercise)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
-                      selectedExercise?.id === exercise.id
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+          {/* Persistent Form Feedback */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Form Feedback</h2>
+              {feedbackHistory.length > 0 && (
+                <button
+                  onClick={clearFeedback}
+                  className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {feedbackHistory.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <p className="text-sm">No feedback yet</p>
+                  <p className="text-xs mt-1">Start exercising to see form tips</p>
+                </div>
+              ) : (
+                feedbackHistory.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-3 rounded-lg border-l-4 ${
+                      item.type === 'success'
+                        ? 'bg-green-50 border-green-500 text-green-900'
+                        : item.type === 'warning'
+                        ? 'bg-yellow-50 border-yellow-500 text-yellow-900'
+                        : item.type === 'correction'
+                        ? 'bg-red-50 border-red-500 text-red-900'
+                        : 'bg-blue-50 border-blue-500 text-blue-900'
                     }`}
                   >
-                    <div className="font-semibold text-gray-900">{exercise.name}</div>
-                    <div className="text-sm text-gray-600 mt-1">{exercise.description}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Rep Counter */}
-            {isAnalyzing && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Rep Count</h2>
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-blue-600">{repCount}</div>
-                  <div className="text-gray-600 mt-2">Reps Completed</div>
-                </div>
-              </div>
-            )}
-
-            {/* Form Feedback */}
-            {isAnalyzing && formFeedback.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Form Feedback</h2>
-                
-                <div className="space-y-3">
-                  {formFeedback.map((item, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-start gap-3 p-3 rounded-lg ${
-                        item.type === 'success'
-                          ? 'bg-green-50 text-green-800'
-                          : item.type === 'warning'
-                          ? 'bg-yellow-50 text-yellow-800'
-                          : 'bg-blue-50 text-blue-800'
-                      }`}
-                    >
-                      {item.type === 'success' ? (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{item.message}</p>
+                        <p className="text-xs opacity-75 mt-1">{item.timestamp}</p>
+                      </div>
+                      {item.type === 'success' && (
+                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
                       )}
-                      <span className="text-sm font-medium">{item.message}</span>
+                      {(item.type === 'warning' || item.type === 'correction') && (
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default FormAnalysisLive;
