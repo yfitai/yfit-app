@@ -208,7 +208,7 @@ const analyzeSquat = (landmarks) => {
         currentIssue = { type: 'warning', message: 'Knees too far forward', priority: 3 };
       }
       // Then check depth
-      else if (kneeAngle > 90 && kneeAngle < 120) {
+      else if (kneeAngle > 90 && kneeAngle < 140) {
         currentIssue = { type: 'warning', message: 'Go deeper - thighs parallel', priority: 2 };
       } else if (kneeAngle <= 90) {
         currentIssue = { type: 'success', message: 'Excellent depth!', priority: 1 };
@@ -225,6 +225,7 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
+    // Standing position - COUNT REP (only if we went deep enough)
     if (kneeAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
@@ -250,9 +251,11 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    else if (kneeAngle < 100 && repStateRef.current === 'up') {
+    // Squatting position - must go below 120 degrees to register as "down"
+    else if (kneeAngle < 120 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
+      console.log('Squat down detected');
     }
     
     // Real-time feedback
