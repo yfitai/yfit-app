@@ -847,6 +847,7 @@ return (
     </button>
   ))}
 </div>
+               </div>
 
 
           {/* Rep Counter - Always Visible */}
