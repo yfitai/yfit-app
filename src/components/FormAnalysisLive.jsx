@@ -185,26 +185,6 @@ const exercises = [
     }
 
   setFormFeedback(feedback);
-
-// Add to persistent feedback history with timestamp (only unique messages)
-if (feedback.length > 0 && isAnalyzingRef.current) {
-  const timestamp = new Date().toLocaleTimeString();
-  const newFeedbackItems = feedback.map(item => ({
-    ...item,
-    timestamp,
-    id: Date.now() + Math.random() // Unique ID
-  }));
-  
-  // Only add if message is different from the last one
-  setFeedbackHistory(prev => {
-    const lastMessage = prev[0]?.message;
-    const newMessage = newFeedbackItems[0]?.message;
-    if (lastMessage === newMessage) {
-      return prev; // Don't add duplicate
-    }
-    return [...newFeedbackItems, ...prev].slice(0, 50); // Keep only last 50 items
-  });
-}
 };
 
 const analyzeSquat = (landmarks) => {
@@ -587,24 +567,42 @@ const analyzeBicepCurl = (landmarks) => {
   const currentTime = Date.now();
   const timeSinceLastRep = currentTime - lastRepTimeRef.current;
   
-  // Curled position (elbow angle < 50)
-  if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
-    setRepCount(prev => prev + 1);
-    repStateRef.current = 'up';
-    lastRepTimeRef.current = currentTime;
-    console.log('Bicep curl rep counted! Total:', repCount + 1);
-  }
-  // Extended position (elbow angle > 150)
-  else if (elbowAngle > 150 && repStateRef.current === 'up') {
+  // Extended position (elbow angle > 150) - ready to curl
+  if (elbowAngle > 150 && repStateRef.current === 'up') {
     repStateRef.current = 'down';
     console.log('Bicep curl extended - ready for next rep');
   }
+  // Curled position (elbow angle < 50) - COUNT THE REP!
+  else if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    const newRepCount = repCount + 1;
+    setRepCount(newRepCount);
+    repStateRef.current = 'up';
+    lastRepTimeRef.current = currentTime;
+    console.log('✅ Bicep curl rep counted! Total:', newRepCount);
+    
+    // Capture feedback for this specific rep
+    const repFeedbackItem = {
+      type: 'success',
+      message: elbowAngle < 40 ? 'Excellent curl - full contraction!' : 'Good curl!',
+      timestamp: new Date().toLocaleTimeString(),
+      repNumber: newRepCount,
+      id: Date.now() + Math.random()
+    };
+    
+    // Add feedback to history
+    setFeedbackHistory(prev => [repFeedbackItem, ...prev].slice(0, 50));
+  }
 
-  // Form feedback
+  // Real-time form feedback (not saved to history)
   if (elbowAngle < 50) {
     feedback.push({
       type: 'success',
       message: 'Full curl - squeeze at the top!'
+    });
+  } else if (elbowAngle > 90 && elbowAngle < 150) {
+    feedback.push({
+      type: 'info',
+      message: 'Curl higher for full range of motion'
     });
   }
 
@@ -899,7 +897,10 @@ return (
                   >
                     <div className="flex items-start gap-2">
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{item.message}</p>
+                        <div className="flex items-baseline gap-2">
+                          {item.repNumber && <span className="text-xs font-bold text-gray-500">#{item.repNumber}</span>}
+                          <p className="text-sm font-medium flex-1">{item.message}</p>
+                        </div>
                         <p className="text-xs opacity-75 mt-1">{item.timestamp}</p>
                       </div>
                       {item.type === 'success' && (
