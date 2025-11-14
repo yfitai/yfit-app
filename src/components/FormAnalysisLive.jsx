@@ -186,7 +186,7 @@ const exercises = [
 
   setFormFeedback(feedback);
 
-// Add to persistent feedback history with timestamp
+// Add to persistent feedback history with timestamp (only unique messages)
 if (feedback.length > 0 && isAnalyzingRef.current) {
   const timestamp = new Date().toLocaleTimeString();
   const newFeedbackItems = feedback.map(item => ({
@@ -194,9 +194,18 @@ if (feedback.length > 0 && isAnalyzingRef.current) {
     timestamp,
     id: Date.now() + Math.random() // Unique ID
   }));
-  setFeedbackHistory(prev => [...newFeedbackItems, ...prev]); // New items at top
+  
+  // Only add if message is different from the last one
+  setFeedbackHistory(prev => {
+    const lastMessage = prev[0]?.message;
+    const newMessage = newFeedbackItems[0]?.message;
+    if (lastMessage === newMessage) {
+      return prev; // Don't add duplicate
+    }
+    return [...newFeedbackItems, ...prev].slice(0, 50); // Keep only last 50 items
+  });
 }
-};
+
 
 const analyzeSquat = (landmarks) => {
 
@@ -821,7 +830,12 @@ return (
               {exercises.map(exercise => (
                 <button
                   key={exercise.id}
-                  onClick={() => setSelectedExercise(exercise)}
+                onClick={() => {
+                     setSelectedExercise(exercise);
+                     setRepCount(0);
+                     setFeedbackHistory([]);
+}}
+
                   disabled={isAnalyzing}
                   className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
                     selectedExercise?.id === exercise.id
@@ -854,13 +868,13 @@ return (
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Form Feedback</h2>
               {feedbackHistory.length > 0 && (
-                <button
-                  onClick={clearFeedback}
-                  className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                 <button
+                     onClick={clearFeedback}
+                     className="px-4 py-2 text-sm font-semibold bg-red-100 text-red-700 rounded-lg hover:bg-red-200 border border-red-300 transition-colors"
                 >
-                  Clear
-                </button>
-              )}
+                     🗑️ Clear All
+               </button>
+  )}
             </div>
             
             <div className="space-y-2 max-h-96 overflow-y-auto">
