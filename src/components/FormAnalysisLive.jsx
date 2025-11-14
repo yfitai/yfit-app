@@ -199,27 +199,25 @@ const analyzeSquat = (landmarks) => {
     const kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
     console.log('Knee angle:', kneeAngle.toFixed(1), '| State:', repStateRef.current);
     
-    // Track form during rep
+    // Track WORST form issue (priority: warning > success)
     if (repStateRef.current === 'down') {
-      if (kneeAngle <= 90) {
-        const issue = { type: 'success', message: 'Excellent depth!', timestamp: Date.now() };
-        const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-        if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-          currentRepIssuesRef.current.push(issue);
-        }
-      } else if (kneeAngle > 90 && kneeAngle < 120) {
-        const issue = { type: 'warning', message: 'Go deeper - thighs parallel', timestamp: Date.now() };
-        const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-        if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-          currentRepIssuesRef.current.push(issue);
-        }
+      let currentIssue = null;
+      
+      // Check knee tracking first (higher priority)
+      if (leftKnee.x > leftAnkle.x + 0.1) {
+        currentIssue = { type: 'warning', message: 'Knees too far forward', priority: 3 };
+      }
+      // Then check depth
+      else if (kneeAngle > 90 && kneeAngle < 120) {
+        currentIssue = { type: 'warning', message: 'Go deeper - thighs parallel', priority: 2 };
+      } else if (kneeAngle <= 90) {
+        currentIssue = { type: 'success', message: 'Excellent depth!', priority: 1 };
       }
       
-      if (leftKnee.x > leftAnkle.x + 0.1) {
-        const issue = { type: 'warning', message: 'Knees too far forward', timestamp: Date.now() };
-        const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-        if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 300) {
-          currentRepIssuesRef.current.push(issue);
+      if (currentIssue) {
+        const existing = currentRepIssuesRef.current[0];
+        if (!existing || currentIssue.priority > existing.priority) {
+          currentRepIssuesRef.current = [currentIssue];
         }
       }
     }
@@ -227,7 +225,6 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Standing position
     if (kneeAngle > 160 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
@@ -236,13 +233,12 @@ const analyzeSquat = (landmarks) => {
         const newRepCount = prev + 1;
         console.log('Rep counted! Total:', newRepCount);
         
-        const formIssues = currentRepIssuesRef.current;
-        let feedbackMessage = formIssues.length === 0 ? 'Good squat!' : 
-          Object.entries(formIssues.reduce((acc, i) => ({ ...acc, [i.message]: (acc[i.message] || 0) + 1 }), {}))
-            .map(([msg, count]) => count > 1 ? `${msg} (${count}x)` : msg).join(', ');
+        const worstIssue = currentRepIssuesRef.current[0];
+        const feedbackMessage = worstIssue ? worstIssue.message : 'Good squat!';
+        const feedbackType = worstIssue ? worstIssue.type : 'success';
         
         const repFeedbackItem = {
-          type: formIssues.some(i => i.type === 'warning') ? 'warning' : 'success',
+          type: feedbackType,
           message: feedbackMessage,
           timestamp: new Date().toLocaleTimeString(),
           repNumber: newRepCount,
@@ -529,7 +525,7 @@ const analyzeSquat = (landmarks) => {
     return feedback;
   };
 
-      const analyzeLateralRaise = (landmarks) => {
+        const analyzeLateralRaise = (landmarks) => {
     const feedback = [];
     
     const leftShoulder = landmarks[11];
@@ -539,19 +535,24 @@ const analyzeSquat = (landmarks) => {
 
     const armAngle = calculateAngle(leftHip, leftShoulder, leftElbow);
     
-    // Track form issues during the rep
-    if (armAngle > 90 && repStateRef.current === 'up') {
-      const issue = { type: 'warning', message: 'Arm too high - shoulder level is enough', timestamp: Date.now() };
-      // Only add if not recently added (prevent duplicates within 200ms)
-      const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-      if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-        currentRepIssuesRef.current.push(issue);
+    // Track the WORST form issue during the rep (priority: warning > success)
+    if (repStateRef.current === 'up') {
+      let currentIssue = null;
+      
+      if (armAngle > 90) {
+        currentIssue = { type: 'warning', message: 'Arm too high - shoulder level is enough', priority: 2 };
+      } else if (armAngle > 70 && armAngle <= 90) {
+        currentIssue = { type: 'success', message: 'Perfect height!', priority: 1 };
+      } else if (armAngle > 50) {
+        currentIssue = { type: 'info', message: 'Raise higher for better activation', priority: 1 };
       }
-    } else if (armAngle > 70 && armAngle <= 90 && repStateRef.current === 'up') {
-      const issue = { type: 'success', message: 'Perfect height!', timestamp: Date.now() };
-      const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-      if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-        currentRepIssuesRef.current.push(issue);
+      
+      // Only store if it's worse than what we have (higher priority)
+      if (currentIssue) {
+        const existing = currentRepIssuesRef.current[0];
+        if (!existing || currentIssue.priority > existing.priority) {
+          currentRepIssuesRef.current = [currentIssue];
+        }
       }
     }
     
@@ -566,28 +567,13 @@ const analyzeSquat = (landmarks) => {
       setRepCount(prev => {
         const newRepCount = prev + 1;
         
-        // Compile all form issues from this rep
-        const formIssues = currentRepIssuesRef.current;
-        let feedbackMessage = '';
-        
-        if (formIssues.length === 0) {
-          feedbackMessage = 'Good lateral raise!';
-        } else {
-          // Count each type of issue
-          const issueCounts = {};
-          formIssues.forEach(issue => {
-            issueCounts[issue.message] = (issueCounts[issue.message] || 0) + 1;
-          });
-          
-          // Build message
-          const issueMessages = Object.entries(issueCounts).map(([msg, count]) => 
-            count > 1 ? `${msg} (${count}x)` : msg
-          );
-          feedbackMessage = issueMessages.join(', ');
-        }
+        // Get the worst issue from this rep
+        const worstIssue = currentRepIssuesRef.current[0];
+        const feedbackMessage = worstIssue ? worstIssue.message : 'Good lateral raise!';
+        const feedbackType = worstIssue ? worstIssue.type : 'success';
         
         const repFeedbackItem = {
-          type: formIssues.some(i => i.type === 'warning') ? 'warning' : 'success',
+          type: feedbackType,
           message: feedbackMessage,
           timestamp: new Date().toLocaleTimeString(),
           repNumber: newRepCount,
@@ -596,7 +582,7 @@ const analyzeSquat = (landmarks) => {
         
         setFeedbackHistory(prevFeedback => [repFeedbackItem, ...prevFeedback].slice(0, 50));
         
-        // Clear issues for next rep
+        // Clear for next rep
         currentRepIssuesRef.current = [];
         
         return newRepCount;
@@ -605,7 +591,6 @@ const analyzeSquat = (landmarks) => {
     // Lowered position (arm angle < 40)
     else if (armAngle < 40 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
-      // Clear issues when starting new rep
       currentRepIssuesRef.current = [];
     }
 
@@ -613,7 +598,7 @@ const analyzeSquat = (landmarks) => {
     if (armAngle > 90) {
       feedback.push({
         type: 'warning',
-        message: 'Don\'t raise too high - shoulder level is enough'
+        message: 'Don't raise too high - shoulder level is enough'
       });
     } else if (armAngle > 70) {
       feedback.push({
@@ -680,7 +665,6 @@ const analyzeSquat = (landmarks) => {
 const analyzeBicepCurl = (landmarks) => {
   const feedback = [];
   
-  // Get landmarks for BOTH arms
   const leftShoulder = landmarks[11];
   const leftElbow = landmarks[13];
   const leftWrist = landmarks[15];
@@ -688,106 +672,72 @@ const analyzeBicepCurl = (landmarks) => {
   const rightElbow = landmarks[14];
   const rightWrist = landmarks[16];
 
-  // Calculate angles for both arms
   const leftElbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
   const rightElbowAngle = calculateAngle(rightShoulder, rightElbow, rightWrist);
   
-  // Use the arm with the smaller angle (the one that's curling)
   const elbowAngle = Math.min(leftElbowAngle, rightElbowAngle);
   const armSide = leftElbowAngle < rightElbowAngle ? 'Left' : 'Right';
   
   console.log(`Bicep Curl - ${armSide} Elbow angle:`, elbowAngle.toFixed(1), '| State:', repStateRef.current);
   
-  // Track form issues during the rep
+  // Track the WORST form issue (priority: warning > success)
   if (repStateRef.current === 'up') {
+    let currentIssue = null;
+    
     if (elbowAngle < 40) {
-      const issue = { type: 'success', message: 'Excellent curl - full contraction!', timestamp: Date.now() };
-      const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-      if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-        currentRepIssuesRef.current.push(issue);
-      }
+      currentIssue = { type: 'success', message: 'Excellent curl - full contraction!', priority: 1 };
     } else if (elbowAngle >= 40 && elbowAngle < 50) {
-      const issue = { type: 'success', message: 'Good curl!', timestamp: Date.now() };
-      const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-      if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-        currentRepIssuesRef.current.push(issue);
-      }
+      currentIssue = { type: 'success', message: 'Good curl!', priority: 1 };
     } else if (elbowAngle >= 50 && elbowAngle < 90) {
-      const issue = { type: 'warning', message: 'Curl higher for full range', timestamp: Date.now() };
-      const lastIssue = currentRepIssuesRef.current[currentRepIssuesRef.current.length - 1];
-      if (!lastIssue || lastIssue.message !== issue.message || Date.now() - lastIssue.timestamp > 200) {
-        currentRepIssuesRef.current.push(issue);
+      currentIssue = { type: 'warning', message: 'Curl higher for full range', priority: 2 };
+    }
+    
+    if (currentIssue) {
+      const existing = currentRepIssuesRef.current[0];
+      if (!existing || currentIssue.priority > existing.priority) {
+        currentRepIssuesRef.current = [currentIssue];
       }
     }
   }
   
-  // Rep counting logic
   const currentTime = Date.now();
   const timeSinceLastRep = currentTime - lastRepTimeRef.current;
   
-  // Extended position (elbow angle > 150) - ready to curl
   if (elbowAngle > 150 && repStateRef.current === 'up') {
     repStateRef.current = 'down';
-    currentRepIssuesRef.current = []; // Clear for new rep
+    currentRepIssuesRef.current = [];
     console.log('Bicep curl extended - ready for next rep');
   }
-  // Curled position (elbow angle < 50) - COUNT THE REP!
   else if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
     repStateRef.current = 'up';
     lastRepTimeRef.current = currentTime;
     
-    // Use callback form to get current rep count
     setRepCount(prev => {
       const newRepCount = prev + 1;
       console.log('✅ Bicep curl rep counted! Total:', newRepCount);
       
-      // Compile all form issues from this rep
-      const formIssues = currentRepIssuesRef.current;
-      let feedbackMessage = '';
+      const worstIssue = currentRepIssuesRef.current[0];
+      const feedbackMessage = worstIssue ? worstIssue.message : 'Good curl!';
+      const feedbackType = worstIssue ? worstIssue.type : 'success';
       
-      if (formIssues.length === 0) {
-        feedbackMessage = 'Good curl!';
-      } else {
-        // Count each type of issue
-        const issueCounts = {};
-        formIssues.forEach(issue => {
-          issueCounts[issue.message] = (issueCounts[issue.message] || 0) + 1;
-        });
-        
-        // Build message
-        const issueMessages = Object.entries(issueCounts).map(([msg, count]) => 
-          count > 1 ? `${msg} (${count}x)` : msg
-        );
-        feedbackMessage = issueMessages.join(', ');
-      }
-      
-      // Capture feedback for this specific rep
       const repFeedbackItem = {
-        type: formIssues.some(i => i.type === 'warning') ? 'warning' : 'success',
+        type: feedbackType,
         message: feedbackMessage,
         timestamp: new Date().toLocaleTimeString(),
         repNumber: newRepCount,
         id: Date.now() + Math.random()
       };
       
-      // Add feedback to history
       setFeedbackHistory(prevFeedback => [repFeedbackItem, ...prevFeedback].slice(0, 50));
-      
       return newRepCount;
     });
   }
 
-  // Real-time form feedback (not saved)
+  // Real-time feedback
   if (elbowAngle < 50) {
-    feedback.push({
-      type: 'success',
-      message: 'Full curl - squeeze at the top!'
-    });
+    feedback.push({ type: 'success', message: 'Full curl - squeeze at the top!' });
   } else if (elbowAngle > 90 && elbowAngle < 150) {
-    feedback.push({
-      type: 'info',
-      message: 'Curl higher for full range of motion'
-    });
+    feedback.push({ type: 'info', message: 'Curl higher for full range of motion' });
   }
 
   return feedback;
