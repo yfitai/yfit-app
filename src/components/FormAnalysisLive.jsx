@@ -196,9 +196,10 @@ if (feedback.length > 0 && isAnalyzingRef.current) {
   }));
   setFeedbackHistory(prev => [...newFeedbackItems, ...prev]); // New items at top
 }
+};
 
+const analyzeSquat = (landmarks) => {
 
-  const analyzeSquat = (landmarks) => {
     const feedback = [];
     
     // Get key landmarks
