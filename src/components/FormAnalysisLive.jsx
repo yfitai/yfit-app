@@ -574,23 +574,28 @@ const analyzeBicepCurl = (landmarks) => {
   }
   // Curled position (elbow angle < 50) - COUNT THE REP!
   else if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
-    const newRepCount = repCount + 1;
-    setRepCount(newRepCount);
     repStateRef.current = 'up';
     lastRepTimeRef.current = currentTime;
-    console.log('✅ Bicep curl rep counted! Total:', newRepCount);
     
-    // Capture feedback for this specific rep
-    const repFeedbackItem = {
-      type: 'success',
-      message: elbowAngle < 40 ? 'Excellent curl - full contraction!' : 'Good curl!',
-      timestamp: new Date().toLocaleTimeString(),
-      repNumber: newRepCount,
-      id: Date.now() + Math.random()
-    };
-    
-    // Add feedback to history
-    setFeedbackHistory(prev => [repFeedbackItem, ...prev].slice(0, 50));
+    // Use callback form to get current rep count
+    setRepCount(prev => {
+      const newRepCount = prev + 1;
+      console.log('✅ Bicep curl rep counted! Total:', newRepCount);
+      
+      // Capture feedback for this specific rep
+      const repFeedbackItem = {
+        type: 'success',
+        message: elbowAngle < 40 ? 'Excellent curl - full contraction!' : 'Good curl!',
+        timestamp: new Date().toLocaleTimeString(),
+        repNumber: newRepCount,
+        id: Date.now() + Math.random()
+      };
+      
+      // Add feedback to history
+      setFeedbackHistory(prevFeedback => [repFeedbackItem, ...prevFeedback].slice(0, 50));
+      
+      return newRepCount;
+    });
   }
 
   // Real-time form feedback (not saved to history)
@@ -705,7 +710,15 @@ const analyzeBicepCurl = (landmarks) => {
     isAnalyzingRef.current = false;
     selectedExerciseRef.current = null;
     setFormFeedback([]);
+    setRepCount(0); // Reset rep count
     console.log('Stopped analysis');
+    
+    // Clear the canvas
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     
     if (cameraRef.current) {
       cameraRef.current.stop();
