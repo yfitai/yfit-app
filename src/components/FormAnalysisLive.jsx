@@ -555,7 +555,7 @@ const analyzeSquat = (landmarks) => {
     if (armAngle > 90) {
       feedback.push({
         type: 'warning',
-        message: 'Don't raise too high - shoulder level is enough'
+        message: 'Don\'t raise too high - shoulder level is enough'
       });
     } else if (armAngle > 70) {
       feedback.push({
