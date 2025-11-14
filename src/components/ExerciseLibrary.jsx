@@ -48,19 +48,25 @@ const ExerciseLibrary = () => {
     { name: 'Full Body', value: 'Full Body' }
   ];
 
-  // Body parts from ExerciseDB
+  // Target muscles (actual values from database)
   const bodyParts = [
-    { name: 'All Body Parts', value: 'all' },
-    { name: 'Back', value: 'back' },
-    { name: 'Cardio', value: 'cardio' },
-    { name: 'Chest', value: 'chest' },
-    { name: 'Lower Arms', value: 'lower arms' },
-    { name: 'Lower Legs', value: 'lower legs' },
-    { name: 'Neck', value: 'neck' },
-    { name: 'Shoulders', value: 'shoulders' },
-    { name: 'Upper Arms', value: 'upper arms' },
-    { name: 'Upper Legs', value: 'upper legs' },
-    { name: 'Waist', value: 'waist' }
+    { name: 'All Muscles', value: 'all' },
+    { name: 'Abs', value: 'abs' },
+    { name: 'Adductors', value: 'adductors' },
+    { name: 'Biceps', value: 'biceps' },
+    { name: 'Calves', value: 'calves' },
+    { name: 'Cardiovascular System', value: 'cardiovascular system' },
+    { name: 'Delts', value: 'delts' },
+    { name: 'Forearms', value: 'forearms' },
+    { name: 'Glutes', value: 'glutes' },
+    { name: 'Hamstrings', value: 'hamstrings' },
+    { name: 'Lats', value: 'lats' },
+    { name: 'Pectorals', value: 'pectorals' },
+    { name: 'Quads', value: 'quads' },
+    { name: 'Spine', value: 'spine' },
+    { name: 'Traps', value: 'traps' },
+    { name: 'Triceps', value: 'triceps' },
+    { name: 'Upper Back', value: 'upper back' }
   ];
 
   // Equipment types from ExerciseDB
