@@ -492,14 +492,23 @@ const FormAnalysisLive = () => {
 const analyzeBicepCurl = (landmarks) => {
   const feedback = [];
   
-  // Get key landmarks
+  // Get landmarks for BOTH arms
   const leftShoulder = landmarks[11];
   const leftElbow = landmarks[13];
   const leftWrist = landmarks[15];
+  const rightShoulder = landmarks[12];
+  const rightElbow = landmarks[14];
+  const rightWrist = landmarks[16];
 
-  // Calculate elbow angle
-  const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
-  console.log('Bicep Curl - Elbow angle:', elbowAngle.toFixed(1), '| State:', repStateRef.current);
+  // Calculate angles for both arms
+  const leftElbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+  const rightElbowAngle = calculateAngle(rightShoulder, rightElbow, rightWrist);
+  
+  // Use the arm with the smaller angle (the one that's curling)
+  const elbowAngle = Math.min(leftElbowAngle, rightElbowAngle);
+  const armSide = leftElbowAngle < rightElbowAngle ? 'Left' : 'Right';
+  
+  console.log(`Bicep Curl - ${armSide} Elbow angle:`, elbowAngle.toFixed(1), '| State:', repStateRef.current);
   
   // Rep counting logic
   const currentTime = Date.now();
@@ -528,6 +537,7 @@ const analyzeBicepCurl = (landmarks) => {
 
   return feedback;
 };
+
 
 
   const analyzeBentOverRow = (landmarks) => {
