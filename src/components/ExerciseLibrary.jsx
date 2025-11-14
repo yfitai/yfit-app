@@ -5,6 +5,26 @@ import { Search, Filter, X, ChevronRight, Dumbbell, Target, Zap, ExternalLink } 
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
+  
+  // List of exercises with implemented form analysis
+  const implementedFormAnalysis = [
+    'squat',
+    'push-up', 
+    'plank',
+    'sit-up',
+    'deadlift',
+    'bench press',
+    'lateral raise',
+    'preacher curl',
+    'bicep curl',
+    'bent over row'
+  ];
+  
+  const hasFormAnalysis = (exerciseName) => {
+    return implementedFormAnalysis.some(impl => 
+      exerciseName.toLowerCase().includes(impl)
+    );
+  };
   const [exercises, setExercises] = useState([]);
   const [filteredExercises, setFilteredExercises] = useState([]);
   
@@ -370,16 +390,22 @@ const ExerciseLibrary = () => {
                     {exercise.equipment?.[0] || 'N/A'}
                   </span>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewFormAnalysis(exercise);
-                  }}
-                  className="w-full px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
-                >
-                  View Form Analysis
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                {hasFormAnalysis(exercise.name) ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewFormAnalysis(exercise);
+                    }}
+                    className="w-full px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                  >
+                    View Form Analysis
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <div className="w-full px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-center text-sm">
+                    Form Analysis Coming Soon
+                  </div>
+                )}
               </div>
             </div>
           ))}
