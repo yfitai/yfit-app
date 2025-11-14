@@ -148,16 +148,26 @@ const ExerciseLibrary = () => {
 
     // Apply body part filter
     if (selectedBodyPart !== 'all') {
-      filtered = filtered.filter(ex => 
-        ex.body_parts && ex.body_parts.some(bp => bp.toLowerCase() === selectedBodyPart.toLowerCase())
-      );
+      filtered = filtered.filter(ex => {
+        if (!ex.body_parts) return false;
+        // Handle both array and string formats
+        if (Array.isArray(ex.body_parts)) {
+          return ex.body_parts.some(bp => bp.toLowerCase() === selectedBodyPart.toLowerCase());
+        }
+        return ex.body_parts.toLowerCase() === selectedBodyPart.toLowerCase();
+      });
     }
 
     // Apply equipment filter
     if (selectedEquipment !== 'all') {
-      filtered = filtered.filter(ex => 
-        ex.equipment && ex.equipment.some(eq => eq.toLowerCase() === selectedEquipment.toLowerCase())
-      );
+      filtered = filtered.filter(ex => {
+        if (!ex.equipment) return false;
+        // Handle both array and string formats
+        if (Array.isArray(ex.equipment)) {
+          return ex.equipment.some(eq => eq.toLowerCase() === selectedEquipment.toLowerCase());
+        }
+        return ex.equipment.toLowerCase() === selectedEquipment.toLowerCase();
+      });
     }
 
     // Apply difficulty filter
