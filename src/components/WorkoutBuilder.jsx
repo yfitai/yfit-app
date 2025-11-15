@@ -185,27 +185,28 @@ const WorkoutBuilder = () => {
   };
 
   const filteredExercises = exercises.filter(ex => {
-    // Search filter
-    const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Category filter - map category names to muscle groups
+    // Category filter - map to muscle groups
     let matchesCategory = filterCategory === 'all';
     if (!matchesCategory && ex.target_muscles) {
       const categoryMuscleMap = {
-        'Chest': ['pectorals', 'chest'],
-        'Back': ['lats', 'upper back', 'spine', 'traps'],
-        'Legs': ['quads', 'hamstrings', 'glutes', 'calves', 'adductors', 'abductors'],
-        'Shoulders': ['delts', 'shoulders'],
-        'Arms': ['biceps', 'triceps', 'forearms'],
+        'Push': ['pectorals', 'delts', 'triceps'],
+        'Pull': ['lats', 'upper back', 'traps', 'biceps', 'forearms'],
+        'Legs': ['quads', 'hamstrings', 'glutes', 'calves', 'adductors'],
         'Core': ['abs', 'obliques', 'serratus anterior'],
-        'Cardio': ['cardiovascular system']
+        'Cardio': ['cardiovascular system'],
+        'Full Body': [] // Will match all if we add special logic
       };
       
       const targetMuscles = categoryMuscleMap[filterCategory] || [];
       const muscleArray = Array.isArray(ex.target_muscles) ? ex.target_muscles : [ex.target_muscles];
-      matchesCategory = muscleArray.some(muscle => 
-        targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
-      );
+      
+      if (filterCategory === 'Full Body') {
+        matchesCategory = true; // Full Body shows everything
+      } else {
+        matchesCategory = muscleArray.some(muscle => 
+          targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
+        );
+      }
     }
     
     // Equipment filter
@@ -224,7 +225,7 @@ const WorkoutBuilder = () => {
           : ex.target_muscles.toLowerCase() === filterTargetMuscle.toLowerCase()
       ));
     
-    return matchesSearch && matchesCategory && matchesEquipment && matchesTargetMuscle;
+    return matchesCategory && matchesEquipment && matchesTargetMuscle;
   });
 
   if (loading) {
@@ -485,13 +486,12 @@ const WorkoutBuilder = () => {
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="all">All Categories</option>
-                  <option value="Chest">Chest</option>
-                  <option value="Back">Back</option>
+                  <option value="Push">Push</option>
+                  <option value="Pull">Pull</option>
                   <option value="Legs">Legs</option>
-                  <option value="Shoulders">Shoulders</option>
-                  <option value="Arms">Arms</option>
                   <option value="Core">Core</option>
                   <option value="Cardio">Cardio</option>
+                  <option value="Full Body">Full Body</option>
                 </select>
 
                 {/* Equipment Filter */}
@@ -517,16 +517,20 @@ const WorkoutBuilder = () => {
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="all">All Muscles</option>
-                  <option value="pecs">Chest</option>
-                  <option value="lats">Back</option>
+                  <option value="pectorals">Chest</option>
+                  <option value="lats">Lats</option>
+                  <option value="upper back">Upper Back</option>
+                  <option value="traps">Traps</option>
                   <option value="quads">Quads</option>
                   <option value="hamstrings">Hamstrings</option>
                   <option value="glutes">Glutes</option>
+                  <option value="calves">Calves</option>
                   <option value="delts">Shoulders</option>
                   <option value="biceps">Biceps</option>
                   <option value="triceps">Triceps</option>
+                  <option value="forearms">Forearms</option>
                   <option value="abs">Abs</option>
-                  <option value="calves">Calves</option>
+                  <option value="cardiovascular system">Cardio</option>
                 </select>
               </div>
             </div>
