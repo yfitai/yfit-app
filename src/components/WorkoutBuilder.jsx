@@ -188,16 +188,41 @@ const WorkoutBuilder = () => {
     // Search filter
     const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Category filter
-    const matchesCategory = filterCategory === 'all' || ex.category === filterCategory;
+    // Category filter - map category names to muscle groups
+    let matchesCategory = filterCategory === 'all';
+    if (!matchesCategory && ex.target_muscles) {
+      const categoryMuscleMap = {
+        'Chest': ['pectorals', 'chest'],
+        'Back': ['lats', 'upper back', 'spine', 'traps'],
+        'Legs': ['quads', 'hamstrings', 'glutes', 'calves', 'adductors', 'abductors'],
+        'Shoulders': ['delts', 'shoulders'],
+        'Arms': ['biceps', 'triceps', 'forearms'],
+        'Core': ['abs', 'obliques', 'serratus anterior'],
+        'Cardio': ['cardiovascular system']
+      };
+      
+      const targetMuscles = categoryMuscleMap[filterCategory] || [];
+      const muscleArray = Array.isArray(ex.target_muscles) ? ex.target_muscles : [ex.target_muscles];
+      matchesCategory = muscleArray.some(muscle => 
+        targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
+      );
+    }
     
     // Equipment filter
     const matchesEquipment = filterEquipment === 'all' || 
-      (ex.equipment && ex.equipment.some(eq => eq.toLowerCase() === filterEquipment.toLowerCase()));
+      (ex.equipment && (
+        Array.isArray(ex.equipment) 
+          ? ex.equipment.some(eq => eq.toLowerCase() === filterEquipment.toLowerCase())
+          : ex.equipment.toLowerCase() === filterEquipment.toLowerCase()
+      ));
     
     // Target muscle filter
     const matchesTargetMuscle = filterTargetMuscle === 'all' || 
-      (ex.target_muscles && ex.target_muscles.some(muscle => muscle.toLowerCase() === filterTargetMuscle.toLowerCase()));
+      (ex.target_muscles && (
+        Array.isArray(ex.target_muscles)
+          ? ex.target_muscles.some(muscle => muscle.toLowerCase() === filterTargetMuscle.toLowerCase())
+          : ex.target_muscles.toLowerCase() === filterTargetMuscle.toLowerCase()
+      ));
     
     return matchesSearch && matchesCategory && matchesEquipment && matchesTargetMuscle;
   });
