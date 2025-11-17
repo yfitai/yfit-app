@@ -138,7 +138,6 @@ const WorkoutBuilder = () => {
           user_id: user.id,
           name: workoutName,
           description: workoutDescription,
-          category_id: selectedCategory || null,
           estimated_duration_minutes: Math.round(estimatedDuration),
           is_template: false
         })
@@ -284,21 +283,6 @@ const WorkoutBuilder = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select a category (optional)</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
 
