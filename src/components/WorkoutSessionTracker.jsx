@@ -57,7 +57,7 @@ const WorkoutSessionTracker = () => {
           *,
           workout_plan_exercises (
             *,
-            exercise:exercises (*)
+            exercises (*)
           )
         `)
         .eq('user_id', user.id)
@@ -99,7 +99,7 @@ const WorkoutSessionTracker = () => {
       const { data: exercises, error: exercisesError } = await supabase
         .from('workout_session_exercises')
         .insert(sessionExercises)
-        .select('*, exercise:exercises(*)');
+        .select('*, exercises(*)');
 
       if (exercisesError) throw exercisesError;
 

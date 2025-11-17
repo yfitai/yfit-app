@@ -78,7 +78,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           *,
           workout_exercises (
             *,
-            exercise:exercises (*)
+            exercises (*)
           )
         `)
         .eq('user_id', user.id)

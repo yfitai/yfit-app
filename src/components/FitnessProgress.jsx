@@ -74,7 +74,7 @@ const FitnessProgress = () => {
         .from('exercise_personal_records')
         .select(`
           *,
-          exercise:exercises(name)
+          exercises(name)
         `)
         .eq('user_id', user.id)
         .eq('is_current', true)
