@@ -606,15 +606,30 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         {/* Exercise Navigation */}
         <div className="flex gap-3">
           <button
-            onClick={() => setCurrentExerciseIndex(prev => Math.max(0, prev - 1))}
+            onClick={() => {
+              console.log('Previous clicked, current index:', currentExerciseIndex);
+              setCurrentExerciseIndex(prev => {
+                const next = Math.max(0, prev - 1);
+                console.log('Moving to index:', next);
+                return next;
+              });
+            }}
             disabled={currentExerciseIndex === 0}
             className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous Exercise
           </button>
           <button
-            onClick={() => setCurrentExerciseIndex(prev => Math.min(selectedWorkout.workout_exercises.length - 1, prev + 1))}
-            disabled={currentExerciseIndex === selectedWorkout.workout_exercises.length - 1}
+            onClick={() => {
+              console.log('Next clicked, current index:', currentExerciseIndex);
+              console.log('Total exercises:', selectedWorkout.workout_exercises.length);
+              setCurrentExerciseIndex(prev => {
+                const next = prev + 1;
+                console.log('Moving to index:', next);
+                return next;
+              });
+            }}
+            disabled={currentExerciseIndex >= selectedWorkout.workout_exercises.length - 1}
             className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next Exercise
