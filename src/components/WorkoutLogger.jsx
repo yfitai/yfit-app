@@ -492,9 +492,9 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         {currentExercise && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {currentExercise.exercise.name}
+              {currentExercise.exercises.name}
             </h2>
-            <p className="text-gray-600 mb-4">{currentExercise.exercise.description}</p>
+            <p className="text-gray-600 mb-4">{currentExercise.exercises.description}</p>
 
             {/* Target Sets/Reps */}
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
