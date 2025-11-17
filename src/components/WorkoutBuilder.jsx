@@ -123,6 +123,10 @@ const WorkoutBuilder = () => {
 
     try {
       setSaving(true);
+      console.log('🔍 Starting workout save...');
+      console.log('User ID:', user?.id);
+      console.log('Workout Name:', workoutName);
+      console.log('Selected Exercises:', selectedExercises);
 
       // Calculate estimated duration (rough estimate: 3 min per set + rest time)
       const estimatedDuration = selectedExercises.reduce((total, ex) => {
@@ -144,7 +148,11 @@ const WorkoutBuilder = () => {
         .select()
         .single();
 
-      if (workoutError) throw workoutError;
+      if (workoutError) {
+        console.error('❌ Workout insert error:', workoutError);
+        throw workoutError;
+      }
+      console.log('✅ Workout created:', workout);
 
       // Create workout exercises
       const workoutExercises = selectedExercises.map(ex => ({
@@ -163,8 +171,13 @@ const WorkoutBuilder = () => {
         .from('workout_exercises')
         .insert(workoutExercises);
 
-      if (exercisesError) throw exercisesError;
+      if (exercisesError) {
+        console.error('❌ Exercises insert error:', exercisesError);
+        throw exercisesError;
+      }
+      console.log('✅ Exercises added successfully');
 
+      console.log('✅ Workout save complete!');
       alert('Workout saved successfully! 🎉');
       resetForm();
     } catch (error) {
