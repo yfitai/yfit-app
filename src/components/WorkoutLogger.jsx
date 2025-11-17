@@ -72,6 +72,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
   const fetchWorkouts = async () => {
     try {
+      console.log('🔍 Fetching workouts for user:', user?.id);
       const { data, error } = await supabase
         .from('workouts')
         .select(`
@@ -84,7 +85,12 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Fetch workouts error:', error);
+        throw error;
+      }
+      console.log('✅ Fetched workouts:', data?.length || 0, 'workouts');
+      console.log('Workout data:', data);
       setWorkouts(data || []);
     } catch (error) {
       console.error('Error fetching workouts:', error);
