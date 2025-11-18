@@ -54,12 +54,15 @@ const WorkoutBuilder = () => {
   };
 
   const addExercise = (exercise) => {
+    console.log('🔍 Adding exercise:', exercise.name);
+    console.log('Current selectedExercises:', selectedExercises.length);
+    
     if (selectedExercises.find(e => e.exercise.id === exercise.id)) {
       alert('Exercise already added to workout');
       return;
     }
 
-    setSelectedExercises([
+    const newExercises = [
       ...selectedExercises,
       {
         exercise,
@@ -71,7 +74,10 @@ const WorkoutBuilder = () => {
         rest_seconds: 60,
         notes: ''
       }
-    ]);
+    ];
+    
+    console.log('✅ Setting selectedExercises to:', newExercises.length, 'exercises');
+    setSelectedExercises(newExercises);
     setShowExerciseSelector(false);
   };
 
@@ -123,10 +129,6 @@ const WorkoutBuilder = () => {
 
     try {
       setSaving(true);
-      console.log('🔍 Starting workout save...');
-      console.log('User ID:', user?.id);
-      console.log('Workout Name:', workoutName);
-      console.log('Selected Exercises:', selectedExercises);
 
       // Calculate estimated duration (rough estimate: 3 min per set + rest time)
       const estimatedDuration = selectedExercises.reduce((total, ex) => {
@@ -148,11 +150,7 @@ const WorkoutBuilder = () => {
         .select()
         .single();
 
-      if (workoutError) {
-        console.error('❌ Workout insert error:', workoutError);
-        throw workoutError;
-      }
-      console.log('✅ Workout created:', workout);
+      if (workoutError) throw workoutError;
 
       // Create workout exercises
       const workoutExercises = selectedExercises.map(ex => ({
@@ -171,13 +169,8 @@ const WorkoutBuilder = () => {
         .from('workout_exercises')
         .insert(workoutExercises);
 
-      if (exercisesError) {
-        console.error('❌ Exercises insert error:', exercisesError);
-        throw exercisesError;
-      }
-      console.log('✅ Exercises added successfully');
+      if (exercisesError) throw exercisesError;
 
-      console.log('✅ Workout save complete!');
       alert('Workout saved successfully! 🎉');
       resetForm();
     } catch (error) {
