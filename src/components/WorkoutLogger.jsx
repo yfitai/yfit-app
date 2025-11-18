@@ -52,6 +52,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     return () => clearInterval(interval);
   }, [isResting, restTimer]);
 
+  // Reset set counter when exercise changes
+  useEffect(() => {
+    setCurrentSet(1);
+  }, [currentExerciseIndex]);
+
   // Session duration tracker
   useEffect(() => {
     let interval;
@@ -491,9 +496,17 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       <div className="max-w-4xl mx-auto p-6">
         {currentExercise && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {currentExercise.exercises.name}
-            </h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {currentExercise.exercises.name}
+              </h2>
+              <div className="text-sm font-semibold text-gray-600">
+                Exercise {currentExerciseIndex + 1} of {selectedWorkout.workout_exercises.length}
+                {currentExerciseIndex === selectedWorkout.workout_exercises.length - 1 && (
+                  <span className="ml-2 text-blue-600">🎯 Final Exercise!</span>
+                )}
+              </div>
+            </div>
             <p className="text-gray-600 mb-4">{currentExercise.exercises.description}</p>
 
             {/* Target Sets/Reps */}
