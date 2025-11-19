@@ -83,6 +83,12 @@ export default function NutritionEnhanced({ user: propUser }) {
           setAdjustedCalories(metrics.adjustedCalories)
           setLeanBodyMass(metrics.leanBodyMass) // Load lean body mass for MacroSettings
           console.log('Loaded demo metrics:', metrics)
+        } else {
+          // Provide default demo values if Goals page not completed
+          console.log('No demo metrics found - using defaults')
+          setTdee(2000)
+          setAdjustedCalories(2000)
+          setLeanBodyMass(60) // ~132 lbs
         }
 
         const demoMeals = localStorage.getItem('yfit_demo_meals')
@@ -600,7 +606,6 @@ export default function NutritionEnhanced({ user: propUser }) {
           <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-sm text-yellow-800">
               ⚠️ Complete your Goals page to see personalized macro recommendations.
-              {console.log('MacroSettings not showing - leanBodyMass:', leanBodyMass, 'adjustedCalories:', adjustedCalories)}
             </p>
           </div>
         )}
