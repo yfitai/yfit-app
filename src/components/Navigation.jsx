@@ -1,4 +1,4 @@
-import { Home, Target, Utensils, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut } from 'lucide-react'
+import { Home, Target, Utensils, Calendar, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut } from 'lucide-react'
 import { signOut } from '../lib/supabase'
 import { NavLink } from 'react-router-dom'
 export default function Navigation({ user }) {
@@ -11,6 +11,7 @@ export default function Navigation({ user }) {
     { path: '/', label: 'Dashboard', icon: Home },
     { path: '/goals', label: 'Goals', icon: Target },
     { path: '/nutrition', label: 'Nutrition', icon: Utensils },
+    { path: '/daily-tracker', label: 'Daily Tracker', icon: Calendar },
     { path: '/fitness', label: 'Fitness', icon: Dumbbell },
     { path: '/medications', label: 'Medications', icon: Pill },
        { path: '/progress', label: 'Progress', icon: TrendingUp },

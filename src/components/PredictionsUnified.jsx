@@ -154,6 +154,8 @@ export default function PredictionsUnified({ user }) {
       sleepImpact: analyzeSleepImpact([], woData), // No sleep data yet
       bodyRecomp: forecastBodyRecomposition(wData, woData, nData),
       habitStreak: predictHabitStreak(woData),
+      bpGoal: predictBPGoal(wData),
+      glucoseGoal: predictGlucoseGoal(wData),
       isCompressedData // Add flag for UI
     });
   };
@@ -792,6 +794,157 @@ export default function PredictionsUnified({ user }) {
     }
   };
 
+  // 9. Blood Pressure Goal Prediction
+  const predictBPGoal = (healthData = weightData) => {
+    if (healthData.length < 7) return null;
+
+    try {
+      const bpLogs = healthData.filter(d => d.blood_pressure_systolic && d.blood_pressure_diastolic);
+      if (bpLogs.length < 7) return null;
+
+      // Sort by date
+      const sorted = bpLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
+      
+      // Calculate averages and trends
+      const avgSystolic = sorted.reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / sorted.length;
+      const avgDiastolic = sorted.reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / sorted.length;
+
+      // Calculate trend (recent vs older)
+      const mid = Math.floor(sorted.length / 2);
+      const olderSystolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / mid;
+      const recentSystolic = sorted.slice(mid).reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / (sorted.length - mid);
+      const systolicChange = recentSystolic - olderSystolic;
+
+      const olderDiastolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / mid;
+      const recentDiastolic = sorted.slice(mid).reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / (sorted.length - mid);
+      const diastolicChange = recentDiastolic - olderDiastolic;
+
+      // Determine status
+      let status = 'normal';
+      if (avgSystolic >= 140 || avgDiastolic >= 90) status = 'high';
+      else if (avgSystolic >= 130 || avgDiastolic >= 80) status = 'elevated';
+      else if (avgSystolic < 90 || avgDiastolic < 60) status = 'low';
+
+      // Determine trend
+      let trend = 'stable';
+      if (Math.abs(systolicChange) < 2 && Math.abs(diastolicChange) < 2) trend = 'stable';
+      else if (systolicChange < -2 || diastolicChange < -2) trend = 'improving';
+      else if (systolicChange > 2 || diastolicChange > 2) trend = 'worsening';
+
+      // Goal: 120/80
+      const goalSystolic = 120;
+      const goalDiastolic = 80;
+      const systolicDiff = avgSystolic - goalSystolic;
+      const diastolicDiff = avgDiastolic - goalDiastolic;
+
+      // Predict weeks to goal (if improving)
+      let weeksToGoal = null;
+      if (trend === 'improving' && systolicChange < 0) {
+        const weeksElapsed = (new Date(sorted[sorted.length - 1].logged_at) - new Date(sorted[0].logged_at)) / (1000 * 60 * 60 * 24 * 7);
+        const ratePerWeek = systolicChange / weeksElapsed;
+        weeksToGoal = Math.abs(systolicDiff / ratePerWeek);
+      }
+
+      return {
+        avgSystolic: Math.round(avgSystolic),
+        avgDiastolic: Math.round(avgDiastolic),
+        status,
+        trend,
+        systolicChange: Math.round(systolicChange * 10) / 10,
+        diastolicChange: Math.round(diastolicChange * 10) / 10,
+        goalSystolic,
+        goalDiastolic,
+        systolicDiff: Math.round(systolicDiff),
+        diastolicDiff: Math.round(diastolicDiff),
+        weeksToGoal: weeksToGoal ? Math.round(weeksToGoal) : null,
+        logsCount: bpLogs.length,
+        recommendation: status === 'high' 
+          ? 'Consult your doctor. Consider lifestyle changes: reduce sodium, exercise regularly, manage stress.'
+          : status === 'elevated'
+          ? 'Monitor closely. Focus on diet, exercise, and stress management to prevent progression.'
+          : trend === 'improving'
+          ? 'Great progress! Keep up your healthy habits.'
+          : 'Maintain your current healthy lifestyle.'
+      };
+    } catch (error) {
+      console.error('Error predicting BP goal:', error);
+      return null;
+    }
+  };
+
+  // 10. Blood Glucose Goal Prediction
+  const predictGlucoseGoal = (healthData = weightData) => {
+    if (healthData.length < 7) return null;
+
+    try {
+      const glucoseLogs = healthData.filter(d => d.glucose_mg_dl);
+      if (glucoseLogs.length < 7) return null;
+
+      // Sort by date
+      const sorted = glucoseLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
+      
+      // Calculate average
+      const avgGlucose = sorted.reduce((sum, d) => sum + d.glucose_mg_dl, 0) / sorted.length;
+
+      // Calculate trend
+      const mid = Math.floor(sorted.length / 2);
+      const olderGlucose = sorted.slice(0, mid).reduce((sum, d) => sum + d.glucose_mg_dl, 0) / mid;
+      const recentGlucose = sorted.slice(mid).reduce((sum, d) => sum + d.glucose_mg_dl, 0) / (sorted.length - mid);
+      const glucoseChange = recentGlucose - olderGlucose;
+
+      // Determine status (fasting glucose)
+      let status = 'normal';
+      if (avgGlucose >= 126) status = 'diabetic';
+      else if (avgGlucose >= 100) status = 'prediabetic';
+      else if (avgGlucose < 70) status = 'low';
+
+      // Determine trend
+      let trend = 'stable';
+      if (Math.abs(glucoseChange) < 5) trend = 'stable';
+      else if (glucoseChange < -5) trend = 'improving';
+      else if (glucoseChange > 5) trend = 'worsening';
+
+      // Goal: <100 mg/dL (normal)
+      const goal = 100;
+      const diff = avgGlucose - goal;
+
+      // Estimate A1C (formula: (avg glucose + 46.7) / 28.7)
+      const estimatedA1C = ((avgGlucose + 46.7) / 28.7).toFixed(1);
+
+      // Predict weeks to goal (if improving)
+      let weeksToGoal = null;
+      if (trend === 'improving' && glucoseChange < 0 && avgGlucose > goal) {
+        const weeksElapsed = (new Date(sorted[sorted.length - 1].logged_at) - new Date(sorted[0].logged_at)) / (1000 * 60 * 60 * 24 * 7);
+        const ratePerWeek = glucoseChange / weeksElapsed;
+        weeksToGoal = Math.abs(diff / ratePerWeek);
+      }
+
+      return {
+        avgGlucose: Math.round(avgGlucose),
+        status,
+        trend,
+        glucoseChange: Math.round(glucoseChange * 10) / 10,
+        goal,
+        diff: Math.round(diff),
+        estimatedA1C,
+        weeksToGoal: weeksToGoal ? Math.round(weeksToGoal) : null,
+        logsCount: glucoseLogs.length,
+        recommendation: status === 'diabetic'
+          ? 'Consult your doctor immediately. Follow prescribed treatment and monitor regularly.'
+          : status === 'prediabetic'
+          ? 'Take action now: improve diet, increase exercise, lose weight if needed. Regular monitoring is key.'
+          : status === 'low'
+          ? 'Low blood sugar detected. Consult your doctor if this persists.'
+          : trend === 'improving'
+          ? 'Excellent progress! Continue your healthy lifestyle.'
+          : 'Maintain your current healthy habits to keep glucose in normal range.'
+      };
+    } catch (error) {
+      console.error('Error predicting glucose goal:', error);
+      return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -1268,6 +1421,130 @@ export default function PredictionsUnified({ user }) {
             <Flame className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Habit Streak Predictions</h3>
             <p className="text-gray-600">Log 14+ workouts to analyze consistency and predict streaks</p>
+          </div>
+        )}
+
+        {/* Blood Pressure Goal Prediction */}
+        {predictions.bpGoal ? (
+          <div className={`bg-gradient-to-r ${
+            predictions.bpGoal.status === 'high' ? 'from-red-600 to-pink-600' :
+            predictions.bpGoal.status === 'elevated' ? 'from-yellow-600 to-orange-600' :
+            predictions.bpGoal.status === 'low' ? 'from-blue-600 to-cyan-600' :
+            'from-green-600 to-emerald-600'
+          } rounded-lg p-6 text-white mb-6`}>
+            <div className="flex items-center mb-4">
+              <Activity className="w-8 h-8 mr-3" />
+              <h2 className="text-2xl font-semibold">Blood Pressure Goal Tracking</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              <div>
+                <div className="text-sm opacity-90 mb-1">Current Average</div>
+                <div className="text-4xl font-bold">{predictions.bpGoal.avgSystolic}/{predictions.bpGoal.avgDiastolic}</div>
+                <div className="text-sm opacity-75">mmHg</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Status</div>
+                <div className="text-4xl font-bold capitalize">{predictions.bpGoal.status}</div>
+                <div className="text-sm opacity-75">Trend: {predictions.bpGoal.trend}</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Goal</div>
+                <div className="text-4xl font-bold">{predictions.bpGoal.goalSystolic}/{predictions.bpGoal.goalDiastolic}</div>
+                <div className="text-sm opacity-75">mmHg (optimal)</div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm opacity-90">Systolic Change</div>
+                  <div className="text-2xl font-bold">{predictions.bpGoal.systolicChange > 0 ? '+' : ''}{predictions.bpGoal.systolicChange} mmHg</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-90">Diastolic Change</div>
+                  <div className="text-2xl font-bold">{predictions.bpGoal.diastolicChange > 0 ? '+' : ''}{predictions.bpGoal.diastolicChange} mmHg</div>
+                </div>
+              </div>
+            </div>
+            {predictions.bpGoal.weeksToGoal && (
+              <div className="bg-white/10 rounded-lg p-4 mb-4">
+                <div className="font-semibold mb-2">🎯 Estimated Time to Goal</div>
+                <div className="text-3xl font-bold">{predictions.bpGoal.weeksToGoal} weeks</div>
+                <div className="text-sm opacity-75 mt-1">Based on current improvement rate</div>
+              </div>
+            )}
+            <div className="bg-white/10 rounded-lg p-4">
+              <div className="font-semibold mb-2">💡 Recommendation</div>
+              <p>{predictions.bpGoal.recommendation}</p>
+              <div className="text-sm opacity-75 mt-2">Based on {predictions.bpGoal.logsCount} BP readings</div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
+            <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Blood Pressure Goal Tracking</h3>
+            <p className="text-gray-600">Log 7+ blood pressure readings in Daily Tracker to track progress</p>
+          </div>
+        )}
+
+        {/* Blood Glucose Goal Prediction */}
+        {predictions.glucoseGoal ? (
+          <div className={`bg-gradient-to-r ${
+            predictions.glucoseGoal.status === 'diabetic' ? 'from-red-600 to-pink-600' :
+            predictions.glucoseGoal.status === 'prediabetic' ? 'from-yellow-600 to-orange-600' :
+            predictions.glucoseGoal.status === 'low' ? 'from-blue-600 to-cyan-600' :
+            'from-green-600 to-emerald-600'
+          } rounded-lg p-6 text-white mb-6`}>
+            <div className="flex items-center mb-4">
+              <TrendingUp className="w-8 h-8 mr-3" />
+              <h2 className="text-2xl font-semibold">Blood Glucose Goal Tracking</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              <div>
+                <div className="text-sm opacity-90 mb-1">Current Average</div>
+                <div className="text-4xl font-bold">{predictions.glucoseGoal.avgGlucose}</div>
+                <div className="text-sm opacity-75">mg/dL</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Status</div>
+                <div className="text-4xl font-bold capitalize">{predictions.glucoseGoal.status}</div>
+                <div className="text-sm opacity-75">Trend: {predictions.glucoseGoal.trend}</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Estimated A1C</div>
+                <div className="text-4xl font-bold">{predictions.glucoseGoal.estimatedA1C}%</div>
+                <div className="text-sm opacity-75">Based on avg glucose</div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm opacity-90">Recent Change</div>
+                  <div className="text-2xl font-bold">{predictions.glucoseGoal.glucoseChange > 0 ? '+' : ''}{predictions.glucoseGoal.glucoseChange} mg/dL</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-90">Goal</div>
+                  <div className="text-2xl font-bold">&lt;{predictions.glucoseGoal.goal} mg/dL</div>
+                </div>
+              </div>
+            </div>
+            {predictions.glucoseGoal.weeksToGoal && (
+              <div className="bg-white/10 rounded-lg p-4 mb-4">
+                <div className="font-semibold mb-2">🎯 Estimated Time to Goal</div>
+                <div className="text-3xl font-bold">{predictions.glucoseGoal.weeksToGoal} weeks</div>
+                <div className="text-sm opacity-75 mt-1">Based on current improvement rate</div>
+              </div>
+            )}
+            <div className="bg-white/10 rounded-lg p-4">
+              <div className="font-semibold mb-2">💡 Recommendation</div>
+              <p>{predictions.glucoseGoal.recommendation}</p>
+              <div className="text-sm opacity-75 mt-2">Based on {predictions.glucoseGoal.logsCount} glucose readings</div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
+            <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Blood Glucose Goal Tracking</h3>
+            <p className="text-gray-600">Log 7+ blood glucose readings in Daily Tracker to track progress</p>
           </div>
         )}
 

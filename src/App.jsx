@@ -6,6 +6,7 @@ import Legal from './pages/Legal'
 import Dashboard from './components/Dashboard'
 import Goals from './components/Goals'
 import NutritionUnified from './components/NutritionUnified'
+import DailyTracker from './components/DailyTracker'
 import Progress from './components/Progress'
 import Fitness from './components/Fitness'
 import Medications from './components/Medications'
@@ -100,6 +101,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard user={user} />} />
                 <Route path="/goals" element={<Goals user={user} />} />
                 <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
                 <Route path="/fitness" element={<Fitness user={user} />} />
                 <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
                 <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
