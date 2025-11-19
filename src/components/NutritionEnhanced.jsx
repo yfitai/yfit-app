@@ -5,7 +5,6 @@ import UnitToggle from './UnitToggle'
 import FoodSearch from './FoodSearch'
 import BarcodeScanner from './BarcodeScanner'
 import MacroSettings from './MacroSettings'
-import WaterTracker from './WaterTracker'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
 import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus } from 'lucide-react'
@@ -605,11 +604,6 @@ export default function NutritionEnhanced({ user: propUser }) {
             </p>
           </div>
         )}
-
-        {/* Water Tracker */}
-        <div className="mb-6">
-          <WaterTracker user={user} />
-        </div>
 
         {/* Meals by Type */}
         {['breakfast', 'lunch', 'dinner', 'snacks'].map((mealType) => (
