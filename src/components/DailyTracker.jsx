@@ -29,9 +29,13 @@ export default function DailyTracker({ user }) {
     notes: ''
   });
 
-  // Unit preferences
-  const [waterUnit, setWaterUnit] = useState('ml'); // 'ml', 'oz', 'cups'
-  const [glucoseUnit, setGlucoseUnit] = useState('mg/dl'); // 'mg/dl', 'mmol/l'
+  // Unit preferences - load from localStorage
+  const [waterUnit, setWaterUnit] = useState(() => {
+    return localStorage.getItem('yfit_water_unit') || 'ml';
+  }); // 'ml', 'oz', 'cups'
+  const [glucoseUnit, setGlucoseUnit] = useState(() => {
+    return localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
+  }); // 'mg/dl', 'mmol/l'
   const [isDoneForDay, setIsDoneForDay] = useState(false);
 
   useEffect(() => {
@@ -350,7 +354,11 @@ export default function DailyTracker({ user }) {
               </div>
               <select
                 value={waterUnit}
-                onChange={(e) => setWaterUnit(e.target.value)}
+                onChange={(e) => {
+                  const newUnit = e.target.value;
+                  setWaterUnit(newUnit);
+                  localStorage.setItem('yfit_water_unit', newUnit);
+                }}
                 className="text-xs px-2 py-1 border border-gray-300 rounded"
               >
                 <option value="ml">ml</option>
@@ -412,7 +420,11 @@ export default function DailyTracker({ user }) {
               </div>
               <select
                 value={glucoseUnit}
-                onChange={(e) => setGlucoseUnit(e.target.value)}
+                onChange={(e) => {
+                  const newUnit = e.target.value;
+                  setGlucoseUnit(newUnit);
+                  localStorage.setItem('yfit_glucose_unit', newUnit);
+                }}
                 className="text-xs px-2 py-1 border border-gray-300 rounded"
               >
                 <option value="mg/dl">mg/dL</option>
