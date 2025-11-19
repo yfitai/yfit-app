@@ -28,6 +28,13 @@ export default function MedicationLog({ user }) {
 
   const loadMedications = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_medications');
+        setMedications(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -47,6 +54,13 @@ export default function MedicationLog({ user }) {
 
   const loadLogs = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_medication_logs');
+        setLogs(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const startOfDay = `${selectedDate}T00:00:00`
       const endOfDay = `${selectedDate}T23:59:59`
 
@@ -73,6 +87,12 @@ export default function MedicationLog({ user }) {
 
   const calculateStats = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        setStats({ taken: 0, missed: 0, skipped: 0, adherenceRate: 0 });
+        return;
+      }
+
       // Get logs for the past 30 days
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
