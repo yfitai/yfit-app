@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, Award, Calendar, Dumbbell, Target, 
-  ChevronRight, Filter, Download, X, Edit2
+  ChevronRight, Filter, Download, X, Edit2, Trash2
 } from 'lucide-react';
 
 const FitnessProgress = () => {
@@ -26,6 +26,7 @@ const FitnessProgress = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionDetails, setSessionDetails] = useState(null);
+  const [hiddenExercises, setHiddenExercises] = useState([]);
 
   useEffect(() => {
     initializeUser();
@@ -90,17 +91,88 @@ const FitnessProgress = () => {
         .limit(10);
       setRecentSessions(sessionsData || []);
 
-      // Fetch personal records
-      const { data: prsData } = await supabase
-        .from('exercise_personal_records')
-        .select(`
-          *,
-          exercises(name)
-        `)
-        .eq('user_id', user.id)
-        .eq('is_current', true)
-        .order('achieved_at', { ascending: false });
-      setPersonalRecords(prsData || []);
+      // Calculate personal records from exercise_sets
+      // Get all session_exercises for this user
+      const userSessionIds = (sessionsData || []).map(s => s.id);
+      
+      if (userSessionIds.length > 0) {
+        const { data: userSessionExercises } = await supabase
+          .from('session_exercises')
+          .select('id, exercise_id')
+          .in('session_id', userSessionIds);
+
+        if (userSessionExercises && userSessionExercises.length > 0) {
+          const sessionExerciseIds = userSessionExercises.map(se => se.id);
+          
+          // Get all sets for these exercises
+          const { data: allSets } = await supabase
+            .from('exercise_sets')
+            .select('*')
+            .in('session_exercise_id', sessionExerciseIds);
+
+          // Calculate PRs by exercise
+          const prsByExercise = {};
+          (allSets || []).forEach(set => {
+            const sessionExercise = userSessionExercises.find(se => se.id === set.session_exercise_id);
+            if (!sessionExercise) return;
+
+            const exerciseId = sessionExercise.exercise_id;
+            if (!prsByExercise[exerciseId]) {
+              prsByExercise[exerciseId] = {
+                maxWeight: 0,
+                maxVolume: 0,
+                maxReps: 0,
+                bestSet: null
+              };
+            }
+
+            const weight = parseFloat(set.weight) || 0;
+            const reps = parseInt(set.reps) || 0;
+            const volume = weight * reps;
+
+            if (weight > prsByExercise[exerciseId].maxWeight) {
+              prsByExercise[exerciseId].maxWeight = weight;
+              prsByExercise[exerciseId].bestSet = set;
+            }
+            if (volume > prsByExercise[exerciseId].maxVolume) {
+              prsByExercise[exerciseId].maxVolume = volume;
+            }
+            if (reps > prsByExercise[exerciseId].maxReps) {
+              prsByExercise[exerciseId].maxReps = reps;
+            }
+          });
+
+          // Get exercise names and format PRs
+          const exerciseIds = Object.keys(prsByExercise);
+          if (exerciseIds.length > 0) {
+            const { data: exerciseNames } = await supabase
+              .from('exercises')
+              .select('id, name')
+              .in('id', exerciseIds);
+
+            const exerciseNameMap = {};
+            (exerciseNames || []).forEach(ex => {
+              exerciseNameMap[ex.id] = ex.name;
+            });
+
+            const prsArray = Object.entries(prsByExercise).map(([exerciseId, prs]) => ({
+              id: exerciseId,
+              exercise: { name: exerciseNameMap[exerciseId] || 'Unknown' },
+              record_type: 'max_weight',
+              value: `${prs.maxWeight} lbs`,
+              achieved_at: prs.bestSet?.created_at || new Date().toISOString()
+            }));
+
+            setPersonalRecords(prsArray.slice(0, 5)); // Show top 5
+          } else {
+            setPersonalRecords([]);
+          }
+        } else {
+          setPersonalRecords([]);
+        }
+      } else {
+        setPersonalRecords([]);
+      }
 
       // Calculate overall stats
       const totalWorkouts = sessionsData?.length || 0;
@@ -330,6 +402,49 @@ const FitnessProgress = () => {
     }
   };
 
+  const deleteWorkoutSession = async (sessionId, sessionName) => {
+    if (!confirm(`Delete "${sessionName}"?\n\nThis will permanently delete:\n- The workout session\n- All exercise sets\n- All related data\n\nThis cannot be undone!`)) {
+      return;
+    }
+
+    try {
+      // Delete exercise sets first (foreign key constraint)
+      const { data: sessionExercises } = await supabase
+        .from('session_exercises')
+        .select('id')
+        .eq('session_id', sessionId);
+
+      if (sessionExercises && sessionExercises.length > 0) {
+        const sessionExerciseIds = sessionExercises.map(se => se.id);
+        
+        await supabase
+          .from('exercise_sets')
+          .delete()
+          .in('session_exercise_id', sessionExerciseIds);
+
+        await supabase
+          .from('session_exercises')
+          .delete()
+          .eq('session_id', sessionId);
+      }
+
+      // Delete the session
+      const { error } = await supabase
+        .from('workout_sessions')
+        .delete()
+        .eq('id', sessionId);
+
+      if (error) throw error;
+
+      // Refresh data
+      await fetchData();
+      alert('Workout deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      alert('Failed to delete workout: ' + error.message);
+    }
+  };
+
   const updateExerciseSet = async (setId, field, value) => {
     try {
       const { error } = await supabase
@@ -475,7 +590,7 @@ const FitnessProgress = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise to Track</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
-            {exercises.map(exercise => (
+            {exercises.filter(ex => !hiddenExercises.includes(ex.id)).map(exercise => (
               <button
                 key={exercise.id}
                 onClick={() => setSelectedExercise(exercise)}
@@ -485,7 +600,20 @@ const FitnessProgress = () => {
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
               >
-                <div className="font-semibold text-gray-900 text-sm">{exercise.name}</div>
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-gray-900 text-sm flex-1">{exercise.name}</div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`Hide "${exercise.name}" from this list?\n\nThis won't delete your workout data.`)) {
+                        setHiddenExercises(prev => [...prev, exercise.id]);
+                      }
+                    }}
+                    className="p-1 hover:bg-red-100 rounded transition-colors"
+                  >
+                    <X className="w-3 h-3 text-red-600" />
+                  </button>
+                </div>
               </button>
             ))}
           </div>
@@ -619,16 +747,33 @@ const FitnessProgress = () => {
                     setSelectedSession(session);
                     fetchSessionDetails(session.id);
                   }}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
-                  <div>
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group">
+                  <div 
+                    className="flex-1 cursor-pointer"
+                    onClick={() => {
+                      setSelectedSession(session);
+                      fetchSessionDetails(session.id);
+                    }}
+                  >
                     <div className="font-semibold text-gray-900">{session.workout?.name || 'Quick Workout'}</div>
                     <div className="text-sm text-gray-600">
                       {new Date(session.start_time).toLocaleDateString()} • {session.total_exercises} exercises • {session.total_sets} sets
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-blue-600">{Math.round(session.total_volume || 0)} lbs</div>
-                    <div className="text-xs text-gray-600">Total Volume</div>
+                  <div className="text-right flex items-center gap-3">
+                    <div>
+                      <div className="text-lg font-bold text-blue-600">{Math.round(session.total_volume || 0)} lbs</div>
+                      <div className="text-xs text-gray-600">Total Volume</div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteWorkoutSession(session.id, session.workout?.name || 'Quick Workout');
+                      }}
+                      className="p-2 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
                   </div>
                 </div>
               ))}
