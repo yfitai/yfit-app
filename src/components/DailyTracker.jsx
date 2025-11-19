@@ -56,9 +56,29 @@ export default function DailyTracker({ user }) {
 
   const fetchTodayLog = async () => {
     try {
+      // Skip Supabase query in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_daily_log');
+        if (stored) {
+          const log = JSON.parse(stored);
+          setTodayLog(log);
+          setFormData({
+            sleep_hours: log.sleep_hours || '',
+            sleep_quality: log.sleep_quality || 'good',
+            water_ml: log.water_ml || '',
+            steps: log.steps || '',
+            bp_systolic: log.bp_systolic || '',
+            bp_diastolic: log.bp_diastolic || '',
+            glucose_mg_dl: log.glucose_mg_dl || '',
+            notes: log.notes || ''
+          });
+        }
+        return;
+      }
+
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
-        .from('health_metrics_logs')
+        .from('daily_logs')
         .select('*')
         .eq('user_id', user.id)
         .gte('logged_at', `${today}T00:00:00`)
@@ -95,11 +115,20 @@ export default function DailyTracker({ user }) {
 
   const fetchWeeklyData = async () => {
     try {
+      // Skip Supabase query in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_weekly_logs');
+        if (stored) {
+          setWeeklyData(JSON.parse(stored));
+        }
+        return;
+      }
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       const { data, error } = await supabase
-        .from('health_metrics_logs')
+        .from('daily_logs')
         .select('*')
         .eq('user_id', user.id)
         .gte('logged_at', sevenDaysAgo.toISOString())
@@ -114,6 +143,23 @@ export default function DailyTracker({ user }) {
 
   const fetchGoals = async () => {
     try {
+      // Skip Supabase query in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_goals');
+        if (stored) {
+          const data = JSON.parse(stored);
+          setGoals({
+            sleep: data.sleep_hours_goal || 8,
+            water: data.water_ml_goal || 2000,
+            steps: data.steps_goal || 10000,
+            bpSystolic: data.bp_systolic_goal || 120,
+            bpDiastolic: data.bp_diastolic_goal || 80,
+            glucose: data.glucose_goal || 100
+          });
+        }
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_goals')
         .select('*')
@@ -155,17 +201,25 @@ export default function DailyTracker({ user }) {
         notes: formData.notes || null
       };
 
+      // Handle demo mode
+      if (user.id.startsWith('demo')) {
+        localStorage.setItem('yfit_demo_daily_log', JSON.stringify(logData));
+        setTodayLog(logData);
+        alert('Daily log saved! (Demo Mode - data saved locally)');
+        return;
+      }
+
       let result;
       if (todayLog) {
         // Update existing log
         result = await supabase
-          .from('health_metrics_logs')
+          .from('daily_logs')
           .update(logData)
           .eq('id', todayLog.id);
       } else {
         // Insert new log
         result = await supabase
-          .from('health_metrics_logs')
+          .from('daily_logs')
           .insert([logData]);
       }
 
