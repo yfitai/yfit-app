@@ -12,7 +12,7 @@ import Medications from './components/Medications'
 import FormAnalysis from './pages/FormAnalysis'
 import WorkoutSessionTracker from './components/WorkoutSessionTracker'
 import AICoachFAQ from './components/AICoachFAQ'
-import PredictionsDashboard from './components/PredictionsDashboard'
+import PredictionsUnified from './components/PredictionsUnified'
 import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
 import Footer from './components/Footer'
@@ -106,7 +106,7 @@ function App() {
                 <Route path="/medications" element={<Medications user={user} />} />
                 <Route path="/progress" element={<Progress user={user} />} />
                 <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
-                <Route path="/predictions" element={<PredictionsDashboard user={user} />} />
+                <Route path="/predictions" element={<PredictionsUnified user={user} />} />
               </>
             ) : (
               <Route path="*" element={<Navigate to="/login" replace />} />
