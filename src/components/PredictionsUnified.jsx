@@ -22,23 +22,28 @@ export default function PredictionsUnified({ user }) {
   });
 
   useEffect(() => {
-    if (user && user.id !== 'demo-user-id') {
+    if (user) {
       fetchAllData();
-    } else if (user && user.id === 'demo-user-id') {
-      // Demo mode - skip data fetching
-      setLoading(false);
     }
   }, [user]);
 
   const fetchAllData = async () => {
     setLoading(true);
     try {
+      // Fetch data - errors are handled in individual fetch functions
       await Promise.all([
         fetchWeightData(),
         fetchWorkoutData(),
         fetchNutritionData(),
         fetchMedicationData()
       ]);
+      
+      console.log('📊 Data fetched:', {
+        weight: weightData.length,
+        workouts: workoutData.length,
+        nutrition: nutritionData.length,
+        medication: medicationData.length
+      });
       
       // Calculate all predictions after data is loaded
       calculateAllPredictions();
