@@ -671,38 +671,31 @@ const FitnessProgress = () => {
     if (recentSessions.length < 5) return null;
 
     try {
-      const sessions = recentSessions.slice(0, 10); // Last 10 sessions
+      // Use all available sessions for better accuracy
+      const sessions = recentSessions;
       
       // Calculate workout frequency (sessions per week)
       const dates = sessions.map(s => new Date(s.start_time));
-      
-      console.log('🔍 Recovery Analysis Debug:');
-      console.log('Total sessions:', sessions.length);
-      console.log('Dates:', dates.map(d => d.toISOString()));
       
       // Calculate span between oldest and newest workout
       const oldestDate = dates[dates.length - 1].getTime();
       const newestDate = dates[0].getTime();
       const daysBetween = (newestDate - oldestDate) / (1000 * 60 * 60 * 24);
       
-      console.log('Oldest date:', new Date(oldestDate).toISOString());
-      console.log('Newest date:', new Date(newestDate).toISOString());
-      console.log('Days between:', daysBetween);
-      
-      // If all workouts are on same day or very close, use alternative calculation
       let frequency;
-      if (daysBetween < 1) {
-        // Use last 30 days as baseline
+      
+      if (daysBetween < 7) {
+        // For short time spans (< 1 week), use 30-day rolling average
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        const recentWorkouts = recentSessions.filter(s => new Date(s.start_time).getTime() > thirtyDaysAgo);
-        frequency = (recentWorkouts.length / 30) * 7;
-        console.log('Using 30-day calculation:', frequency);
+        const last30Days = recentSessions.filter(s => new Date(s.start_time).getTime() > thirtyDaysAgo);
+        frequency = (last30Days.length / 30) * 7;
       } else {
-        // Ensure minimum span of 7 days for more stable calculation
-        const effectiveDays = Math.max(7, daysBetween);
-        frequency = (sessions.length / effectiveDays) * 7;
-        console.log('Using span calculation:', frequency);
+        // For longer spans, use actual data
+        frequency = (sessions.length / daysBetween) * 7;
       }
+      
+      // Cap at 7x/week maximum (one workout per day)
+      frequency = Math.min(7, frequency);
       
       // Calculate average volume and intensity
       const avgVolume = sessions.reduce((sum, s) => sum + (s.total_volume || 0), 0) / sessions.length;
@@ -729,7 +722,7 @@ const FitnessProgress = () => {
       return {
         needsRest,
         reason,
-        frequency: Math.round(frequency * 10) / 10,
+        frequency: Math.max(0, Math.round(frequency * 10) / 10), // Ensure non-negative
         daysSinceLastWorkout: Math.round(daysSinceLastWorkout * 10) / 10,
         recommendation: needsRest ? 
           'Take 1-2 rest days to optimize recovery and prevent overtraining' :
