@@ -27,6 +27,14 @@ const FitnessProgress = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionDetails, setSessionDetails] = useState(null);
   const [hiddenExercises, setHiddenExercises] = useState([]);
+  const [predictions, setPredictions] = useState({
+    strengthForecast: null,
+    plateauDetection: null,
+    restDayRecommendation: null,
+    goalAchievement: null,
+    performanceTrends: null,
+    exerciseCorrelations: []
+  });
 
   useEffect(() => {
     initializeUser();
@@ -487,6 +495,349 @@ const FitnessProgress = () => {
     return Math.round(prediction);
   };
 
+  const calculateStrengthForecast = () => {
+    if (!selectedExercise || progressData.length < 3) return null;
+
+    try {
+      // Calculate growth rate
+      const weights = progressData.map(d => d.maxWeight);
+      const dates = progressData.map(d => new Date(d.timestamp).getTime());
+      
+      // Calculate average weekly growth
+      const weeklyGrowth = [];
+      for (let i = 1; i < weights.length; i++) {
+        const daysDiff = (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+        const weightDiff = weights[i] - weights[i-1];
+        const weeklyRate = (weightDiff / daysDiff) * 7;
+        weeklyGrowth.push(weeklyRate);
+      }
+
+      const avgWeeklyGrowth = weeklyGrowth.reduce((a, b) => a + b, 0) / weeklyGrowth.length;
+      const currentMax = weights[weights.length - 1];
+
+      // Exponential growth model with diminishing returns
+      const growthFactor = Math.max(0.5, 1 - (currentMax / 500)); // Diminishing returns as weight increases
+      const adjustedGrowth = avgWeeklyGrowth * growthFactor;
+
+      // Predictions for 4, 8, 12 weeks
+      const predictions = [
+        { weeks: 4, weight: Math.round(currentMax + (adjustedGrowth * 4)) },
+        { weeks: 8, weight: Math.round(currentMax + (adjustedGrowth * 8 * 0.9)) }, // Slight deceleration
+        { weeks: 12, weight: Math.round(currentMax + (adjustedGrowth * 12 * 0.85)) }
+      ];
+
+      // Calculate confidence based on data consistency
+      const variance = weeklyGrowth.reduce((sum, rate) => sum + Math.pow(rate - avgWeeklyGrowth, 2), 0) / weeklyGrowth.length;
+      const stdDev = Math.sqrt(variance);
+      const confidence = Math.max(50, Math.min(95, 100 - (stdDev * 10)));
+
+      return {
+        currentMax,
+        avgWeeklyGrowth: Math.round(avgWeeklyGrowth * 10) / 10,
+        predictions,
+        confidence: Math.round(confidence),
+        trend: avgWeeklyGrowth > 0 ? 'increasing' : avgWeeklyGrowth < 0 ? 'decreasing' : 'stable'
+      };
+    } catch (error) {
+      console.error('Error calculating strength forecast:', error);
+      return null;
+    }
+  };
+
+  const calculatePerformanceTrends = () => {
+    if (recentSessions.length < 3) return null;
+
+    try {
+      const sessions = recentSessions.slice(0, 10); // Last 10 sessions
+      
+      // Calculate averages
+      const avgVolume = sessions.reduce((sum, s) => sum + (s.total_volume || 0), 0) / sessions.length;
+      const avgSets = sessions.reduce((sum, s) => sum + (s.total_sets || 0), 0) / sessions.length;
+      const avgReps = sessions.reduce((sum, s) => sum + (s.total_reps || 0), 0) / sessions.length;
+
+      // Calculate trends (comparing first half vs second half)
+      const half = Math.floor(sessions.length / 2);
+      const firstHalf = sessions.slice(0, half);
+      const secondHalf = sessions.slice(half);
+
+      const firstAvgVolume = firstHalf.reduce((sum, s) => sum + (s.total_volume || 0), 0) / firstHalf.length;
+      const secondAvgVolume = secondHalf.reduce((sum, s) => sum + (s.total_volume || 0), 0) / secondHalf.length;
+
+      const volumeTrend = ((secondAvgVolume - firstAvgVolume) / firstAvgVolume) * 100;
+
+      // Predict next workout
+      const predictedVolume = Math.round(avgVolume + (volumeTrend / 100 * avgVolume));
+      const predictedSets = Math.round(avgSets);
+      const predictedReps = Math.round(avgReps);
+
+      return {
+        avgVolume: Math.round(avgVolume),
+        avgSets: Math.round(avgSets),
+        avgReps: Math.round(avgReps),
+        volumeTrend: Math.round(volumeTrend * 10) / 10,
+        predictedVolume,
+        predictedSets,
+        predictedReps,
+        trend: volumeTrend > 5 ? 'improving' : volumeTrend < -5 ? 'declining' : 'stable'
+      };
+    } catch (error) {
+      console.error('Error calculating performance trends:', error);
+      return null;
+    }
+  };
+
+  const calculateGoalAchievement = () => {
+    if (!selectedExercise || progressData.length < 3) return null;
+
+    try {
+      const forecast = calculateStrengthForecast();
+      if (!forecast) return null;
+
+      // Example goal: 10% increase from current max
+      const currentMax = forecast.currentMax;
+      const goalWeight = Math.round(currentMax * 1.1);
+      
+      // Calculate weeks to goal based on growth rate
+      const weeksToGoal = Math.round((goalWeight - currentMax) / forecast.avgWeeklyGrowth);
+      
+      // Calculate probability based on consistency and trend
+      let probability = forecast.confidence;
+      if (forecast.trend === 'decreasing') probability *= 0.5;
+      if (weeksToGoal > 24) probability *= 0.7; // Lower confidence for distant goals
+
+      return {
+        currentMax,
+        goalWeight,
+        weeksToGoal: Math.max(1, weeksToGoal),
+        probability: Math.round(Math.min(95, Math.max(10, probability))),
+        achievableBy: new Date(Date.now() + weeksToGoal * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        recommendation: weeksToGoal < 0 ? 'Goal already achieved!' : 
+                       weeksToGoal < 12 ? 'Very achievable with consistent training' :
+                       weeksToGoal < 24 ? 'Achievable with dedication' :
+                       'Consider a more realistic short-term goal'
+      };
+    } catch (error) {
+      console.error('Error calculating goal achievement:', error);
+      return null;
+    }
+  };
+
+  const detectPlateau = () => {
+    if (!selectedExercise || progressData.length < 4) return null;
+
+    try {
+      const recentData = progressData.slice(-4); // Last 4 data points
+      const weights = recentData.map(d => d.maxWeight);
+      
+      // Calculate variance in recent weights
+      const avg = weights.reduce((a, b) => a + b, 0) / weights.length;
+      const variance = weights.reduce((sum, w) => sum + Math.pow(w - avg, 2), 0) / weights.length;
+      const stdDev = Math.sqrt(variance);
+      
+      // Plateau detected if standard deviation is very low (< 2.5% of average)
+      const isPlateau = stdDev < (avg * 0.025);
+      
+      // Check if weights are stagnant or decreasing
+      const trend = weights[weights.length - 1] - weights[0];
+      const isStagnant = Math.abs(trend) < (avg * 0.05); // Less than 5% change
+      
+      if (isPlateau || isStagnant) {
+        return {
+          detected: true,
+          duration: recentData.length,
+          currentWeight: weights[weights.length - 1],
+          recommendations: [
+            'Consider a deload week (reduce weight by 10-20%)',
+            'Try different rep ranges (e.g., switch from 8-12 to 3-5 reps)',
+            'Add variation exercises',
+            'Check recovery: sleep, nutrition, stress levels',
+            'Increase training frequency or volume gradually'
+          ],
+          severity: isStagnant && trend < 0 ? 'high' : 'moderate'
+        };
+      }
+      
+      return {
+        detected: false,
+        message: 'Good progress! Keep up the consistent training.'
+      };
+    } catch (error) {
+      console.error('Error detecting plateau:', error);
+      return null;
+    }
+  };
+
+  const recommendRestDay = () => {
+    if (recentSessions.length < 5) return null;
+
+    try {
+      const sessions = recentSessions.slice(0, 7); // Last 7 sessions
+      
+      // Calculate workout frequency (sessions per week)
+      const dates = sessions.map(s => new Date(s.start_time));
+      const daysSinceFirst = (Date.now() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
+      const frequency = (sessions.length / daysSinceFirst) * 7;
+      
+      // Calculate average volume and intensity
+      const avgVolume = sessions.reduce((sum, s) => sum + (s.total_volume || 0), 0) / sessions.length;
+      const recentVolume = sessions.slice(0, 3).reduce((sum, s) => sum + (s.total_volume || 0), 0) / 3;
+      
+      // Check for overtraining indicators
+      const volumeIncrease = ((recentVolume - avgVolume) / avgVolume) * 100;
+      const daysSinceLastWorkout = (Date.now() - dates[0].getTime()) / (1000 * 60 * 60 * 24);
+      
+      let needsRest = false;
+      let reason = '';
+      
+      if (frequency > 6) {
+        needsRest = true;
+        reason = 'High training frequency (>6 days/week)';
+      } else if (volumeIncrease > 30) {
+        needsRest = true;
+        reason = 'Significant volume increase (>30%)';
+      } else if (daysSinceLastWorkout < 0.5) {
+        needsRest = true;
+        reason = 'Insufficient recovery time between sessions';
+      }
+      
+      return {
+        needsRest,
+        reason,
+        frequency: Math.round(frequency * 10) / 10,
+        daysSinceLastWorkout: Math.round(daysSinceLastWorkout * 10) / 10,
+        recommendation: needsRest ? 
+          'Take 1-2 rest days to optimize recovery and prevent overtraining' :
+          daysSinceLastWorkout > 3 ? 
+            'Good time for your next workout!' :
+            'Continue with your current schedule'
+      };
+    } catch (error) {
+      console.error('Error calculating rest day recommendation:', error);
+      return null;
+    }
+  };
+
+  const analyzeExerciseCorrelations = async () => {
+    if (!user || recentSessions.length < 5) return [];
+
+    try {
+      // Get all session exercises for user's sessions
+      const sessionIds = recentSessions.map(s => s.id);
+      const { data: sessionExercises } = await supabase
+        .from('session_exercises')
+        .select('id, session_id, exercise_id')
+        .in('session_id', sessionIds);
+
+      if (!sessionExercises || sessionExercises.length === 0) return [];
+
+      const sessionExerciseIds = sessionExercises.map(se => se.id);
+      
+      // Get all sets
+      const { data: allSets } = await supabase
+        .from('exercise_sets')
+        .select('*')
+        .in('session_exercise_id', sessionExerciseIds);
+
+      if (!allSets || allSets.length === 0) return [];
+
+      // Group by exercise and calculate max weights over time
+      const exerciseProgress = {};
+      
+      allSets.forEach(set => {
+        const sessionExercise = sessionExercises.find(se => se.id === set.session_exercise_id);
+        if (!sessionExercise) return;
+
+        const exerciseId = sessionExercise.exercise_id;
+        const sessionId = sessionExercise.session_id;
+        const session = recentSessions.find(s => s.id === sessionId);
+        if (!session) return;
+
+        if (!exerciseProgress[exerciseId]) {
+          exerciseProgress[exerciseId] = [];
+        }
+
+        exerciseProgress[exerciseId].push({
+          date: new Date(session.start_time),
+          weight: parseFloat(set.weight) || 0
+        });
+      });
+
+      // Calculate correlations between exercises
+      const exerciseIds = Object.keys(exerciseProgress);
+      const correlations = [];
+
+      for (let i = 0; i < exerciseIds.length; i++) {
+        for (let j = i + 1; j < exerciseIds.length; j++) {
+          const ex1Id = exerciseIds[i];
+          const ex2Id = exerciseIds[j];
+          
+          const ex1Data = exerciseProgress[ex1Id];
+          const ex2Data = exerciseProgress[ex2Id];
+
+          if (ex1Data.length < 3 || ex2Data.length < 3) continue;
+
+          // Calculate correlation coefficient
+          const ex1Weights = ex1Data.map(d => d.weight);
+          const ex2Weights = ex2Data.map(d => d.weight);
+
+          const ex1Avg = ex1Weights.reduce((a, b) => a + b, 0) / ex1Weights.length;
+          const ex2Avg = ex2Weights.reduce((a, b) => a + b, 0) / ex2Weights.length;
+
+          let numerator = 0;
+          let ex1Variance = 0;
+          let ex2Variance = 0;
+
+          for (let k = 0; k < Math.min(ex1Weights.length, ex2Weights.length); k++) {
+            const ex1Diff = ex1Weights[k] - ex1Avg;
+            const ex2Diff = ex2Weights[k] - ex2Avg;
+            numerator += ex1Diff * ex2Diff;
+            ex1Variance += ex1Diff * ex1Diff;
+            ex2Variance += ex2Diff * ex2Diff;
+          }
+
+          const correlation = numerator / Math.sqrt(ex1Variance * ex2Variance);
+
+          if (Math.abs(correlation) > 0.5) { // Only show strong correlations
+            correlations.push({
+              exercise1: ex1Id,
+              exercise2: ex2Id,
+              correlation: Math.round(correlation * 100) / 100,
+              strength: Math.abs(correlation) > 0.7 ? 'strong' : 'moderate'
+            });
+          }
+        }
+      }
+
+      // Get exercise names
+      if (correlations.length > 0) {
+        const allExerciseIds = [...new Set(correlations.flatMap(c => [c.exercise1, c.exercise2]))];
+        const { data: exerciseNames } = await supabase
+          .from('exercises')
+          .select('id, name')
+          .in('id', allExerciseIds);
+
+        const nameMap = {};
+        (exerciseNames || []).forEach(ex => {
+          nameMap[ex.id] = ex.name;
+        });
+
+        return correlations.map(c => ({
+          ...c,
+          exercise1Name: nameMap[c.exercise1] || 'Unknown',
+          exercise2Name: nameMap[c.exercise2] || 'Unknown',
+          insight: c.correlation > 0 ? 
+            `When ${nameMap[c.exercise1]} improves, ${nameMap[c.exercise2]} typically increases by ${Math.round(Math.abs(c.correlation) * 100)}%` :
+            `${nameMap[c.exercise1]} and ${nameMap[c.exercise2]} show inverse relationship`
+        })).slice(0, 5); // Top 5 correlations
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error analyzing exercise correlations:', error);
+      return [];
+    }
+  };
+
   const calculateRecommendedWeight = () => {
     if (progressData.length === 0) return null;
 
@@ -671,21 +1022,129 @@ const FitnessProgress = () => {
             </div>
 
             {/* Predictive Analytics */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white mb-6">
-              <h2 className="text-2xl font-semibold mb-4">AI-Powered Predictions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="text-sm opacity-90 mb-2">Predicted Next 1RM</div>
-                  <div className="text-4xl font-bold">{predictNext1RM() || 'N/A'} lbs</div>
-                  <div className="text-sm opacity-75 mt-2">
-                    Based on your progression trend
+            <div className="space-y-6 mb-6">
+              {/* Strength Forecast */}
+              {(() => {
+                const forecast = calculateStrengthForecast();
+                return forecast && (
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+                    <h2 className="text-2xl font-semibold mb-4">💪 Strength Forecast</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {forecast.predictions.map(pred => (
+                        <div key={pred.weeks} className="bg-white/10 rounded-lg p-4">
+                          <div className="text-sm opacity-90 mb-2">In {pred.weeks} Weeks</div>
+                          <div className="text-3xl font-bold">{pred.weight} lbs</div>
+                          <div className="text-xs opacity-75 mt-2">
+                            +{pred.weight - forecast.currentMax} lbs from current
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-sm">
+                      <span>Weekly Growth: +{forecast.avgWeeklyGrowth} lbs</span>
+                      <span>Confidence: {forecast.confidence}%</span>
+                      <span className="capitalize">Trend: {forecast.trend}</span>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-sm opacity-90 mb-2">Recommended Working Weight</div>
-                  <div className="text-4xl font-bold">{calculateRecommendedWeight() || 'N/A'} lbs</div>
-                  <div className="text-sm opacity-75 mt-2">
-                    80% of predicted 1RM for optimal gains
+                );
+              })()}
+
+              {/* Goal Achievement */}
+              {(() => {
+                const goal = calculateGoalAchievement();
+                return goal && (
+                  <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-6 text-white">
+                    <h2 className="text-2xl font-semibold mb-4">🎯 Goal Achievement Probability</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Current Max</div>
+                        <div className="text-3xl font-bold">{goal.currentMax} lbs</div>
+                      </div>
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Goal Weight</div>
+                        <div className="text-3xl font-bold">{goal.goalWeight} lbs</div>
+                        <div className="text-xs opacity-75 mt-1">+10% increase</div>
+                      </div>
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Success Probability</div>
+                        <div className="text-3xl font-bold">{goal.probability}%</div>
+                        <div className="text-xs opacity-75 mt-1">By {goal.achievableBy}</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 bg-white/10 rounded-lg p-3 text-sm">
+                      {goal.recommendation}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Plateau Detection */}
+              {(() => {
+                const plateau = detectPlateau();
+                return plateau && plateau.detected && (
+                  <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-6 text-white">
+                    <h2 className="text-2xl font-semibold mb-4">🚨 Plateau Detected</h2>
+                    <div className="mb-4">
+                      <p className="text-lg">Your progress has stalled at <strong>{plateau.currentWeight} lbs</strong></p>
+                      <p className="text-sm opacity-75 mt-1">Severity: {plateau.severity}</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-4">
+                      <div className="font-semibold mb-2">Recommendations:</div>
+                      <ul className="space-y-1 text-sm">
+                        {plateau.recommendations.map((rec, i) => (
+                          <li key={i}>• {rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Rest Day Recommendation */}
+              {(() => {
+                const rest = recommendRestDay();
+                return rest && (
+                  <div className={`bg-gradient-to-r ${rest.needsRest ? 'from-yellow-600 to-orange-600' : 'from-cyan-600 to-blue-600'} rounded-lg p-6 text-white`}>
+                    <h2 className="text-2xl font-semibold mb-4">🛌 Recovery Analysis</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Training Frequency</div>
+                        <div className="text-3xl font-bold">{rest.frequency}x/week</div>
+                      </div>
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Days Since Last Workout</div>
+                        <div className="text-3xl font-bold">{rest.daysSinceLastWorkout}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm opacity-90 mb-2">Status</div>
+                        <div className="text-2xl font-bold">{rest.needsRest ? '⚠️ Rest Needed' : '✅ Good to Go'}</div>
+                      </div>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-semibold">{rest.recommendation}</p>
+                      {rest.reason && <p className="text-sm opacity-75 mt-1">Reason: {rest.reason}</p>}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Basic Predictions */}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white">
+                <h2 className="text-2xl font-semibold mb-4">📊 Quick Stats</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-sm opacity-90 mb-2">Predicted Next 1RM</div>
+                    <div className="text-4xl font-bold">{predictNext1RM() || 'N/A'} lbs</div>
+                    <div className="text-sm opacity-75 mt-2">
+                      Based on your progression trend
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm opacity-90 mb-2">Recommended Working Weight</div>
+                    <div className="text-4xl font-bold">{calculateRecommendedWeight() || 'N/A'} lbs</div>
+                    <div className="text-sm opacity-75 mt-2">
+                      80% of predicted 1RM for optimal gains
+                    </div>
                   </div>
                 </div>
               </div>
