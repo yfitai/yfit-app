@@ -181,6 +181,7 @@ const FitnessProgress = () => {
 
   const fetchSessionDetails = async (sessionId) => {
     try {
+      console.log('🔍 Fetching session details for:', sessionId);
       const { data, error } = await supabase
         .from('session_exercises')
         .select(`
@@ -188,12 +189,19 @@ const FitnessProgress = () => {
           exercises(name, description)
         `)
         .eq('session_id', sessionId)
-        .order('exercise_order');
+        .order('set_number');
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error fetching session details:', error);
+        setSessionDetails([]);
+        return;
+      }
+      
+      console.log('✅ Session details loaded:', data?.length, 'sets');
       setSessionDetails(data || []);
     } catch (error) {
-      console.error('Error fetching session details:', error);
+      console.error('❌ Exception fetching session details:', error);
+      setSessionDetails([]);
     }
   };
 
@@ -273,7 +281,7 @@ const FitnessProgress = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-cyan-50 p-6">
+    <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Fitness Progress</h1>
@@ -341,8 +349,8 @@ const FitnessProgress = () => {
         {/* Exercise Selection */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise to Track</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {exercises.slice(0, 12).map(exercise => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+            {exercises.map(exercise => (
               <button
                 key={exercise.id}
                 onClick={() => setSelectedExercise(exercise)}

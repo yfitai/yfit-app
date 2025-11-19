@@ -310,7 +310,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   // Workout Selector View
   if (showWorkoutSelector) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Start Workout</h1>
 
@@ -377,7 +377,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   // If empty workout (no exercises), show add exercise UI
   if (!currentExercise && activeSession) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="max-w-4xl mx-auto p-4">
             <div className="flex items-center justify-between mb-4">
@@ -436,7 +436,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       {/* Header with Stats */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
