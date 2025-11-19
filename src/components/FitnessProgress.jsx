@@ -142,31 +142,77 @@ const FitnessProgress = () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - daysAgo);
 
-      // Query session_exercises with workout_sessions join
-      const { data, error } = await supabase
+      // First get session_exercises for this exercise
+      const { data: sessionExercisesData, error: seError } = await supabase
         .from('session_exercises')
-        .select(`
-          *,
-          workout_sessions!inner(
-            start_time,
-            user_id
-          )
-        `)
-        .eq('workout_sessions.user_id', user.id)
-        .eq('exercise_id', selectedExercise.id)
-        .gte('workout_sessions.start_time', startDate.toISOString())
-        .order('workout_sessions.start_time', { ascending: true });
+        .select('id, session_id')
+        .eq('exercise_id', selectedExercise.id);
 
-      if (error) {
-        console.error('Error fetching session exercises:', error);
+      if (seError || !sessionExercisesData || sessionExercisesData.length === 0) {
+        console.log('No session exercises found for this exercise');
         setProgressData([]);
         return;
       }
 
+      const sessionExerciseIds = sessionExercisesData.map(se => se.id);
+      const sessionIds = sessionExercisesData.map(se => se.session_id);
+
+      // Get workout sessions for date filtering
+      const { data: sessionsData, error: sessionsError } = await supabase
+        .from('workout_sessions')
+        .select('id, start_time')
+        .eq('user_id', user.id)
+        .in('id', sessionIds)
+        .gte('start_time', startDate.toISOString());
+
+      if (sessionsError || !sessionsData) {
+        console.error('Error fetching sessions:', sessionsError);
+        setProgressData([]);
+        return;
+      }
+
+      const validSessionIds = sessionsData.map(s => s.id);
+      const sessionDateMap = {};
+      sessionsData.forEach(s => {
+        sessionDateMap[s.id] = s.start_time;
+      });
+
+      // Filter session_exercises to only valid sessions
+      const validSessionExerciseIds = sessionExercisesData
+        .filter(se => validSessionIds.includes(se.session_id))
+        .map(se => se.id);
+
+      if (validSessionExerciseIds.length === 0) {
+        setProgressData([]);
+        return;
+      }
+
+      // Now get the actual sets data
+      const { data: setsData, error: setsError } = await supabase
+        .from('exercise_sets')
+        .select('*')
+        .in('session_exercise_id', validSessionExerciseIds);
+
+      if (setsError) {
+        console.error('Error fetching sets:', setsError);
+        setProgressData([]);
+        return;
+      }
+
+      // Map session_exercise_id back to session_id
+      const seIdToSessionId = {};
+      sessionExercisesData.forEach(se => {
+        seIdToSessionId[se.id] = se.session_id;
+      });
+
       // Group by date and calculate totals
       const dataByDate = {};
-      (data || []).forEach(d => {
-        const date = new Date(d.workout_sessions.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      (setsData || []).forEach(set => {
+        const sessionId = seIdToSessionId[set.session_exercise_id];
+        const timestamp = sessionDateMap[sessionId];
+        if (!timestamp) return;
+
+        const date = new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         if (!dataByDate[date]) {
           dataByDate[date] = {
             date,
@@ -175,11 +221,11 @@ const FitnessProgress = () => {
             reps: 0,
             sets: 0,
             maxWeight: 0,
-            timestamp: d.workout_sessions.start_time
+            timestamp
           };
         }
-        const weight = parseFloat(d.weight) || 0;
-        const reps = parseInt(d.reps) || 0;
+        const weight = parseFloat(set.weight) || 0;
+        const reps = parseInt(set.reps) || 0;
         const volume = weight * reps;
         
         dataByDate[date].volume += volume;
@@ -214,7 +260,7 @@ const FitnessProgress = () => {
         .from('session_exercises')
         .select('*')
         .eq('session_id', sessionId)
-        .order('set_number');
+        .order('exercise_order');
 
       if (sessionError) {
         console.error('❌ Error fetching session exercises:', sessionError);
@@ -228,9 +274,23 @@ const FitnessProgress = () => {
         return;
       }
 
-      // Get unique exercise IDs
+      // Get session exercise IDs
+      const sessionExerciseIds = sessionExercises.map(se => se.id);
       const exerciseIds = [...new Set(sessionExercises.map(se => se.exercise_id))];
       
+      // Fetch exercise sets
+      const { data: exerciseSets, error: setsError } = await supabase
+        .from('exercise_sets')
+        .select('*')
+        .in('session_exercise_id', sessionExerciseIds)
+        .order('set_number');
+
+      if (setsError) {
+        console.error('❌ Error fetching exercise sets:', setsError);
+        setSessionDetails([]);
+        return;
+      }
+
       // Fetch exercise details separately
       const { data: exerciseDetails, error: exerciseError } = await supabase
         .from('exercises')
@@ -241,17 +301,26 @@ const FitnessProgress = () => {
         console.error('❌ Error fetching exercise details:', exerciseError);
       }
 
-      // Create a map of exercise details
+      // Create maps
       const exerciseMap = {};
       (exerciseDetails || []).forEach(ex => {
         exerciseMap[ex.id] = ex;
       });
 
-      // Combine session exercises with exercise details
-      const combinedData = sessionExercises.map(se => ({
-        ...se,
-        exercises: exerciseMap[se.exercise_id] || { name: 'Unknown Exercise', description: '' }
-      }));
+      const sessionExerciseMap = {};
+      sessionExercises.forEach(se => {
+        sessionExerciseMap[se.id] = se;
+      });
+
+      // Combine sets with exercise details
+      const combinedData = (exerciseSets || []).map(set => {
+        const sessionExercise = sessionExerciseMap[set.session_exercise_id];
+        const exercise = exerciseMap[sessionExercise?.exercise_id];
+        return {
+          ...set,
+          exercises: exercise || { name: 'Unknown Exercise', description: '' }
+        };
+      });
       
       console.log('✅ Session details loaded:', combinedData.length, 'sets');
       setSessionDetails(combinedData);
@@ -261,12 +330,12 @@ const FitnessProgress = () => {
     }
   };
 
-  const updateSessionExercise = async (exerciseId, field, value) => {
+  const updateExerciseSet = async (setId, field, value) => {
     try {
       const { error } = await supabase
-        .from('session_exercises')
+        .from('exercise_sets')
         .update({ [field]: value })
-        .eq('id', exerciseId);
+        .eq('id', setId);
 
       if (error) throw error;
       
@@ -275,8 +344,8 @@ const FitnessProgress = () => {
         await fetchSessionDetails(selectedSession.id);
       }
     } catch (error) {
-      console.error('Error updating exercise:', error);
-      alert('Failed to update exercise');
+      console.error('Error updating set:', error);
+      alert('Failed to update set');
     }
   };
 
@@ -639,7 +708,7 @@ const FitnessProgress = () => {
                           <input
                             type="number"
                             value={exercise.weight || 0}
-                            onChange={(e) => updateSessionExercise(exercise.id, 'weight', parseFloat(e.target.value))}
+                            onChange={(e) => updateExerciseSet(exercise.id, 'weight', parseFloat(e.target.value))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
@@ -648,7 +717,7 @@ const FitnessProgress = () => {
                           <input
                             type="number"
                             value={exercise.reps || 0}
-                            onChange={(e) => updateSessionExercise(exercise.id, 'reps', parseInt(e.target.value))}
+                            onChange={(e) => updateExerciseSet(exercise.id, 'reps', parseInt(e.target.value))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
@@ -657,7 +726,7 @@ const FitnessProgress = () => {
                           <input
                             type="number"
                             value={exercise.rpe || 5}
-                            onChange={(e) => updateSessionExercise(exercise.id, 'rpe', parseInt(e.target.value))}
+                            onChange={(e) => updateExerciseSet(exercise.id, 'rpe', parseInt(e.target.value))}
                             min="1"
                             max="10"
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
