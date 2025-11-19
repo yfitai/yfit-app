@@ -29,6 +29,11 @@ export default function DailyTracker({ user }) {
     notes: ''
   });
 
+  // Unit preferences
+  const [waterUnit, setWaterUnit] = useState('ml'); // 'ml', 'oz', 'cups'
+  const [glucoseUnit, setGlucoseUnit] = useState('mg/dl'); // 'mg/dl', 'mmol/l'
+  const [isDoneForDay, setIsDoneForDay] = useState(false);
+
   useEffect(() => {
     if (user) {
       fetchTodayLog();
@@ -36,6 +41,18 @@ export default function DailyTracker({ user }) {
       fetchGoals();
     }
   }, [user]);
+
+  // Reset isDoneForDay at midnight
+  useEffect(() => {
+    const checkMidnight = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0) {
+        setIsDoneForDay(false);
+        fetchTodayLog();
+      }
+    }, 60000); // Check every minute
+    return () => clearInterval(checkMidnight);
+  }, []);
 
   const fetchTodayLog = async () => {
     try {
@@ -63,6 +80,11 @@ export default function DailyTracker({ user }) {
           glucose_mg_dl: data[0].glucose_mg_dl || '',
           notes: data[0].notes || ''
         });
+        // Check if log is marked as done (has notes with done marker or has all main fields)
+        const hasMainFields = data[0].sleep_hours && data[0].water_ml && data[0].steps;
+        if (hasMainFields) {
+          setIsDoneForDay(true);
+        }
       }
     } catch (error) {
       console.error('Error fetching today log:', error);
@@ -171,6 +193,64 @@ export default function DailyTracker({ user }) {
     return 'bg-red-500';
   };
 
+  // Water conversion functions
+  const convertWaterToMl = (value, unit) => {
+    if (!value) return 0;
+    const val = parseFloat(value);
+    if (unit === 'ml') return val;
+    if (unit === 'oz') return val * 29.5735; // 1 oz = 29.5735 ml
+    if (unit === 'cups') return val * 236.588; // 1 cup = 236.588 ml
+    return val;
+  };
+
+  const convertWaterFromMl = (mlValue, unit) => {
+    if (!mlValue) return 0;
+    const val = parseFloat(mlValue);
+    if (unit === 'ml') return Math.round(val);
+    if (unit === 'oz') return Math.round(val / 29.5735);
+    if (unit === 'cups') return Math.round(val / 236.588 * 10) / 10; // 1 decimal for cups
+    return val;
+  };
+
+  const getWaterDisplayValue = () => {
+    return convertWaterFromMl(formData.water_ml, waterUnit);
+  };
+
+  const getWaterGoalDisplay = () => {
+    return convertWaterFromMl(goals.water, waterUnit);
+  };
+
+  const addWater = (amount) => {
+    const currentMl = parseFloat(formData.water_ml) || 0;
+    const addMl = convertWaterToMl(amount, waterUnit);
+    setFormData({...formData, water_ml: currentMl + addMl});
+  };
+
+  // Glucose conversion functions
+  const convertGlucoseToMgDl = (value, unit) => {
+    if (!value) return '';
+    const val = parseFloat(value);
+    if (unit === 'mg/dl') return val;
+    if (unit === 'mmol/l') return val * 18.0182; // 1 mmol/L = 18.0182 mg/dL
+    return val;
+  };
+
+  const convertGlucoseFromMgDl = (mgDlValue, unit) => {
+    if (!mgDlValue) return '';
+    const val = parseFloat(mgDlValue);
+    if (unit === 'mg/dl') return Math.round(val);
+    if (unit === 'mmol/l') return Math.round(val / 18.0182 * 10) / 10; // 1 decimal
+    return val;
+  };
+
+  const getGlucoseDisplayValue = () => {
+    return convertGlucoseFromMgDl(formData.glucose_mg_dl, glucoseUnit);
+  };
+
+  const getGlucoseGoalDisplay = () => {
+    return convertGlucoseFromMgDl(goals.glucose, glucoseUnit);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -209,14 +289,25 @@ export default function DailyTracker({ user }) {
 
           {/* Water */}
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center mb-2">
-              <Droplets className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="font-semibold text-gray-900">Water</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <Droplets className="w-5 h-5 text-blue-600 mr-2" />
+                <span className="font-semibold text-gray-900">Water</span>
+              </div>
+              <select
+                value={waterUnit}
+                onChange={(e) => setWaterUnit(e.target.value)}
+                className="text-xs px-2 py-1 border border-gray-300 rounded"
+              >
+                <option value="ml">ml</option>
+                <option value="oz">oz</option>
+                <option value="cups">cups</option>
+              </select>
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {formData.water_ml || 0}ml
+              {getWaterDisplayValue()} {waterUnit}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.water}ml</div>
+            <div className="text-sm text-gray-600 mb-2">Goal: {getWaterGoalDisplay()} {waterUnit}</div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className={`h-2 rounded-full ${getProgressColor(calculateProgress(formData.water_ml, goals.water))}`}
@@ -260,14 +351,24 @@ export default function DailyTracker({ user }) {
 
           {/* Blood Glucose */}
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center mb-2">
-              <Activity className="w-5 h-5 text-purple-600 mr-2" />
-              <span className="font-semibold text-gray-900">Glucose</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <Activity className="w-5 h-5 text-purple-600 mr-2" />
+                <span className="font-semibold text-gray-900">Glucose</span>
+              </div>
+              <select
+                value={glucoseUnit}
+                onChange={(e) => setGlucoseUnit(e.target.value)}
+                className="text-xs px-2 py-1 border border-gray-300 rounded"
+              >
+                <option value="mg/dl">mg/dL</option>
+                <option value="mmol/l">mmol/L</option>
+              </select>
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {formData.glucose_mg_dl || '--'}
+              {getGlucoseDisplayValue() || '--'}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.glucose} mg/dL</div>
+            <div className="text-sm text-gray-600 mb-2">Goal: {getGlucoseGoalDisplay()} {glucoseUnit}</div>
             <div className="text-xs text-gray-500">
               {formData.glucose_mg_dl && formData.glucose_mg_dl <= goals.glucose ? '✓ Good' : 'Monitor'}
             </div>
@@ -319,16 +420,37 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  💧 Water (ml)
+                  💧 Water - Add Throughout Day ({waterUnit})
                 </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={formData.water_ml}
-                  onChange={(e) => setFormData({...formData, water_ml: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="2000"
-                />
+                <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-sm text-gray-600 mb-1">Current Total:</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {getWaterDisplayValue()} {waterUnit}
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => addWater(waterUnit === 'ml' ? 250 : waterUnit === 'oz' ? 8 : 1)}
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition"
+                  >
+                    + {waterUnit === 'ml' ? '250ml' : waterUnit === 'oz' ? '8oz' : '1 cup'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addWater(waterUnit === 'ml' ? 500 : waterUnit === 'oz' ? 16 : 2)}
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition"
+                  >
+                    + {waterUnit === 'ml' ? '500ml' : waterUnit === 'oz' ? '16oz' : '2 cups'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, water_ml: 0})}
+                    className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition"
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -380,16 +502,19 @@ export default function DailyTracker({ user }) {
             {/* Blood Glucose */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                🩸 Blood Glucose (mg/dL)
+                🩸 Blood Glucose ({glucoseUnit})
               </label>
               <input
                 type="number"
                 min="0"
-                max="600"
-                value={formData.glucose_mg_dl}
-                onChange={(e) => setFormData({...formData, glucose_mg_dl: e.target.value})}
+                step={glucoseUnit === 'mmol/l' ? '0.1' : '1'}
+                value={getGlucoseDisplayValue()}
+                onChange={(e) => {
+                  const mgDlValue = convertGlucoseToMgDl(e.target.value, glucoseUnit);
+                  setFormData({...formData, glucose_mg_dl: mgDlValue});
+                }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                placeholder="100"
+                placeholder={glucoseUnit === 'mg/dl' ? '100' : '5.6'}
               />
             </div>
 
@@ -407,14 +532,40 @@ export default function DailyTracker({ user }) {
               />
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : (todayLog ? '✓ Update Log' : '+ Save Log')}
-            </button>
+            {/* Submit Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                type="submit"
+                disabled={loading || isDoneForDay}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : (todayLog ? '✓ Update Log' : '+ Save Log')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isDoneForDay) {
+                    handleSubmit(new Event('submit'));
+                    setIsDoneForDay(true);
+                    alert('✅ Day complete! Your log is saved and locked.');
+                  }
+                }}
+                disabled={isDoneForDay}
+                className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                  isDoneForDay 
+                    ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
+                }`}
+              >
+                {isDoneForDay ? '✓ Done for Today' : '🎯 Done for Day'}
+              </button>
+            </div>
+            {isDoneForDay && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+                <p className="text-green-700 font-medium">✅ Great job! Your daily log is complete and saved.</p>
+                <p className="text-sm text-green-600 mt-1">You can still update if needed, or come back tomorrow for a new day!</p>
+              </div>
+            )}
           </form>
         </div>
 
