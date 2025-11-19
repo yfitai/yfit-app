@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, Award, Calendar, Dumbbell, Target, 
-  ChevronRight, Filter, Download
+  ChevronRight, Filter, Download, X, Edit2
 } from 'lucide-react';
 
 const FitnessProgress = () => {
@@ -24,6 +24,8 @@ const FitnessProgress = () => {
   });
   const [timeRange, setTimeRange] = useState('30'); // days
   const [loading, setLoading] = useState(true);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionDetails, setSessionDetails] = useState(null);
 
   useEffect(() => {
     initializeUser();
@@ -114,26 +116,103 @@ const FitnessProgress = () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - daysAgo);
 
-      const { data } = await supabase
-        .from('strength_progression')
-        .select('*')
-        .eq('user_id', user.id)
+      // Query session_exercises with workout_sessions join
+      const { data, error } = await supabase
+        .from('session_exercises')
+        .select(`
+          *,
+          workout_sessions!inner(
+            start_time,
+            user_id
+          )
+        `)
+        .eq('workout_sessions.user_id', user.id)
         .eq('exercise_id', selectedExercise.id)
-        .gte('date', startDate.toISOString().split('T')[0])
-        .order('date', { ascending: true });
+        .gte('workout_sessions.start_time', startDate.toISOString())
+        .order('workout_sessions.start_time', { ascending: true });
 
-      // Transform data for charts
-      const chartData = (data || []).map(d => ({
-        date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        weight: d.max_weight || 0,
-        volume: d.total_volume || 0,
-        reps: d.total_reps || 0,
-        estimated1RM: d.estimated_1rm || 0
-      }));
+      if (error) {
+        console.error('Error fetching session exercises:', error);
+        setProgressData([]);
+        return;
+      }
+
+      // Group by date and calculate totals
+      const dataByDate = {};
+      (data || []).forEach(d => {
+        const date = new Date(d.workout_sessions.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (!dataByDate[date]) {
+          dataByDate[date] = {
+            date,
+            weight: 0,
+            volume: 0,
+            reps: 0,
+            sets: 0,
+            maxWeight: 0,
+            timestamp: d.workout_sessions.start_time
+          };
+        }
+        const weight = parseFloat(d.weight) || 0;
+        const reps = parseInt(d.reps) || 0;
+        const volume = weight * reps;
+        
+        dataByDate[date].volume += volume;
+        dataByDate[date].reps += reps;
+        dataByDate[date].sets += 1;
+        dataByDate[date].maxWeight = Math.max(dataByDate[date].maxWeight, weight);
+      });
+
+      // Transform to array and calculate estimated 1RM
+      const chartData = Object.values(dataByDate).map(d => ({
+        date: d.date,
+        weight: d.maxWeight,
+        volume: Math.round(d.volume),
+        reps: d.reps,
+        sets: d.sets,
+        estimated1RM: d.maxWeight > 0 ? Math.round(d.maxWeight * (1 + d.reps / 30)) : 0,
+        timestamp: d.timestamp
+      })).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
       setProgressData(chartData);
     } catch (error) {
       console.error('Error fetching exercise progress:', error);
+    }
+  };
+
+  const fetchSessionDetails = async (sessionId) => {
+    try {
+      const { data, error } = await supabase
+        .from('session_exercises')
+        .select(`
+          *,
+          exercises(name, description)
+        `)
+        .eq('session_id', sessionId)
+        .order('exercise_order');
+
+      if (error) throw error;
+      setSessionDetails(data || []);
+    } catch (error) {
+      console.error('Error fetching session details:', error);
+    }
+  };
+
+  const updateSessionExercise = async (exerciseId, field, value) => {
+    try {
+      const { error } = await supabase
+        .from('session_exercises')
+        .update({ [field]: value })
+        .eq('id', exerciseId);
+
+      if (error) throw error;
+      
+      // Refresh session details
+      if (selectedSession) {
+        await fetchSessionDetails(selectedSession.id);
+      }
+    } catch (error) {
+      console.error('Error updating exercise:', error);
+      alert('Failed to update exercise');
     }
   };
 
@@ -194,7 +273,7 @@ const FitnessProgress = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-cyan-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Fitness Progress</h1>
@@ -401,7 +480,13 @@ const FitnessProgress = () => {
           ) : (
             <div className="space-y-3">
               {recentSessions.map(session => (
-                <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                <div 
+                  key={session.id} 
+                  onClick={() => {
+                    setSelectedSession(session);
+                    fetchSessionDetails(session.id);
+                  }}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
                   <div>
                     <div className="font-semibold text-gray-900">{session.workout?.name || 'Quick Workout'}</div>
                     <div className="text-sm text-gray-600">
@@ -418,6 +503,117 @@ const FitnessProgress = () => {
           )}
         </div>
       </div>
+
+      {/* Session Details Modal */}
+      {selectedSession && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedSession.workout?.name || 'Quick Workout'}</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {new Date(selectedSession.start_time).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedSession(null);
+                    setSessionDetails(null);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6 text-gray-600" />
+                </button>
+              </div>
+              
+              {/* Session Stats */}
+              <div className="grid grid-cols-4 gap-4 mt-4">
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
+                  <div className="text-xs text-gray-600">Exercises</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{selectedSession.total_sets || 0}</div>
+                  <div className="text-xs text-gray-600">Sets</div>
+                </div>
+                <div className="text-center p-3 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">{selectedSession.total_reps || 0}</div>
+                  <div className="text-xs text-gray-600">Reps</div>
+                </div>
+                <div className="text-center p-3 bg-orange-50 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_volume || 0)}</div>
+                  <div className="text-xs text-gray-600">Volume (lbs)</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Exercise Details */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {!sessionDetails ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading workout details...</p>
+                </div>
+              ) : sessionDetails.length === 0 ? (
+                <p className="text-center text-gray-600 py-12">No exercise data found</p>
+              ) : (
+                <div className="space-y-4">
+                  {sessionDetails.map((exercise, index) => (
+                    <div key={exercise.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{exercise.exercises?.name || 'Unknown Exercise'}</h3>
+                          <p className="text-sm text-gray-600">Set {exercise.set_number}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-4 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Weight (lbs)</label>
+                          <input
+                            type="number"
+                            value={exercise.weight || 0}
+                            onChange={(e) => updateSessionExercise(exercise.id, 'weight', parseFloat(e.target.value))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Reps</label>
+                          <input
+                            type="number"
+                            value={exercise.reps || 0}
+                            onChange={(e) => updateSessionExercise(exercise.id, 'reps', parseInt(e.target.value))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">RPE</label>
+                          <input
+                            type="number"
+                            value={exercise.rpe || 5}
+                            onChange={(e) => updateSessionExercise(exercise.id, 'rpe', parseInt(e.target.value))}
+                            min="1"
+                            max="10"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Volume</label>
+                          <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm font-semibold text-gray-900">
+                            {Math.round((exercise.weight || 0) * (exercise.reps || 0))} lbs
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

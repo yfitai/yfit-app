@@ -208,18 +208,19 @@ export default function Progress({ user: propUser }) {
     }
 
     const { data } = await supabase
-      .from('workout_logs')
+      .from('workout_sessions')
       .select('*')
       .eq('user_id', userId)
-      .gte('completed_at', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
-      .order('completed_at', { ascending: true })
+      .eq('is_completed', true)
+      .gte('start_time', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
+      .order('start_time', { ascending: true })
 
     if (data) {
       setFitnessData(data.map(d => ({
-        date: new Date(d.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date: new Date(d.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         workouts: 1,
-        duration: d.duration_minutes || 0,
-        calories_burned: d.calories_burned || 0
+        duration: Math.round((new Date(d.end_time) - new Date(d.start_time)) / 60000) || 0,
+        calories_burned: Math.round((d.total_volume || 0) * 0.05) || 0 // Rough estimate
       })))
     }
   }
