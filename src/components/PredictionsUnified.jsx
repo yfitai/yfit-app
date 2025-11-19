@@ -385,7 +385,14 @@ export default function PredictionsUnified({ user }) {
 
   // 5. Injury Risk Assessment
   const assessInjuryRisk = () => {
-    if (workoutData.length < 7) return null;
+    console.log('🔍 Injury Risk Debug:');
+    console.log('Workout data length:', workoutData.length);
+    console.log('Workout data sample:', workoutData.slice(0, 2));
+    
+    if (workoutData.length < 7) {
+      console.log('❌ Not enough workouts for injury risk (need 7, have ' + workoutData.length + ')');
+      return null;
+    }
 
     try {
       const recentWorkouts = workoutData.slice(0, 7);
@@ -432,6 +439,8 @@ export default function PredictionsUnified({ user }) {
 
       const riskLevel = riskScore >= 50 ? 'high' : riskScore >= 25 ? 'moderate' : 'low';
 
+      console.log('✅ Injury risk calculated:', { riskLevel, riskScore });
+      
       return {
         riskLevel,
         riskScore,
@@ -454,7 +463,13 @@ export default function PredictionsUnified({ user }) {
 
   // 6. Deload Week Predictor
   const predictDeloadWeek = () => {
-    if (workoutData.length < 14) return null;
+    console.log('🔍 Deload Week Debug:');
+    console.log('Workout data length:', workoutData.length);
+    
+    if (workoutData.length < 14) {
+      console.log('❌ Not enough workouts for deload prediction (need 14, have ' + workoutData.length + ')');
+      return null;
+    }
 
     try {
       // Calculate accumulated fatigue over last 4 weeks
@@ -490,6 +505,8 @@ export default function PredictionsUnified({ user }) {
       const weeksOfTraining = weeks.filter(w => w.workouts >= 3).length;
       const needsDeload = weeksOfTraining >= 4 || fatigueScore > 100 || volumeTrend === 'increasing';
 
+      console.log('✅ Deload prediction calculated:', { needsDeload, fatigueScore });
+      
       return {
         needsDeload,
         weeksOfTraining,
