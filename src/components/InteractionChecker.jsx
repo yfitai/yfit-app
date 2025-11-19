@@ -27,6 +27,13 @@ export default function InteractionChecker({ user }) {
 
   const loadMedications = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_medications');
+        setMedications(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -45,6 +52,13 @@ export default function InteractionChecker({ user }) {
 
   const loadSupplements = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_supplements');
+        setSupplements(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_supplements')
         .select(`
@@ -63,6 +77,13 @@ export default function InteractionChecker({ user }) {
 
   const loadSafetyAlerts = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_safety_alerts');
+        setSafetyAlerts(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('safety_alerts')
         .select('*')
