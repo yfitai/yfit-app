@@ -671,12 +671,19 @@ const FitnessProgress = () => {
     if (recentSessions.length < 5) return null;
 
     try {
-      const sessions = recentSessions.slice(0, 7); // Last 7 sessions
+      const sessions = recentSessions.slice(0, 10); // Last 10 sessions
       
       // Calculate workout frequency (sessions per week)
       const dates = sessions.map(s => new Date(s.start_time));
-      const daysSinceFirst = (Date.now() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-      const frequency = (sessions.length / daysSinceFirst) * 7;
+      
+      // Calculate span between oldest and newest workout
+      const oldestDate = dates[dates.length - 1].getTime();
+      const newestDate = dates[0].getTime();
+      const daysBetween = (newestDate - oldestDate) / (1000 * 60 * 60 * 24);
+      
+      // Ensure minimum span of 1 day to avoid division issues
+      const effectiveDays = Math.max(1, daysBetween);
+      const frequency = (sessions.length / effectiveDays) * 7;
       
       // Calculate average volume and intensity
       const avgVolume = sessions.reduce((sum, s) => sum + (s.total_volume || 0), 0) / sessions.length;
