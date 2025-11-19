@@ -624,8 +624,10 @@ export default function PredictionsUnified({ user }) {
       const bestTimeRange = `${formatHour(bestHour)} - ${formatHour(bestHour + 1)}`;
       const worstTimeRange = `${formatHour(worstHour)} - ${formatHour(worstHour + 1)}`;
 
-      // Calculate performance difference
-      const performanceDiff = ((byHour[bestHour].avgVolume - byHour[worstHour].avgVolume) / byHour[worstHour].avgVolume) * 100;
+      // Calculate performance difference (handle zero volume)
+      const performanceDiff = byHour[worstHour].avgVolume > 0
+        ? ((byHour[bestHour].avgVolume - byHour[worstHour].avgVolume) / byHour[worstHour].avgVolume) * 100
+        : 100; // If worst is 0, just show 100% better
 
       return {
         bestTime: bestTimeRange,
@@ -768,13 +770,17 @@ export default function PredictionsUnified({ user }) {
       // Predict streak maintenance
       const streakProbability = Math.min(95, consistencyRate * 1.2);
 
+      // Cap frequency at 7x/week max
+      const rawFrequency = (data.length / totalDays) * 7;
+      const cappedFrequency = Math.min(7, rawFrequency);
+
       return {
         currentStreak,
         longestStreak,
         consistencyRate: Math.round(consistencyRate),
         streakProbability: Math.round(streakProbability),
         totalWorkouts: data.length,
-        avgWorkoutsPerWeek: Math.round((data.length / totalDays) * 7 * 10) / 10,
+        avgWorkoutsPerWeek: Math.round(cappedFrequency * 10) / 10,
         status: currentStreak > 0 ? 'active' : 'broken',
         recommendation: streakProbability > 70 
           ? 'You\'re on track! Keep up the consistency'
