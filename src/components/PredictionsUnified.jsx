@@ -130,13 +130,25 @@ export default function PredictionsUnified({ user }) {
 
   const calculatePredictionsDirectly = (wData, woData, nData, mData) => {
     console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length });
+    
+    // Check for compressed data (workouts within short timeframe)
+    let isCompressedData = false;
+    if (woData.length >= 5) {
+      const dates = woData.map(w => new Date(w.start_time));
+      const daysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
+      if (daysBetween < 7) {
+        isCompressedData = true;
+        console.log('⚠️ Compressed data detected: ' + woData.length + ' workouts in ' + daysBetween.toFixed(1) + ' days');
+      }
+    }
     setPredictions({
       weightLoss: calculateWeightLossPrediction(wData),
       tdee: calculateTDEE(wData, woData, nData),
       medicationAdherence: predictMedicationAdherence(mData),
       nutritionPatterns: analyzeNutritionPatterns(nData),
       injuryRisk: assessInjuryRisk(woData),
-      deloadWeek: predictDeloadWeek(woData)
+      deloadWeek: predictDeloadWeek(woData),
+      isCompressedData // Add flag for UI
     });
   };
 
@@ -152,11 +164,11 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 1. Weight Loss Prediction
-  const calculateWeightLossPrediction = () => {
-    if (weightData.length < 3) return null;
+  const calculateWeightLossPrediction = (data = weightData) => {
+    if (data.length < 3) return null;
 
     try {
-      const sortedWeights = [...weightData].sort((a, b) => 
+      const sortedWeights = [...data].sort((a, b) => 
         new Date(a.date).getTime() - new Date(b.date).getTime()
       );
 
@@ -187,7 +199,7 @@ export default function PredictionsUnified({ user }) {
         weeksToGoal: Math.round(adjustedWeeks),
         goalDate: goalDate.toLocaleDateString(),
         trend: weeklyChange < 0 ? 'losing' : weeklyChange > 0 ? 'gaining' : 'stable',
-        confidence: Math.min(95, 50 + (weightData.length * 3))
+        confidence: Math.min(95, 50 + (data.length * 3))
       };
     } catch (error) {
       console.error('Error calculating weight loss:', error);
@@ -196,16 +208,16 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 2. TDEE Calculation
-  const calculateTDEE = () => {
-    if (weightData.length < 7 || nutritionData.length < 7) return null;
+  const calculateTDEE = (wData = weightData, woData = workoutData, nData = nutritionData) => {
+    if (wData.length < 7 || nData.length < 7) return null;
 
     try {
       // Calculate average daily calorie intake
-      const avgCalories = nutritionData.reduce((sum, log) => 
-        sum + (parseFloat(log.calories) || 0), 0) / nutritionData.length;
+      const avgCalories = nData.reduce((sum, log) => 
+        sum + (parseFloat(log.calories) || 0), 0) / nData.length;
 
       // Calculate weight change over period
-      const sortedWeights = [...weightData].sort((a, b) => 
+      const sortedWeights = [...wData].sort((a, b) => 
         new Date(a.date).getTime() - new Date(b.date).getTime()
       );
       
@@ -219,7 +231,7 @@ export default function PredictionsUnified({ user }) {
       const tdee = Math.round(avgCalories - caloriesDelta);
 
       // Activity level classification
-      const workoutsPerWeek = (workoutData.length / days) * 7;
+      const workoutsPerWeek = (woData.length / days) * 7;
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';
@@ -251,19 +263,19 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 3. Medication Adherence Prediction
-  const predictMedicationAdherence = () => {
-    if (medicationData.length < 14) return null;
+  const predictMedicationAdherence = (data = medicationData) => {
+    if (data.length < 14) return null;
 
     try {
-      const taken = medicationData.filter(log => log.taken).length;
-      const total = medicationData.length;
+      const taken = data.filter(log => log.taken).length;
+      const total = data.length;
       const adherenceRate = (taken / total) * 100;
 
       // Analyze patterns
       const byDayOfWeek = {};
       const byTimeOfDay = {};
       
-      medicationData.forEach(log => {
+      data.forEach(log => {
         const date = new Date(log.scheduled_time);
         const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
         const hour = date.getHours();
@@ -322,8 +334,8 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 4. Nutrition Pattern Analysis
-  const analyzeNutritionPatterns = () => {
-    if (nutritionData.length < 7) return null;
+  const analyzeNutritionPatterns = (data = nutritionData) => {
+    if (data.length < 7) return null;
 
     try {
       const avgMacros = {
@@ -333,7 +345,7 @@ export default function PredictionsUnified({ user }) {
         calories: 0
       };
 
-      nutritionData.forEach(log => {
+      data.forEach(log => {
         avgMacros.protein += parseFloat(log.protein_g) || 0;
         avgMacros.carbs += parseFloat(log.carbs_g) || 0;
         avgMacros.fat += parseFloat(log.fat_g) || 0;
@@ -341,7 +353,7 @@ export default function PredictionsUnified({ user }) {
       });
 
       Object.keys(avgMacros).forEach(key => {
-        avgMacros[key] = Math.round(avgMacros[key] / nutritionData.length);
+        avgMacros[key] = Math.round(avgMacros[key] / data.length);
       });
 
       // Calculate macro ratios
@@ -354,7 +366,7 @@ export default function PredictionsUnified({ user }) {
 
       // Analyze by day of week
       const byDayOfWeek = {};
-      nutritionData.forEach(log => {
+      data.forEach(log => {
         const day = new Date(log.entry_date).toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
         byDayOfWeek[day].calories += parseFloat(log.calories) || 0;
@@ -426,12 +438,14 @@ export default function PredictionsUnified({ user }) {
         ? olderWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / olderWorkouts.length 
         : recentAvgVolume;
 
-      const volumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
+      const rawVolumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
+      const volumeIncrease = Math.max(-200, Math.min(200, rawVolumeIncrease)); // Cap at ±200%
 
       // Calculate workout frequency
       const dates = data.map(w => new Date(w.start_time));
       const daysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-      const frequency = (data.length / daysBetween) * 7;
+      const rawFrequency = (data.length / daysBetween) * 7;
+      const frequency = Math.min(7, rawFrequency); // Cap at 7x/week
 
       // Risk factors
       const riskFactors = [];
@@ -574,6 +588,25 @@ export default function PredictionsUnified({ user }) {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">🔮 AI Predictions</h1>
           <p className="text-gray-600">Data-driven insights and forecasts based on your health journey</p>
         </div>
+
+        {/* Compressed Data Disclaimer */}
+        {predictions.isCompressedData && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">Test Data Detected</h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>Your data appears to be compressed (multiple workouts in a short timeframe). Some predictions may show extreme values. For accurate predictions, log data over a longer period (weeks/months).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Weight Loss Prediction */}
         {predictions.weightLoss ? (
