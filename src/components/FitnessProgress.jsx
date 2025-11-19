@@ -676,14 +676,33 @@ const FitnessProgress = () => {
       // Calculate workout frequency (sessions per week)
       const dates = sessions.map(s => new Date(s.start_time));
       
+      console.log('🔍 Recovery Analysis Debug:');
+      console.log('Total sessions:', sessions.length);
+      console.log('Dates:', dates.map(d => d.toISOString()));
+      
       // Calculate span between oldest and newest workout
       const oldestDate = dates[dates.length - 1].getTime();
       const newestDate = dates[0].getTime();
       const daysBetween = (newestDate - oldestDate) / (1000 * 60 * 60 * 24);
       
-      // Ensure minimum span of 1 day to avoid division issues
-      const effectiveDays = Math.max(1, daysBetween);
-      const frequency = (sessions.length / effectiveDays) * 7;
+      console.log('Oldest date:', new Date(oldestDate).toISOString());
+      console.log('Newest date:', new Date(newestDate).toISOString());
+      console.log('Days between:', daysBetween);
+      
+      // If all workouts are on same day or very close, use alternative calculation
+      let frequency;
+      if (daysBetween < 1) {
+        // Use last 30 days as baseline
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+        const recentWorkouts = recentSessions.filter(s => new Date(s.start_time).getTime() > thirtyDaysAgo);
+        frequency = (recentWorkouts.length / 30) * 7;
+        console.log('Using 30-day calculation:', frequency);
+      } else {
+        // Ensure minimum span of 7 days for more stable calculation
+        const effectiveDays = Math.max(7, daysBetween);
+        frequency = (sessions.length / effectiveDays) * 7;
+        console.log('Using span calculation:', frequency);
+      }
       
       // Calculate average volume and intensity
       const avgVolume = sessions.reduce((sum, s) => sum + (s.total_volume || 0), 0) / sessions.length;
