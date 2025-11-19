@@ -25,11 +25,13 @@ export default function PredictionsUnified({ user }) {
     if (user) {
       fetchAllData();
     }
-  }, [user]);  const fetchAllData = async () => {
+  }, [user]);
+
+  const fetchAllData = async () => {
     setLoading(true);
     try {
-      // Fetch data and get results directly
-      const [weightResults, workoutResults, nutritionResults, medicationResults] = await Promise.all([
+      // Fetch data - errors are handled in individual fetch functions
+      await Promise.all([
         fetchWeightData(),
         fetchWorkoutData(),
         fetchNutritionData(),
@@ -37,14 +39,14 @@ export default function PredictionsUnified({ user }) {
       ]);
       
       console.log('📊 Data fetched:', {
-        weight: weightResults.length,
-        workouts: workoutResults.length,
-        nutrition: nutritionResults.length,
-        medication: medicationResults.length
+        weight: weightData.length,
+        workouts: workoutData.length,
+        nutrition: nutritionData.length,
+        medication: medicationData.length
       });
       
-      // Calculate predictions with fetched data (not state)
-      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults);
+      // Calculate all predictions after data is loaded
+      calculateAllPredictions();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -63,11 +65,9 @@ export default function PredictionsUnified({ user }) {
       
       if (error) throw error;
       setWeightData(data || []);
-      return data || [];
     } catch (error) {
       console.error('Error fetching weight data:', error);
       setWeightData([]);
-      return [];
     }
   };
 
@@ -82,11 +82,9 @@ export default function PredictionsUnified({ user }) {
       
       if (error) throw error;
       setWorkoutData(data || []);
-      return data || [];
     } catch (error) {
       console.error('Error fetching workout data:', error);
       setWorkoutData([]);
-      return [];
     }
   };
 
@@ -101,11 +99,9 @@ export default function PredictionsUnified({ user }) {
       
       if (error) throw error;
       setNutritionData(data || []);
-      return data || [];
     } catch (error) {
       console.error('Error fetching nutrition data:', error);
       setNutritionData([]);
-      return [];
     }
   };
 
@@ -120,34 +116,20 @@ export default function PredictionsUnified({ user }) {
       
       if (error) throw error;
       setMedicationData(data || []);
-      return data || [];
     } catch (error) {
       console.error('Error fetching medication data:', error);
       setMedicationData([]);
-      return [];
     }
-  };
-
-  const calculatePredictionsDirectly = (wData, woData, nData, mData) => {
-    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length });
-    setPredictions({
-      weightLoss: calculateWeightLossPrediction(wData),
-      tdee: calculateTDEE(wData, woData, nData),
-      medicationAdherence: predictMedicationAdherence(mData),
-      nutritionPatterns: analyzeNutritionPatterns(nData),
-      injuryRisk: assessInjuryRisk(woData),
-      deloadWeek: predictDeloadWeek(woData)
-    });
   };
 
   const calculateAllPredictions = () => {
     setPredictions({
-      weightLoss: calculateWeightLossPrediction(weightData),
-      tdee: calculateTDEE(weightData, workoutData, nutritionData),
-      medicationAdherence: predictMedicationAdherence(medicationData),
-      nutritionPatterns: analyzeNutritionPatterns(nutritionData),
-      injuryRisk: assessInjuryRisk(workoutData),
-      deloadWeek: predictDeloadWeek(workoutData)
+      weightLoss: calculateWeightLossPrediction(),
+      tdee: calculateTDEE(),
+      medicationAdherence: predictMedicationAdherence(),
+      nutritionPatterns: analyzeNutritionPatterns(),
+      injuryRisk: assessInjuryRisk(),
+      deloadWeek: predictDeloadWeek()
     });
   };
 
@@ -407,19 +389,19 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 5. Injury Risk Assessment
-  const assessInjuryRisk = (data = workoutData) => {
+  const assessInjuryRisk = () => {
     console.log('🔍 Injury Risk Debug:');
-    console.log('Workout data length:', data.length);
-    console.log('Workout data sample:', data.slice(0, 2));
+    console.log('Workout data length:', workoutData.length);
+    console.log('Workout data sample:', workoutData.slice(0, 2));
     
-    if (data.length < 7) {
-      console.log('❌ Not enough workouts for injury risk (need 7, have ' + data.length + ')');
+    if (workoutData.length < 7) {
+      console.log('❌ Not enough workouts for injury risk (need 7, have ' + workoutData.length + ')');
       return null;
     }
 
     try {
-      const recentWorkouts = data.slice(0, 7);
-      const olderWorkouts = data.slice(7, 14);
+      const recentWorkouts = workoutData.slice(0, 7);
+      const olderWorkouts = workoutData.slice(7, 14);
 
       const recentAvgVolume = recentWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / recentWorkouts.length;
       const olderAvgVolume = olderWorkouts.length > 0 
@@ -429,9 +411,9 @@ export default function PredictionsUnified({ user }) {
       const volumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
 
       // Calculate workout frequency
-      const dates = data.map(w => new Date(w.start_time));
+      const dates = workoutData.map(w => new Date(w.start_time));
       const daysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-      const frequency = (data.length / daysBetween) * 7;
+      const frequency = (workoutData.length / daysBetween) * 7;
 
       // Risk factors
       const riskFactors = [];
@@ -485,12 +467,12 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 6. Deload Week Predictor
-  const predictDeloadWeek = (data = workoutData) => {
+  const predictDeloadWeek = () => {
     console.log('🔍 Deload Week Debug:');
-    console.log('Workout data length:', data.length);
+    console.log('Workout data length:', workoutData.length);
     
-    if (data.length < 14) {
-      console.log('❌ Not enough workouts for deload prediction (need 14, have ' + data.length + ')');
+    if (workoutData.length < 14) {
+      console.log('❌ Not enough workouts for deload prediction (need 14, have ' + workoutData.length + ')');
       return null;
     }
 
@@ -501,7 +483,7 @@ export default function PredictionsUnified({ user }) {
         const weekStart = new Date(Date.now() - (i * 7 * 24 * 60 * 60 * 1000));
         const weekEnd = new Date(Date.now() - ((i + 1) * 7 * 24 * 60 * 60 * 1000));
         
-        const weekWorkouts = data.filter(w => {
+        const weekWorkouts = workoutData.filter(w => {
           const workoutDate = new Date(w.start_time);
           return workoutDate >= weekEnd && workoutDate <= weekStart;
         });
