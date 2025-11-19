@@ -51,11 +51,30 @@ const FitnessProgress = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch exercises with workout data
+      // Fetch exercises from completed sessions
+      const { data: sessionExercises } = await supabase
+        .from('session_exercises')
+        .select('exercise_id, workout_sessions!inner(user_id)')
+        .eq('workout_sessions.user_id', user.id);
+
+      // Fetch exercises from workout templates
+      const { data: templateExercises } = await supabase
+        .from('workout_exercises')
+        .select('exercise_id, workouts!inner(user_id)')
+        .eq('workouts.user_id', user.id);
+
+      // Get unique exercise IDs
+      const completedExerciseIds = [...new Set((sessionExercises || []).map(se => se.exercise_id))];
+      const templateExerciseIds = [...new Set((templateExercises || []).map(te => te.exercise_id))];
+      const allExerciseIds = [...new Set([...completedExerciseIds, ...templateExerciseIds])];
+
+      // Fetch exercise details for these IDs
       const { data: exercisesData } = await supabase
         .from('exercises')
         .select('*')
+        .in('id', allExerciseIds)
         .order('name');
+      
       setExercises(exercisesData || []);
 
       // Fetch recent workout sessions
@@ -107,6 +126,13 @@ const FitnessProgress = () => {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Fallback: if filtering fails, show all exercises
+      const { data: allExercises } = await supabase
+        .from('exercises')
+        .select('*')
+        .order('name')
+        .limit(20);
+      setExercises(allExercises || []);
     }
   };
 
@@ -182,23 +208,53 @@ const FitnessProgress = () => {
   const fetchSessionDetails = async (sessionId) => {
     try {
       console.log('🔍 Fetching session details for:', sessionId);
-      const { data, error } = await supabase
+      
+      // Fetch session exercises
+      const { data: sessionExercises, error: sessionError } = await supabase
         .from('session_exercises')
-        .select(`
-          *,
-          exercises(name, description)
-        `)
+        .select('*')
         .eq('session_id', sessionId)
         .order('set_number');
 
-      if (error) {
-        console.error('❌ Error fetching session details:', error);
+      if (sessionError) {
+        console.error('❌ Error fetching session exercises:', sessionError);
         setSessionDetails([]);
         return;
       }
+
+      if (!sessionExercises || sessionExercises.length === 0) {
+        console.log('⚠️ No exercises found for this session');
+        setSessionDetails([]);
+        return;
+      }
+
+      // Get unique exercise IDs
+      const exerciseIds = [...new Set(sessionExercises.map(se => se.exercise_id))];
       
-      console.log('✅ Session details loaded:', data?.length, 'sets');
-      setSessionDetails(data || []);
+      // Fetch exercise details separately
+      const { data: exerciseDetails, error: exerciseError } = await supabase
+        .from('exercises')
+        .select('id, name, description')
+        .in('id', exerciseIds);
+
+      if (exerciseError) {
+        console.error('❌ Error fetching exercise details:', exerciseError);
+      }
+
+      // Create a map of exercise details
+      const exerciseMap = {};
+      (exerciseDetails || []).forEach(ex => {
+        exerciseMap[ex.id] = ex;
+      });
+
+      // Combine session exercises with exercise details
+      const combinedData = sessionExercises.map(se => ({
+        ...se,
+        exercises: exerciseMap[se.exercise_id] || { name: 'Unknown Exercise', description: '' }
+      }));
+      
+      console.log('✅ Session details loaded:', combinedData.length, 'sets');
+      setSessionDetails(combinedData);
     } catch (error) {
       console.error('❌ Exception fetching session details:', error);
       setSessionDetails([]);
