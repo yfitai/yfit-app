@@ -22,8 +22,11 @@ export default function PredictionsUnified({ user }) {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && user.id !== 'demo-user-id') {
       fetchAllData();
+    } else if (user && user.id === 'demo-user-id') {
+      // Demo mode - skip data fetching
+      setLoading(false);
     }
   }, [user]);
 
@@ -83,10 +86,10 @@ export default function PredictionsUnified({ user }) {
   const fetchNutritionData = async () => {
     try {
       const { data, error } = await supabase
-        .from('nutrition_logs')
+        .from('nutrition_entries')
         .select('*')
         .eq('user_id', user.id)
-        .order('date', { ascending: false })
+        .order('entry_date', { ascending: false })
         .limit(30);
       
       if (error) throw error;
@@ -308,9 +311,9 @@ export default function PredictionsUnified({ user }) {
       };
 
       nutritionData.forEach(log => {
-        avgMacros.protein += parseFloat(log.protein) || 0;
-        avgMacros.carbs += parseFloat(log.carbs) || 0;
-        avgMacros.fat += parseFloat(log.fat) || 0;
+        avgMacros.protein += parseFloat(log.protein_g) || 0;
+        avgMacros.carbs += parseFloat(log.carbs_g) || 0;
+        avgMacros.fat += parseFloat(log.fat_g) || 0;
         avgMacros.calories += parseFloat(log.calories) || 0;
       });
 
@@ -329,7 +332,7 @@ export default function PredictionsUnified({ user }) {
       // Analyze by day of week
       const byDayOfWeek = {};
       nutritionData.forEach(log => {
-        const day = new Date(log.date).toLocaleDateString('en-US', { weekday: 'long' });
+        const day = new Date(log.entry_date).toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
         byDayOfWeek[day].calories += parseFloat(log.calories) || 0;
         byDayOfWeek[day].count++;
