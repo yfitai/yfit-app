@@ -54,11 +54,17 @@ export default function PredictionsUnified({ user }) {
 
   const fetchWeightData = async () => {
     try {
+      // Skip in demo mode - no weight data
+      if (user.id.startsWith('demo')) {
+        setWeightData([]);
+        return [];
+      }
+
       const { data, error } = await supabase
-        .from('weight_logs')
+        .from('body_measurements')
         .select('*')
         .eq('user_id', user.id)
-        .order('date', { ascending: false })
+        .order('measurement_date', { ascending: false })
         .limit(30);
       
       if (error) throw error;
@@ -92,11 +98,17 @@ export default function PredictionsUnified({ user }) {
 
   const fetchNutritionData = async () => {
     try {
+      // Skip in demo mode - no nutrition data
+      if (user.id.startsWith('demo')) {
+        setNutritionData([]);
+        return [];
+      }
+
       const { data, error } = await supabase
-        .from('nutrition_entries')
+        .from('nutrition_logs')
         .select('*')
         .eq('user_id', user.id)
-        .order('entry_date', { ascending: false })
+        .order('log_date', { ascending: false })
         .limit(30);
       
       if (error) throw error;
@@ -111,6 +123,12 @@ export default function PredictionsUnified({ user }) {
 
   const fetchMedicationData = async () => {
     try {
+      // Skip in demo mode - no medication data
+      if (user.id.startsWith('demo')) {
+        setMedicationData([]);
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('medication_logs')
         .select('*')
