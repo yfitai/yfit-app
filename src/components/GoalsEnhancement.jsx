@@ -36,6 +36,7 @@ export default function GoalsEnhancement({
   const [sodiumGoal, setSodiumGoal] = useState('2300')
   const [waterGoal, setWaterGoal] = useState('2000')
   const [stepsGoal, setStepsGoal] = useState('10000')
+  const [sleepGoal, setSleepGoal] = useState('8')
   
   // Auto-fill starting values from current measurements
   useEffect(() => {
@@ -122,7 +123,8 @@ export default function GoalsEnhancement({
       sugar_goal_g: sugarGoal ? parseFloat(sugarGoal) : 50,
       sodium_goal_mg: sodiumGoal ? parseFloat(sodiumGoal) : 2300,
       water_goal_ml: waterGoal ? parseInt(waterGoal) : 2000,
-      steps_goal: stepsGoal ? parseInt(stepsGoal) : 10000
+      steps_goal: stepsGoal ? parseInt(stepsGoal) : 10000,
+      sleep_hours_goal: sleepGoal ? parseFloat(sleepGoal) : 8
     }
     
     if (onGoalsChange) {
@@ -131,7 +133,7 @@ export default function GoalsEnhancement({
   }, [
     startingWeight, targetWeight, startingBodyFat, targetBodyFat,
     targetDate, weeklyGoal, fiberGoal, sugarGoal, sodiumGoal,
-    waterGoal, stepsGoal, unitSystem
+    waterGoal, stepsGoal, sleepGoal, unitSystem
   ])
   
   const estimatedDate = calculateEstimatedDate()
@@ -346,6 +348,21 @@ export default function GoalsEnhancement({
               placeholder="10000 recommended"
             />
             <p className="text-xs text-gray-500 mt-1">10,000 steps recommended</p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Sleep Goal (hours/night)
+            </label>
+            <input
+              type="number"
+              step="0.5"
+              value={sleepGoal}
+              onChange={(e) => setSleepGoal(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="8 hours recommended"
+            />
+            <p className="text-xs text-gray-500 mt-1">7-9 hours recommended</p>
           </div>
         </div>
       </div>

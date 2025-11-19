@@ -51,7 +51,8 @@ export default function Goals({ user: propUser }) {
     sugar_goal_g: 50,
     sodium_goal_mg: 2300,
     water_goal_ml: 2000,
-    steps_goal: 10000
+    steps_goal: 10000,
+    sleep_hours_goal: 8
   })
   
   // Manual Override Options
@@ -142,7 +143,8 @@ export default function Goals({ user: propUser }) {
         sugar_goal_g: goalsData.sugar_goal_g || 50,
         sodium_goal_mg: goalsData.sodium_goal_mg || 2300,
         water_goal_ml: goalsData.water_goal_ml || 2000,
-        steps_goal: goalsData.steps_goal || 10000
+        steps_goal: goalsData.steps_goal || 10000,
+        sleep_hours_goal: goalsData.sleep_hours_goal || 8
       })
     }
 
@@ -392,6 +394,7 @@ export default function Goals({ user: propUser }) {
             sodium_goal_mg: enhancedGoals.sodium_goal_mg,
             water_goal_ml: enhancedGoals.water_goal_ml,
             steps_goal: enhancedGoals.steps_goal,
+            sleep_hours_goal: enhancedGoals.sleep_hours_goal,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'user_id'
