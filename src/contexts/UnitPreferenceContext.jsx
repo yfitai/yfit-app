@@ -20,6 +20,16 @@ export function UnitPreferenceProvider({ children }) {
         return
       }
 
+      // Skip Supabase query in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_unit_preference')
+        if (stored) {
+          setUnitSystem(stored)
+        }
+        setLoading(false)
+        return
+      }
+
       const { data, error } = await supabase
         .from('user_preferences')
         .select('preferred_unit_system')
@@ -44,6 +54,12 @@ export function UnitPreferenceProvider({ children }) {
     try {
       const user = await getCurrentUser()
       if (!user) return
+
+      // Save to localStorage in demo mode
+      if (user.id.startsWith('demo')) {
+        localStorage.setItem('yfit_demo_unit_preference', newSystem)
+        return
+      }
 
       const { error } = await supabase
         .from('user_preferences')
