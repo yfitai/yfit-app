@@ -25,6 +25,28 @@ export default function Nutrition({ user: propUser }) {
     loadData()
   }, [])
 
+  // Midnight reset for meal entries
+  useEffect(() => {
+    const checkMidnight = setInterval(() => {
+      const now = new Date()
+      if (now.getHours() === 0 && now.getMinutes() === 0) {
+        // Clear today's meals display
+        setTodaysMeals([])
+        setTotalCalories(0)
+        
+        // Clear demo mode localStorage meals (but keep templates/favorites if they exist)
+        if (user && user.id.startsWith('demo')) {
+          localStorage.removeItem('yfit_demo_meals')
+        }
+        
+        // Reload data for new day
+        loadData()
+      }
+    }, 60000) // Check every minute
+    
+    return () => clearInterval(checkMidnight)
+  }, [user])
+
   const loadData = async () => {
     try {
       // Use prop user if provided (for demo mode), otherwise fetch from Supabase
