@@ -142,12 +142,18 @@ export default function PredictionsUnified({ user }) {
       }
     }
     setPredictions({
+      // Phase 1
       weightLoss: calculateWeightLossPrediction(wData),
       tdee: calculateTDEE(wData, woData, nData),
       medicationAdherence: predictMedicationAdherence(mData),
       nutritionPatterns: analyzeNutritionPatterns(nData),
       injuryRisk: assessInjuryRisk(woData),
       deloadWeek: predictDeloadWeek(woData),
+      // Phase 2
+      optimalTime: analyzeOptimalTrainingTime(woData),
+      sleepImpact: analyzeSleepImpact([], woData), // No sleep data yet
+      bodyRecomp: forecastBodyRecomposition(wData, woData, nData),
+      habitStreak: predictHabitStreak(woData),
       isCompressedData // Add flag for UI
     });
   };
@@ -570,6 +576,216 @@ export default function PredictionsUnified({ user }) {
     }
   };
 
+  // ========== PHASE 2 PREDICTIONS ==========
+
+  // 7. Optimal Training Time Analysis
+  const analyzeOptimalTrainingTime = (data = workoutData) => {
+    if (data.length < 10) return null;
+
+    try {
+      // Group workouts by hour of day
+      const byHour = {};
+      data.forEach(workout => {
+        const hour = new Date(workout.start_time).getHours();
+        if (!byHour[hour]) {
+          byHour[hour] = {
+            count: 0,
+            totalVolume: 0,
+            avgVolume: 0,
+            workouts: []
+          };
+        }
+        byHour[hour].count++;
+        byHour[hour].totalVolume += workout.total_volume || 0;
+        byHour[hour].workouts.push(workout);
+      });
+
+      // Calculate averages
+      Object.keys(byHour).forEach(hour => {
+        byHour[hour].avgVolume = byHour[hour].totalVolume / byHour[hour].count;
+      });
+
+      // Find best and worst times
+      const hours = Object.keys(byHour).map(h => parseInt(h));
+      const bestHour = hours.reduce((best, hour) => 
+        byHour[hour].avgVolume > byHour[best].avgVolume ? hour : best
+      );
+      const worstHour = hours.reduce((worst, hour) => 
+        byHour[hour].avgVolume < byHour[worst].avgVolume ? hour : worst
+      );
+
+      // Format time ranges
+      const formatHour = (h) => {
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHour = h % 12 || 12;
+        return `${displayHour}:00 ${period}`;
+      };
+
+      const bestTimeRange = `${formatHour(bestHour)} - ${formatHour(bestHour + 1)}`;
+      const worstTimeRange = `${formatHour(worstHour)} - ${formatHour(worstHour + 1)}`;
+
+      // Calculate performance difference
+      const performanceDiff = ((byHour[bestHour].avgVolume - byHour[worstHour].avgVolume) / byHour[worstHour].avgVolume) * 100;
+
+      return {
+        bestTime: bestTimeRange,
+        bestHour,
+        bestAvgVolume: Math.round(byHour[bestHour].avgVolume),
+        worstTime: worstTimeRange,
+        worstAvgVolume: Math.round(byHour[worstHour].avgVolume),
+        performanceDiff: Math.round(performanceDiff),
+        hourlyData: byHour,
+        recommendation: performanceDiff > 15 
+          ? `Schedule workouts around ${bestTimeRange} for optimal performance`
+          : 'Your performance is consistent across different times'
+      };
+    } catch (error) {
+      console.error('Error analyzing optimal training time:', error);
+      return null;
+    }
+  };
+
+  // 8. Sleep Impact Analysis
+  const analyzeSleepImpact = (sleepData = [], workData = workoutData) => {
+    // Note: Requires sleep tracking data
+    if (sleepData.length < 7 || workData.length < 7) return null;
+
+    try {
+      // This would correlate sleep data with workout performance
+      // For now, return placeholder until sleep tracking is added
+      return null;
+    } catch (error) {
+      console.error('Error analyzing sleep impact:', error);
+      return null;
+    }
+  };
+
+  // 9. Body Recomposition Forecast
+  const forecastBodyRecomposition = (wData = weightData, woData = workoutData, nData = nutritionData) => {
+    if (wData.length < 7 || woData.length < 10 || nData.length < 7) return null;
+
+    try {
+      // Calculate current trends
+      const sortedWeights = [...wData].sort((a, b) => 
+        new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      const firstWeight = parseFloat(sortedWeights[0].weight);
+      const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight);
+      const weightChange = lastWeight - firstWeight;
+      const days = (new Date(sortedWeights[sortedWeights.length - 1].date).getTime() - 
+                   new Date(sortedWeights[0].date).getTime()) / (1000 * 60 * 60 * 24);
+      const weeklyWeightChange = (weightChange / days) * 7;
+
+      // Calculate training volume trend
+      const recentWorkouts = woData.slice(0, Math.floor(woData.length / 2));
+      const olderWorkouts = woData.slice(Math.floor(woData.length / 2));
+      const recentAvgVolume = recentWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / recentWorkouts.length;
+      const olderAvgVolume = olderWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / olderWorkouts.length;
+      const volumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
+
+      // Estimate body composition changes
+      // Simplified model: strength gains + slight weight loss = recomp
+      const isRecomping = volumeIncrease > 5 && Math.abs(weeklyWeightChange) < 0.5;
+      
+      // Project 12 weeks
+      const projectedWeightChange = weeklyWeightChange * 12;
+      const projectedWeight = lastWeight + projectedWeightChange;
+
+      // Estimate muscle/fat split (simplified)
+      let estimatedMuscleGain = 0;
+      let estimatedFatLoss = 0;
+
+      if (isRecomping) {
+        estimatedMuscleGain = Math.abs(volumeIncrease) * 0.1; // Rough estimate
+        estimatedFatLoss = Math.abs(projectedWeightChange) + estimatedMuscleGain;
+      } else if (weeklyWeightChange < 0) {
+        // Losing weight
+        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.75;
+        estimatedMuscleGain = volumeIncrease > 0 ? Math.abs(projectedWeightChange) * 0.25 : 0;
+      } else {
+        // Gaining weight
+        estimatedMuscleGain = projectedWeightChange * 0.5;
+        estimatedFatLoss = 0;
+      }
+
+      return {
+        currentWeight: Math.round(lastWeight * 10) / 10,
+        projectedWeight: Math.round(projectedWeight * 10) / 10,
+        weeklyWeightChange: Math.round(weeklyWeightChange * 100) / 100,
+        isRecomping,
+        estimatedMuscleGain: Math.round(estimatedMuscleGain * 10) / 10,
+        estimatedFatLoss: Math.round(estimatedFatLoss * 10) / 10,
+        volumeTrend: volumeIncrease > 5 ? 'increasing' : volumeIncrease < -5 ? 'decreasing' : 'stable',
+        recommendation: isRecomping 
+          ? 'Great! You\'re building muscle while losing fat'
+          : weeklyWeightChange < -1 
+            ? 'Consider increasing calories to preserve muscle'
+            : 'Continue current approach'
+      };
+    } catch (error) {
+      console.error('Error forecasting body recomposition:', error);
+      return null;
+    }
+  };
+
+  // 10. Habit Streak Predictions
+  const predictHabitStreak = (data = workoutData) => {
+    if (data.length < 14) return null;
+
+    try {
+      // Calculate current streak
+      const sortedDates = data.map(w => new Date(w.start_time).toDateString()).sort();
+      const uniqueDates = [...new Set(sortedDates)];
+      
+      let currentStreak = 0;
+      let longestStreak = 0;
+      let tempStreak = 1;
+
+      for (let i = 1; i < uniqueDates.length; i++) {
+        const prevDate = new Date(uniqueDates[i - 1]);
+        const currDate = new Date(uniqueDates[i]);
+        const daysDiff = (currDate - prevDate) / (1000 * 60 * 60 * 24);
+
+        if (daysDiff <= 2) { // Allow 1 rest day
+          tempStreak++;
+        } else {
+          longestStreak = Math.max(longestStreak, tempStreak);
+          tempStreak = 1;
+        }
+      }
+      longestStreak = Math.max(longestStreak, tempStreak);
+
+      // Check if still on streak
+      const lastWorkout = new Date(data[0].start_time);
+      const daysSinceLastWorkout = (Date.now() - lastWorkout.getTime()) / (1000 * 60 * 60 * 24);
+      currentStreak = daysSinceLastWorkout <= 2 ? tempStreak : 0;
+
+      // Calculate consistency rate
+      const totalDays = (Date.now() - new Date(data[data.length - 1].start_time).getTime()) / (1000 * 60 * 60 * 24);
+      const consistencyRate = (uniqueDates.length / totalDays) * 100;
+
+      // Predict streak maintenance
+      const streakProbability = Math.min(95, consistencyRate * 1.2);
+
+      return {
+        currentStreak,
+        longestStreak,
+        consistencyRate: Math.round(consistencyRate),
+        streakProbability: Math.round(streakProbability),
+        totalWorkouts: data.length,
+        avgWorkoutsPerWeek: Math.round((data.length / totalDays) * 7 * 10) / 10,
+        status: currentStreak > 0 ? 'active' : 'broken',
+        recommendation: streakProbability > 70 
+          ? 'You\'re on track! Keep up the consistency'
+          : 'Try scheduling workouts in advance to improve consistency'
+      };
+    } catch (error) {
+      console.error('Error predicting habit streak:', error);
+      return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -904,6 +1120,148 @@ export default function PredictionsUnified({ user }) {
             <Apple className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Nutrition Pattern Analysis</h3>
             <p className="text-gray-600">Log 7+ days of nutrition to analyze patterns</p>
+          </div>
+        )}
+
+        {/* ========== PHASE 2 PREDICTIONS ========== */}
+
+        {/* Optimal Training Time */}
+        {predictions.optimalTime ? (
+          <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg p-6 text-white mb-6">
+            <div className="flex items-center mb-4">
+              <Clock className="w-8 h-8 mr-3" />
+              <h2 className="text-2xl font-semibold">⏰ Optimal Training Time</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              <div>
+                <div className="text-sm opacity-90 mb-1">Best Time</div>
+                <div className="text-3xl font-bold">{predictions.optimalTime.bestTime}</div>
+                <div className="text-sm opacity-75">Avg volume: {predictions.optimalTime.bestAvgVolume}</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Worst Time</div>
+                <div className="text-2xl font-bold">{predictions.optimalTime.worstTime}</div>
+                <div className="text-sm opacity-75">Avg volume: {predictions.optimalTime.worstAvgVolume}</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Performance Difference</div>
+                <div className="text-3xl font-bold">{predictions.optimalTime.performanceDiff}%</div>
+                <div className="text-sm opacity-75">better at peak time</div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <div className="font-semibold mb-2">Recommendation:</div>
+              <p>{predictions.optimalTime.recommendation}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
+            <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Optimal Training Time</h3>
+            <p className="text-gray-600">Log 10+ workouts at different times to find your peak performance window</p>
+          </div>
+        )}
+
+        {/* Body Recomposition Forecast */}
+        {predictions.bodyRecomp ? (
+          <div className="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-lg p-6 text-white mb-6">
+            <div className="flex items-center mb-4">
+              <TrendingUp className="w-8 h-8 mr-3" />
+              <h2 className="text-2xl font-semibold">💪 Body Recomposition Forecast</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
+              <div>
+                <div className="text-sm opacity-90 mb-1">Current Weight</div>
+                <div className="text-3xl font-bold">{predictions.bodyRecomp.currentWeight} lbs</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">12-Week Projection</div>
+                <div className="text-3xl font-bold">{predictions.bodyRecomp.projectedWeight} lbs</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Est. Muscle Gain</div>
+                <div className="text-3xl font-bold text-green-200">+{predictions.bodyRecomp.estimatedMuscleGain} lbs</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Est. Fat Loss</div>
+                <div className="text-3xl font-bold text-red-200">-{predictions.bodyRecomp.estimatedFatLoss} lbs</div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm opacity-90">Status</div>
+                  <div className="text-xl font-bold">{predictions.bodyRecomp.isRecomping ? '🔥 Recomping' : 'Standard Progress'}</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-90">Volume Trend</div>
+                  <div className="text-xl font-bold capitalize">{predictions.bodyRecomp.volumeTrend}</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <div className="font-semibold mb-2">Recommendation:</div>
+              <p>{predictions.bodyRecomp.recommendation}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
+            <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Body Recomposition Forecast</h3>
+            <p className="text-gray-600">Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition</p>
+          </div>
+        )}
+
+        {/* Habit Streak Predictions */}
+        {predictions.habitStreak ? (
+          <div className="bg-gradient-to-r from-pink-600 to-rose-600 rounded-lg p-6 text-white mb-6">
+            <div className="flex items-center mb-4">
+              <Flame className="w-8 h-8 mr-3" />
+              <h2 className="text-2xl font-semibold">🔥 Habit Streak Predictions</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
+              <div>
+                <div className="text-sm opacity-90 mb-1">Current Streak</div>
+                <div className="text-4xl font-bold">{predictions.habitStreak.currentStreak}</div>
+                <div className="text-sm opacity-75">days</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Longest Streak</div>
+                <div className="text-4xl font-bold">{predictions.habitStreak.longestStreak}</div>
+                <div className="text-sm opacity-75">days</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Consistency Rate</div>
+                <div className="text-4xl font-bold">{predictions.habitStreak.consistencyRate}%</div>
+              </div>
+              <div>
+                <div className="text-sm opacity-90 mb-1">Streak Probability</div>
+                <div className="text-4xl font-bold">{predictions.habitStreak.streakProbability}%</div>
+                <div className="text-sm opacity-75">next 7 days</div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm opacity-90">Total Workouts</div>
+                  <div className="text-2xl font-bold">{predictions.habitStreak.totalWorkouts}</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-90">Avg Per Week</div>
+                  <div className="text-2xl font-bold">{predictions.habitStreak.avgWorkoutsPerWeek}x</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <div className="font-semibold mb-2">Status: <span className="capitalize">{predictions.habitStreak.status}</span></div>
+              <p>{predictions.habitStreak.recommendation}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
+            <Flame className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Habit Streak Predictions</h3>
+            <p className="text-gray-600">Log 14+ workouts to analyze consistency and predict streaks</p>
           </div>
         )}
 
