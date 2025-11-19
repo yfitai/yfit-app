@@ -38,12 +38,18 @@ export default function ProviderReport({ user }) {
 
   const loadMedications = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_medications');
+        setMedications(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
           *,
-          medication:medications(*),
-          prescriber:medical_providers(name)
+          medication:medications(*)
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
@@ -58,6 +64,13 @@ export default function ProviderReport({ user }) {
 
   const loadSupplements = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_supplements');
+        setSupplements(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_supplements')
         .select(`
@@ -77,6 +90,13 @@ export default function ProviderReport({ user }) {
 
   const loadAllergies = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_allergies');
+        setAllergies(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_allergies')
         .select('*')
@@ -92,6 +112,13 @@ export default function ProviderReport({ user }) {
 
   const loadProviders = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_providers');
+        setProviders(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('medical_providers')
         .select('*')

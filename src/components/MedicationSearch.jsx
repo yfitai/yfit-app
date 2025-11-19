@@ -46,6 +46,13 @@ export default function MedicationSearch({ user }) {
 
   const loadProviders = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_providers');
+        setProviders(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('medical_providers')
         .select('*')

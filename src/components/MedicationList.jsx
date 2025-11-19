@@ -14,12 +14,18 @@ export default function MedicationList({ user }) {
 
   const loadMedications = async () => {
     try {
+      // Skip in demo mode
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_medications');
+        setMedications(stored ? JSON.parse(stored) : []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
           *,
-          medication:medications(*),
-          prescriber:medical_providers(name)
+          medication:medications(*)
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
