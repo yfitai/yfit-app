@@ -444,7 +444,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             <div>
               <h1 className="text-xl font-bold text-gray-900">{selectedWorkout?.name || 'Quick Workout'}</h1>
               <p className="text-sm text-gray-600">
-                Exercise {currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0}
+                {currentExercise ? (
+                  <>{currentExercise.exercises.name} ({currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0})</>
+                ) : (
+                  <>Exercise {currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0}</>
+                )}
               </p>
             </div>
             <button
@@ -501,7 +505,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                 {currentExercise.exercises.name}
               </h2>
               <div className="text-sm font-semibold text-gray-600">
-                Exercise {currentExerciseIndex + 1} of {selectedWorkout.workout_exercises.length}
+                {currentExercise.exercises.name} ({currentExerciseIndex + 1} of {selectedWorkout.workout_exercises.length})
                 {currentExerciseIndex === selectedWorkout.workout_exercises.length - 1 && (
                   <span className="ml-2 text-blue-600">🎯 Final Exercise!</span>
                 )}
@@ -545,7 +549,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     type="number"
                     value={setData.weight}
                     onChange={(e) => setSetData(prev => ({ ...prev, weight: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
                     placeholder="0"
                   />
                   <button
@@ -571,7 +575,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     type="number"
                     value={setData.reps}
                     onChange={(e) => setSetData(prev => ({ ...prev, reps: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
                     placeholder="0"
                   />
                   <button
@@ -585,9 +589,10 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
               {/* RPE Slider */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   RPE (Rate of Perceived Exertion): {setData.rpe}/10
                 </label>
+                <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
                 <input
                   type="range"
                   min="1"
@@ -643,7 +648,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               });
             }}
             disabled={currentExerciseIndex >= selectedWorkout.workout_exercises.length - 1}
-            className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next Exercise
           </button>

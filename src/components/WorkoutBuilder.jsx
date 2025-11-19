@@ -16,6 +16,7 @@ const WorkoutBuilder = () => {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterEquipment, setFilterEquipment] = useState('all');
   const [filterTargetMuscle, setFilterTargetMuscle] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     initializeUser();
@@ -78,6 +79,7 @@ const WorkoutBuilder = () => {
     
     console.log('✅ Setting selectedExercises to:', newExercises.length, 'exercises');
     setSelectedExercises(newExercises);
+    setSearchQuery(''); // Clear search when closing
     setShowExerciseSelector(false);
   };
 
@@ -189,6 +191,10 @@ const WorkoutBuilder = () => {
   };
 
   const filteredExercises = exercises.filter(ex => {
+    // Search filter
+    const matchesSearch = searchQuery === '' || 
+      ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
     // Category filter - map to muscle groups
     let matchesCategory = filterCategory === 'all';
     if (!matchesCategory && ex.target_muscles) {
@@ -229,7 +235,7 @@ const WorkoutBuilder = () => {
           : ex.target_muscles.toLowerCase() === filterTargetMuscle.toLowerCase()
       ));
     
-    return matchesCategory && matchesEquipment && matchesTargetMuscle;
+    return matchesSearch && matchesCategory && matchesEquipment && matchesTargetMuscle;
   });
 
   if (loading) {
@@ -452,6 +458,20 @@ const WorkoutBuilder = () => {
                 >
                   <X className="w-6 h-6 text-gray-600" />
                 </button>
+              </div>
+
+              {/* Search Bar */}
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search exercises by name..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
               {/* Filters */}
