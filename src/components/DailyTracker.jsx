@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase';
 import { 
   Moon, Droplets, Footprints, Heart, Activity, 
   TrendingUp, Calendar, Plus, Check, X 
 } from 'lucide-react';
+import WearablesSync from './WearablesSync';;
 
 export default function DailyTracker({ user }) {
   const [loading, setLoading] = useState(true);
@@ -323,6 +324,22 @@ export default function DailyTracker({ user }) {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Daily Tracker</h1>
           <p className="text-gray-600">Track your daily health metrics and habits</p>
+        </div>
+
+        {/* Wearables Sync */}
+        <div className="mb-8">
+          <WearablesSync 
+            user={user} 
+            onSyncComplete={(data) => {
+              // Auto-populate form with synced data
+              if (data.steps) setFormData(prev => ({ ...prev, steps: data.steps }));
+              if (data.sleep) setFormData(prev => ({ ...prev, sleep_hours: data.sleep }));
+              if (data.heartRate) {
+                // Could add heart rate field in future
+                console.log('Heart rate synced:', data.heartRate);
+              }
+            }}
+          />
         </div>
 
         {/* Today's Progress Cards */}
