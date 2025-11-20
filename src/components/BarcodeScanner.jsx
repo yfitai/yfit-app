@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BarcodeScanner as CapacitorBarcodeScanner } from '@capacitor/barcode-scanner'
+import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner'
 import { Capacitor } from '@capacitor/core'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
@@ -41,23 +41,17 @@ export default function BarcodeScanner({ onScanSuccess, onClose }) {
 
   const startNativeScan = async () => {
     try {
-      // Check and request camera permission
-      const status = await CapacitorBarcodeScanner.checkPermission({ force: true })
-      
-      if (!status.granted) {
-        setError('Camera permission denied. Please enable camera access in settings.')
-        setScanning(false)
-        return
-      }
+      // Start scanning with Capacitor Barcode Scanner
+      const result = await CapacitorBarcodeScanner.scanBarcode({
+        hint: 17, // Try all formats
+        scanInstructions: 'Point camera at barcode',
+        scanButton: false,
+        scanText: 'Scanning...',
+        cameraDirection: 1 // Back camera
+      })
 
-      // Prepare scanner (makes webview transparent)
-      await CapacitorBarcodeScanner.prepare()
-
-      // Start scanning
-      const result = await CapacitorBarcodeScanner.startScan()
-
-      if (result.hasContent) {
-        handleScanSuccess(result.content)
+      if (result && result.ScanResult) {
+        handleScanSuccess(result.ScanResult)
       } else {
         setError('No barcode detected. Please try again.')
         setScanning(false)
@@ -98,8 +92,8 @@ export default function BarcodeScanner({ onScanSuccess, onClose }) {
   const stopScan = async () => {
     try {
       if (isNative) {
-        // Stop native scanner and restore webview
-        await CapacitorBarcodeScanner.stopScan()
+        // Native scanner stops automatically after scan
+        // No cleanup needed
       } else if (html5Scanner) {
         // Stop web scanner
         await html5Scanner.stop()
