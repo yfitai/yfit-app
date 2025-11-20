@@ -1,5 +1,43 @@
 {
   "appId": "com.yfitai.app",
   "appName": "YFIT AI",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "BarcodeScanner": {
+      "cameraDirection": "back"
+    },
+    "Camera": {
+      "iosPermissions": {
+        "NSCameraUsageDescription": "YFIT needs camera access to scan food barcodes and analyze workout form.",
+        "NSPhotoLibraryUsageDescription": "YFIT needs photo library access to save progress photos.",
+        "NSPhotoLibraryAddUsageDescription": "YFIT needs permission to save photos to your library."
+      },
+      "androidPermissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "HealthKit": {
+      "iosPermissions": {
+        "NSHealthShareUsageDescription": "YFIT needs access to read your health data including steps, heart rate, sleep, and workouts to provide personalized fitness insights.",
+        "NSHealthUpdateUsageDescription": "YFIT needs permission to save workout data to Apple Health."
+      }
+    }
+  },
+  "ios": {
+    "contentInset": "always"
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "",
+      "keystorePassword": "",
+      "keystoreAlias": "",
+      "keystoreAliasPassword": "",
+      "releaseType": "APK"
+    }
+  }
 }
