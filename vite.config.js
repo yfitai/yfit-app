@@ -5,6 +5,8 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Use relative base path for Capacitor mobile apps
+  base: './',
   plugins: [
     react(),
     tailwindcss(),
