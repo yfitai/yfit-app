@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
-import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner'
 import { Capacitor } from '@capacitor/core'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
+
+// Conditionally import CapacitorBarcodeScanner for native platforms only
+let CapacitorBarcodeScanner = null
+if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
+  try {
+    CapacitorBarcodeScanner = require('@capacitor/barcode-scanner').CapacitorBarcodeScanner
+  } catch (e) {
+    console.warn('Barcode scanner not available:', e)
+  }
+}
 
 export default function BarcodeScanner({ onScanSuccess, onClose }) {
   const [scanning, setScanning] = useState(false)
