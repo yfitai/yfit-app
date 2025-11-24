@@ -202,7 +202,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       </div>
 
       {/* Articles List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 pb-24">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             Loading FAQ articles...

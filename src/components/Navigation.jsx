@@ -26,7 +26,7 @@ export default function Navigation({ user }) {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
-            <img src="/assets/yfit-logo.png" alt="YFIT" className="h-8 sm:h-10" />
+            <img src="./assets/yfit-logo.png" alt="YFIT" className="h-8 sm:h-10" />
           </div>
 
           {/* Navigation Links - Scrollable on mobile */}
