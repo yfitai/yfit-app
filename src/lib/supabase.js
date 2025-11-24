@@ -102,6 +102,26 @@ export const signIn = async (email, password) => {
     return { data: null, error }
   }
   
+  // Check if user profile exists, create if missing
+  if (data.user) {
+    const profile = await getUserProfile(data.user.id)
+    if (!profile) {
+      console.log('Creating missing user profile...')
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: data.user.id,
+          first_name: data.user.user_metadata?.first_name || 'User',
+          last_name: data.user.user_metadata?.last_name || '',
+          email: data.user.email
+        })
+      
+      if (profileError) {
+        console.error('Error creating profile on login:', profileError)
+      }
+    }
+  }
+  
   return { data, error: null }
 }
 
