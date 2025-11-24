@@ -49,14 +49,14 @@ export default function Medications({ user }) {
 
         {/* Tab Navigation */}
         <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
-          <div className="flex overflow-x-auto">
+          <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-1">
             {tabs.map((tab) => {
               const Icon = tab.icon
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-6 py-4 font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
                       : 'text-gray-600 hover:bg-gray-50'

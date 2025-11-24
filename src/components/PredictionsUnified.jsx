@@ -978,7 +978,7 @@ export default function PredictionsUnified({ user }) {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
+    <div className="min-h-screen p-2 sm:p-6 overflow-x-hidden" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">🔮 AI Predictions</h1>

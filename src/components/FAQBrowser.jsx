@@ -202,7 +202,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       </div>
 
       {/* Articles List */}
-      <div className="flex-1 overflow-y-auto p-4 pb-40">
+      <div className="flex-1 overflow-y-auto p-4 pb-4">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             Loading FAQ articles...
@@ -296,8 +296,8 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
+      {/* Footer - Sticky at bottom */}
+      <div className="sticky bottom-0 p-4 border-t bg-gray-50 dark:bg-gray-900 shadow-lg">
         <p className="text-xs text-gray-500 text-center mb-2">
           Can't find what you're looking for?
         </p>

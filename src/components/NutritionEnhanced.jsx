@@ -446,10 +446,10 @@ export default function NutritionEnhanced({ user: propUser }) {
   const fatProgress = Math.min((totalFat / fatGoal) * 100, 100)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-8 px-2 sm:px-4 overflow-x-hidden">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
               Nutrition Tracking
