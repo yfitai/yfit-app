@@ -383,7 +383,14 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
         {/* Demo Mode Button */}
           <div className="text-center mt-6">
             <button
-              onClick={onDemoMode}
+              onClick={() => {
+                console.log('Demo Mode button clicked', typeof onDemoMode);
+                if (typeof onDemoMode === 'function') {
+                  onDemoMode();
+                } else {
+                  console.error('onDemoMode is not a function:', onDemoMode);
+                }
+              }}
               className="bg-gradient-to-r from-gray-700 to-gray-900 text-white px-6 py-3 rounded-lg text-sm font-medium hover:from-gray-600 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl"
             >
               🧪 Try Demo Mode (No Sign Up Required)
