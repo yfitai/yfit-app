@@ -27,6 +27,8 @@ export default function DailyTracker({ user }) {
     bp_systolic: '',
     bp_diastolic: '',
     glucose_mg_dl: '',
+    weight_kg: '',
+    body_fat_percent: '',
     notes: ''
   });
 
@@ -599,6 +601,39 @@ export default function DailyTracker({ user }) {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 placeholder={glucoseUnit === 'mg/dl' ? '100' : '5.6'}
               />
+            </div>
+
+            {/* Weight & Body Fat */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ⚖️ Weight (kg)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={formData.weight_kg}
+                  onChange={(e) => setFormData({...formData, weight_kg: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="70.5"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  💪 Body Fat (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={formData.body_fat_percent}
+                  onChange={(e) => setFormData({...formData, body_fat_percent: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  placeholder="15.0"
+                />
+              </div>
             </div>
 
             {/* Notes */}

@@ -222,15 +222,7 @@ export default function Dashboard({ user }) {
           </CardContent>
         </Card>
 
-        {/* Coming Soon Notice */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            <strong>Phase 1 Foundation Complete!</strong> 🎉
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            More features coming soon: Goals, Nutrition, Fitness, Medications, and more!
-          </p>
-        </div>
+
       </main>
     </div>
   )
