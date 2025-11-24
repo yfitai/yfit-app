@@ -20,41 +20,41 @@ import { supabase } from '../lib/supabase'
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Nutrition & Meal Planning</h1>
             
             {/* Tab Navigation */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-1">
               <button
                 onClick={() => setActiveTab('daily')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   activeTab === 'daily'
                     ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <Apple className="w-5 h-5" />
-                Daily Tracker
+                <Apple className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Daily Tracker</span>
               </button>
               
               <button
                 onClick={() => setActiveTab('weekly')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   activeTab === 'weekly'
                     ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <Calendar className="w-5 h-5" />
-                Weekly Planner
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Weekly Planner</span>
               </button>
               
               <button
                 onClick={() => setActiveTab('templates')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   activeTab === 'templates'
                     ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <BookOpen className="w-5 h-5" />
-                Templates
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Templates</span>
               </button>
             </div>
           </div>
