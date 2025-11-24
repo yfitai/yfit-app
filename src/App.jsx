@@ -45,6 +45,7 @@ function App() {
   }
 
   const handleDemoMode = () => {
+    console.log('handleDemoMode called');
     // Create a demo user for testing dashboard UI
     const demoUser = {
       id: 'demo-user-id',
@@ -55,10 +56,14 @@ function App() {
       },
       created_at: new Date().toISOString()
     }
+    console.log('Setting demo user:', demoUser);
     // Set demo mode in localStorage so getCurrentUser() can detect it
     localStorage.setItem('demoMode', 'true')
+    console.log('Demo mode set in localStorage');
     setUser(demoUser)
+    console.log('User state updated');
     setDemoMode(true)
+    console.log('Demo mode state set to true');
   }
 
   if (loading) {
