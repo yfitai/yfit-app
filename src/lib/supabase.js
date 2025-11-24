@@ -102,23 +102,18 @@ export const signIn = async (email, password) => {
     return { data: null, error }
   }
   
-  // Check if user profile exists, create if missing
+  // Check if user profile exists, create if missing (non-blocking)
   if (data.user) {
-    const profile = await getUserProfile(data.user.id)
-    if (!profile) {
-      console.log('Creating missing user profile...')
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: data.user.id,
-          first_name: data.user.user_metadata?.first_name || 'User',
-          last_name: data.user.user_metadata?.last_name || '',
-          email: data.user.email
-        })
-      
-      if (profileError) {
-        console.error('Error creating profile on login:', profileError)
+    try {
+      const profile = await getUserProfile(data.user.id)
+      if (!profile) {
+        console.log('User profile not found - this is normal for new accounts')
+        // Don't try to create profile if table doesn't exist
+        // Profile will be created when user completes Goals page
       }
+    } catch (profileError) {
+      console.log('Profile check skipped:', profileError.message)
+      // Continue with login even if profile operations fail
     }
   }
   

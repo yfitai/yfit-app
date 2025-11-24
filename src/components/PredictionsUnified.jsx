@@ -22,6 +22,9 @@ export default function PredictionsUnified({ user }) {
   });
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
     if (user) {
       fetchAllData();
     }

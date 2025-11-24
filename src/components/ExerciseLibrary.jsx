@@ -358,10 +358,11 @@ const ExerciseLibrary = () => {
             >
               <div className="aspect-video bg-gray-100 relative">
                 <img
-                  src={exercise.gif_url}
+                  src={exercise.gif_url || 'https://via.placeholder.com/400x300/e5e7eb/6b7280?text=Exercise'}
                   alt={exercise.name}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300/e5e7eb/6b7280?text=Exercise' }}
                 />
                 <div className="absolute top-2 right-2">
                   <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded">
