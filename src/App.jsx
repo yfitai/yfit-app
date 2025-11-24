@@ -95,7 +95,7 @@ function App() {
           )}
                  <Routes>
             {/* Public Routes - No login required */}
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
             <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
             <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
             <Route path="/legal" element={<Legal />} />
