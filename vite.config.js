@@ -39,9 +39,9 @@ export default defineConfig({
     // Generate unique filenames for all assets with content hash
     rollupOptions: {
       output: {
-        // Use timestamp in addition to hash for extra uniqueness
-        entryFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
-        chunkFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
+        // Use content hash for cache busting
+        entryFileNames: `assets/[name]-[hash].js`,
+        chunkFileNames: `assets/[name]-[hash].js`,
         assetFileNames: (assetInfo) => {
           // Keep images and fonts in their own folders with hash
           const info = assetInfo.name.split('.')
@@ -52,7 +52,7 @@ export default defineConfig({
           if (/woff2?|ttf|eot/i.test(ext)) {
             return `assets/fonts/[name]-[hash][extname]`
           }
-          return `assets/[name]-[hash]-${Date.now()}[extname]`
+          return `assets/[name]-[hash][extname]`
         }
       }
     },
