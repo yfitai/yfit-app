@@ -382,7 +382,7 @@ export default function Progress({ user: propUser }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-8 overflow-x-hidden w-full">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
@@ -642,22 +642,22 @@ function OverviewCard({ title, current, goal, unit, icon, color }) {
       <div className="space-y-2">
         <div>
           <div className="text-3xl font-bold text-gray-900">
-            {current.toFixed(1)}<span className="text-lg text-gray-600">{unit}</span>
+            {current != null ? current.toFixed(1) : '--'}<span className="text-lg text-gray-600">{unit}</span>
           </div>
           <div className="text-sm text-gray-600">
-            Goal: {goal.toFixed(1)}{unit}
+            Goal: {goal != null ? goal.toFixed(1) : '--'}{unit}
           </div>
         </div>
         
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className={`h-2 rounded-full ${color === 'blue' ? 'bg-blue-500' : color === 'green' ? 'bg-green-500' : 'bg-purple-500'}`}
-            style={{ width: `${Math.min(Math.abs(progress), 100)}%` }}
+            style={{ width: `${progress != null ? Math.min(Math.abs(progress), 100) : 0}%` }}
           ></div>
         </div>
         
         <div className="text-sm font-medium text-gray-700">
-          {remaining.toFixed(1)}{unit} to go
+          {remaining != null ? remaining.toFixed(1) : '--'}{unit} to go
         </div>
       </div>
     </div>

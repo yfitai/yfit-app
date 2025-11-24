@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles } from 'lucide-react'
 import { supabase, signOut, getUserProfile } from '../lib/supabase'
-import logo from '../assets/logo.png'
+// Logo is loaded from public/assets/yfit-logo.png
 
 export default function Dashboard({ user }) {
   const navigate = useNavigate()
@@ -95,7 +95,7 @@ export default function Dashboard({ user }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img src={logo} alt="YFIT AI" className="h-10" />
+              <img src="./assets/yfit-logo.png" alt="YFIT AI" className="h-10" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
                 YFIT AI
               </h1>
