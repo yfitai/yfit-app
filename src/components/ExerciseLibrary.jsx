@@ -357,13 +357,18 @@ const ExerciseLibrary = () => {
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             >
               <div className="aspect-video bg-gray-100 relative">
-                <img
-                  src={exercise.gif_url || 'https://via.placeholder.com/400x300/e5e7eb/6b7280?text=Exercise'}
-                  alt={exercise.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300/e5e7eb/6b7280?text=Exercise' }}
-                />
+                {exercise.gif_url ? (
+                  <img
+                    src={exercise.gif_url}
+                    alt={exercise.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.querySelector('.fallback-icon').style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div className={`fallback-icon absolute inset-0 flex items-center justify-center ${exercise.gif_url ? 'hidden' : 'flex'}`}>
+                  <Dumbbell className="w-16 h-16 text-gray-400" />
+                </div>
                 <div className="absolute top-2 right-2">
                   <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded">
                     {exercise.category}
