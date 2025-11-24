@@ -91,8 +91,8 @@ function App() {
                  <Routes>
             {/* Public Routes - No login required */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Auth />} />
-            <Route path="/signup" element={<Auth />} />
+            <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
+            <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
             <Route path="/legal" element={<Legal />} />
 
             {/* Protected Routes - Login required */}
