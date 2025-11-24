@@ -389,12 +389,12 @@ export default function Progress({ user: propUser }) {
         <p className="text-gray-600">Track your journey and see how far you've come</p>
         
         {/* Time Range Selector */}
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {['7', '30', '90', '365'].map(days => (
             <button
               key={days}
               onClick={() => setTimeRange(days)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 timeRange === days
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
