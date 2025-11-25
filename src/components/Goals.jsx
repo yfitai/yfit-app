@@ -68,16 +68,23 @@ export default function Goals({ user: propUser }) {
     chest: '',
     waist: '',
     hips: '',
-    thighLeft: '',
-    thighRight: '',
-    calfLeft: '',
-    calfRight: '',
-    bicepLeft: '',
-    bicepRight: '',
-    forearmLeft: '',
-    forearmRight: '',
-    ankleLeft: '',
-    ankleRight: ''
+    biceps: '',
+    forearms: '',
+    thighs: '',
+    calves: ''
+  })
+
+  // Body Measurement Goals (all in cm in database)
+  const [measurementGoals, setMeasurementGoals] = useState({
+    neck: '',
+    shoulders: '',
+    chest: '',
+    waist: '',
+    hips: '',
+    biceps: '',
+    forearms: '',
+    thighs: '',
+    calves: ''
   })
 
   useEffect(() => {
@@ -164,16 +171,22 @@ export default function Goals({ user: propUser }) {
         chest: convertCmToDisplay(measurementsData.chest_cm, unitSystem),
         waist: convertCmToDisplay(measurementsData.waist_cm, unitSystem),
         hips: convertCmToDisplay(measurementsData.hips_cm, unitSystem),
-        thighLeft: convertCmToDisplay(measurementsData.thigh_left_cm, unitSystem),
-        thighRight: convertCmToDisplay(measurementsData.thigh_right_cm, unitSystem),
-        calfLeft: convertCmToDisplay(measurementsData.calf_left_cm, unitSystem),
-        calfRight: convertCmToDisplay(measurementsData.calf_right_cm, unitSystem),
-        bicepLeft: convertCmToDisplay(measurementsData.bicep_left_cm, unitSystem),
-        bicepRight: convertCmToDisplay(measurementsData.bicep_right_cm, unitSystem),
-        forearmLeft: convertCmToDisplay(measurementsData.forearm_left_cm, unitSystem),
-        forearmRight: convertCmToDisplay(measurementsData.forearm_right_cm, unitSystem),
-        ankleLeft: convertCmToDisplay(measurementsData.ankle_left_cm, unitSystem),
-        ankleRight: convertCmToDisplay(measurementsData.ankle_right_cm, unitSystem)
+        biceps: convertCmToDisplay(measurementsData.biceps_cm, unitSystem),
+        forearms: convertCmToDisplay(measurementsData.forearms_cm, unitSystem),
+        thighs: convertCmToDisplay(measurementsData.thighs_cm, unitSystem),
+        calves: convertCmToDisplay(measurementsData.calves_cm, unitSystem)
+      })
+
+      setMeasurementGoals({
+        neck: convertCmToDisplay(measurementsData.neck_goal_cm, unitSystem),
+        shoulders: convertCmToDisplay(measurementsData.shoulders_goal_cm, unitSystem),
+        chest: convertCmToDisplay(measurementsData.chest_goal_cm, unitSystem),
+        waist: convertCmToDisplay(measurementsData.waist_goal_cm, unitSystem),
+        hips: convertCmToDisplay(measurementsData.hips_goal_cm, unitSystem),
+        biceps: convertCmToDisplay(measurementsData.biceps_goal_cm, unitSystem),
+        forearms: convertCmToDisplay(measurementsData.forearms_goal_cm, unitSystem),
+        thighs: convertCmToDisplay(measurementsData.thighs_goal_cm, unitSystem),
+        calves: convertCmToDisplay(measurementsData.calves_goal_cm, unitSystem)
       })
     }
   }
@@ -267,16 +280,19 @@ export default function Goals({ user: propUser }) {
         chest_cm: convertInputToCm(parseFloat(measurements.chest || 0), unitSystem),
         waist_cm: convertInputToCm(parseFloat(measurements.waist || 0), unitSystem),
         hips_cm: convertInputToCm(parseFloat(measurements.hips || 0), unitSystem),
-        thigh_left_cm: convertInputToCm(parseFloat(measurements.thighLeft || 0), unitSystem),
-        thigh_right_cm: convertInputToCm(parseFloat(measurements.thighRight || 0), unitSystem),
-        calf_left_cm: convertInputToCm(parseFloat(measurements.calfLeft || 0), unitSystem),
-        calf_right_cm: convertInputToCm(parseFloat(measurements.calfRight || 0), unitSystem),
-        bicep_left_cm: convertInputToCm(parseFloat(measurements.bicepLeft || 0), unitSystem),
-        bicep_right_cm: convertInputToCm(parseFloat(measurements.bicepRight || 0), unitSystem),
-        forearm_left_cm: convertInputToCm(parseFloat(measurements.forearmLeft || 0), unitSystem),
-        forearm_right_cm: convertInputToCm(parseFloat(measurements.forearmRight || 0), unitSystem),
-        ankle_left_cm: convertInputToCm(parseFloat(measurements.ankleLeft || 0), unitSystem),
-        ankle_right_cm: convertInputToCm(parseFloat(measurements.ankleRight || 0), unitSystem)
+        biceps_cm: convertInputToCm(parseFloat(measurements.biceps || 0), unitSystem),
+        forearms_cm: convertInputToCm(parseFloat(measurements.forearms || 0), unitSystem),
+        thighs_cm: convertInputToCm(parseFloat(measurements.thighs || 0), unitSystem),
+        calves_cm: convertInputToCm(parseFloat(measurements.calves || 0), unitSystem),
+        neck_goal_cm: convertInputToCm(parseFloat(measurementGoals.neck || 0), unitSystem),
+        shoulders_goal_cm: convertInputToCm(parseFloat(measurementGoals.shoulders || 0), unitSystem),
+        chest_goal_cm: convertInputToCm(parseFloat(measurementGoals.chest || 0), unitSystem),
+        waist_goal_cm: convertInputToCm(parseFloat(measurementGoals.waist || 0), unitSystem),
+        hips_goal_cm: convertInputToCm(parseFloat(measurementGoals.hips || 0), unitSystem),
+        biceps_goal_cm: convertInputToCm(parseFloat(measurementGoals.biceps || 0), unitSystem),
+        forearms_goal_cm: convertInputToCm(parseFloat(measurementGoals.forearms || 0), unitSystem),
+        thighs_goal_cm: convertInputToCm(parseFloat(measurementGoals.thighs || 0), unitSystem),
+        calves_goal_cm: convertInputToCm(parseFloat(measurementGoals.calves || 0), unitSystem)
       }
 
       // Calculate all metrics
@@ -809,12 +825,12 @@ export default function Goals({ user: propUser }) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Left Bicep ({getMeasurementUnit(unitSystem)})
+                    Biceps ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.bicepLeft}
-                    onChange={(e) => handleMeasurementChange('bicepLeft', e.target.value)}
+                    value={measurements.biceps}
+                    onChange={(e) => handleMeasurementChange('biceps', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     placeholder="Largest point"
                     step="0.1"
@@ -822,38 +838,12 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Right Bicep ({getMeasurementUnit(unitSystem)})
+                    Forearms ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.bicepRight}
-                    onChange={(e) => handleMeasurementChange('bicepRight', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Largest point"
-                    step="0.1"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Left Forearm ({getMeasurementUnit(unitSystem)})
-                  </label>
-                  <input
-                    type="number"
-                    value={measurements.forearmLeft}
-                    onChange={(e) => handleMeasurementChange('forearmLeft', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Widest point"
-                    step="0.1"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Right Forearm ({getMeasurementUnit(unitSystem)})
-                  </label>
-                  <input
-                    type="number"
-                    value={measurements.forearmRight}
-                    onChange={(e) => handleMeasurementChange('forearmRight', e.target.value)}
+                    value={measurements.forearms}
+                    onChange={(e) => handleMeasurementChange('forearms', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     placeholder="Widest point"
                     step="0.1"
@@ -870,12 +860,12 @@ export default function Goals({ user: propUser }) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Left Thigh ({getMeasurementUnit(unitSystem)})
+                    Thighs ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.thighLeft}
-                    onChange={(e) => handleMeasurementChange('thighLeft', e.target.value)}
+                    value={measurements.thighs}
+                    onChange={(e) => handleMeasurementChange('thighs', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     placeholder="Widest point"
                     step="0.1"
@@ -883,66 +873,179 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Right Thigh ({getMeasurementUnit(unitSystem)})
+                    Calves ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.thighRight}
-                    onChange={(e) => handleMeasurementChange('thighRight', e.target.value)}
+                    value={measurements.calves}
+                    onChange={(e) => handleMeasurementChange('calves', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     placeholder="Widest point"
                     step="0.1"
                   />
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Target Measurements (Goals) */}
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 mb-8 border-2 border-amber-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <span>🎯</span> Target Measurements (Optional)
+          </h3>
+          <p className="text-sm text-gray-600 mb-6">
+            Set your goal measurements to track progress. Leave blank for measurements you don't want to track.
+          </p>
+
+          <div className="space-y-6">
+            {/* Torso Goals */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-200">
+                Torso Goals
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Left Calf ({getMeasurementUnit(unitSystem)})
+                    Neck Goal ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.calfLeft}
-                    onChange={(e) => handleMeasurementChange('calfLeft', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    placeholder="Widest point"
+                    value={measurementGoals.neck}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, neck: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Right Calf ({getMeasurementUnit(unitSystem)})
+                    Shoulders Goal ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.calfRight}
-                    onChange={(e) => handleMeasurementChange('calfRight', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    placeholder="Widest point"
+                    value={measurementGoals.shoulders}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, shoulders: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Left Ankle ({getMeasurementUnit(unitSystem)})
+                    Chest Goal ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.ankleLeft}
-                    onChange={(e) => handleMeasurementChange('ankleLeft', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    placeholder="Narrowest point"
+                    value={measurementGoals.chest}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, chest: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
+                    step="0.1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Core Goals */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">
+                Core Goals
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Waist Goal ({getMeasurementUnit(unitSystem)})
+                  </label>
+                  <input
+                    type="number"
+                    value={measurementGoals.waist}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, waist: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Right Ankle ({getMeasurementUnit(unitSystem)})
+                    Hips Goal ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
-                    value={measurements.ankleRight}
-                    onChange={(e) => handleMeasurementChange('ankleRight', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    placeholder="Narrowest point"
+                    value={measurementGoals.hips}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, hips: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
+                    step="0.1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Arms Goals */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-purple-200">
+                Arms Goals
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Biceps Goal ({getMeasurementUnit(unitSystem)})
+                  </label>
+                  <input
+                    type="number"
+                    value={measurementGoals.biceps}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, biceps: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
+                    step="0.1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Forearms Goal ({getMeasurementUnit(unitSystem)})
+                  </label>
+                  <input
+                    type="number"
+                    value={measurementGoals.forearms}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, forearms: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
+                    step="0.1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Legs Goals */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-orange-200">
+                Legs Goals
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Thighs Goal ({getMeasurementUnit(unitSystem)})
+                  </label>
+                  <input
+                    type="number"
+                    value={measurementGoals.thighs}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, thighs: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
+                    step="0.1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Calves Goal ({getMeasurementUnit(unitSystem)})
+                  </label>
+                  <input
+                    type="number"
+                    value={measurementGoals.calves}
+                    onChange={(e) => setMeasurementGoals({...measurementGoals, calves: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="Optional"
                     step="0.1"
                   />
                 </div>
