@@ -171,10 +171,10 @@ export default function ProgressPhotos({ userId }) {
         </div>
         
         {/* View Mode Toggle */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-3 sm:flex gap-2">
           <button
             onClick={() => setViewMode('grid')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
               viewMode === 'grid'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -184,7 +184,7 @@ export default function ProgressPhotos({ userId }) {
           </button>
           <button
             onClick={() => setViewMode('timeline')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
               viewMode === 'timeline'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -194,7 +194,7 @@ export default function ProgressPhotos({ userId }) {
           </button>
           <button
             onClick={() => setViewMode('compare')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
               viewMode === 'compare'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
