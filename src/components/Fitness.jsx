@@ -62,14 +62,15 @@ const Fitness = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-3 border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 py-2 sm:px-4 sm:py-3 border-b-2 transition-colors whitespace-nowrap flex-shrink-0 text-xs sm:text-base ${
                     activeTab === tab.id
                       ? 'border-blue-600 text-blue-600 bg-blue-50'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-sm sm:text-base font-medium">{tab.name}</span>
+                  <span className="hidden sm:inline font-medium">{tab.name}</span>
+                  <span className="sm:hidden font-medium">{tab.name.split(' ')[0]}</span>
                 </button>
               );
             })}
