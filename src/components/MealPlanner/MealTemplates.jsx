@@ -85,12 +85,12 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate }
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Meal Templates</h3>
         
         {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-2">
           {['all', 'favorites', 'breakfast', 'lunch', 'dinner', 'snack'].map((filterOption) => (
             <button
               key={filterOption}
               onClick={() => setFilter(filterOption)}
-              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+              className={`px-3 py-1 text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap ${
                 filter === filterOption
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

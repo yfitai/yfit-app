@@ -7,3 +7,6 @@ project(':capacitor-barcode-scanner').projectDir = new File('../node_modules/@ca
 
 include ':capacitor-camera'
 project(':capacitor-camera').projectDir = new File('../node_modules/@capacitor/camera/android')
+
+include ':capacitor-health'
+project(':capacitor-health').projectDir = new File('../node_modules/capacitor-health/android')

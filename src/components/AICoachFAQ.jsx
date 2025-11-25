@@ -13,7 +13,7 @@ export default function AICoachFAQ({ userId }) {
   }
 
   return (
-    <div className="container mx-auto p-4 h-screen flex flex-col">
+    <div className="container mx-auto p-4 min-h-screen flex flex-col">
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           AI Coach & FAQ
@@ -23,7 +23,7 @@ export default function AICoachFAQ({ userId }) {
         </p>
       </div>
 
-      <Card className="flex-1 overflow-hidden">
+      <Card className="flex-1 overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-2 p-1 bg-gray-100 dark:bg-gray-800">
             <TabsTrigger 

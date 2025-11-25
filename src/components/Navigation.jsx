@@ -35,6 +35,7 @@ export default function Navigation({ user }) {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className={({ isActive }) =>
                   `flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all whitespace-nowrap flex-shrink-0 min-w-[60px] ${
                     isActive

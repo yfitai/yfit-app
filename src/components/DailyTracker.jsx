@@ -4,9 +4,11 @@ import {
   Moon, Droplets, Footprints, Heart, Activity, 
   TrendingUp, Calendar, Plus, Check, X 
 } from 'lucide-react';
-import WearablesSync from './WearablesSync';;
+import WearablesSync from './WearablesSync';
+import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 
 export default function DailyTracker({ user }) {
+  const { units } = useUnitPreference();
   const [loading, setLoading] = useState(true);
   const [todayLog, setTodayLog] = useState(null);
   const [weeklyData, setWeeklyData] = useState([]);
@@ -607,16 +609,20 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ⚖️ Weight (kg)
+                  ⚖️ Weight ({units === 'imperial' ? 'lbs' : 'kg'})
                 </label>
                 <input
                   type="number"
                   min="0"
                   step="0.1"
-                  value={formData.weight_kg}
-                  onChange={(e) => setFormData({...formData, weight_kg: e.target.value})}
+                  value={formData.weight_kg ? (units === 'imperial' ? (parseFloat(formData.weight_kg) * 2.20462).toFixed(1) : formData.weight_kg) : ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const kgValue = units === 'imperial' ? (parseFloat(value) / 2.20462).toFixed(1) : value;
+                    setFormData({...formData, weight_kg: kgValue});
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="70.5"
+                  placeholder={units === 'imperial' ? '155.0' : '70.5'}
                 />
               </div>
               <div>
