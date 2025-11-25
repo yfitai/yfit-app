@@ -49,15 +49,6 @@ export default function Navigation({ user }) {
               </NavLink>
             ))}
           </div>
-
-          {/* Sign Out Button */}
-          <button
-            onClick={handleSignOut}
-            className="flex flex-col items-center justify-center px-2 py-1 rounded-lg text-red-600 hover:bg-red-50 transition-all flex-shrink-0 min-w-[60px]"
-          >
-            <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-xs mt-0.5">Sign Out</span>
-          </button>
         </div>
       </div>
     </nav>
