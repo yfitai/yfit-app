@@ -357,13 +357,30 @@ const ExerciseLibrary = () => {
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             >
               <div className="aspect-video bg-gray-100 relative">
-                {exercise.gif_url ? (
+                {exercise.gif_url && exercise.image_url_2 ? (
+                  <div className="grid grid-cols-2 gap-1 w-full h-full">
+                    <img
+                      src={exercise.gif_url}
+                      alt={`${exercise.name} - start`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <img
+                      src={exercise.image_url_2}
+                      alt={`${exercise.name} - end`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                ) : exercise.gif_url ? (
                   <img
                     src={exercise.gif_url}
                     alt={exercise.name}
                     className="w-full h-full object-cover"
                     loading="lazy"
-                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.querySelector('.fallback-icon').style.display = 'flex'; }}
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ) : null}
                 <div className={`fallback-icon absolute inset-0 flex items-center justify-center ${exercise.gif_url ? 'hidden' : 'flex'}`}>
@@ -436,13 +453,40 @@ const ExerciseLibrary = () => {
                 </button>
               </div>
 
-              <div className="aspect-video bg-gray-100 rounded-lg mb-4">
-                <img
-                  src={selectedExercise.gif_url}
-                  alt={selectedExercise.name}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
+              {selectedExercise.gif_url && selectedExercise.image_url_2 ? (
+                <div className="mb-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">Starting Position</p>
+                      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <img
+                          src={selectedExercise.gif_url}
+                          alt={`${selectedExercise.name} - start`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">Extended Position</p>
+                      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <img
+                          src={selectedExercise.image_url_2}
+                          alt={`${selectedExercise.name} - end`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="aspect-video bg-gray-100 rounded-lg mb-4">
+                  <img
+                    src={selectedExercise.gif_url}
+                    alt={selectedExercise.name}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>

@@ -341,14 +341,35 @@ const WorkoutSessionTracker = () => {
               </div>
             </div>
 
-            {/* Exercise GIF */}
-            {currentExercise.exercise.gif_url && (
+            {/* Exercise Images */}
+            {currentExercise.exercise.gif_url && currentExercise.exercise.image_url_2 ? (
+              <div className="max-w-2xl mx-auto mb-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">Start</p>
+                    <img
+                      src={currentExercise.exercise.gif_url}
+                      alt={`${currentExercise.exercise.name} - start`}
+                      className="w-full rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">Extended</p>
+                    <img
+                      src={currentExercise.exercise.image_url_2}
+                      alt={`${currentExercise.exercise.name} - end`}
+                      className="w-full rounded-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : currentExercise.exercise.gif_url ? (
               <img
                 src={currentExercise.exercise.gif_url}
                 alt={currentExercise.exercise.name}
                 className="w-full max-w-md mx-auto rounded-lg mb-6"
               />
-            )}
+            ) : null}
 
             {/* Target */}
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
