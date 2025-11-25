@@ -757,28 +757,29 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 
           {/* Add Food Buttons */}
           <div className="space-y-2">
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <button
                 onClick={onAddFood}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-2 sm:px-4 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium text-xs sm:text-sm"
               >
-                <Plus className="w-4 h-4" />
-                Search Food
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Search</span>
+                <span className="xs:hidden">🔍</span>
               </button>
               <button
                 onClick={onScanBarcode}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all font-medium"
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-2 sm:px-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all font-medium text-xs sm:text-sm"
               >
-                <Scan className="w-4 h-4" />
-                Scan
+                <Scan className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Scan</span>
               </button>
               <button
                 onClick={onUseTemplate}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium"
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-2 sm:px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium text-xs sm:text-sm"
                 title="Use Template"
               >
-                <Utensils className="w-4 h-4" />
-                Template
+                <Utensils className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Template</span>
               </button>
             </div>
             
