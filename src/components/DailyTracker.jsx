@@ -34,9 +34,12 @@ export default function DailyTracker({ user }) {
     notes: ''
   });
 
-  // Unit preferences - load from localStorage
+  // Unit preferences - load from localStorage or default based on global units
   const [waterUnit, setWaterUnit] = useState(() => {
-    return localStorage.getItem('yfit_water_unit') || 'ml';
+    const stored = localStorage.getItem('yfit_water_unit');
+    if (stored) return stored;
+    // Default based on global Imperial/Metric setting
+    return units === 'imperial' ? 'oz' : 'ml';
   }); // 'ml', 'oz', 'cups'
   const [glucoseUnit, setGlucoseUnit] = useState(() => {
     return localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
