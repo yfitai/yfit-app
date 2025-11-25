@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles } from 'lucide-react'
+import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain } from 'lucide-react'
 import { supabase, signOut, getUserProfile } from '../lib/supabase'
 // Logo is loaded from public/assets/yfit-logo.png
 
@@ -194,29 +194,69 @@ export default function Dashboard({ user }) {
             <CardDescription>Get started with your health journey</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <Button 
+                onClick={() => navigate('/goals')}
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm"
+              >
+                <Target className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Goals</span>
+              </Button>
+
               <Button 
                 onClick={() => navigate('/nutrition')}
-                className="h-auto py-6 flex flex-col items-center space-y-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm"
               >
-                <Apple className="h-6 w-6" />
-                <span>Log Meal</span>
+                <Apple className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Nutrition</span>
               </Button>
 
               <Button 
                 onClick={() => navigate('/fitness')}
-                className="h-auto py-6 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-xs sm:text-sm"
               >
-                <Dumbbell className="h-6 w-6" />
-                <span>Start Workout</span>
+                <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Fitness</span>
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/daily-tracker')}
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-xs sm:text-sm"
+              >
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Daily Tracker</span>
               </Button>
 
               <Button 
                 onClick={() => navigate('/medications')}
-                className="h-auto py-6 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-xs sm:text-sm"
               >
-                <Pill className="h-6 w-6" />
-                <span>Track Medication</span>
+                <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Medications</span>
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/progress')}
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-xs sm:text-sm"
+              >
+                <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Progress</span>
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/predictions')}
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-xs sm:text-sm"
+              >
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>Predictions</span>
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/ai-coach')}
+                className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-xs sm:text-sm"
+              >
+                <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>AI Coach</span>
               </Button>
             </div>
           </CardContent>
