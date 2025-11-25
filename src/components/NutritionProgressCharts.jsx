@@ -266,27 +266,27 @@ export default function NutritionProgressCharts({ user }) {
       {/* Summary Statistics */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h4 className="text-md font-semibold text-gray-800 mb-4">Average Daily Intake ({timeRange} days)</h4>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Fiber Average */}
-          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-            <Apple className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-600">{avgFiber}g</p>
+          <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
+            <Apple className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 mx-auto mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-green-600 break-words">{avgFiber}g</p>
             <p className="text-xs text-gray-600 mt-1">Avg Fiber</p>
             <p className="text-xs text-gray-500">Goal: {goals.fiber}g</p>
           </div>
 
           {/* Sugar Average */}
-          <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-            <Candy className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-yellow-600">{avgSugar}g</p>
+          <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <Candy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 mx-auto mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-yellow-600 break-words">{avgSugar}g</p>
             <p className="text-xs text-gray-600 mt-1">Avg Sugar</p>
             <p className="text-xs text-gray-500">Limit: {goals.sugar}g</p>
           </div>
 
           {/* Sodium Average */}
-          <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-            <Droplet className="w-6 h-6 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-red-600">{avgSodium}mg</p>
+          <div className="text-center p-3 sm:p-4 bg-red-50 rounded-lg border border-red-200">
+            <Droplet className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 mx-auto mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-red-600 break-words">{avgSodium}mg</p>
             <p className="text-xs text-gray-600 mt-1">Avg Sodium</p>
             <p className="text-xs text-gray-500">Limit: {goals.sodium}mg</p>
           </div>
