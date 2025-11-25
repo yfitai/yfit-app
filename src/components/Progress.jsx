@@ -11,6 +11,7 @@ export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
   const [timeRange, setTimeRange] = useState('30') // 7, 30, 90, 365 days
+  const [measurementCategory, setMeasurementCategory] = useState('upper') // upper, core, lower
   
   // Progress data
   const [weightData, setWeightData] = useState([])
@@ -500,22 +501,52 @@ export default function Progress({ user: propUser }) {
       )}
 
       {/* Body Measurements */}
-      {measurementsData.length > 0 && (
-        <ChartCard title="Body Measurements" icon={<Activity className="w-5 h-5" />}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={measurementsData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="start" fill="#94a3b8" name="Starting" />
-              <Bar dataKey="current" fill="#3b82f6" name="Current" />
-              <Bar dataKey="goal" fill="#10b981" name="Goal" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      )}
+      {measurementsData.length > 0 && (() => {
+        const categories = {
+          upper: { label: 'Upper Body', measurements: ['Neck', 'Shoulders', 'Chest', 'Biceps', 'Forearms'] },
+          core: { label: 'Core', measurements: ['Waist', 'Hips'] },
+          lower: { label: 'Lower Body', measurements: ['Thighs', 'Calves', 'Ankles'] }
+        }
+        
+        const filteredData = measurementsData.filter(m => 
+          categories[measurementCategory].measurements.includes(m.name)
+        )
+        
+        return (
+          <ChartCard title="Body Measurements" icon={<Activity className="w-5 h-5" />}>
+            {/* Category Tabs */}
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {Object.entries(categories).map(([key, { label }]) => (
+                <button
+                  key={key}
+                  onClick={() => setMeasurementCategory(key)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    measurementCategory === key
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            
+            {/* Chart */}
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={filteredData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="start" fill="#94a3b8" name="Starting" />
+                <Bar dataKey="current" fill="#3b82f6" name="Current" />
+                <Bar dataKey="goal" fill="#10b981" name="Goal" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        )
+      })()}
 
       {/* Health Metrics Grid */}
       {healthMetricsData.length > 0 && (
