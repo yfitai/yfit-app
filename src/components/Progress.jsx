@@ -314,11 +314,16 @@ export default function Progress({ user: propUser }) {
 
   const generateDemoMeasurementsData = () => {
     return [
+      { name: 'Neck', current: 15, start: 16, goal: 14.5 },
+      { name: 'Shoulders', current: 46, start: 48, goal: 45 },
       { name: 'Chest', current: 42, start: 44, goal: 40 },
       { name: 'Waist', current: 34, start: 38, goal: 32 },
       { name: 'Hips', current: 40, start: 42, goal: 38 },
+      { name: 'Biceps', current: 14, start: 15, goal: 13.5 },
+      { name: 'Forearms', current: 11, start: 11.5, goal: 10.5 },
       { name: 'Thighs', current: 24, start: 26, goal: 22 },
-      { name: 'Arms', current: 14, start: 15, goal: 13 }
+      { name: 'Calves', current: 15, start: 16, goal: 14.5 },
+      { name: 'Ankles', current: 9, start: 9.5, goal: 8.5 }
     ]
   }
 
