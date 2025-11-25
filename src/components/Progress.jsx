@@ -533,10 +533,17 @@ export default function Progress({ user: propUser }) {
             </div>
             
             {/* Chart */}
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={filteredData}>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={filteredData} margin={{ bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={0}
+                  textAnchor="middle"
+                  interval={0}
+                  height={60}
+                  tick={{ fontSize: 12 }}
+                />
                 <YAxis />
                 <Tooltip />
                 <Legend />
