@@ -51,55 +51,40 @@ const ExerciseLibrary = () => {
   // Target muscles (actual values from database)
   const bodyParts = [
     { name: 'All Muscles', value: 'all' },
-    { name: 'Abs', value: 'abs' },
+    { name: 'Abs', value: 'abdominals' },
+    { name: 'Abductors', value: 'abductors' },
     { name: 'Adductors', value: 'adductors' },
     { name: 'Biceps', value: 'biceps' },
     { name: 'Calves', value: 'calves' },
-    { name: 'Cardiovascular System', value: 'cardiovascular system' },
-    { name: 'Delts', value: 'delts' },
+    { name: 'Chest', value: 'chest' },
     { name: 'Forearms', value: 'forearms' },
     { name: 'Glutes', value: 'glutes' },
     { name: 'Hamstrings', value: 'hamstrings' },
     { name: 'Lats', value: 'lats' },
-    { name: 'Pectorals', value: 'pectorals' },
-    { name: 'Quads', value: 'quads' },
-    { name: 'Spine', value: 'spine' },
+    { name: 'Lower Back', value: 'lower back' },
+    { name: 'Middle Back', value: 'middle back' },
+    { name: 'Neck', value: 'neck' },
+    { name: 'Quads', value: 'quadriceps' },
+    { name: 'Shoulders', value: 'shoulders' },
     { name: 'Traps', value: 'traps' },
-    { name: 'Triceps', value: 'triceps' },
-    { name: 'Upper Back', value: 'upper back' }
+    { name: 'Triceps', value: 'triceps' }
   ];
 
-  // Equipment types from ExerciseDB
+  // Equipment types (actual values from database)
   const equipmentOptions = [
     { name: 'All Equipment', value: 'all' },
-    { name: 'Assisted', value: 'assisted' },
-    { name: 'Band', value: 'band' },
     { name: 'Barbell', value: 'barbell' },
-    { name: 'Body Weight', value: 'body weight' },
-    { name: 'Bosu Ball', value: 'bosu ball' },
+    { name: 'Body Weight', value: 'bodyweight' },
     { name: 'Cable', value: 'cable' },
     { name: 'Dumbbell', value: 'dumbbell' },
-    { name: 'Elliptical Machine', value: 'elliptical machine' },
-    { name: 'EZ Barbell', value: 'ez barbell' },
-    { name: 'Hammer', value: 'hammer' },
-    { name: 'Kettlebell', value: 'kettlebell' },
-    { name: 'Leverage Machine', value: 'leverage machine' },
-    { name: 'Medicine Ball', value: 'medicine ball' },
-    { name: 'Olympic Barbell', value: 'olympic barbell' },
-    { name: 'Resistance Band', value: 'resistance band' },
-    { name: 'Roller', value: 'roller' },
-    { name: 'Rope', value: 'rope' },
-    { name: 'Skierg Machine', value: 'skierg machine' },
-    { name: 'Sled Machine', value: 'sled machine' },
-    { name: 'Smith Machine', value: 'smith machine' },
-    { name: 'Stability Ball', value: 'stability ball' },
-    { name: 'Stationary Bike', value: 'stationary bike' },
-    { name: 'Stepmill Machine', value: 'stepmill machine' },
-    { name: 'Tire', value: 'tire' },
-    { name: 'Trap Bar', value: 'trap bar' },
-    { name: 'Upper Body Ergometer', value: 'upper body ergometer' },
-    { name: 'Weighted', value: 'weighted' },
-    { name: 'Wheel Roller', value: 'wheel roller' }
+    { name: 'Exercise Ball', value: 'exercise_ball' },
+    { name: 'EZ Bar', value: 'ez_bar' },
+    { name: 'Foam Roller', value: 'foam_roller' },
+    { name: 'Kettlebell', value: 'kettlebells' },
+    { name: 'Machine', value: 'machine' },
+    { name: 'Medicine Ball', value: 'medicine_ball' },
+    { name: 'Other', value: 'other' },
+    { name: 'Resistance Band', value: 'resistance_band' }
   ];
 
   const difficultyLevels = [
