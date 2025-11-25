@@ -549,6 +549,15 @@ const ExerciseLibrary = () => {
                   </span>
                 </div>
 
+                {selectedExercise.description && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Instructions</h4>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {selectedExercise.description}
+                    </p>
+                  </div>
+                )}
+
                 <button
                   onClick={() => handleViewFormAnalysis(selectedExercise)}
                   className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium"
