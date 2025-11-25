@@ -11,7 +11,7 @@ export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
   const [timeRange, setTimeRange] = useState('30') // 7, 30, 90, 365 days
-  const [measurementCategory, setMeasurementCategory] = useState('upper') // upper, core, lower
+  const [measurementCategory, setMeasurementCategory] = useState('torso') // torso, arms, core, lower
   
   // Progress data
   const [weightData, setWeightData] = useState([])
@@ -503,7 +503,8 @@ export default function Progress({ user: propUser }) {
       {/* Body Measurements */}
       {measurementsData.length > 0 && (() => {
         const categories = {
-          upper: { label: 'Upper Body', measurements: ['Neck', 'Shoulders', 'Chest', 'Biceps', 'Forearms'] },
+          torso: { label: 'Torso', measurements: ['Neck', 'Shoulders', 'Chest'] },
+          arms: { label: 'Arms', measurements: ['Biceps', 'Forearms'] },
           core: { label: 'Core', measurements: ['Waist', 'Hips'] },
           lower: { label: 'Lower Body', measurements: ['Thighs', 'Calves', 'Ankles'] }
         }
