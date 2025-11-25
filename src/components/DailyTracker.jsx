@@ -42,12 +42,29 @@ export default function DailyTracker({ user }) {
     return localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
   }); // 'mg/dl', 'mmol/l'
   const [isDoneForDay, setIsDoneForDay] = useState(false);
+  
+  // Weekly body measurements state
+  const [showMeasurements, setShowMeasurements] = useState(false);
+  const [lastMeasurementDate, setLastMeasurementDate] = useState(null);
+  const [measurements, setMeasurements] = useState({
+    neck_cm: '',
+    shoulders_cm: '',
+    chest_cm: '',
+    waist_cm: '',
+    hips_cm: '',
+    biceps_cm: '',
+    forearms_cm: '',
+    thighs_cm: '',
+    calves_cm: ''
+  });
+  const [savingMeasurements, setSavingMeasurements] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchTodayLog();
       fetchWeeklyData();
       fetchGoals();
+      fetchLastMeasurement();
     }
   }, [user]);
 
@@ -147,6 +164,86 @@ export default function DailyTracker({ user }) {
       setWeeklyData(data || []);
     } catch (error) {
       console.error('Error fetching weekly data:', error);
+    }
+  };
+
+  const fetchLastMeasurement = async () => {
+    try {
+      if (user.id.startsWith('demo')) {
+        const stored = localStorage.getItem('yfit_demo_last_measurement');
+        if (stored) {
+          const data = JSON.parse(stored);
+          setLastMeasurementDate(data.date);
+          setMeasurements(data.measurements);
+        }
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('progress_measurements')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('measurement_type', ['neck', 'shoulders', 'chest', 'waist', 'hips', 'biceps', 'forearms', 'thighs', 'calves'])
+        .order('measured_at', { ascending: false })
+        .limit(9);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setLastMeasurementDate(new Date(data[0].measured_at).toLocaleDateString());
+        const measurementData = {};
+        data.forEach(m => {
+          measurementData[`${m.measurement_type}_cm`] = m.measurement_value;
+        });
+        setMeasurements(measurementData);
+      }
+    } catch (error) {
+      console.error('Error fetching last measurement:', error);
+    }
+  };
+
+  const saveMeasurements = async () => {
+    setSavingMeasurements(true);
+    try {
+      const now = new Date().toISOString();
+      
+      if (user.id.startsWith('demo')) {
+        localStorage.setItem('yfit_demo_last_measurement', JSON.stringify({
+          date: new Date().toLocaleDateString(),
+          measurements
+        }));
+        setLastMeasurementDate(new Date().toLocaleDateString());
+        setShowMeasurements(false);
+        alert('✅ Measurements saved!');
+        setSavingMeasurements(false);
+        return;
+      }
+
+      // Save each measurement as a separate row
+      const measurementTypes = ['neck', 'shoulders', 'chest', 'waist', 'hips', 'biceps', 'forearms', 'thighs', 'calves'];
+      const promises = measurementTypes.map(type => {
+        const value = measurements[`${type}_cm`];
+        if (value) {
+          return supabase.from('progress_measurements').insert({
+            user_id: user.id,
+            measurement_type: type,
+            measurement_value: parseFloat(value),
+            unit: units === 'imperial' ? 'in' : 'cm',
+            measured_at: now
+          });
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(promises);
+      setLastMeasurementDate(new Date().toLocaleDateString());
+      setShowMeasurements(false);
+      alert('✅ Measurements saved!');
+    } catch (error) {
+      console.error('Error saving measurements:', error);
+      alert('❌ Error saving measurements');
+    } finally {
+      setSavingMeasurements(false);
     }
   };
 
@@ -691,6 +788,166 @@ export default function DailyTracker({ user }) {
               </div>
             )}
           </form>
+        </div>
+
+        {/* Weekly Body Measurements */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">📏 Weekly Body Measurements</h2>
+              {lastMeasurementDate && (
+                <p className="text-sm text-gray-600 mt-1">Last measured: {lastMeasurementDate}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowMeasurements(!showMeasurements)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            >
+              {showMeasurements ? 'Hide' : 'Update Measurements'}
+            </button>
+          </div>
+
+          {showMeasurements && (
+            <div className="mt-6 space-y-6">
+              {/* Torso */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Torso</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Neck ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.neck_cm}
+                      onChange={(e) => setMeasurements({...measurements, neck_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Shoulders ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.shoulders_cm}
+                      onChange={(e) => setMeasurements({...measurements, shoulders_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chest ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.chest_cm}
+                      onChange={(e) => setMeasurements({...measurements, chest_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Core */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Core</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Waist ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.waist_cm}
+                      onChange={(e) => setMeasurements({...measurements, waist_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Hips ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.hips_cm}
+                      onChange={(e) => setMeasurements({...measurements, hips_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Arms */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Arms</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Biceps ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.biceps_cm}
+                      onChange={(e) => setMeasurements({...measurements, biceps_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Forearms ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.forearms_cm}
+                      onChange={(e) => setMeasurements({...measurements, forearms_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Legs */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Legs</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thighs ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.thighs_cm}
+                      onChange={(e) => setMeasurements({...measurements, thighs_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Calves ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={measurements.calves_cm}
+                      onChange={(e) => setMeasurements({...measurements, calves_cm: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="0.0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <button
+                type="button"
+                onClick={saveMeasurements}
+                disabled={savingMeasurements}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
+              >
+                {savingMeasurements ? 'Saving...' : '💾 Save Measurements'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Weekly Summary */}
