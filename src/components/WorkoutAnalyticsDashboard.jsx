@@ -341,7 +341,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="week" stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} label={{ value: 'Volume (k lbs)', angle: -90, position: 'insideLeft' }} />
+            <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} label={{ value: 'Volume (1000 lbs)', angle: -90, position: 'insideLeft' }} />
             <Tooltip 
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               labelStyle={{ color: '#374151', fontWeight: 'bold' }}
@@ -352,7 +352,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
               stroke="#3b82f6" 
               strokeWidth={2}
               fill="url(#volumeGradient)" 
-              name="Volume (k lbs)"
+              name="Volume (1000 lbs)"
             />
           </AreaChart>
         </ResponsiveContainer>
