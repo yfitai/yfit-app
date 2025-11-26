@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
+import { Camera } from '@capacitor/camera'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
 
@@ -50,6 +51,18 @@ export default function BarcodeScanner({ onScanSuccess, onClose }) {
 
   const startNativeScan = async () => {
     try {
+      // Check and request camera permission first
+      const permission = await Camera.checkPermissions()
+      
+      if (permission.camera === 'denied') {
+        // Request permission
+        const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
+        
+        if (requestResult.camera !== 'granted') {
+          throw new Error('Camera permission denied')
+        }
+      }
+      
       // Start scanning with Capacitor Barcode Scanner
       const result = await CapacitorBarcodeScanner.scanBarcode({
         hint: 17, // Try all formats
