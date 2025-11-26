@@ -128,17 +128,29 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       newFat = Math.round(remaining * 0.25) // 25% of remaining
       newCarbs = 100 - newProtein - newFat // Fill the rest
     } else if (type === 'carbs') {
+      // When carbs change, keep protein fixed and adjust fat only
       newCarbs = newValue
-      // Adjust protein and fat proportionally
-      const remaining = 100 - newCarbs
-      newProtein = Math.round(remaining * 0.5)
-      newFat = 100 - newCarbs - newProtein
+      newFat = 100 - newProtein - newCarbs
+      // Ensure fat stays within valid range
+      if (newFat < 15) {
+        newFat = 15
+        newCarbs = 100 - newProtein - newFat
+      } else if (newFat > 50) {
+        newFat = 50
+        newCarbs = 100 - newProtein - newFat
+      }
     } else if (type === 'fat') {
+      // When fat changes, keep protein fixed and adjust carbs only
       newFat = newValue
-      // Adjust protein and carbs proportionally
-      const remaining = 100 - newFat
-      newProtein = Math.round(remaining * 0.4)
       newCarbs = 100 - newProtein - newFat
+      // Ensure carbs stays within valid range
+      if (newCarbs < 10) {
+        newCarbs = 10
+        newFat = 100 - newProtein - newCarbs
+      } else if (newCarbs > 70) {
+        newCarbs = 70
+        newFat = 100 - newProtein - newCarbs
+      }
     }
 
     setProteinPercent(newProtein)

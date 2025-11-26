@@ -12,6 +12,7 @@ const USDA_API_BASE = 'https://api.nal.usda.gov/fdc/v1'
 
 // Get USDA API key from environment variable
 const USDA_API_KEY = import.meta.env.VITE_USDA_API_KEY || 'DEMO_KEY'
+console.log('🔑 USDA API Key loaded:', USDA_API_KEY ? (USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom key (length: ' + USDA_API_KEY.length + ' )') : 'NOT SET')
 
 // User-Agent for Open Food Facts (required)
 const USER_AGENT = 'YFIT/1.0 (contact@yfit.app)'
@@ -112,10 +113,14 @@ async function searchUSDA(query, limit) {
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
       if (response.status === 401) {
-        console.warn('USDA API: Invalid or missing API key')
+        console.error('❌ USDA API: Invalid or missing API key')
+        console.error('Response:', errorText)
       } else if (response.status === 429) {
-        console.warn('USDA API: Rate limit exceeded')
+        console.error('❌ USDA API: Rate limit exceeded')
+      } else {
+        console.error(`❌ USDA API error ${response.status}:`, errorText)
       }
       throw new Error(`USDA API error: ${response.status}`)
     }
@@ -178,51 +183,37 @@ function transformUSDAFood(usdaFood) {
   
   if (usdaFood.foodNutrients) {
     usdaFood.foodNutrients.forEach(nutrient => {
-      const name = nutrient.nutrientName?.toLowerCase() || ''
+      const name = nutrient.nutrientName?.toLowerCase()
       const value = nutrient.value || 0
       
-    if (name.includes('energy') || name.includes('calorie')) {
-       console.log('✅ Found calories:', value, 'from nutrient:', nutrient.nutrientName)
-        nutrients.calories = Math.round(value)
-      } else if (name.includes('protein')) {
-        console.log('✅ Found protein:', value)
-        nutrients.protein = parseFloat(value.toFixed(1))
-      } else if (name.includes('carbohydrate')) {
-        console.log('✅ Found carbs:', value)
-        nutrients.carbs = parseFloat(value.toFixed(1))
-      } else if (name.includes('total lipid') || name.includes('fat, total')) {
-        console.log('✅ Found fat:', value)
-        nutrients.fat = parseFloat(value.toFixed(1))
-      } else if (name.includes('fiber')) {
-        nutrients.fiber = parseFloat(value.toFixed(1))
-      } else if (name.includes('sugars, total')) {
-        nutrients.sugar = parseFloat(value.toFixed(1))
-      } else if (name.includes('sodium')) {
-        nutrients.sodium = Math.round(value)
-      }
+      if (name?.includes('protein')) nutrients.protein = value
+      else if (name?.includes('carbohydrate')) nutrients.carbs = value
+      else if (name?.includes('total lipid') || name?.includes('fat, total')) nutrients.fat = value
+      else if (name?.includes('energy') && nutrient.unitName === 'KCAL') nutrients.calories = value
+      else if (name?.includes('fiber')) nutrients.fiber = value
+      else if (name?.includes('sugars, total')) nutrients.sugar = value
+      else if (name?.includes('sodium')) nutrients.sodium = value
     })
   }
-  
-  console.log('🥗 Final nutrients:', nutrients)
+
+  console.log('🥗 Extracted nutrients:', nutrients)
 
   return {
-    id: `usda_${usdaFood.fdcId}`,
-    fdcId: usdaFood.fdcId,
+    id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
     brand: 'USDA',
     source: 'usda',
-    servingSize: '100g',
-    servingGrams: 100,
-    calories: nutrients.calories || 0,
-    protein: nutrients.protein || 0,
-    carbs: nutrients.carbs || 0,
-    fat: nutrients.fat || 0,
-    fiber: nutrients.fiber || 0,
-    sugar: nutrients.sugar || 0,
-    sodium: nutrients.sodium || 0
+    calories: Math.round(nutrients.calories || 0),
+    protein: Math.round(nutrients.protein || 0),
+    carbs: Math.round(nutrients.carbs || 0),
+    fat: Math.round(nutrients.fat || 0),
+    fiber: Math.round(nutrients.fiber || 0),
+    sugar: Math.round(nutrients.sugar || 0),
+    sodium: Math.round(nutrients.sodium || 0),
+    servingSize: 100,
+    servingUnit: 'g'
   }
 }
-
 
 /**
  * Search Open Food Facts API
@@ -230,7 +221,7 @@ function transformUSDAFood(usdaFood) {
 async function searchOpenFoodFacts(query, limit) {
   try {
     const response = await fetch(
-      `https://world.openfoodfacts.net/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${limit * 4}&fields=code,product_name,product_name_en,brands,serving_size,nutriments,image_url,languages_codes`,
+      `${OPEN_FOOD_FACTS_API}/search?search_terms=${encodeURIComponent(query)}&page_size=${limit}&fields=product_name,brands,nutriments,serving_size,code`,
       {
         headers: {
           'User-Agent': USER_AGENT
@@ -243,63 +234,14 @@ async function searchOpenFoodFacts(query, limit) {
     }
 
     const data = await response.json()
-
-    const accentedChars = ['à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ', 'ß']
     
-    const nonEnglishWords = [
-      ' de ', ' du ', ' des ', ' le ', ' la ', ' les ', ' au ', ' aux ',
-      'fromage', 'lait', 'blanc', 'frais', 'yaourt',
-      ' el ', ' los ', ' las ', ' del ', ' con ',
-      ' der ', ' die ', ' das ', ' mit ', ' und '
-    ]
-    
-    const nonEnglishBrands = [
-      'sidi ali', 'jaouda', 'oulmès', 'vittel', 'evian', 'perrier'
-    ]
+    if (!data.products || data.products.length === 0) {
+      return []
+    }
 
-    return (data.products || [])
-      .filter(product => {
-        const name = product.product_name_en || product.product_name || ''
-        if (!name || name === 'Unknown Product' || name.length < 2) return false
-        
-        const nameLower = name.toLowerCase()
-        const brand = (product.brands || '').toLowerCase()
-        const queryLower = query.toLowerCase()
-        
-        if (!nameLower.includes(queryLower) && !brand.includes(queryLower)) {
-          return false
-        }
-        
-        if (nonEnglishBrands.some(b => brand.includes(b) || nameLower.includes(b))) return false
-        if (accentedChars.some(char => nameLower.includes(char) || brand.includes(char))) return false
-        
-        const languages = product.languages_codes || []
-        if (languages.length > 0 && !languages.includes('en')) return false
-        
-        const latinChars = name.match(/[a-zA-Z]/g) || []
-        const totalChars = name.replace(/\s/g, '').length
-        if (totalChars === 0) return false
-        if (latinChars.length / totalChars < 0.9) return false
-        
-        return true
-      })
-      .slice(0, limit)
-      .map(product => ({
-        id: product.code,
-        barcode: product.code,
-        name: product.product_name_en || product.product_name,
-        brand: product.brands || 'Unknown',
-        source: 'openfoodfacts',
-        servingSize: product.serving_size || '100g',
-        calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),
-       protein: parseFloat((Number(product.nutriments?.proteins_100g) || 0).toFixed(1)),
-      carbs: parseFloat((Number(product.nutriments?.carbohydrates_100g) || 0).toFixed(1)),
-      fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
-      fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
-      sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
-      sodium: Math.round(product.nutriments?.sodium_100g || 0),
-      imageUrl: product.image_url
-      }))
+    return data.products
+      .filter(product => product.product_name && product.nutriments)
+      .map(product => transformOpenFoodFactsProduct(product))
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
     return []
@@ -307,12 +249,60 @@ async function searchOpenFoodFacts(query, limit) {
 }
 
 /**
- * Lookup food by barcode
+ * Transform Open Food Facts product to our standard format
  */
-export async function lookupBarcode(barcode) {
+function transformOpenFoodFactsProduct(product) {
+  const nutriments = product.nutriments || {}
+  
+  return {
+    id: `off-${product.code}`,
+    name: product.product_name,
+    brand: product.brands || 'Unknown',
+    source: 'openfoodfacts',
+    calories: Math.round(nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0),
+    protein: Math.round(nutriments.proteins_100g || 0),
+    carbs: Math.round(nutriments.carbohydrates_100g || 0),
+    fat: Math.round(nutriments.fat_100g || 0),
+    fiber: Math.round(nutriments.fiber_100g || 0),
+    sugar: Math.round(nutriments.sugars_100g || 0),
+    sodium: Math.round(nutriments.sodium_100g * 1000 || 0), // Convert g to mg
+    servingSize: parseFloat(product.serving_size) || 100,
+    servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g'
+  }
+}
+
+/**
+ * Search custom foods created by user
+ */
+async function searchCustomFoods(query, limit) {
   try {
+    const { data, error } = await supabase
+      .from('custom_foods')
+      .select('*')
+      .ilike('name', `%${query}%`)
+      .limit(limit)
+
+    if (error) throw error
+
+    return (data || []).map(food => ({
+      ...food,
+      source: 'custom',
+      id: `custom-${food.id}`
+    }))
+  } catch (error) {
+    console.error('Error searching custom foods:', error)
+    return []
+  }
+}
+
+/**
+ * Get food by barcode
+ */
+export async function getFoodByBarcode(barcode) {
+  try {
+    // Try Open Food Facts first
     const response = await fetch(
-      `${OPEN_FOOD_FACTS_API}/product/${barcode}.json`,
+      `${OPEN_FOOD_FACTS_API}/product/${barcode}`,
       {
         headers: {
           'User-Agent': USER_AGENT
@@ -321,33 +311,16 @@ export async function lookupBarcode(barcode) {
     )
 
     if (!response.ok) {
-      throw new Error(`Barcode lookup error: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.status === 0 || !data.product) {
       return null
     }
 
-    const product = data.product
-
-    return {
-      id: product.code,
-      barcode: product.code,
-      name: product.product_name_en || product.product_name || 'Unknown Product',
-      brand: product.brands || 'Unknown',
-      source: 'openfoodfacts',
-      servingSize: product.serving_size || '100g',
-      calories: Math.round(product.nutriments?.['energy-kcal_100g'] || 0),
-      protein: parseFloat((Number(product.nutriments?.proteins_100g) || 0).toFixed(1)),
-     carbs: parseFloat((Number(product.nutriments?.carbohydrates_100g) || 0).toFixed(1)),
-     fat: parseFloat((Number(product.nutriments?.fat_100g) || 0).toFixed(1)),
-     fiber: parseFloat((Number(product.nutriments?.fiber_100g) || 0).toFixed(1)),
-     sugar: parseFloat((Number(product.nutriments?.sugars_100g) || 0).toFixed(1)),
-     sodium: Math.round(product.nutriments?.sodium_100g || 0),
-     imageUrl: product.image_url
+    const data = await response.json()
+    
+    if (data.status === 1 && data.product) {
+      return transformOpenFoodFactsProduct(data.product)
     }
+
+    return null
   } catch (error) {
     console.error('Error looking up barcode:', error)
     return null
@@ -355,105 +328,69 @@ export async function lookupBarcode(barcode) {
 }
 
 /**
- * Save food to user's recent foods
- */
-export async function saveRecentFood(userId, food) {
-  try {
-    const { error } = await supabase
-      .from('recent_foods')
-      .upsert({
-        user_id: userId,
-        food_id: food.id,
-        food_data: food,
-        last_used: new Date().toISOString()
-      })
-
-    if (error) throw error
-    return true
-  } catch (error) {
-    console.error('Error saving recent food:', error)
-    return false
-  }
-}
-
-/**
- * Get user's recent foods
+ * Get recent foods for a user
  */
 export async function getRecentFoods(userId, limit = 10) {
   try {
     const { data, error } = await supabase
-      .from('recent_foods')
-      .select('*')
+      .from('food_log')
+      .select('food_data')
       .eq('user_id', userId)
-      .order('last_used', { ascending: false })
-      .limit(limit)
+      .order('logged_at', { ascending: false })
+      .limit(limit * 2) // Get more to account for duplicates
 
     if (error) throw error
-    return data?.map(item => item.food_data) || []
+
+    // Extract unique foods
+    const seen = new Set()
+    const uniqueFoods = []
+
+    for (const entry of data || []) {
+      const food = entry.food_data
+      if (food && !seen.has(food.id)) {
+        seen.add(food.id)
+        uniqueFoods.push(food)
+        if (uniqueFoods.length >= limit) break
+      }
+    }
+
+    return uniqueFoods
   } catch (error) {
-    console.error('Error fetching recent foods:', error)
+    console.error('Error getting recent foods:', error)
     return []
   }
 }
 
 /**
- * Get user's favorite foods
+ * Get favorite foods for a user
  */
-export async function getFavoriteFoods(userId, limit = 10) {
+export async function getFavoriteFoods(userId) {
   try {
     const { data, error } = await supabase
       .from('favorite_foods')
-      .select('*')
+      .select('food_data')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(limit)
 
     if (error) throw error
-    return data?.map(item => item.food_data) || []
+
+    return (data || []).map(entry => entry.food_data)
   } catch (error) {
-    console.error('Error fetching favorite foods:', error)
+    console.error('Error getting favorite foods:', error)
     return []
-  }
-}
-
-/**
- * Get food by barcode (alias for lookupBarcode)
- */
-export async function getFoodByBarcode(barcode) {
-  return await lookupBarcode(barcode)
-}
-
-/**
- * Update recent food timestamp
- */
-export async function updateRecentFood(userId, foodId) {
-  try {
-    const { error } = await supabase
-      .from('recent_foods')
-      .update({ last_used: new Date().toISOString() })
-      .eq('user_id', userId)
-      .eq('food_id', foodId)
-
-    if (error) throw error
-    return true
-  } catch (error) {
-    console.error('Error updating recent food:', error)
-    return false
   }
 }
 
 /**
  * Add food to favorites
  */
-export async function addFavoriteFood(userId, food) {
+export async function addFavoriteFood(userId, foodData) {
   try {
     const { error } = await supabase
       .from('favorite_foods')
       .insert({
         user_id: userId,
-        food_id: food.id,
-        food_data: food,
-        created_at: new Date().toISOString()
+        food_data: foodData
       })
 
     if (error) throw error
@@ -473,7 +410,7 @@ export async function removeFavoriteFood(userId, foodId) {
       .from('favorite_foods')
       .delete()
       .eq('user_id', userId)
-      .eq('food_id', foodId)
+      .eq('food_data->id', foodId)
 
     if (error) throw error
     return true
@@ -483,94 +420,28 @@ export async function removeFavoriteFood(userId, foodId) {
   }
 }
 
-
 /**
- * Remove duplicate foods from results
+ * Deduplicate foods by name and brand
  */
 function deduplicateFoods(foods) {
-  const seen = new Set()
-  return foods.filter(food => {
-    // Include source in the key to prevent removing USDA foods that have same name as branded
-    const key = `${food.name.toLowerCase()}_${(food.brand || '').toLowerCase()}_${food.source || ''}`
-    if (seen.has(key)) {
-      return false
+  const seen = new Map()
+  const unique = []
+
+  for (const food of foods) {
+    const key = `${food.name.toLowerCase()}-${food.brand?.toLowerCase() || ''}`
+    if (!seen.has(key)) {
+      seen.set(key, true)
+      unique.push(food)
     }
-    seen.add(key)
-    return true
-  })
-}
-
-
-/**
- * Get detailed food information by ID
- */
-export async function getFoodDetails(foodId) {
-  try {
-    if (foodId.startsWith('usda_')) {
-      const fdcId = foodId.replace('usda_', '')
-      const response = await fetch(
-        `${USDA_API_BASE}/food/${fdcId}?api_key=${USDA_API_KEY}`
-      )
-      if (!response.ok) throw new Error(`USDA API error: ${response.status}`)
-      const data = await response.json()
-      return transformUSDAFood(data)
-    }
-    
-    return await lookupBarcode(foodId)
-  } catch (error) {
-    console.error('Error fetching food details:', error)
-    return null
   }
-}
 
-export default {
-  searchFoods,
-  lookupBarcode,
-  getFoodByBarcode,
-  saveRecentFood,
-  getRecentFoods,
-  getFavoriteFoods,
-  updateRecentFood,
-  addFavoriteFood,
-  removeFavoriteFood,
-  getFoodDetails
+  return unique
 }
 /**
- * Search custom/user-created foods
+ * Update recent food (for backward compatibility)
  */
-/**
- * Search custom/user-created foods
- */
-async function searchCustomFoods(query, limit) {
-  try {
-    const { data, error } = await supabase
-      .from('custom_foods')
-      .select('*')
-      .ilike('product_name', `%${query}%`)
-      .limit(limit)
-    
-    if (error) throw error
-    
-    return (data || []).map(food => ({
-      id: `custom_${food.id}`,
-      name: food.product_name,
-      brand: food.brand || 'Custom',
-      source: 'custom',
-      servingSize: food.serving_size || '100g',
-      calories: food.calories_per_100g || 0,
-      protein: food.protein_per_100g || 0,
-      carbs: food.carbs_per_100g || 0,
-      fat: food.fat_per_100g || 0,
-      fiber: food.fiber_per_100g || 0,
-      sugar: food.sugar_per_100g || 0,
-      sodium: food.sodium_per_100g || 0
-    }))
-  } catch (error) {
-    console.error('Error searching custom foods:', error)
-    return []
-  }
+export async function updateRecentFood(userId, foodData) {
+  // This function is kept for backward compatibility
+  // Recent foods are now tracked automatically via food_log
+  return true
 }
-
-
-
-

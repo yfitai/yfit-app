@@ -1144,6 +1144,8 @@ export default function Goals({ user: propUser }) {
             currentWeight={weight}
             currentBodyFat={calculatedMetrics?.bodyFatPercentage}
             goalType={goalType}
+            weightChangeRate={weightChangeRate}
+            initialData={enhancedGoals}
             onGoalsChange={handleGoalsChange}
           />
         </div>

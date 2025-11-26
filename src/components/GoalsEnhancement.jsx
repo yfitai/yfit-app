@@ -16,6 +16,8 @@ export default function GoalsEnhancement({
   currentWeight,
   currentBodyFat,
   goalType,
+  weightChangeRate,
+  initialData,
   onGoalsChange 
 }) {
   const { unitSystem, isMetric } = useUnitPreference()
@@ -28,7 +30,7 @@ export default function GoalsEnhancement({
   const [targetWeight, setTargetWeight] = useState('')
   const [targetBodyFat, setTargetBodyFat] = useState('')
   const [targetDate, setTargetDate] = useState('')
-  const [weeklyGoal, setWeeklyGoal] = useState('0.5') // kg per week
+  const [weeklyGoal, setWeeklyGoal] = useState('') // User selects from dropdown
   
   // Nutrition Goals (will be auto-calculated but can be overridden)
   const [fiberGoal, setFiberGoal] = useState('25')
@@ -37,60 +39,67 @@ export default function GoalsEnhancement({
   const [waterGoal, setWaterGoal] = useState('2000')
   const [stepsGoal, setStepsGoal] = useState('10000')
   const [sleepGoal, setSleepGoal] = useState('8')
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [manuallyEditedWeight, setManuallyEditedWeight] = useState(false)
+  const [manuallyEditedGoal, setManuallyEditedGoal] = useState(false)
   
-  // Auto-fill starting values from current measurements
+  // Load initial data from database (only once)
   useEffect(() => {
-    if (currentWeight && !startingWeight) {
+    if (initialData && !dataLoaded) {
+      if (initialData.starting_weight_kg) {
+        setStartingWeight(convertKgToDisplay(initialData.starting_weight_kg, unitSystem))
+      }
+      if (initialData.target_weight_kg && initialData.target_weight_kg > 20) {
+        // Only load if it's a reasonable weight (> 20kg / 44lbs)
+        // This filters out old invalid data from previous auto-calculation bug
+        setTargetWeight(convertKgToDisplay(initialData.target_weight_kg, unitSystem))
+      }
+      if (initialData.starting_body_fat_percentage) {
+        setStartingBodyFat(initialData.starting_body_fat_percentage.toString())
+      }
+      if (initialData.target_body_fat_percentage) {
+        setTargetBodyFat(initialData.target_body_fat_percentage.toString())
+      }
+      if (initialData.target_date) {
+        setTargetDate(initialData.target_date)
+      }
+      if (initialData.weekly_goal_kg) {
+        // Convert kg to display units (lbs or kg)
+        const weeklyInDisplay = isMetric ? initialData.weekly_goal_kg : initialData.weekly_goal_kg * 2.20462
+        setWeeklyGoal(weeklyInDisplay.toFixed(1))
+      }
+      if (initialData.fiber_goal_g) setFiberGoal(initialData.fiber_goal_g.toString())
+      if (initialData.sugar_goal_g) setSugarGoal(initialData.sugar_goal_g.toString())
+      if (initialData.sodium_goal_mg) setSodiumGoal(initialData.sodium_goal_mg.toString())
+      if (initialData.water_goal_ml) setWaterGoal(initialData.water_goal_ml.toString())
+      if (initialData.steps_goal) setStepsGoal(initialData.steps_goal.toString())
+      if (initialData.sleep_hours_goal) setSleepGoal(initialData.sleep_hours_goal.toString())
+      setDataLoaded(true)
+    }
+  }, [initialData])
+  
+  // Auto-sync starting weight with Basic Info weight (unless manually edited)
+  useEffect(() => {
+    if (currentWeight && !manuallyEditedWeight) {
       setStartingWeight(currentWeight)
     }
     if (currentBodyFat && !startingBodyFat) {
       setStartingBodyFat(currentBodyFat)
     }
-  }, [currentWeight, currentBodyFat])
+  }, [currentWeight, currentBodyFat, manuallyEditedWeight])
   
-  // Calculate suggested target based on goal type
+  // Auto-sync weekly goal with Basic Info weight change rate (unless manually edited)
   useEffect(() => {
-    if (currentWeight && goalType && !targetWeight) {
-      const weightNum = parseFloat(currentWeight)
-      let suggestedTarget
-      
-      switch (goalType) {
-        case 'lose_weight':
-          suggestedTarget = weightNum * 0.9 // 10% loss
-          break
-        case 'gain_weight':
-          suggestedTarget = weightNum * 1.1 // 10% gain
-          break
-        case 'build_strength':
-          suggestedTarget = weightNum * 1.05 // 5% gain
-          break
-        default:
-          suggestedTarget = weightNum
-      }
-      
-      setTargetWeight(suggestedTarget.toFixed(1))
+    if (weightChangeRate && !manuallyEditedGoal) {
+      setWeeklyGoal(weightChangeRate)
     }
-    
-    if (currentBodyFat && goalType && !targetBodyFat) {
-      const bfNum = parseFloat(currentBodyFat)
-      let suggestedBF
-      
-      switch (goalType) {
-        case 'lose_weight':
-          suggestedBF = Math.max(bfNum - 5, 10) // Reduce by 5%, min 10%
-          break
-        case 'build_strength':
-          suggestedBF = bfNum - 2 // Slight reduction
-          break
-        default:
-          suggestedBF = bfNum
-      }
-      
-      setTargetBodyFat(suggestedBF.toFixed(1))
-    }
-  }, [currentWeight, currentBodyFat, goalType])
+  }, [weightChangeRate, manuallyEditedGoal])
   
-  // Calculate estimated completion date
+  
+  // Target weight and body fat are manually entered by user
+  // No auto-calculation to allow full control
+  
+  // Calculate estimated completion date and days
   const calculateEstimatedDate = () => {
     if (!startingWeight || !targetWeight || !weeklyGoal) return null
     
@@ -98,17 +107,34 @@ export default function GoalsEnhancement({
     const target = parseFloat(targetWeight)
     const weekly = parseFloat(weeklyGoal)
     
+    console.log('Calculate Date - Start:', start, 'Target:', target, 'Weekly:', weekly)
+    
     if (weekly === 0) return null
     
     const totalChange = Math.abs(target - start)
     const weeksNeeded = totalChange / weekly
     const daysNeeded = Math.ceil(weeksNeeded * 7)
     
+    console.log('Total Change:', totalChange, 'Weeks:', weeksNeeded, 'Days:', daysNeeded)
+    
     const estimatedDate = new Date()
     estimatedDate.setDate(estimatedDate.getDate() + daysNeeded)
     
-    return estimatedDate.toISOString().split('T')[0]
+    return {
+      date: estimatedDate.toISOString().split('T')[0],
+      days: daysNeeded
+    }
   }
+  
+  // Auto-calculate and set target date when inputs change
+  useEffect(() => {
+    if (startingWeight && targetWeight && weeklyGoal) {
+      const calculation = calculateEstimatedDate()
+      if (calculation) {
+        setTargetDate(calculation.date)
+      }
+    }
+  }, [startingWeight, targetWeight, weeklyGoal])
   
   // Notify parent component of changes
   useEffect(() => {
@@ -118,7 +144,7 @@ export default function GoalsEnhancement({
       starting_body_fat_percentage: startingBodyFat ? parseFloat(startingBodyFat) : null,
       target_body_fat_percentage: targetBodyFat ? parseFloat(targetBodyFat) : null,
       target_date: targetDate || null,
-      weekly_goal_kg: weeklyGoal ? parseFloat(weeklyGoal) : 0.5,
+      weekly_goal_kg: weeklyGoal ? (isMetric ? parseFloat(weeklyGoal) : parseFloat(weeklyGoal) / 2.20462) : 0.5,
       fiber_goal_g: fiberGoal ? parseFloat(fiberGoal) : 25,
       sugar_goal_g: sugarGoal ? parseFloat(sugarGoal) : 50,
       sodium_goal_mg: sodiumGoal ? parseFloat(sodiumGoal) : 2300,
@@ -160,10 +186,18 @@ export default function GoalsEnhancement({
               type="number"
               step="0.1"
               value={startingWeight}
-              onChange={(e) => setStartingWeight(e.target.value)}
+              onChange={(e) => {
+                setStartingWeight(e.target.value)
+                setManuallyEditedWeight(true)
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder={`Enter weight in ${weightUnit}`}
             />
+            {!manuallyEditedWeight && (
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-synced from Basic Info
+              </p>
+            )}
           </div>
           
           <div>
@@ -227,14 +261,24 @@ export default function GoalsEnhancement({
             </label>
             <select
               value={weeklyGoal}
-              onChange={(e) => setWeeklyGoal(e.target.value)}
+              onChange={(e) => {
+                console.log('Weekly Goal selected:', e.target.value)
+                setWeeklyGoal(e.target.value)
+                setManuallyEditedGoal(true)
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="0.25">0.25 {weightUnit}/week (Slow)</option>
-              <option value="0.5">0.5 {weightUnit}/week (Moderate)</option>
-              <option value="0.75">0.75 {weightUnit}/week (Fast)</option>
-              <option value="1.0">1.0 {weightUnit}/week (Aggressive)</option>
+              <option value="">Select rate...</option>
+              <option value="0.5">0.5 {weightUnit}/week</option>
+              <option value="1">1 {weightUnit}/week</option>
+              <option value="1.5">1.5 {weightUnit}/week</option>
+              <option value="2">2 {weightUnit}/week</option>
             </select>
+            {!manuallyEditedGoal && (
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-synced from Basic Info
+              </p>
+            )}
           </div>
           
           <div>
@@ -256,14 +300,19 @@ export default function GoalsEnhancement({
           <div className="mt-4 p-3 bg-white rounded-md border border-green-200">
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="w-4 h-4 text-green-600" />
-              <span className="text-gray-700">
-                Estimated completion: <strong>{new Date(estimatedDate).toLocaleDateString()}</strong>
-                {targetDate && targetDate !== estimatedDate && (
-                  <span className="ml-2 text-orange-600">
-                    (Your target: {new Date(targetDate).toLocaleDateString()})
-                  </span>
-                )}
-              </span>
+              <div className="text-gray-700">
+                <div>
+                  <strong>Timeline:</strong> {estimatedDate.days} days ({Math.ceil(estimatedDate.days / 7)} weeks)
+                </div>
+                <div className="mt-1">
+                  <strong>Target Date:</strong> {new Date(estimatedDate.date).toLocaleDateString()}
+                  {targetDate && targetDate !== estimatedDate.date && (
+                    <span className="ml-2 text-orange-600">
+                      (Manual override: {new Date(targetDate).toLocaleDateString()})
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
