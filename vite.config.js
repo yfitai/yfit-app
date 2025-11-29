@@ -35,9 +35,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
+   build: {
+  outDir: 'dist',
+
     // Generate unique filenames for all assets with content hash
     rollupOptions: {
+
       output: {
         // Use content hash for cache busting
         entryFileNames: `assets/[name]-[hash].js`,
