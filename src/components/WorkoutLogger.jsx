@@ -222,13 +222,13 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       };
       
       console.log('Adding to sessionExercises:', exerciseWithData);
-      setSessionExercises(prev => [...prev, exerciseWithData]);
+      setSessionExercises(prev => {
+        const updated = [...prev, exerciseWithData];
+        // Jump to the newly added exercise
+        setCurrentExerciseIndex(updated.length - 1);
+        return updated;
+      });
       setShowExerciseSelector(false);
-      
-      // If this is the first exercise, start tracking it
-      if (sessionExercises.length === 0) {
-        setCurrentExerciseIndex(0);
-      }
     } catch (error) {
       console.error('Error adding exercise:', error);
       alert('Failed to add exercise');
