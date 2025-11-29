@@ -199,12 +199,12 @@ const WorkoutBuilder = () => {
     let matchesCategory = filterCategory === 'all';
     if (!matchesCategory && ex.target_muscles) {
       const categoryMuscleMap = {
-        'Push': ['pectorals', 'delts', 'triceps'],
-        'Pull': ['lats', 'upper back', 'traps', 'biceps', 'forearms'],
-        'Legs': ['quads', 'hamstrings', 'glutes', 'calves', 'adductors'],
-        'Core': ['abs', 'obliques', 'serratus anterior'],
-        'Cardio': ['cardiovascular', 'cardio', 'aerobic'],
-        'Stretching': ['flexibility', 'mobility', 'stretch'],
+        'Push': ['chest', 'shoulders', 'triceps'],
+        'Pull': ['lats', 'middle back', 'lower back', 'traps', 'biceps', 'forearms'],
+        'Legs': ['quadriceps', 'hamstrings', 'glutes', 'calves', 'adductors', 'abductors'],
+        'Core': ['abdominals', 'obliques', 'lower back'],
+        'Cardio': [], // Will be handled by exercise name matching
+        'Stretching': [], // Will be handled by exercise name matching
         'Full Body': [] // Will match all if we add special logic
       };
       
@@ -213,6 +213,14 @@ const WorkoutBuilder = () => {
       
       if (filterCategory === 'Full Body') {
         matchesCategory = true; // Full Body shows everything
+      } else if (filterCategory === 'Cardio') {
+        // Match cardio exercises by name keywords
+        const cardioKeywords = ['run', 'walk', 'jog', 'bike', 'cycle', 'row', 'swim', 'elliptical', 'treadmill', 'stair'];
+        matchesCategory = cardioKeywords.some(keyword => ex.name.toLowerCase().includes(keyword));
+      } else if (filterCategory === 'Stretching') {
+        // Match stretching exercises by name keywords
+        const stretchKeywords = ['stretch', 'flexibility', 'mobility', 'yoga'];
+        matchesCategory = stretchKeywords.some(keyword => ex.name.toLowerCase().includes(keyword));
       } else {
         matchesCategory = muscleArray.some(muscle => 
           targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
@@ -507,11 +515,15 @@ const WorkoutBuilder = () => {
                   <option value="all">All Equipment</option>
                   <option value="barbell">Barbell</option>
                   <option value="dumbbell">Dumbbell</option>
-                  <option value="body weight">Body Weight</option>
+                  <option value="bodyweight">Body Weight</option>
                   <option value="cable">Cable</option>
                   <option value="machine">Machine</option>
-                  <option value="kettlebell">Kettlebell</option>
-                  <option value="band">Band</option>
+                  <option value="kettlebells">Kettlebell</option>
+                  <option value="resistance_band">Resistance Band</option>
+                  <option value="ez_bar">EZ Bar</option>
+                  <option value="exercise_ball">Exercise Ball</option>
+                  <option value="medicine_ball">Medicine Ball</option>
+                  <option value="foam_roller">Foam Roller</option>
                 </select>
 
                 {/* Target Muscle Filter */}
