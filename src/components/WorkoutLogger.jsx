@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import { 
   Play, Pause, Square, Plus, Minus, Check, X, Clock, 
-  Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save
+  Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save, Search, Heart
 } from 'lucide-react';
 
 const WorkoutLogger = ({ onNavigateToBuilder }) => {
@@ -13,6 +13,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [currentSet, setCurrentSet] = useState(1);
   const [setData, setSetData] = useState({ weight: '', reps: '', rpe: 5 });
+  const [cardioData, setCardioData] = useState({ duration: '', distance: '', pace: '' });
   const [restTimer, setRestTimer] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [sessionStats, setSessionStats] = useState({
@@ -23,6 +24,13 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   });
   const [showWorkoutSelector, setShowWorkoutSelector] = useState(true);
   const [loading, setLoading] = useState(true);
+  
+  // New states for exercise selection
+  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  const [availableExercises, setAvailableExercises] = useState([]);
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sessionExercises, setSessionExercises] = useState([]);
 
   useEffect(() => {
     initializeUser();
@@ -31,6 +39,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   useEffect(() => {
     if (user) {
       fetchWorkouts();
+      fetchAvailableExercises();
     }
   }, [user]);
 
@@ -55,6 +64,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   // Reset set counter when exercise changes
   useEffect(() => {
     setCurrentSet(1);
+    setSetData({ weight: '', reps: '', rpe: 5 });
+    setCardioData({ duration: '', distance: '', pace: '' });
   }, [currentExerciseIndex]);
 
   // Session duration tracker
@@ -68,6 +79,22 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     }
     return () => clearInterval(interval);
   }, [activeSession]);
+
+  // Calculate pace when duration or distance changes
+  useEffect(() => {
+    if (cardioData.duration && cardioData.distance) {
+      const durationMinutes = parseFloat(cardioData.duration);
+      const distance = parseFloat(cardioData.distance);
+      if (durationMinutes > 0 && distance > 0) {
+        const pace = (durationMinutes / distance).toFixed(2);
+        const paceStr = pace + ' min/km';
+        // Only update if pace changed to avoid infinite loop
+        if (cardioData.pace !== paceStr) {
+          setCardioData(prev => ({ ...prev, pace: paceStr }));
+        }
+      }
+    }
+  }, [cardioData.duration, cardioData.distance, cardioData.pace]);
 
   const initializeUser = async () => {
     const currentUser = await getCurrentUser();
@@ -95,10 +122,23 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         throw error;
       }
       console.log('✅ Fetched workouts:', data?.length || 0, 'workouts');
-      console.log('Workout data:', data);
       setWorkouts(data || []);
     } catch (error) {
       console.error('Error fetching workouts:', error);
+    }
+  };
+
+  const fetchAvailableExercises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exercises')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setAvailableExercises(data || []);
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
     }
   };
 
@@ -125,10 +165,18 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           exercise_id: we.exercise_id,
           exercise_order: we.exercise_order,
           target_sets: we.target_sets,
-          completed_sets: 0
+          completed_sets: 0,
+          exercise: we.exercises
         }));
 
-        await supabase.from('session_exercises').insert(sessionExercises);
+        const { data: insertedExercises } = await supabase
+          .from('session_exercises')
+          .insert(sessionExercises)
+          .select('*, exercises(*)');
+        
+        setSessionExercises(insertedExercises || sessionExercises);
+      } else {
+        setSessionExercises([]);
       }
 
       setActiveSession(session);
@@ -141,38 +189,118 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     }
   };
 
+  const addExerciseToSession = async (exercise) => {
+    try {
+      const newExercise = {
+        session_id: activeSession.id,
+        exercise_id: exercise.id,
+        exercise_order: sessionExercises.length,
+        target_sets: isCardioExercise(exercise) ? 1 : 3,
+        completed_sets: 0
+      };
+
+      console.log('Adding exercise to session:', exercise.id, exercise.name);
+      
+      const { data, error } = await supabase
+        .from('session_exercises')
+        .insert(newExercise)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
+
+      console.log('Inserted session exercise:', data);
+
+      // Add the exercise object manually since we already have it
+      const exerciseWithData = { 
+        ...data, 
+        exercise: exercise,
+        exercise_id: exercise.id // Ensure exercise_id is set correctly
+      };
+      
+      console.log('Adding to sessionExercises:', exerciseWithData);
+      setSessionExercises(prev => [...prev, exerciseWithData]);
+      setShowExerciseSelector(false);
+      
+      // If this is the first exercise, start tracking it
+      if (sessionExercises.length === 0) {
+        setCurrentExerciseIndex(0);
+      }
+    } catch (error) {
+      console.error('Error adding exercise:', error);
+      alert('Failed to add exercise');
+    }
+  };
+
+  const isCardioExercise = (exercise) => {
+    return exercise.category?.toLowerCase() === 'cardio' || 
+           exercise.name?.toLowerCase().includes('running') ||
+           exercise.name?.toLowerCase().includes('walking') ||
+           exercise.name?.toLowerCase().includes('biking') ||
+           exercise.name?.toLowerCase().includes('cycling') ||
+           exercise.name?.toLowerCase().includes('rowing') ||
+           exercise.name?.toLowerCase().includes('swimming');
+  };
+
   const logSet = async () => {
-    if (!setData.weight || !setData.reps) {
-      alert('Please enter weight and reps');
+    const currentExercise = sessionExercises[currentExerciseIndex];
+    
+    if (!currentExercise) {
+      alert('No exercise selected');
       return;
     }
 
+    // Validate inputs based on exercise type
+    if (isCardioExercise(currentExercise.exercise)) {
+      if (!cardioData.duration || !cardioData.distance) {
+        alert('Please enter duration and distance');
+        return;
+      }
+      await logCardioSet(currentExercise);
+    } else {
+      if (!setData.weight || !setData.reps) {
+        alert('Please enter weight and reps');
+        return;
+      }
+      await logStrengthSet(currentExercise);
+    }
+  };
+
+  const logStrengthSet = async (currentExercise) => {
     try {
-      const currentExercise = selectedWorkout.workout_exercises[currentExerciseIndex];
+      // Get session exercise - use the ID from currentExercise if available
+      const exerciseId = currentExercise.exercise?.id || currentExercise.exercise_id;
       
-      // Get session exercise
-      const { data: sessionExercises } = await supabase
+      const { data: sessionExercise, error: fetchError } = await supabase
         .from('session_exercises')
         .select('*')
         .eq('session_id', activeSession.id)
-        .eq('exercise_id', currentExercise.exercise_id)
+        .eq('exercise_id', exerciseId)
         .single();
+      
+      if (fetchError || !sessionExercise) {
+        console.error('Failed to find session exercise:', fetchError);
+        throw new Error('Could not find exercise in session');
+      }
 
       // Insert set
       await supabase.from('exercise_sets').insert({
-        session_exercise_id: sessionExercises.id,
+        session_exercise_id: sessionExercise.id,
         set_number: currentSet,
         weight: parseFloat(setData.weight),
         reps: parseInt(setData.reps),
         rpe: setData.rpe,
-        rest_seconds: currentExercise.rest_seconds || 60
+        rest_seconds: 60
       });
 
       // Update session exercise completed sets
       await supabase
         .from('session_exercises')
         .update({ completed_sets: currentSet })
-        .eq('id', sessionExercises.id);
+        .eq('id', sessionExercise.id);
 
       // Update stats
       const volume = parseFloat(setData.weight) * parseInt(setData.reps);
@@ -184,18 +312,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       }));
 
       // Start rest timer
-      setRestTimer(currentExercise.rest_seconds || 60);
+      setRestTimer(60);
       setIsResting(true);
 
       // Move to next set or exercise
-      if (currentSet >= currentExercise.target_sets) {
+      if (currentSet >= (currentExercise.target_sets || 3)) {
         // Move to next exercise
-        if (currentExerciseIndex < selectedWorkout.workout_exercises.length - 1) {
+        if (currentExerciseIndex < sessionExercises.length - 1) {
           setCurrentExerciseIndex(prev => prev + 1);
           setCurrentSet(1);
-        } else {
-          // Workout complete
-          completeWorkout();
         }
       } else {
         setCurrentSet(prev => prev + 1);
@@ -205,6 +330,48 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       setSetData({ weight: '', reps: '', rpe: 5 });
     } catch (error) {
       console.error('Error logging set:', error);
+      alert('Failed to log set');
+    }
+  };
+
+  const logCardioSet = async (currentExercise) => {
+    try {
+      // Get session exercise
+      const { data: sessionExercise } = await supabase
+        .from('session_exercises')
+        .select('*')
+        .eq('session_id', activeSession.id)
+        .eq('exercise_id', currentExercise.exercise_id)
+        .single();
+
+      // Insert cardio set
+      await supabase.from('exercise_sets').insert({
+        session_exercise_id: sessionExercise.id,
+        set_number: 1,
+        duration_minutes: parseFloat(cardioData.duration),
+        distance_km: parseFloat(cardioData.distance),
+        pace: cardioData.pace,
+        rpe: setData.rpe
+      });
+
+      // Update session exercise completed sets
+      await supabase
+        .from('session_exercises')
+        .update({ completed_sets: 1 })
+        .eq('id', sessionExercise.id);
+
+      // Move to next exercise
+      if (currentExerciseIndex < sessionExercises.length - 1) {
+        setCurrentExerciseIndex(prev => prev + 1);
+        setCurrentSet(1);
+      }
+
+      // Reset cardio data
+      setCardioData({ duration: '', distance: '', pace: '' });
+      setSetData({ weight: '', reps: '', rpe: 5 });
+    } catch (error) {
+      console.error('Error logging cardio:', error);
+      alert('Failed to log cardio exercise');
     }
   };
 
@@ -220,7 +387,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         .update({
           end_time: new Date().toISOString(),
           duration_seconds: sessionStats.duration,
-          total_exercises: selectedWorkout?.workout_exercises?.length || 0,
+          total_exercises: sessionExercises.length,
           total_sets: sessionStats.totalSets,
           total_reps: sessionStats.totalReps,
           total_volume: sessionStats.totalVolume,
@@ -254,9 +421,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   const resetSession = () => {
     setActiveSession(null);
     setSelectedWorkout(null);
+    setSessionExercises([]);
     setCurrentExerciseIndex(0);
     setCurrentSet(1);
     setSetData({ weight: '', reps: '', rpe: 5 });
+    setCardioData({ duration: '', distance: '', pace: '' });
     setRestTimer(0);
     setIsResting(false);
     setSessionStats({ totalSets: 0, totalReps: 0, totalVolume: 0, duration: 0 });
@@ -286,6 +455,22 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const filteredExercises = availableExercises.filter(exercise => {
+    const matchesSearch = exercise.name.toLowerCase().includes(exerciseSearchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || exercise.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = [
+    { name: 'All', value: 'all' },
+    { name: 'Push', value: 'Push' },
+    { name: 'Pull', value: 'Pull' },
+    { name: 'Legs', value: 'Legs' },
+    { name: 'Core', value: 'Core' },
+    { name: 'Cardio', value: 'Cardio' },
+    { name: 'Stretching', value: 'Stretching' }
+  ];
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -306,6 +491,91 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       </div>
     );
   }
+
+  // Exercise Selector Modal
+  const ExerciseSelectorModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Add Exercise</h2>
+            <button
+              onClick={() => setShowExerciseSelector(false)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              value={exerciseSearchQuery}
+              onChange={(e) => setExerciseSearchQuery(e.target.value)}
+              placeholder="Search exercises..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {categories.map(cat => (
+              <button
+                key={cat.value}
+                onClick={() => setSelectedCategory(cat.value)}
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === cat.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Exercise List */}
+        <div className="overflow-y-auto max-h-96 p-4">
+          {filteredExercises.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No exercises found
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filteredExercises.map(exercise => (
+                <button
+                  key={exercise.id}
+                  onClick={() => addExerciseToSession(exercise)}
+                  className="w-full text-left p-4 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200 hover:border-blue-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{exercise.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                          {exercise.category}
+                        </span>
+                        {isCardioExercise(exercise) && (
+                          <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded flex items-center gap-1">
+                            <Heart className="w-3 h-3" />
+                            Cardio
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Plus className="w-5 h-5 text-blue-600" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   // Workout Selector View
   if (showWorkoutSelector) {
@@ -372,12 +642,14 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   }
 
   // Active Workout View
-  const currentExercise = selectedWorkout?.workout_exercises?.[currentExerciseIndex];
+  const currentExercise = sessionExercises[currentExerciseIndex];
 
   // If empty workout (no exercises), show add exercise UI
   if (!currentExercise && activeSession) {
     return (
       <div className="min-h-screen" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
+        {showExerciseSelector && <ExerciseSelectorModal />}
+        
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="max-w-4xl mx-auto p-4">
             <div className="flex items-center justify-between mb-4">
@@ -419,8 +691,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Empty Workout</h2>
-            <p className="text-gray-600 mb-6">Add exercises as you go or complete this freestyle session</p>
+            <p className="text-gray-600 mb-6">Add exercises to start tracking your workout</p>
             <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setShowExerciseSelector(true)}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Add Exercise
+              </button>
               <button
                 onClick={completeWorkout}
                 className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
@@ -435,8 +714,13 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     );
   }
 
+  // Active exercise tracking
+  const isCardio = currentExercise && isCardioExercise(currentExercise.exercise);
+
   return (
     <div className="min-h-screen" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
+      {showExerciseSelector && <ExerciseSelectorModal />}
+      
       {/* Header with Stats */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
@@ -445,9 +729,9 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               <h1 className="text-xl font-bold text-gray-900">{selectedWorkout?.name || 'Quick Workout'}</h1>
               <p className="text-sm text-gray-600">
                 {currentExercise ? (
-                  <>{currentExercise.exercises.name} ({currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0})</>
+                  <>{currentExercise.exercise.name} ({currentExerciseIndex + 1} of {sessionExercises.length})</>
                 ) : (
-                  <>Exercise {currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0}</>
+                  <>Exercise {currentExerciseIndex + 1} of {sessionExercises.length}</>
                 )}
               </p>
             </div>
@@ -502,162 +786,214 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-2xl font-bold text-gray-900">
-                {currentExercise.exercises.name}
+                {currentExercise.exercise.name}
               </h2>
-              <div className="text-sm font-semibold text-gray-600">
-                {currentExercise.exercises.name} ({currentExerciseIndex + 1} of {selectedWorkout.workout_exercises.length})
-                {currentExerciseIndex === selectedWorkout.workout_exercises.length - 1 && (
-                  <span className="ml-2 text-blue-600">🎯 Final Exercise!</span>
-                )}
-              </div>
+              {isCardio && (
+                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center gap-1">
+                  <Heart className="w-4 h-4" />
+                  Cardio
+                </span>
+              )}
             </div>
-            <p className="text-gray-600 mb-4">{currentExercise.exercises.description}</p>
+            <p className="text-gray-600 mb-4">{currentExercise.exercise.description}</p>
 
-            {/* Target Sets/Reps */}
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Target Sets</div>
-                  <div className="text-2xl font-bold text-gray-900">{currentExercise.target_sets}</div>
+            {/* Cardio Tracking */}
+            {isCardio ? (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Cardio Session</h3>
+
+                {/* Duration Input */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={cardioData.duration}
+                    onChange={(e) => setCardioData(prev => ({ ...prev, duration: e.target.value }))}
+                    className="w-full text-center text-2xl font-bold p-3 border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-green-50"
+                    placeholder="30"
+                  />
                 </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Target Reps</div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {currentExercise.target_reps_min}-{currentExercise.target_reps_max}
+
+                {/* Distance Input */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Distance (km)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={cardioData.distance}
+                    onChange={(e) => setCardioData(prev => ({ ...prev, distance: e.target.value }))}
+                    className="w-full text-center text-2xl font-bold p-3 border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-green-50"
+                    placeholder="5.0"
+                  />
+                </div>
+
+                {/* Pace Display */}
+                {cardioData.pace && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="text-sm text-gray-600 mb-1">Average Pace</div>
+                    <div className="text-2xl font-bold text-blue-600">{cardioData.pace}</div>
+                  </div>
+                )}
+
+                {/* RPE Slider */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    RPE (Rate of Perceived Exertion): {setData.rpe}/10
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">How hard did this feel?</p>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={setData.rpe}
+                    onChange={(e) => setSetData(prev => ({ ...prev, rpe: parseInt(e.target.value) }))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-xs text-gray-600 mt-1">
+                    <span>Easy</span>
+                    <span>Moderate</span>
+                    <span>Max Effort</span>
                   </div>
                 </div>
+
+                {/* Log Cardio Button */}
+                <button
+                  onClick={logSet}
+                  disabled={!cardioData.duration || !cardioData.distance}
+                  className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Check className="w-6 h-6" />
+                  Complete Cardio Session
+                </button>
               </div>
-            </div>
-
-            {/* Current Set */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Set {currentSet} of {currentExercise.target_sets}
-              </h3>
-
-              {/* Weight Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Weight (lbs)</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, weight: Math.max(0, (parseFloat(prev.weight) || 0) - 5).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="number"
-                    value={setData.weight}
-                    onChange={(e) => setSetData(prev => ({ ...prev, weight: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
-                    placeholder="0"
-                  />
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, weight: ((parseFloat(prev.weight) || 0) + 5).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Reps Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Reps</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, reps: Math.max(0, (parseInt(prev.reps) || 0) - 1).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="number"
-                    value={setData.reps}
-                    onChange={(e) => setSetData(prev => ({ ...prev, reps: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
-                    placeholder="0"
-                  />
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, reps: ((parseInt(prev.reps) || 0) + 1).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* RPE Slider */}
+            ) : (
+              /* Strength Training */
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  RPE (Rate of Perceived Exertion): {setData.rpe}/10
-                </label>
-                <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={setData.rpe}
-                  onChange={(e) => setSetData(prev => ({ ...prev, rpe: parseInt(e.target.value) }))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>Easy</span>
-                  <span>Moderate</span>
-                  <span>Max Effort</span>
-                </div>
-              </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Set {currentSet} of {currentExercise.target_sets || 3}
+                </h3>
 
-              {/* Log Set Button */}
-              <button
-                onClick={logSet}
-                disabled={!setData.weight || !setData.reps}
-                className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Check className="w-6 h-6" />
-                Complete Set
-              </button>
-            </div>
+                {/* Weight Input */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Weight (lbs)</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSetData(prev => ({ ...prev, weight: Math.max(0, (parseFloat(prev.weight) || 0) - 5).toString() }))}
+                      className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={setData.weight}
+                      onChange={(e) => setSetData(prev => ({ ...prev, weight: e.target.value }))}
+                      className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                      placeholder="0"
+                    />
+                    <button
+                      onClick={() => setSetData(prev => ({ ...prev, weight: ((parseFloat(prev.weight) || 0) + 5).toString() }))}
+                      className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reps Input */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Reps</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSetData(prev => ({ ...prev, reps: Math.max(0, (parseInt(prev.reps) || 0) - 1).toString() }))}
+                      className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={setData.reps}
+                      onChange={(e) => setSetData(prev => ({ ...prev, reps: e.target.value }))}
+                      className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                      placeholder="0"
+                    />
+                    <button
+                      onClick={() => setSetData(prev => ({ ...prev, reps: ((parseInt(prev.reps) || 0) + 1).toString() }))}
+                      className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* RPE Slider */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    RPE (Rate of Perceived Exertion): {setData.rpe}/10
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={setData.rpe}
+                    onChange={(e) => setSetData(prev => ({ ...prev, rpe: parseInt(e.target.value) }))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-xs text-gray-600 mt-1">
+                    <span>Easy</span>
+                    <span>Moderate</span>
+                    <span>Max Effort</span>
+                  </div>
+                </div>
+
+                {/* Log Set Button */}
+                <button
+                  onClick={logSet}
+                  disabled={!setData.weight || !setData.reps}
+                  className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Check className="w-6 h-6" />
+                  Complete Set
+                </button>
+              </div>
+            )}
           </div>
         )}
 
+        {/* Add More Exercises Button */}
+        <button
+          onClick={() => setShowExerciseSelector(true)}
+          className="w-full mb-4 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+        >
+          <Plus className="w-5 h-5" />
+          Add Another Exercise
+        </button>
+
         {/* Exercise Navigation */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              console.log('Previous clicked, current index:', currentExerciseIndex);
-              setCurrentExerciseIndex(prev => {
-                const next = Math.max(0, prev - 1);
-                console.log('Moving to index:', next);
-                return next;
-              });
-            }}
-            disabled={currentExerciseIndex === 0}
-            className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Previous Exercise
-          </button>
-          <button
-            onClick={() => {
-              console.log('Next clicked, current index:', currentExerciseIndex);
-              console.log('Total exercises:', selectedWorkout.workout_exercises.length);
-              setCurrentExerciseIndex(prev => {
-                const next = prev + 1;
-                console.log('Moving to index:', next);
-                return next;
-              });
-            }}
-            disabled={currentExerciseIndex >= selectedWorkout.workout_exercises.length - 1}
-            className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next Exercise
-          </button>
-        </div>
+        {sessionExercises.length > 1 && (
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => setCurrentExerciseIndex(prev => Math.max(0, prev - 1))}
+              disabled={currentExerciseIndex === 0}
+              className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous Exercise
+            </button>
+            <button
+              onClick={() => setCurrentExerciseIndex(prev => Math.min(sessionExercises.length - 1, prev + 1))}
+              disabled={currentExerciseIndex >= sessionExercises.length - 1}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next Exercise
+            </button>
+          </div>
+        )}
 
         {/* Finish Workout Button */}
         <button
           onClick={completeWorkout}
-          className="w-full mt-4 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           <Save className="w-6 h-6" />
           Finish Workout
