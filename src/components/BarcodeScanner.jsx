@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Camera } from '@capacitor/camera'
-import { BarcodeScanner } from '@capacitor/barcode-scanner'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
-console.log('BarcodeScanner imported:', BarcodeScanner)
+
+// Conditionally import BarcodeScanner only for native platforms
+// This prevents build errors on web where the package isn't needed
+let BarcodeScanner = null
+if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
+  // Dynamic import for native platforms only
+  import('@capacitor/barcode-scanner').then(module => {
+    BarcodeScanner = module.BarcodeScanner
+    console.log('BarcodeScanner imported:', BarcodeScanner)
+  })
+}
 
 export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   const [scanning, setScanning] = useState(false)
@@ -43,6 +52,12 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const startNativeScan = async () => {
     try {
+      // Wait for BarcodeScanner to be loaded
+      if (!BarcodeScanner) {
+        const module = await import('@capacitor/barcode-scanner')
+        BarcodeScanner = module.BarcodeScanner
+      }
+
       // Check and request camera permission first
       const permission = await Camera.checkPermissions()
       
