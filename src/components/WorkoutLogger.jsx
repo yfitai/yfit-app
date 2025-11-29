@@ -314,19 +314,6 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Start Workout</h1>
 
-          {/* Quick Start */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-6 text-white">
-            <h2 className="text-xl font-semibold mb-2">Quick Start</h2>
-            <p className="mb-4 opacity-90">Start a freestyle workout without a template</p>
-            <button
-              onClick={onNavigateToBuilder}
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              <Play className="inline w-5 h-5 mr-2" />
-              Start Empty Workout
-            </button>
-          </div>
-
           {/* Saved Workouts */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Workouts</h2>

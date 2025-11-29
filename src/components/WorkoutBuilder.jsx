@@ -203,7 +203,8 @@ const WorkoutBuilder = () => {
         'Pull': ['lats', 'upper back', 'traps', 'biceps', 'forearms'],
         'Legs': ['quads', 'hamstrings', 'glutes', 'calves', 'adductors'],
         'Core': ['abs', 'obliques', 'serratus anterior'],
-        'Cardio': ['cardiovascular system'],
+        'Cardio': ['cardiovascular', 'cardio', 'aerobic'],
+        'Stretching': ['flexibility', 'mobility', 'stretch'],
         'Full Body': [] // Will match all if we add special logic
       };
       
@@ -280,6 +281,9 @@ const WorkoutBuilder = () => {
                 placeholder="e.g., Push Day, Leg Day, Full Body"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              {!workoutName && (
+                <p className="mt-1 text-sm text-amber-600">⚠️ Enter a workout name before adding exercises</p>
+              )}
             </div>
 
             <div>
@@ -306,7 +310,9 @@ const WorkoutBuilder = () => {
             </h2>
             <button
               onClick={() => setShowExerciseSelector(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={!workoutName.trim()}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              title={!workoutName.trim() ? 'Enter a workout name first' : ''}
             >
               <Plus className="w-5 h-5" />
               Add Exercise
@@ -488,6 +494,7 @@ const WorkoutBuilder = () => {
                   <option value="Legs">Legs</option>
                   <option value="Core">Core</option>
                   <option value="Cardio">Cardio</option>
+                  <option value="Stretching">Stretching</option>
                   <option value="Full Body">Full Body</option>
                 </select>
 
