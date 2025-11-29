@@ -107,6 +107,9 @@ export default function GoalsEnhancement({
     const target = parseFloat(targetWeight)
     const weekly = parseFloat(weeklyGoal)
     
+    // Validate all values are valid numbers
+    if (isNaN(start) || isNaN(target) || isNaN(weekly)) return null
+    
     console.log('Calculate Date - Start:', start, 'Target:', target, 'Weekly:', weekly)
     
     if (weekly === 0) return null
@@ -114,6 +117,9 @@ export default function GoalsEnhancement({
     const totalChange = Math.abs(target - start)
     const weeksNeeded = totalChange / weekly
     const daysNeeded = Math.ceil(weeksNeeded * 7)
+    
+    // Validate the calculation result
+    if (isNaN(daysNeeded) || !isFinite(daysNeeded)) return null
     
     console.log('Total Change:', totalChange, 'Weeks:', weeksNeeded, 'Days:', daysNeeded)
     
@@ -448,7 +454,7 @@ export default function GoalsEnhancement({
               <div className="bg-white p-4 rounded-md border border-gray-200">
                 <p className="text-sm text-gray-600 mb-1">Timeline</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {Math.ceil((new Date(estimatedDate) - new Date()) / (1000 * 60 * 60 * 24))} days
+                  {estimatedDate.days} days
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Estimated duration</p>
               </div>
@@ -459,4 +465,3 @@ export default function GoalsEnhancement({
     </div>
   )
 }
-

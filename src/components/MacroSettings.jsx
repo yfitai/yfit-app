@@ -229,17 +229,17 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       {/* Macro Summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="text-center p-4 bg-blue-50 rounded-lg">
-          <p className="text-2xl font-bold text-blue-600">{macros.protein.grams}g</p>
+          <p className="text-xl font-bold text-blue-600">{macros.protein.grams}g</p>
           <p className="text-sm text-gray-600">Protein</p>
           <p className="text-xs text-gray-500">{macros.protein.percentage}%</p>
         </div>
         <div className="text-center p-4 bg-orange-50 rounded-lg">
-          <p className="text-2xl font-bold text-orange-600">{macros.carbs.grams}g</p>
+          <p className="text-xl font-bold text-orange-600">{macros.carbs.grams}g</p>
           <p className="text-sm text-gray-600">Carbs</p>
           <p className="text-xs text-gray-500">{macros.carbs.percentage}%</p>
         </div>
         <div className="text-center p-4 bg-purple-50 rounded-lg">
-          <p className="text-2xl font-bold text-purple-600">{macros.fat.grams}g</p>
+          <p className="text-xl font-bold text-purple-600">{macros.fat.grams}g</p>
           <p className="text-sm text-gray-600">Fat</p>
           <p className="text-xs text-gray-500">{macros.fat.percentage}%</p>
         </div>
