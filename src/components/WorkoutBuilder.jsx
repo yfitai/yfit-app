@@ -533,20 +533,23 @@ const WorkoutBuilder = () => {
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="all">All Muscles</option>
-                  <option value="pectorals">Chest</option>
+                  <option value="chest">Chest</option>
                   <option value="lats">Lats</option>
-                  <option value="upper back">Upper Back</option>
+                  <option value="middle back">Middle Back</option>
+                  <option value="lower back">Lower Back</option>
                   <option value="traps">Traps</option>
-                  <option value="quads">Quads</option>
+                  <option value="quadriceps">Quads</option>
                   <option value="hamstrings">Hamstrings</option>
                   <option value="glutes">Glutes</option>
                   <option value="calves">Calves</option>
-                  <option value="delts">Shoulders</option>
+                  <option value="adductors">Adductors</option>
+                  <option value="abductors">Abductors</option>
+                  <option value="shoulders">Shoulders</option>
                   <option value="biceps">Biceps</option>
                   <option value="triceps">Triceps</option>
                   <option value="forearms">Forearms</option>
-                  <option value="abs">Abs</option>
-                  <option value="cardiovascular system">Cardio</option>
+                  <option value="abdominals">Abs</option>
+                  <option value="neck">Neck</option>
                 </select>
               </div>
             </div>
