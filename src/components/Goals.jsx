@@ -24,6 +24,8 @@ export default function Goals({ user: propUser }) {
   const { unitSystem, isMetric } = useUnitPreference()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [user, setUser] = useState(propUser || null)
   const [userProfile, setUserProfile] = useState(null)
   const [calculatedMetrics, setCalculatedMetrics] = useState(null)
@@ -92,6 +94,8 @@ export default function Goals({ user: propUser }) {
   }, [])
 
   const loadUserData = async () => {
+  console.log('Goals component loaded, showResetModal:', showResetModal)
+
     setLoading(true)
     try {
       // Use prop user if provided (for demo mode), otherwise fetch from Supabase
@@ -456,8 +460,7 @@ export default function Goals({ user: propUser }) {
 
         alert('✅ Goals saved successfully!')
       }
-
-      // Scroll to results
+  // Scroll to results
       setTimeout(() => {
         document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' })
       }, 100)
@@ -469,6 +472,75 @@ export default function Goals({ user: propUser }) {
       setSaving(false)
     }
   }
+
+  const handleStartFresh = async () => {
+    setResetting(true)
+    try {
+      const isDemoMode = !user || user.id.startsWith('demo')
+
+      if (isDemoMode) {
+        // Clear demo data from localStorage
+        localStorage.removeItem('yfit_demo_meals')
+        localStorage.removeItem('yfit_demo_workouts')
+        localStorage.removeItem('yfit_demo_metrics')
+        localStorage.removeItem('yfit_demo_goals')
+        localStorage.removeItem('yfit_demo_measurements')
+        alert('✅ Demo data cleared! You can now set new goals.')
+      } else {
+        // Delete from database (keeps custom_foods, favorite_foods, templates)
+        const { error: mealsError } = await supabase
+          .from('meals')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: workoutsError } = await supabase
+          .from('workouts')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: metricsError } = await supabase
+          .from('calculated_metrics')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: goalsError } = await supabase
+          .from('user_goals')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: measurementsError } = await supabase
+          .from('body_measurements')
+          .delete()
+          .eq('user_id', user.id)
+
+        if (mealsError || workoutsError || metricsError || goalsError || measurementsError) {
+          throw new Error('Error resetting data')
+        }
+
+        alert('✅ Data reset successfully! You can now start fresh.')
+      }
+
+      // Reset form
+      setAge('')
+      setWeight('')
+      setHeightCm('')
+      setHeightFeet('')
+      setHeightInches('')
+      setMeasurements({
+        neck: '', shoulders: '', chest: '', waist: '', hips: '',
+        biceps: '', forearms: '', thighs: '', calves: ''
+      })
+      setCalculatedMetrics(null)
+      setShowResetModal(false)
+
+    } catch (error) {
+      console.error('Error resetting data:', error)
+      alert('❌ Error resetting data. Please try again.')
+    } finally {
+      setResetting(false)
+    }
+  }
+
 
   if (loading) {
     return (
@@ -1150,16 +1222,25 @@ export default function Goals({ user: propUser }) {
           />
         </div>
 
-        {/* Save Button */}
-        <div className="flex justify-center mb-8">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Saving...' : 'Save Goals & Calculate Metrics'}
-          </button>
-        </div>
+     {/* Save Button */}
+<div className="flex flex-col items-center gap-4 mb-8">
+  <button
+    onClick={handleSave}
+    disabled={saving}
+    className="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    {saving ? 'Saving...' : 'Save Goals & Calculate Metrics'}
+  </button>
+
+  {/* Start Fresh Button */}
+  <button
+    onClick={() => setShowResetModal(true)}
+    className="px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
+  >
+    🔄 Start Fresh Journey
+  </button>
+</div>
+
 
         {/* Results Section */}
         {calculatedMetrics && (
@@ -1180,7 +1261,46 @@ export default function Goals({ user: propUser }) {
             </div>
           </div>
         )}
+          
+   
+
+        {/* Reset Confirmation Modal */}
+        {showResetModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">⚠️ Start Fresh Journey?</h2>
+              <p className="text-gray-600 mb-6">
+                This will permanently delete:
+              </p>
+              <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
+                <li>All meal & workout history</li>
+                <li>Your current goals and body measurements</li>
+                <li>All progress data and analytics</li>
+              </ul>
+              <p className="text-green-600 font-medium mb-6">
+                ✅ Your custom foods, favorites, and templates will be saved.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleStartFresh}
+                  disabled={resetting}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50"
+                >
+                  {resetting ? 'Resetting...' : 'Start Fresh'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
+
+

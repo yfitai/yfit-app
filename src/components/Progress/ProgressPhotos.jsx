@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Camera, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { Capacitor } from '@capacitor/core'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -91,6 +93,91 @@ export default function ProgressPhotos({ userId }) {
       setUploading(false)
     }
   }
+
+  const handleCameraCapture = async (viewType) => {
+    // Check if running on native platform
+    if (!Capacitor.isNativePlatform()) {
+      alert('Camera is only available on mobile devices. Please use the upload button instead.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Take photo with camera
+      const image = await CapacitorCamera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        saveToGallery: false,
+        correctOrientation: true,
+        width: 1080,
+        height: 1920,
+        promptLabelHeader: 'Take Progress Photo',
+        promptLabelCancel: 'Cancel',
+        promptLabelPhoto: 'From Gallery',
+        promptLabelPicture: 'Take Photo'
+      });
+
+      if (!image.dataUrl) {
+        throw new Error('No image data');
+      }
+
+      if (userId.startsWith('demo')) {
+        // Demo mode - simulate upload
+        const newPhoto = {
+          id: `demo-photo-${Date.now()}`,
+          user_id: userId,
+          image_url: image.dataUrl,
+          view_type: viewType,
+          taken_at: new Date().toISOString(),
+          notes: ''
+        };
+        setPhotos([newPhoto, ...photos]);
+        alert('Photo captured successfully! (Demo mode - not actually saved)');
+      } else {
+        // Convert data URL to blob
+        const response = await fetch(image.dataUrl);
+        const blob = await response.blob();
+        
+        // Upload to Supabase Storage
+        const fileName = `${userId}/${Date.now()}.jpg`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('progress-photos')
+          .upload(fileName, blob);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('progress-photos')
+          .getPublicUrl(fileName);
+
+        // Save to database
+        const { data: photoData, error: dbError } = await supabase
+          .from('progress_photos')
+          .insert({
+            user_id: userId,
+            image_url: publicUrl,
+            view_type: viewType,
+            taken_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (dbError) throw dbError;
+
+        setPhotos([photoData, ...photos]);
+        alert('Photo captured and uploaded successfully!');
+      }
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+      alert('Error capturing photo. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleDeletePhoto = async (photoId) => {
     if (!confirm('Are you sure you want to delete this photo?')) return
@@ -243,23 +330,33 @@ export default function ProgressPhotos({ userId }) {
 
       {/* Upload Section */}
       <div className="mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">Upload New Photo</h3>
+        <h3 className="font-semibold text-gray-900 mb-3">Add New Photo</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {['front', 'side', 'back'].map(viewType => (
-            <label
-              key={viewType}
-              className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors"
-            >
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-sm font-medium text-gray-700 capitalize">{viewType} View</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handlePhotoUpload(e, viewType)}
+            <div key={viewType} className="space-y-2">
+              {/* Camera Button */}
+              <button
+                onClick={() => handleCameraCapture(viewType)}
                 disabled={uploading}
-              />
-            </label>
+                className="w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Camera className="w-8 h-8 text-blue-600 mb-2" />
+                <span className="text-sm font-medium text-blue-700 capitalize">Take {viewType}</span>
+              </button>
+              
+              {/* Upload Button */}
+              <label className="w-full flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
+                <Upload className="w-6 h-6 text-gray-400 mb-2" />
+                <span className="text-xs text-gray-600 capitalize">or Upload</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handlePhotoUpload(e, viewType)}
+                  disabled={uploading}
+                />
+              </label>
+            </div>
           ))}
         </div>
       </div>

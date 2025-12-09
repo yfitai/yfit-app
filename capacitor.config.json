@@ -1,10 +1,7 @@
 {
   "appId": "com.yfitai.app",
   "appName": "YFIT AI",
-"webDir": "dist",
-
-
-
+  "webDir": "dist",
   "server": {
     "androidScheme": "https"
   },
@@ -23,6 +20,10 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ]
+    },
+    "GoogleFit": {
+      "androidClientId": "298223107294-pclldfceagnea0e8ucn551phh9prqtd6.apps.googleusercontent.com",
+      "webClientId": "298223107294-67tf18uqbddio22vl86gc87prcejb9s7.apps.googleusercontent.com"
     },
     "HealthKit": {
       "iosPermissions": {

@@ -5,7 +5,7 @@ import {
   Tooltip, Legend, ResponsiveContainer, Area, AreaChart
 } from 'recharts';
 import { 
-  TrendingUp, Award, Calendar, Dumbbell, Target, 
+  TrendingUp, Award, Calendar, Dumbbell, Target, Navigation,
   ChevronRight, Filter, Download, X, Edit2, Trash2
 } from 'lucide-react';
 
@@ -20,6 +20,7 @@ const FitnessProgress = () => {
     totalWorkouts: 0,
     totalVolume: 0,
     totalReps: 0,
+    totalDistance: 0,
     avgFormScore: 0
   });
   const [timeRange, setTimeRange] = useState('30'); // days
@@ -130,6 +131,9 @@ const FitnessProgress = () => {
                 maxWeight: 0,
                 maxVolume: 0,
                 maxReps: 0,
+                maxDistance: 0,
+                longestDuration: 0,
+                bestPace: 0,
                 bestSet: null
               };
             }
@@ -138,6 +142,7 @@ const FitnessProgress = () => {
             const reps = parseInt(set.reps) || 0;
             const volume = weight * reps;
 
+            // Track strength metrics
             if (weight > prsByExercise[exerciseId].maxWeight) {
               prsByExercise[exerciseId].maxWeight = weight;
               prsByExercise[exerciseId].bestSet = set;
@@ -148,28 +153,83 @@ const FitnessProgress = () => {
             if (reps > prsByExercise[exerciseId].maxReps) {
               prsByExercise[exerciseId].maxReps = reps;
             }
+
+            // Track cardio metrics
+            const distance = parseFloat(set.distance) || 0;
+            const duration = parseFloat(set.duration_minutes) || 0;
+            const pace = parseFloat(set.pace) || 0;
+
+            if (distance > prsByExercise[exerciseId].maxDistance) {
+              prsByExercise[exerciseId].maxDistance = distance;
+              if (!prsByExercise[exerciseId].bestSet) {
+                prsByExercise[exerciseId].bestSet = set;
+              }
+            }
+            if (duration > prsByExercise[exerciseId].longestDuration) {
+              prsByExercise[exerciseId].longestDuration = duration;
+            }
+            if (pace > prsByExercise[exerciseId].bestPace) {
+              prsByExercise[exerciseId].bestPace = pace;
+            }
           });
 
           // Get exercise names and format PRs
           const exerciseIds = Object.keys(prsByExercise);
           if (exerciseIds.length > 0) {
-            const { data: exerciseNames } = await supabase
+            const { data: exercisesInfo } = await supabase
               .from('exercises')
-              .select('id, name')
+              .select('id, name, category')
               .in('id', exerciseIds);
 
-            const exerciseNameMap = {};
-            (exerciseNames || []).forEach(ex => {
-              exerciseNameMap[ex.id] = ex.name;
+            const exerciseInfoMap = {};
+            (exercisesInfo || []).forEach(ex => {
+              exerciseInfoMap[ex.id] = { name: ex.name, category: ex.category };
             });
 
-            const prsArray = Object.entries(prsByExercise).map(([exerciseId, prs]) => ({
-              id: exerciseId,
-              exercise: { name: exerciseNameMap[exerciseId] || 'Unknown' },
-              record_type: 'max_weight',
-              value: `${prs.maxWeight} lbs`,
-              achieved_at: prs.bestSet?.created_at || new Date().toISOString()
-            }));
+            // Helper function to get exercise type
+            const getExerciseType = (category) => {
+              if (!category) return 'strength';
+              let categoryStr = category;
+              if (typeof category === 'string' && category.startsWith('[')) {
+                try {
+                  const parsed = JSON.parse(category);
+                  categoryStr = Array.isArray(parsed) ? parsed[0] : category;
+                } catch {
+                  categoryStr = category;
+                }
+              }
+              const lowerCategory = String(categoryStr).toLowerCase();
+              if (lowerCategory.includes('cardio')) return 'cardio';
+              if (lowerCategory.includes('stretch')) return 'stretching';
+              return 'strength';
+            };
+
+            const prsArray = Object.entries(prsByExercise).map(([exerciseId, prs]) => {
+              const exerciseInfo = exerciseInfoMap[exerciseId] || { name: 'Unknown', category: null };
+              const exerciseType = getExerciseType(exerciseInfo.category);
+              
+              // Determine record type and value based on exercise type
+              let recordType, value;
+              
+              if (exerciseType === 'cardio') {
+                recordType = 'max_distance';
+                value = `${prs.maxDistance.toFixed(2)} miles`;
+              } else if (exerciseType === 'stretching') {
+                recordType = 'longest_duration';
+                value = `${prs.longestDuration.toFixed(0)} min`;
+              } else {
+                recordType = 'max_weight';
+                value = `${prs.maxWeight} lbs`;
+              }
+              
+              return {
+                id: exerciseId,
+                exercise: { name: exerciseInfo.name },
+                record_type: recordType,
+                value: value,
+                achieved_at: prs.bestSet?.created_at || new Date().toISOString()
+              };
+            });
 
             setPersonalRecords(prsArray.slice(0, 5)); // Show top 5
           } else {
@@ -186,6 +246,7 @@ const FitnessProgress = () => {
       const totalWorkouts = sessionsData?.length || 0;
       const totalVolume = sessionsData?.reduce((sum, s) => sum + (s.total_volume || 0), 0) || 0;
       const totalReps = sessionsData?.reduce((sum, s) => sum + (s.total_reps || 0), 0) || 0;
+      const totalDistance = sessionsData?.reduce((sum, s) => sum + (s.total_distance || 0), 0) || 0;
 
       // Fetch form analysis average
       let avgFormScore = 0;
@@ -207,6 +268,7 @@ const FitnessProgress = () => {
         totalWorkouts,
         totalVolume: Math.round(totalVolume),
         totalReps,
+        totalDistance: Math.round(totalDistance * 100) / 100, // Round to 2 decimals
         avgFormScore: Math.round(avgFormScore)
       });
     } catch (error) {
@@ -475,6 +537,36 @@ const FitnessProgress = () => {
       console.error('Error updating set:', error);
       alert('Failed to update set');
     }
+  };
+
+  // Helper function to determine exercise type
+  const getExerciseDisplayType = (exercise) => {
+    if (!exercise) return 'weighted';
+    
+    const category = exercise.category || '';
+    const equipment = exercise.equipment || [];
+    
+    // Parse category if it's a JSON string
+    const categoryStr = typeof category === 'string' ? category.toLowerCase() : '';
+    
+    // Parse equipment array
+    let equipmentArray = [];
+    if (Array.isArray(equipment)) {
+      equipmentArray = equipment.map(e => e.toLowerCase());
+    } else if (typeof equipment === 'string') {
+      try {
+        equipmentArray = JSON.parse(equipment).map(e => e.toLowerCase());
+      } catch {
+        equipmentArray = [equipment.toLowerCase()];
+      }
+    }
+    
+    // Check exercise type
+    if (categoryStr.includes('cardio')) return 'cardio';
+    if (categoryStr.includes('stretching')) return 'stretching';
+    if (equipmentArray.includes('bodyweight') || equipmentArray.includes('other')) return 'bodyweight';
+    
+    return 'weighted';
   };
 
   const predictNext1RM = () => {
@@ -915,7 +1007,7 @@ const FitnessProgress = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -947,6 +1039,17 @@ const FitnessProgress = () => {
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalReps.toLocaleString()}</div>
             <div className="text-sm text-gray-600">Total Reps</div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 bg-cyan-100 rounded-lg">
+                <Navigation className="w-6 h-6 text-cyan-600" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalDistance.toFixed(2)}</div>
+            <div className="text-sm text-gray-600">Total Distance (miles)</div>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -994,58 +1097,181 @@ const FitnessProgress = () => {
           </div>
         </div>
 
-        {selectedExercise && progressData.length > 0 && (
-          <>
-            {/* Strength Progression Chart */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {selectedExercise.name} - Strength Progression
-              </h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={progressData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="weight" 
-                    stroke="#3B82F6" 
-                    strokeWidth={2}
-                    name="Max Weight (lbs)"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="estimated1RM" 
-                    stroke="#10B981" 
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    name="Estimated 1RM (lbs)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+        {selectedExercise && progressData.length > 0 && (() => {
+          const exerciseType = getExerciseDisplayType(selectedExercise);
+          
+          return (
+            <>
+              {/* Cardio Charts */}
+              {exerciseType === 'cardio' && (
+                <>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Distance Progression
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="distance" 
+                          stroke="#3B82F6" 
+                          strokeWidth={2}
+                          name="Distance (miles)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="pace" 
+                          stroke="#10B981" 
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          name="Pace (mph)"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Duration
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="duration" fill="#8B5CF6" name="Duration (minutes)" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
 
-            {/* Volume Chart */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {selectedExercise.name} - Training Volume
-              </h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={progressData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="volume" fill="#8B5CF6" name="Total Volume (lbs)" />
-                  <Bar dataKey="reps" fill="#F59E0B" name="Total Reps" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+              {/* Stretching Charts */}
+              {exerciseType === 'stretching' && (
+                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    {selectedExercise.name} - Duration Progression
+                  </h2>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={progressData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="duration" 
+                        stroke="#3B82F6" 
+                        strokeWidth={2}
+                        name="Duration (minutes)"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
 
-            {/* Predictive Analytics */}
+              {/* Bodyweight Charts */}
+              {exerciseType === 'bodyweight' && (
+                <>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Reps Progression
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="reps" 
+                          stroke="#3B82F6" 
+                          strokeWidth={2}
+                          name="Max Reps"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Total Reps per Session
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="reps" fill="#F59E0B" name="Total Reps" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
+
+              {/* Weighted Strength Charts */}
+              {exerciseType === 'weighted' && (
+                <>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Strength Progression
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="weight" 
+                          stroke="#3B82F6" 
+                          strokeWidth={2}
+                          name="Max Weight (lbs)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="estimated1RM" 
+                          stroke="#10B981" 
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          name="Estimated 1RM (lbs)"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      {selectedExercise.name} - Training Volume
+                    </h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={progressData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="volume" fill="#8B5CF6" name="Total Volume (lbs)" />
+                        <Bar dataKey="reps" fill="#F59E0B" name="Total Reps" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
+
+            {/* Predictive Analytics - Only for weighted exercises */}
+            {exerciseType === 'weighted' && (
             <div className="space-y-6 mb-6">
               {/* Strength Forecast */}
               {(() => {
@@ -1173,8 +1399,10 @@ const FitnessProgress = () => {
                 </div>
               </div>
             </div>
+            )}
           </>
-        )}
+          );
+        })()}
 
         {selectedExercise && progressData.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center mb-6">
@@ -1245,8 +1473,17 @@ const FitnessProgress = () => {
                   </div>
                   <div className="text-right flex items-center gap-3">
                     <div>
-                      <div className="text-lg font-bold text-blue-600">{Math.round(session.total_volume || 0)} lbs</div>
-                      <div className="text-xs text-gray-600">Total Volume</div>
+                      {session.total_distance > 0 ? (
+                        <>
+                          <div className="text-lg font-bold text-blue-600">{session.total_distance.toFixed(2)} miles</div>
+                          <div className="text-xs text-gray-600">Total Distance</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-lg font-bold text-blue-600">{Math.round(session.total_volume || 0)} lbs</div>
+                          <div className="text-xs text-gray-600">Total Volume</div>
+                        </>
+                      )}
                     </div>
                     <button
                       onClick={(e) => {

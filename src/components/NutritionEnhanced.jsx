@@ -203,25 +203,45 @@ export default function NutritionEnhanced({ user: propUser }) {
 
     const isDemoMode = user.id.startsWith('demo')
 
-    // Calculate nutrition based on serving quantity
-    const multiplier = servingQuantity
+    // Calculate nutrition based on serving quantity and unit
+    // Get the unit conversion (same logic as ServingSizeSelector)
+    const isLiquid = selectedFood.foodType === 'liquid'
+    const units = isLiquid ? [
+      { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
+      { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
+      { value: 'cup', label: 'Cups', toGrams: 240 },
+      { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
+      { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
+      { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
+    ] : [
+      { value: 'g', label: 'Grams (g)', toGrams: 1 },
+      { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+      { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+      { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
+    ]
+    
+    const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
+    const totalGrams = (servingQuantity || 0) * selectedUnit.toGrams
+    const multiplier = totalGrams / 100 // All nutrition is per 100g
+    
     const mealData = {
       user_id: user.id,
       meal_type: selectedMealType,
       meal_date: new Date().toISOString().split('T')[0],
       food_name: selectedFood.name,
-      calories: (selectedFood.calories || 0) * multiplier,
-      protein: (selectedFood.protein || 0) * multiplier,
-      carbs: (selectedFood.carbs || 0) * multiplier,
-      fat: (selectedFood.fat || 0) * multiplier,
-      fiber: (selectedFood.fiber || 0) * multiplier,
-      sugar: (selectedFood.sugar || 0) * multiplier,
-      sodium: (selectedFood.sodium || 0) * multiplier,
+      calories: Math.round((selectedFood.calories || 0) * multiplier),
+      protein: Math.round((selectedFood.protein || 0) * multiplier),
+      carbs: Math.round((selectedFood.carbs || 0) * multiplier),
+      fat: Math.round((selectedFood.fat || 0) * multiplier),
+      fiber: Math.round((selectedFood.fiber || 0) * multiplier),
+      sugar: Math.round((selectedFood.sugar || 0) * multiplier),
+      sodium: Math.round((selectedFood.sodium || 0) * multiplier),
       food_id: selectedFood.id,
       serving_quantity: servingQuantity,
       serving_unit: servingUnit,
       created_at: new Date().toISOString()
     }
+
 
     if (isDemoMode) {
       // Save to localStorage
@@ -802,18 +822,26 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 
 // Serving Size Selector Component
 function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel }) {
-  // Available units
-  const units = [
-    { value: 'g', label: 'Grams (g)', toGrams: 1 },
-    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
-    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+
+  // Available units - show different options based on food type
+  const isLiquid = food.foodType === 'liquid'
+  
+  const units = isLiquid ? [
+    // Liquid foods: volume units + serving
     { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
     { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
     { value: 'cup', label: 'Cups', toGrams: 240 },
     { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
     { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
     { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
+  ] : [
+    // Solid foods: weight units + serving
+    { value: 'g', label: 'Grams (g)', toGrams: 1 },
+    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+    { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
   ]
+
 
   // Calculate multiplier based on quantity and unit
   const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
@@ -823,6 +851,20 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   const displayProtein = Math.round((food.protein || 0) * multiplier)
   const displayCarbs = Math.round((food.carbs || 0) * multiplier)
   const displayFat = Math.round((food.fat || 0) * multiplier)
+
+  console.log('🥜 DEBUG:', {
+    servingQuantity,
+    servingUnit,
+    'selectedUnit.toGrams': selectedUnit.toGrams,
+    totalGrams,
+    multiplier,
+    'food.calories': food.calories,
+    displayCalories
+  })
+
+
+
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -846,7 +888,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
             <div className="flex gap-2">
               {/* Quantity Input */}
             
-            <input
+ <input
   type="number"
   value={servingQuantity}
   onChange={(e) => {
@@ -857,29 +899,34 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
       setServingQuantity(parseFloat(value) || 1)
     }
   }}
+  onFocus={() => {
+    setServingQuantity('')
+  }}
   min="0.1"
   step="0.1"
-  className="w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 />
 
-                
-              
-              {/* Unit Dropdown */}
-              <select
-                value={servingUnit}
-                onChange={(e) => setServingUnit(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-              >
-                {units.map(unit => (
-                  <option key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </option>
-                ))}
-              </select>
+        
+   {/* Unit Dropdown */}
+<select
+  value={servingUnit}
+  onChange={(e) => setServingUnit(e.target.value)}
+  className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+>
+  {units.map(unit => (
+    <option key={unit.value} value={unit.value}>
+      {unit.label}
+    </option>
+  ))}
+</select>
+           
+           
             </div>
             <p className="text-xs text-gray-500 mt-1">
               ≈ {totalGrams.toFixed(1)}g total
             </p>
+       
           </div>
 
           {/* Nutrition Summary */}

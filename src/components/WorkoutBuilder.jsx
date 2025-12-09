@@ -18,6 +18,28 @@ const WorkoutBuilder = () => {
   const [filterTargetMuscle, setFilterTargetMuscle] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Helper function to determine exercise type
+  const getExerciseType = (exercise) => {
+    if (!exercise) return 'strength';
+    
+    let category = exercise.category;
+    
+    // Handle JSON array format: '["cardio"]' -> 'cardio'
+    if (typeof category === 'string' && category.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(category);
+        category = Array.isArray(parsed) ? parsed[0] : category;
+      } catch (e) {
+        // If parsing fails, use as-is
+      }
+    }
+    
+    const categoryLower = (category || '').toLowerCase();
+    if (categoryLower === 'cardio') return 'cardio';
+    if (categoryLower === 'stretching' || categoryLower === 'flexibility') return 'stretching';
+    return 'strength';
+  };
+
   useEffect(() => {
     initializeUser();
   }, []);
@@ -63,14 +85,17 @@ const WorkoutBuilder = () => {
       return;
     }
 
+    const exerciseType = getExerciseType(exercise);
+    
     const newExercises = [
       ...selectedExercises,
       {
         exercise,
         exercise_order: selectedExercises.length + 1,
-        target_sets: 3,
-        target_reps_min: 8,
-        target_reps_max: 12,
+        // Only set defaults for strength exercises
+        target_sets: exerciseType === 'strength' ? 3 : 1,
+        target_reps_min: exerciseType === 'strength' ? 8 : 1,
+        target_reps_max: exerciseType === 'strength' ? 12 : 1,
         target_weight: null,
         rest_seconds: 60,
         notes: ''
@@ -214,13 +239,25 @@ const WorkoutBuilder = () => {
       if (filterCategory === 'Full Body') {
         matchesCategory = true; // Full Body shows everything
       } else if (filterCategory === 'Cardio') {
-        // Match cardio exercises by name keywords
-        const cardioKeywords = ['run', 'walk', 'jog', 'bike', 'cycle', 'row', 'swim', 'elliptical', 'treadmill', 'stair'];
-        matchesCategory = cardioKeywords.some(keyword => ex.name.toLowerCase().includes(keyword));
+        // Match cardio exercises by database category
+        let exCategory = ex.category;
+        if (typeof exCategory === 'string' && exCategory.startsWith('[')) {
+          try {
+            const parsed = JSON.parse(exCategory);
+            exCategory = Array.isArray(parsed) ? parsed[0] : exCategory;
+          } catch (e) {}
+        }
+        matchesCategory = (exCategory || '').toLowerCase() === 'cardio';
       } else if (filterCategory === 'Stretching') {
-        // Match stretching exercises by name keywords
-        const stretchKeywords = ['stretch', 'flexibility', 'mobility', 'yoga'];
-        matchesCategory = stretchKeywords.some(keyword => ex.name.toLowerCase().includes(keyword));
+        // Match stretching exercises by database category
+        let exCategory = ex.category;
+        if (typeof exCategory === 'string' && exCategory.startsWith('[')) {
+          try {
+            const parsed = JSON.parse(exCategory);
+            exCategory = Array.isArray(parsed) ? parsed[0] : exCategory;
+          } catch (e) {}
+        }
+        matchesCategory = (exCategory || '').toLowerCase() === 'stretching' || (exCategory || '').toLowerCase() === 'flexibility';
       } else {
         matchesCategory = muscleArray.some(muscle => 
           targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
@@ -339,7 +376,10 @@ const WorkoutBuilder = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {selectedExercises.map((item, index) => (
+              {selectedExercises.map((item, index) => {
+                const exerciseType = getExerciseType(item.exercise);
+                
+                return (
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-start gap-4">
                     {/* Drag Handle */}
@@ -366,7 +406,11 @@ const WorkoutBuilder = () => {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-gray-900">{item.exercise.name}</h3>
-                          <p className="text-sm text-gray-600">{item.exercise.primary_muscle?.name}</p>
+                          <p className="text-sm text-gray-600 capitalize">
+                            {exerciseType === 'cardio' && '🏃 Cardio Exercise'}
+                            {exerciseType === 'stretching' && '🧘 Stretching Exercise'}
+                            {exerciseType === 'strength' && '💪 Strength Exercise'}
+                          </p>
                         </div>
                         <button
                           onClick={() => removeExercise(index)}
@@ -376,7 +420,8 @@ const WorkoutBuilder = () => {
                         </button>
                       </div>
 
-                      {/* Exercise Parameters */}
+                      {/* Exercise Parameters - Only show for strength exercises */}
+                      {exerciseType === 'strength' && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
                           <label className="block text-xs text-gray-600 mb-1">Sets</label>
@@ -421,6 +466,18 @@ const WorkoutBuilder = () => {
                         </div>
                       </div>
 
+                      )}
+
+                      {/* Cardio/Stretching message */}
+                      {(exerciseType === 'cardio' || exerciseType === 'stretching') && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-sm text-blue-800">
+                            {exerciseType === 'cardio' && '⏱️ Duration and pace will be tracked when you log this workout'}
+                            {exerciseType === 'stretching' && '⏱️ Duration will be tracked when you log this workout'}
+                          </p>
+                        </div>
+                      )}
+
                       {/* Notes */}
                       <div className="mt-3">
                         <input
@@ -434,7 +491,8 @@ const WorkoutBuilder = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

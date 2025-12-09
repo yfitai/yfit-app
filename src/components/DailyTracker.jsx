@@ -4,7 +4,6 @@ import {
   Moon, Droplets, Footprints, Heart, Activity, 
   TrendingUp, Calendar, Plus, Check, X 
 } from 'lucide-react';
-import WearablesSync from './WearablesSync';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 
 export default function DailyTracker({ user }) {
@@ -430,21 +429,7 @@ export default function DailyTracker({ user }) {
           <p className="text-gray-600">Track your daily health metrics and habits</p>
         </div>
 
-        {/* Wearables Sync */}
-        <div className="mb-8">
-          <WearablesSync 
-            user={user} 
-            onSyncComplete={(data) => {
-              // Auto-populate form with synced data
-              if (data.steps) setFormData(prev => ({ ...prev, steps: data.steps }));
-              if (data.sleep) setFormData(prev => ({ ...prev, sleep_hours: data.sleep }));
-              if (data.heartRate) {
-                // Could add heart rate field in future
-                console.log('Heart rate synced:', data.heartRate);
-              }
-            }}
-          />
-        </div>
+     
 
         {/* Today's Progress Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">

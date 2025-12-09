@@ -253,23 +253,75 @@ async function searchOpenFoodFacts(query, limit) {
  */
 function transformOpenFoodFactsProduct(product) {
   const nutriments = product.nutriments || {}
+  const categories = (product.categories_tags || []).join(' ').toLowerCase()
+  const productName = (product.product_name || '').toLowerCase()
+  const isLiquid = (
+    categories.includes('en:beverages') || 
+    categories.includes('en:drinks') || 
+    categories.includes('en:juices') || 
+    categories.includes('en:milks') || 
+    categories.includes('en:waters') || 
+    categories.includes('en:sodas') || 
+    categories.includes('en:honeys') ||
+    productName.includes('juice') || 
+    productName.includes('drink') || 
+    productName.includes('beverage') || 
+    (productName.includes('milk') && !productName.includes('cheese')) || 
+    productName.includes('water') || 
+    productName.includes('soda') || 
+    productName.includes('canneberge') || 
+    productName.includes('cranberry') ||
+    productName.includes('honey') ||
+    productName.includes('miel') ||
+    productName.includes('cream') ||
+    productName.includes('crème') ||
+    productName.includes('ketchup') ||
+    productName.includes(' 2l') ||
+    productName.includes(' 1l') ||
+    productName.includes(' ml') ||
+    (product.serving_size && (product.serving_size.includes('ml') || product.serving_size.includes('mL') || product.serving_size.includes('fl oz')))
+  ) || false
+
+    console.log('Food:', product.product_name, 'Categories:', categories, 'ProductName:', productName, 'isLiquid:', isLiquid, 'serving_size:', product.serving_size)
+  console.log('🥜 API DATA:', {
+    product_name: product.product_name,
+    'energy-kcal_100g': nutriments['energy-kcal_100g'],
+    'energy_100g': nutriments.energy_100g,
+    'proteins_100g': nutriments.proteins_100g,
+    'carbohydrates_100g': nutriments.carbohydrates_100g,
+    'fat_100g': nutriments.fat_100g
+  })
+
+   // Validate data - check if values are suspiciously high (likely data entry error)
+  const totalMacros = (nutriments.proteins_100g || 0) + (nutriments.carbohydrates_100g || 0) + (nutriments.fat_100g || 0)
+  const dataIsCorrupted = totalMacros > 110 // Macros can't exceed 100g per 100g (allow 10% margin)
+  const correctionFactor = dataIsCorrupted ? 10 : 1 // Divide by 10 if corrupted
   
+  if (dataIsCorrupted) {
+    console.warn('⚠️ Corrupted data detected for', product.product_name, '- applying 10x correction')
+  }
+
   return {
     id: `off-${product.code}`,
     name: product.product_name,
     brand: product.brands || 'Unknown',
     source: 'openfoodfacts',
-    calories: Math.round(nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0),
-    protein: Math.round(nutriments.proteins_100g || 0),
-    carbs: Math.round(nutriments.carbohydrates_100g || 0),
-    fat: Math.round(nutriments.fat_100g || 0),
-    fiber: Math.round(nutriments.fiber_100g || 0),
-    sugar: Math.round(nutriments.sugars_100g || 0),
-    sodium: Math.round(nutriments.sodium_100g * 1000 || 0), // Convert g to mg
+    calories: Math.round((nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0) / correctionFactor),
+    protein: Math.round((nutriments.proteins_100g || 0) / correctionFactor),
+    carbs: Math.round((nutriments.carbohydrates_100g || 0) / correctionFactor),
+    fat: Math.round((nutriments.fat_100g || 0) / correctionFactor),
+    fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
+    sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
+    sodium: Math.round(nutriments.sodium_100g * 1000 / correctionFactor || 0),
     servingSize: parseFloat(product.serving_size) || 100,
-    servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g'
+    servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
+    servingGrams: parseFloat(product.serving_size) || 100,
+    foodType: isLiquid ? 'liquid' : 'solid'
   }
 }
+
+
+ 
 
 /**
  * Search custom foods created by user

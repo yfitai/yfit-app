@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase, getCurrentUser } from '../lib/supabase';
+import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { 
   Play, Pause, Square, Plus, Minus, Check, X, Clock, 
   Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save
 } from 'lucide-react';
 
 const WorkoutLogger = ({ onNavigateToBuilder }) => {
+  const { distanceUnit, toggleDistanceUnit, isDistanceMetric, isDistanceImperial } = useUnitPreference();
   const [user, setUser] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
   const [workouts, setWorkouts] = useState([]);
@@ -19,10 +21,17 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     totalSets: 0,
     totalReps: 0,
     totalVolume: 0,
+    totalDistance: 0,
     duration: 0
   });
   const [showWorkoutSelector, setShowWorkoutSelector] = useState(true);
   const [loading, setLoading] = useState(true);
+  
+  // Cardio tracking state
+  const [cardioData, setCardioData] = useState({ duration: '', pace: '', distance: 0 });
+  
+  // Stretching tracking state
+  const [stretchingData, setStretchingData] = useState({ duration: '' });
 
   useEffect(() => {
     initializeUser();
@@ -142,14 +151,24 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   };
 
   const logSet = async () => {
-    if (!setData.weight || !setData.reps) {
+    const currentExercise = selectedWorkout.workout_exercises[currentExerciseIndex];
+    const type = getExerciseType(currentExercise);
+
+    // Validate based on exercise type
+    if (type === 'strength' && (!setData.weight || !setData.reps)) {
       alert('Please enter weight and reps');
+      return;
+    }
+    if (type === 'cardio' && (!cardioData.duration || !cardioData.pace)) {
+      alert('Please enter duration and pace');
+      return;
+    }
+    if (type === 'stretching' && !stretchingData.duration) {
+      alert('Please enter duration');
       return;
     }
 
     try {
-      const currentExercise = selectedWorkout.workout_exercises[currentExerciseIndex];
-      
       // Get session exercise
       const { data: sessionExercises } = await supabase
         .from('session_exercises')
@@ -158,38 +177,75 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         .eq('exercise_id', currentExercise.exercise_id)
         .single();
 
-      // Insert set
-      await supabase.from('exercise_sets').insert({
-        session_exercise_id: sessionExercises.id,
-        set_number: currentSet,
-        weight: parseFloat(setData.weight),
-        reps: parseInt(setData.reps),
-        rpe: setData.rpe,
-        rest_seconds: currentExercise.rest_seconds || 60
-      });
+      // Insert set based on exercise type
+      if (type === 'strength') {
+        await supabase.from('exercise_sets').insert({
+          session_exercise_id: sessionExercises.id,
+          set_number: currentSet,
+          weight: parseFloat(setData.weight),
+          reps: parseInt(setData.reps),
+          rpe: setData.rpe,
+          rest_seconds: currentExercise.rest_seconds || 60
+        });
+
+        // Update stats for strength
+        const volume = parseFloat(setData.weight) * parseInt(setData.reps);
+        setSessionStats(prev => ({
+          ...prev,
+          totalSets: prev.totalSets + 1,
+          totalReps: prev.totalReps + parseInt(setData.reps),
+          totalVolume: prev.totalVolume + volume
+        }));
+
+        // Start rest timer
+        setRestTimer(currentExercise.rest_seconds || 60);
+        setIsResting(true);
+      } else if (type === 'cardio') {
+        await supabase.from('exercise_sets').insert({
+          session_exercise_id: sessionExercises.id,
+          set_number: 1,
+          duration_minutes: parseFloat(cardioData.duration),
+          pace: parseFloat(cardioData.pace),
+          distance: parseFloat(cardioData.distance),
+          rpe: 5
+        });
+
+        // Update stats for cardio
+        setSessionStats(prev => ({
+          ...prev,
+          totalSets: prev.totalSets + 1,
+          totalReps: prev.totalReps + 1,
+          totalVolume: prev.totalVolume,
+          totalDistance: prev.totalDistance + parseFloat(cardioData.distance)
+        }));
+      } else if (type === 'stretching') {
+        await supabase.from('exercise_sets').insert({
+          session_exercise_id: sessionExercises.id,
+          set_number: 1,
+          duration_minutes: parseFloat(stretchingData.duration),
+          rpe: 5
+        });
+
+        // Update stats for stretching
+        setSessionStats(prev => ({
+          ...prev,
+          totalSets: prev.totalSets + 1,
+          totalReps: prev.totalReps + 1,
+          totalVolume: prev.totalVolume
+        }));
+      }
 
       // Update session exercise completed sets
       await supabase
         .from('session_exercises')
-        .update({ completed_sets: currentSet })
+        .update({ completed_sets: type === 'strength' ? currentSet : 1 })
         .eq('id', sessionExercises.id);
 
-      // Update stats
-      const volume = parseFloat(setData.weight) * parseInt(setData.reps);
-      setSessionStats(prev => ({
-        ...prev,
-        totalSets: prev.totalSets + 1,
-        totalReps: prev.totalReps + parseInt(setData.reps),
-        totalVolume: prev.totalVolume + volume
-      }));
-
-      // Start rest timer
-      setRestTimer(currentExercise.rest_seconds || 60);
-      setIsResting(true);
-
       // Move to next set or exercise
-      if (currentSet >= currentExercise.target_sets) {
-        // Move to next exercise
+      if (type === 'strength' && currentSet < currentExercise.target_sets) {
+        setCurrentSet(prev => prev + 1);
+      } else {
+        // Move to next exercise or complete workout
         if (currentExerciseIndex < selectedWorkout.workout_exercises.length - 1) {
           setCurrentExerciseIndex(prev => prev + 1);
           setCurrentSet(1);
@@ -197,12 +253,16 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           // Workout complete
           completeWorkout();
         }
-      } else {
-        setCurrentSet(prev => prev + 1);
       }
 
-      // Reset set data
-      setSetData({ weight: '', reps: '', rpe: 5 });
+      // Reset data based on type
+      if (type === 'strength') {
+        setSetData({ weight: '', reps: '', rpe: 5 });
+      } else if (type === 'cardio') {
+        setCardioData({ duration: '', pace: '', distance: 0 });
+      } else if (type === 'stretching') {
+        setStretchingData({ duration: '' });
+      }
     } catch (error) {
       console.error('Error logging set:', error);
     }
@@ -224,6 +284,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           total_sets: sessionStats.totalSets,
           total_reps: sessionStats.totalReps,
           total_volume: sessionStats.totalVolume,
+          total_distance: sessionStats.totalDistance,
           is_completed: true
         })
         .eq('id', activeSession.id);
@@ -259,7 +320,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     setSetData({ weight: '', reps: '', rpe: 5 });
     setRestTimer(0);
     setIsResting(false);
-    setSessionStats({ totalSets: 0, totalReps: 0, totalVolume: 0, duration: 0 });
+    setSessionStats({ totalSets: 0, totalReps: 0, totalVolume: 0, totalDistance: 0, duration: 0 });
     setShowWorkoutSelector(true);
   };
 
@@ -360,6 +421,30 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
   // Active Workout View
   const currentExercise = selectedWorkout?.workout_exercises?.[currentExerciseIndex];
+  
+  // Helper function to determine exercise type
+  const getExerciseType = (exercise) => {
+    if (!exercise?.exercises) return 'strength';
+    
+    let category = exercise.exercises.category;
+    
+    // Handle JSON array format: '["cardio"]' -> 'cardio'
+    if (typeof category === 'string' && category.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(category);
+        category = Array.isArray(parsed) ? parsed[0] : category;
+      } catch (e) {
+        // If parsing fails, use as-is
+      }
+    }
+    
+    const categoryLower = (category || '').toLowerCase();
+    if (categoryLower === 'cardio') return 'cardio';
+    if (categoryLower === 'stretching' || categoryLower === 'flexibility') return 'stretching';
+    return 'strength';
+  };
+  
+  const exerciseType = getExerciseType(currentExercise);
 
   // If empty workout (no exercises), show add exercise UI
   if (!currentExercise && activeSession) {
@@ -381,23 +466,27 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             </div>
 
             {/* Session Stats */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className={`grid ${exerciseType === 'strength' ? 'grid-cols-4' : 'grid-cols-1'} gap-4`}>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{formatTime(sessionStats.duration)}</div>
                 <div className="text-xs text-gray-600">Duration</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
-                <div className="text-xs text-gray-600">Sets</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
-                <div className="text-xs text-gray-600">Reps</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
-                <div className="text-xs text-gray-600">Volume (lbs)</div>
-              </div>
+              {exerciseType === 'strength' && (
+                <>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
+                    <div className="text-xs text-gray-600">Sets</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
+                    <div className="text-xs text-gray-600">Reps</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
+                    <div className="text-xs text-gray-600">Volume (lbs)</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -447,23 +536,27 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           </div>
 
           {/* Session Stats */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className={`grid ${exerciseType === 'strength' ? 'grid-cols-4' : 'grid-cols-1'} gap-4`}>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{formatTime(sessionStats.duration)}</div>
               <div className="text-xs text-gray-600">Duration</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
-              <div className="text-xs text-gray-600">Sets</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
-              <div className="text-xs text-gray-600">Reps</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
-              <div className="text-xs text-gray-600">Volume (lbs)</div>
-            </div>
+            {exerciseType === 'strength' && (
+              <>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
+                  <div className="text-xs text-gray-600">Sets</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
+                  <div className="text-xs text-gray-600">Reps</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
+                  <div className="text-xs text-gray-600">Volume (lbs)</div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -500,110 +593,240 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             </div>
             <p className="text-gray-600 mb-4">{currentExercise.exercises.description}</p>
 
-            {/* Target Sets/Reps */}
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Target Sets</div>
-                  <div className="text-2xl font-bold text-gray-900">{currentExercise.target_sets}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Target Reps</div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {currentExercise.target_reps_min}-{currentExercise.target_reps_max}
+            {/* Target Sets/Reps - Only show for strength exercises */}
+            {exerciseType === 'strength' && (
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Target Sets</div>
+                    <div className="text-2xl font-bold text-gray-900">{currentExercise.target_sets}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Target Reps</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {currentExercise.target_reps_min}-{currentExercise.target_reps_max}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Current Set */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Set {currentSet} of {currentExercise.target_sets}
-              </h3>
+              {exerciseType === 'strength' && (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Set {currentSet} of {currentExercise.target_sets}
+                  </h3>
 
-              {/* Weight Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Weight (lbs)</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, weight: Math.max(0, (parseFloat(prev.weight) || 0) - 5).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="number"
-                    value={setData.weight}
-                    onChange={(e) => setSetData(prev => ({ ...prev, weight: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
-                    placeholder="0"
-                  />
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, weight: ((parseFloat(prev.weight) || 0) + 5).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+                  {/* Weight Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Weight (lbs)</label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSetData(prev => ({ ...prev, weight: Math.max(0, (parseFloat(prev.weight) || 0) - 5).toString() }))}
+                        className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <Minus className="w-5 h-5" />
+                      </button>
+                      <input
+                        type="number"
+                        value={setData.weight}
+                        onChange={(e) => setSetData(prev => ({ ...prev, weight: e.target.value }))}
+                        className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                        placeholder="0"
+                      />
+                      <button
+                        onClick={() => setSetData(prev => ({ ...prev, weight: ((parseFloat(prev.weight) || 0) + 5).toString() }))}
+                        className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Reps Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Reps</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, reps: Math.max(0, (parseInt(prev.reps) || 0) - 1).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="number"
-                    value={setData.reps}
-                    onChange={(e) => setSetData(prev => ({ ...prev, reps: e.target.value }))}
-                    className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
-                    placeholder="0"
-                  />
-                  <button
-                    onClick={() => setSetData(prev => ({ ...prev, reps: ((parseInt(prev.reps) || 0) + 1).toString() }))}
-                    className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+                  {/* Reps Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Reps</label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSetData(prev => ({ ...prev, reps: Math.max(0, (parseInt(prev.reps) || 0) - 1).toString() }))}
+                        className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <Minus className="w-5 h-5" />
+                      </button>
+                      <input
+                        type="number"
+                        value={setData.reps}
+                        onChange={(e) => setSetData(prev => ({ ...prev, reps: e.target.value }))}
+                        className="flex-1 text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                        placeholder="0"
+                      />
+                      <button
+                        onClick={() => setSetData(prev => ({ ...prev, reps: ((parseInt(prev.reps) || 0) + 1).toString() }))}
+                        className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
 
-              {/* RPE Slider */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  RPE (Rate of Perceived Exertion): {setData.rpe}/10
-                </label>
-                <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={setData.rpe}
-                  onChange={(e) => setSetData(prev => ({ ...prev, rpe: parseInt(e.target.value) }))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>Easy</span>
-                  <span>Moderate</span>
-                  <span>Max Effort</span>
-                </div>
-              </div>
+                  {/* RPE Slider */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      RPE (Rate of Perceived Exertion): {setData.rpe}/10
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={setData.rpe}
+                      onChange={(e) => setSetData(prev => ({ ...prev, rpe: parseInt(e.target.value) }))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                      <span>Easy</span>
+                      <span>Moderate</span>
+                      <span>Max Effort</span>
+                    </div>
+                  </div>
 
-              {/* Log Set Button */}
-              <button
-                onClick={logSet}
-                disabled={!setData.weight || !setData.reps}
-                className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Check className="w-6 h-6" />
-                Complete Set
-              </button>
+                  {/* Log Set Button */}
+                  <button
+                    onClick={logSet}
+                    disabled={!setData.weight || !setData.reps}
+                    className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <Check className="w-6 h-6" />
+                    Complete Set
+                  </button>
+                </>
+              )}
+
+              {exerciseType === 'cardio' && (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Cardio Session
+                    </h3>
+                    
+                    {/* Distance Unit Toggle */}
+                    <button
+                      onClick={toggleDistanceUnit}
+                      className="flex items-center gap-2 bg-gray-100 rounded-full p-1 transition-all duration-200 hover:bg-gray-150"
+                      aria-label={`Switch to ${isDistanceMetric ? 'imperial' : 'metric'} distance units`}
+                    >
+                      <div className={`px-3 py-1 rounded-full transition-all duration-200 text-xs font-medium ${
+                        isDistanceImperial
+                          ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
+                          : 'text-gray-600'
+                      }`}>
+                        mph
+                      </div>
+                      <div className={`px-3 py-1 rounded-full transition-all duration-200 text-xs font-medium ${
+                        isDistanceMetric
+                          ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
+                          : 'text-gray-600'
+                      }`}>
+                        km/h
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Duration Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <input
+                      type="number"
+                      placeholder="Enter duration in minutes"
+                      value={cardioData.duration}
+                      onChange={(e) => {
+                        const duration = e.target.value;
+                        setCardioData(prev => ({
+                          ...prev,
+                          duration,
+                          distance: duration && prev.pace ? ((parseFloat(duration) / 60) * parseFloat(prev.pace)).toFixed(2) : 0
+                        }));
+                      }}
+                      className="w-full text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                    />
+                  </div>
+
+                  {/* Pace Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pace ({isDistanceMetric ? 'km/h' : 'mph'})
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      placeholder={isDistanceMetric ? 'e.g., 6 for walking, 10 for jogging' : 'e.g., 4 for walking, 6 for jogging'}
+                      value={cardioData.pace}
+                      onChange={(e) => {
+                        const pace = e.target.value;
+                        setCardioData(prev => ({
+                          ...prev,
+                          pace,
+                          distance: prev.duration && pace ? ((parseFloat(prev.duration) / 60) * parseFloat(pace)).toFixed(2) : 0
+                        }));
+                      }}
+                      className="w-full text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                    />
+                  </div>
+
+                  {/* Distance Display (Auto-calculated) */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Distance ({isDistanceMetric ? 'km' : 'miles'})
+                    </label>
+                    <div className="w-full text-center text-3xl font-bold p-4 bg-green-50 border-2 border-green-300 rounded-lg text-green-700">
+                      {cardioData.distance || '0.00'}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 text-center">Auto-calculated from duration × pace</p>
+                  </div>
+
+                  {/* Log Cardio Button */}
+                  <button
+                    onClick={logSet}
+                    disabled={!cardioData.duration || !cardioData.pace}
+                    className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <Check className="w-6 h-6" />
+                    Complete Cardio
+                  </button>
+                </>
+              )}
+
+              {exerciseType === 'stretching' && (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Stretching Session
+                  </h3>
+
+                  {/* Duration Input */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <input
+                      type="number"
+                      placeholder="Enter duration in minutes"
+                      value={stretchingData.duration}
+                      onChange={(e) => setStretchingData({ duration: e.target.value })}
+                      className="w-full text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                    />
+                  </div>
+
+                  {/* Log Stretching Button */}
+                  <button
+                    onClick={logSet}
+                    disabled={!stretchingData.duration}
+                    className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <Check className="w-6 h-6" />
+                    Complete Stretching
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

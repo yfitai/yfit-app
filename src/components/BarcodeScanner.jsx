@@ -4,17 +4,6 @@ import { Camera } from '@capacitor/camera'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
 
-// Conditionally import BarcodeScanner only for native platforms
-// This prevents build errors on web where the package isn't needed
-let BarcodeScanner = null
-if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
-  // Dynamic import for native platforms only
-  import('@capacitor/barcode-scanner').then(module => {
-    BarcodeScanner = module.BarcodeScanner
-    console.log('BarcodeScanner imported:', BarcodeScanner)
-  })
-}
-
 export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   const [scanning, setScanning] = useState(false)
   const [error, setError] = useState(null)
@@ -25,7 +14,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   useEffect(() => {
     // Auto-start scanning when component mounts
     startScan()
-    
+
     // Cleanup on unmount
     return () => {
       stopScan()
@@ -34,6 +23,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const startScan = async () => {
     try {
+      console.log('startScan called, isNative:', isNative)
       setError(null)
       setScanning(true)
 
@@ -52,32 +42,48 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const startNativeScan = async () => {
     try {
-      // Wait for BarcodeScanner to be loaded
-      if (!BarcodeScanner) {
-        const module = await import('@capacitor/barcode-scanner')
-        BarcodeScanner = module.BarcodeScanner
+      console.log('startNativeScan called')
+      
+      // Get BarcodeScanner from Capacitor.Plugins (native plugin registry)
+      const { CapacitorBarcodeScanner } = Capacitor.Plugins
+      
+      if (!CapacitorBarcodeScanner) {
+        console.error('CapacitorBarcodeScanner plugin not found in Capacitor.Plugins')
+        console.error('Available plugins:', Object.keys(Capacitor.Plugins))
+        throw new Error('Barcode scanner plugin not available')
       }
 
+      console.log('CapacitorBarcodeScanner found:', CapacitorBarcodeScanner)
+      console.log('Methods:', Object.keys(CapacitorBarcodeScanner))
+
       // Check and request camera permission first
+      console.log('Checking camera permissions...')
       const permission = await Camera.checkPermissions()
-      
+      console.log('Camera permission status:', permission)
+
       if (permission.camera === 'denied') {
+        console.log('Camera permission denied, requesting...')
         // Request permission
         const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
-        
+        console.log('Permission request result:', requestResult)
+
         if (requestResult.camera !== 'granted') {
           throw new Error('Camera permission denied')
         }
       }
-      
+
+      console.log('Permissions OK, starting barcode scan...')
+
       // Start scanning with Capacitor Barcode Scanner
-      const result = await BarcodeScanner.scanBarcode({
+      const result = await CapacitorBarcodeScanner.scanBarcode({
         hint: 17, // Try all formats
         scanInstructions: 'Point camera at barcode',
         scanButton: false,
         scanText: 'Scanning...',
         cameraDirection: 1 // Back camera
       })
+
+      console.log('Scan result:', result)
 
       if (result && result.ScanResult) {
         handleScanSuccess(result.ScanResult)
@@ -87,6 +93,11 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       }
     } catch (err) {
       console.error('Native scan error:', err)
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      })
       throw err
     }
   }
@@ -135,7 +146,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const handleScanSuccess = async (barcode) => {
     console.log('Barcode detected:', barcode)
-    
+
     // Stop scanning
     setScanning(false)
     setLookingUp(true)
@@ -161,12 +172,15 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   }
 
   const handleScanError = (err) => {
+    console.log('handleScanError called with:', err)
     if (err.message?.includes('permission')) {
-      setError('Camera permission denied. Please enable camera access.')
+      setError('Camera permission denied. Please enable camera access in settings.')
     } else if (err.message?.includes('cancel')) {
       setError('Scan cancelled.')
+    } else if (err.message?.includes('not available')) {
+      setError(err.message)
     } else {
-      setError('Unable to access camera. Please check permissions and try again.')
+      setError('Unable to access camera. Check permissions and try again.')
     }
     setScanning(false)
   }
@@ -186,8 +200,8 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
       {/* Web Scanner Container */}
       {!isNative && (
-        <div 
-          id="barcode-reader" 
+        <div
+          id="barcode-reader"
           className="w-full max-w-md"
           style={{ display: scanning && !lookingUp ? 'block' : 'none' }}
         ></div>
@@ -263,8 +277,8 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
         <div className="absolute top-8 left-0 right-0 flex justify-center">
           <div className="bg-black bg-opacity-75 text-white px-6 py-3 rounded-full max-w-md mx-4">
             <p className="text-sm text-center">
-              {isNative 
-                ? 'Position barcode within the frame' 
+              {isNative
+                ? 'Position barcode within the frame'
                 : 'Allow camera access and point at barcode'}
             </p>
           </div>

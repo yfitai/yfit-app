@@ -5,14 +5,15 @@ const UnitPreferenceContext = createContext()
 
 export function UnitPreferenceProvider({ children }) {
   const [unitSystem, setUnitSystem] = useState('imperial') // default to imperial
+  const [distanceUnit, setDistanceUnit] = useState('imperial') // default to imperial (mph/miles)
   const [loading, setLoading] = useState(true)
 
-  // Load user's unit preference from database
+  // Load user's unit preferences from database
   useEffect(() => {
-    loadUnitPreference()
+    loadUnitPreferences()
   }, [])
 
-  const loadUnitPreference = async () => {
+  const loadUnitPreferences = async () => {
     try {
       const user = await getCurrentUser()
       if (!user) {
@@ -22,9 +23,13 @@ export function UnitPreferenceProvider({ children }) {
 
       // Skip Supabase query in demo mode
       if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_unit_preference')
-        if (stored) {
-          setUnitSystem(stored)
+        const storedUnit = localStorage.getItem('yfit_demo_unit_preference')
+        const storedDistance = localStorage.getItem('yfit_demo_distance_unit_preference')
+        if (storedUnit) {
+          setUnitSystem(storedUnit)
+        }
+        if (storedDistance) {
+          setDistanceUnit(storedDistance)
         }
         setLoading(false)
         return
@@ -32,15 +37,16 @@ export function UnitPreferenceProvider({ children }) {
 
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('preferred_unit_system')
+        .select('preferred_unit_system, preferred_distance_unit')
         .eq('user_id', user.id)
         .single()
 
       if (data && !error) {
-        setUnitSystem(data.preferred_unit_system)
+        setUnitSystem(data.preferred_unit_system || 'imperial')
+        setDistanceUnit(data.preferred_distance_unit || 'imperial')
       }
     } catch (error) {
-      console.error('Error loading unit preference:', error)
+      console.error('Error loading unit preferences:', error)
     } finally {
       setLoading(false)
     }
@@ -79,12 +85,49 @@ export function UnitPreferenceProvider({ children }) {
     }
   }
 
+  const toggleDistanceUnit = async () => {
+    const newUnit = distanceUnit === 'metric' ? 'imperial' : 'metric'
+    setDistanceUnit(newUnit)
+
+    // Save to database
+    try {
+      const user = await getCurrentUser()
+      if (!user) return
+
+      // Save to localStorage in demo mode
+      if (user.id.startsWith('demo')) {
+        localStorage.setItem('yfit_demo_distance_unit_preference', newUnit)
+        return
+      }
+
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          preferred_distance_unit: newUnit,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        })
+
+      if (error) {
+        console.error('Error saving distance unit preference:', error)
+      }
+    } catch (error) {
+      console.error('Error updating distance unit preference:', error)
+    }
+  }
+
   const value = {
     unitSystem,
     toggleUnitSystem,
+    distanceUnit,
+    toggleDistanceUnit,
     loading,
     isMetric: unitSystem === 'metric',
-    isImperial: unitSystem === 'imperial'
+    isImperial: unitSystem === 'imperial',
+    isDistanceMetric: distanceUnit === 'metric',
+    isDistanceImperial: distanceUnit === 'imperial'
   }
 
   return (
