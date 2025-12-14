@@ -1,0 +1,453 @@
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { jsPDF } from 'jspdf';
+
+function ProviderReport({ user }) {
+  console.log('ProviderReport: Component mounted, user =', user);
+  
+  const [medications, setMedications] = useState([]);
+  const [supplements, setSupplements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [downloadMessage, setDownloadMessage] = useState('');
+
+  useEffect(() => {
+    console.log('ProviderReport: useEffect triggered, user =', user);
+    if (user) {
+      loadMedications();
+    }
+  }, [user]);
+
+  const loadMedications = async () => {
+    setLoading(true);
+    try {
+      console.log('ProviderReport: Loading medications...');
+      console.log('ProviderReport: user =', user);
+      
+      // Check if demo mode (same as MedicationList)
+      if (user.id.startsWith('demo')) {
+        console.log('ProviderReport: Demo mode detected');
+        // Load from localStorage with correct key
+        const stored = localStorage.getItem('yfit_demo_medications');
+        console.log('ProviderReport: stored raw =', stored);
+        const allItems = stored ? JSON.parse(stored) : [];
+        console.log('ProviderReport: allItems =', allItems);
+        const meds = allItems.filter(item => !item.is_supplement);
+        const supps = allItems.filter(item => item.is_supplement === true);
+        console.log('ProviderReport: meds =', meds);
+        console.log('ProviderReport: supps =', supps);
+        setMedications(meds);
+        setSupplements(supps);
+      } else {
+        // Load from Supabase
+        const { data, error } = await supabase
+          .from('user_medications')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const meds = (data || []).filter(item => !item.is_supplement);
+        const supps = (data || []).filter(item => item.is_supplement === true);
+        setMedications(meds);
+        setSupplements(supps);
+      }
+    } catch (error) {
+      console.error('Error loading medications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generatePDF = () => {
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      let y = 20;
+
+      // Title
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.text('Medication & Supplement Report', pageWidth / 2, y, { align: 'center' });
+      y += 10;
+
+      // Date
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      const dateStr = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      doc.text(`Generated: ${dateStr}`, pageWidth / 2, y, { align: 'center' });
+      y += 15;
+
+      // Medications Section
+      if (medications.length > 0) {
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Medications', margin, y);
+        y += 8;
+
+        medications.forEach((med, index) => {
+          // Check if we need a new page
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+
+          doc.setFontSize(11);
+          doc.setFont(undefined, 'bold');
+          doc.text(`${index + 1}. ${med.medication?.name || med.custom_name}`, margin, y);
+          y += 6;
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+
+          if (med.dosage) {
+            doc.text(`   Dosage: ${med.dosage}`, margin, y);
+            y += 5;
+          }
+          if (med.frequency) {
+            doc.text(`   Frequency: ${med.frequency}`, margin, y);
+            y += 5;
+          }
+          if (med.purpose) {
+            doc.text(`   Purpose: ${med.purpose}`, margin, y);
+            y += 5;
+          }
+          if (med.prescriber) {
+            doc.text(`   Prescriber: ${med.prescriber}`, margin, y);
+            y += 5;
+          }
+          if (med.notes) {
+            const lines = doc.splitTextToSize(`   Notes: ${med.notes}`, pageWidth - 2 * margin);
+            doc.text(lines, margin, y);
+            y += lines.length * 5;
+          }
+
+          y += 5; // Space between medications
+        });
+
+        y += 5;
+      }
+
+      // Supplements Section
+      if (supplements.length > 0) {
+        // Check if we need a new page
+        if (y > 250) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Supplements', margin, y);
+        y += 8;
+
+        supplements.forEach((supp, index) => {
+          // Check if we need a new page
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+
+          doc.setFontSize(11);
+          doc.setFont(undefined, 'bold');
+          doc.text(`${index + 1}. ${supp.medication?.name || supp.custom_name}`, margin, y);
+          y += 6;
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+
+          if (supp.dosage) {
+            doc.text(`   Dosage: ${supp.dosage}`, margin, y);
+            y += 5;
+          }
+          if (supp.frequency) {
+            doc.text(`   Frequency: ${supp.frequency}`, margin, y);
+            y += 5;
+          }
+          if (supp.purpose) {
+            doc.text(`   Purpose: ${supp.purpose}`, margin, y);
+            y += 5;
+          }
+          if (supp.notes) {
+            const lines = doc.splitTextToSize(`   Notes: ${supp.notes}`, pageWidth - 2 * margin);
+            doc.text(lines, margin, y);
+            y += lines.length * 5;
+          }
+
+          y += 5; // Space between supplements
+        });
+      }
+
+      // Generate filename with date
+      const filename = `Medication_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      // Convert PDF to data URL
+      const pdfDataUrl = doc.output('dataurlstring');
+      
+      // Open in new window/tab - this will allow the browser to handle download
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>${filename}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body { 
+                margin: 0; 
+                padding: 0; 
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+              }
+              .header {
+                background: #007bff;
+                color: white;
+                padding: 15px;
+                text-align: center;
+                font-family: Arial, sans-serif;
+              }
+              .header h1 {
+                margin: 0;
+                font-size: 18px;
+              }
+              .header p {
+                margin: 5px 0 0 0;
+                font-size: 12px;
+              }
+              .buttons {
+                background: #f8f9fa;
+                padding: 10px;
+                text-align: center;
+                border-bottom: 1px solid #dee2e6;
+              }
+              button {
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                margin: 0 5px;
+                border-radius: 5px;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+              }
+              button:active {
+                background: #218838;
+              }
+              iframe { 
+                flex: 1;
+                border: none; 
+                width: 100%;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>📋 Medication Report</h1>
+              <p>Use the buttons below or browser menu to download/print</p>
+            </div>
+            <div class="buttons">
+              <button onclick="downloadPDF()">📥 Download</button>
+              <button onclick="window.print()">🖨️ Print</button>
+            </div>
+            <iframe src="${pdfDataUrl}" type="application/pdf"></iframe>
+            <script>
+              function downloadPDF() {
+                const link = document.createElement('a');
+                link.href = '${pdfDataUrl}';
+                link.download = '${filename}';
+                link.click();
+              }
+            </script>
+          </body>
+          </html>
+        `);
+        newWindow.document.close();
+        
+        setDownloadMessage('✓ PDF opened in new tab. Use Download or Print button.');
+      } else {
+        // Fallback if popup blocked
+        setDownloadMessage('⚠️ Please allow popups for this app, then try again.');
+      }
+
+      setTimeout(() => setDownloadMessage(''), 8000);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setDownloadMessage('✗ Error generating PDF. Please try again.');
+      setTimeout(() => setDownloadMessage(''), 5000);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <p>Loading medications...</p>
+      </div>
+    );
+  }
+
+  const totalItems = medications.length + supplements.length;
+
+  if (totalItems === 0) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <p>No medications or supplements to display.</p>
+        <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
+          Add medications from the Medications tab to generate a report.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '20px', paddingBottom: '80px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '20px' }}>
+        <h2 style={{ margin: '0 0 5px 0', fontSize: '20px' }}>Provider Report</h2>
+        <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
+          Share this report with your healthcare provider
+        </p>
+      </div>
+
+      {/* Download Button */}
+      <button
+        onClick={generatePDF}
+        style={{
+          width: '100%',
+          padding: '12px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          marginBottom: '15px'
+        }}
+      >
+        📥 Download PDF Report
+      </button>
+
+      {/* Download Message */}
+      {downloadMessage && (
+        <div style={{
+          padding: '12px',
+          backgroundColor: downloadMessage.includes('✓') ? '#d4edda' : downloadMessage.includes('⚠️') ? '#fff3cd' : '#f8d7da',
+          color: downloadMessage.includes('✓') ? '#155724' : downloadMessage.includes('⚠️') ? '#856404' : '#721c24',
+          borderRadius: '8px',
+          marginBottom: '15px',
+          fontSize: '14px',
+          textAlign: 'center'
+        }}>
+          {downloadMessage}
+        </div>
+      )}
+
+      {/* Medications Section */}
+      {medications.length > 0 && (
+        <div style={{ marginBottom: '25px' }}>
+          <h3 style={{ fontSize: '18px', marginBottom: '15px', color: '#333' }}>
+            Medications ({medications.length})
+          </h3>
+          {medications.map((med, index) => (
+            <div
+              key={med.id || index}
+              style={{
+                backgroundColor: '#f8f9fa',
+                padding: '15px',
+                borderRadius: '8px',
+                marginBottom: '12px',
+                border: '1px solid #dee2e6'
+              }}
+            >
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px', color: '#333' }}>
+                {med.medication?.name || med.custom_name}
+              </div>
+              {med.dosage && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Dosage:</strong> {med.dosage}
+                </div>
+              )}
+              {med.frequency && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Frequency:</strong> {med.frequency}
+                </div>
+              )}
+              {med.purpose && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Purpose:</strong> {med.purpose}
+                </div>
+              )}
+              {med.prescriber && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Prescriber:</strong> {med.prescriber}
+                </div>
+              )}
+              {med.notes && (
+                <div style={{ fontSize: '14px', marginTop: '8px', color: '#666' }}>
+                  <strong>Notes:</strong> {med.notes}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Supplements Section */}
+      {supplements.length > 0 && (
+        <div>
+          <h3 style={{ fontSize: '18px', marginBottom: '15px', color: '#333' }}>
+            Supplements ({supplements.length})
+          </h3>
+          {supplements.map((supp, index) => (
+            <div
+              key={supp.id || index}
+              style={{
+                backgroundColor: '#f8f9fa',
+                padding: '15px',
+                borderRadius: '8px',
+                marginBottom: '12px',
+                border: '1px solid #dee2e6'
+              }}
+            >
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px', color: '#333' }}>
+                {supp.medication?.name || supp.custom_name}
+              </div>
+              {supp.dosage && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Dosage:</strong> {supp.dosage}
+                </div>
+              )}
+              {supp.frequency && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Frequency:</strong> {supp.frequency}
+                </div>
+              )}
+              {supp.purpose && (
+                <div style={{ fontSize: '14px', marginBottom: '5px' }}>
+                  <strong>Purpose:</strong> {supp.purpose}
+                </div>
+              )}
+              {supp.notes && (
+                <div style={{ fontSize: '14px', marginTop: '8px', color: '#666' }}>
+                  <strong>Notes:</strong> {supp.notes}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ProviderReport;
