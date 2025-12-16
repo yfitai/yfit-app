@@ -252,7 +252,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       type="email"
                       placeholder="your@email.com"
                       value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
+                      onChange={(e) => {
+                        setLoginEmail(e.target.value)
+                        setError('')
+                      }}
                       required
                       disabled={isLoading}
                     />
@@ -265,7 +268,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       type="password"
                       placeholder="••••••••"
                       value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
+                      onChange={(e) => {
+                        setLoginPassword(e.target.value)
+                        setError('')
+                      }}
                       required
                       disabled={isLoading}
                     />
@@ -319,7 +325,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                         type="text"
                         placeholder="John"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => {
+                        setFirstName(e.target.value)
+                        setError('')
+                      }}
                         required
                         disabled={isLoading}
                       />
@@ -332,7 +341,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                         type="text"
                         placeholder="Doe"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => {
+                        setLastName(e.target.value)
+                        setError('')
+                      }}
                         required
                         disabled={isLoading}
                       />
@@ -346,7 +358,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       type="email"
                       placeholder="your@email.com"
                       value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
+                      onChange={(e) => {
+                        setSignupEmail(e.target.value)
+                        setError('')
+                      }}
                       required
                       disabled={isLoading}
                     />
@@ -359,7 +374,10 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       type="password"
                       placeholder="••••••••"
                       value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
+                      onChange={(e) => {
+                        setSignupPassword(e.target.value)
+                        setError('')
+                      }}
                       required
                       disabled={isLoading}
                     />
