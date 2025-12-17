@@ -6,11 +6,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.jsx'
 import { signIn, signUp, resendConfirmationEmail } from '../lib/supabase'
-import { Mail, CheckCircle } from 'lucide-react'
+import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 
 export default function Auth({ onAuthSuccess, onDemoMode }) {
-  const [isLoading, setIsLoading] = useState(false)
+const [isLoading, setIsLoading] = useState(false)
+const [showLoginPassword, setShowLoginPassword] = useState(false)
+const [showSignupPassword, setShowSignupPassword] = useState(false)
+
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
@@ -260,22 +263,32 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       disabled={isLoading}
                     />
                   </div>
-                  
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => {
-                        setLoginPassword(e.target.value)
-                        setError('')
-                      }}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
+  <Label htmlFor="login-password">Password</Label>
+  <div className="relative">
+    <Input
+      id="login-password"
+      type={showLoginPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={loginPassword}
+      onChange={(e) => {
+        setLoginPassword(e.target.value)
+        setError('')
+      }}
+      required
+      disabled={isLoading}
+    />
+    <button
+      type="button"
+      onClick={() => setShowLoginPassword(!showLoginPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+      {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
+
+               
                 </CardContent>
                 <CardFooter>
                   <Button 
@@ -366,21 +379,32 @@ export default function Auth({ onAuthSuccess, onDemoMode }) {
                       disabled={isLoading}
                     />
                   </div>
-                  
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password *</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupPassword}
-                      onChange={(e) => {
-                        setSignupPassword(e.target.value)
-                        setError('')
-                      }}
-                      required
-                      disabled={isLoading}
-                    />
+  <Label htmlFor="signup-password">Password *</Label>
+  <div className="relative">
+    <Input
+      id="signup-password"
+      type={showSignupPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={signupPassword}
+      onChange={(e) => {
+        setSignupPassword(e.target.value)
+        setError('')
+      }}
+      required
+      disabled={isLoading}
+    />
+    <button
+      type="button"
+      onClick={() => setShowSignupPassword(!showSignupPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+      {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
+
+              
                     <p className="text-xs text-gray-500">Minimum 6 characters</p>
                   </div>
                 </CardContent>
