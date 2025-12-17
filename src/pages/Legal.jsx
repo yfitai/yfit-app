@@ -52,7 +52,7 @@ export default function Legal() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
-          <p>Last updated: October 29, 2025</p>
+          <p>Last updated: December 16, 2025</p>
           <p className="mt-2">
             Questions? Contact us at{' '}
             <a href="mailto:support@yfitai.com" className="text-blue-600 hover:underline">
@@ -69,7 +69,7 @@ function PrivacyPolicy() {
   return (
     <div className="prose max-w-none">
       <h2>Privacy Policy</h2>
-      <p className="text-gray-600">Effective Date: October 29, 2025</p>
+      <p className="text-gray-600">Effective Date: December 16, 2025</p>
 
       <h3>1. Introduction</h3>
       <p>
@@ -143,7 +143,7 @@ function TermsOfService() {
   return (
     <div className="prose max-w-none">
       <h2>Terms of Service</h2>
-      <p className="text-gray-600">Effective Date: October 29, 2025</p>
+      <p className="text-gray-600">Effective Date: December 16, 2025</p>
 
       <h3>1. Acceptance of Terms</h3>
       <p>
@@ -212,7 +212,7 @@ function CookiePolicy() {
   return (
     <div className="prose max-w-none">
       <h2>Cookie Policy</h2>
-      <p className="text-gray-600">Effective Date: October 29, 2025</p>
+      <p className="text-gray-600">Effective Date: December 16, 2025</p>
 
       <h3>1. What Are Cookies?</h3>
       <p>
@@ -263,7 +263,7 @@ function HIPAANotice() {
   return (
     <div className="prose max-w-none">
       <h2>HIPAA Compliance Notice</h2>
-      <p className="text-gray-600">Effective Date: October 29, 2025</p>
+      <p className="text-gray-600">Effective Date: December 16, 2025</p>
 
       <h3>1. HIPAA Applicability</h3>
       <p>
