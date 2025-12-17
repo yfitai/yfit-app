@@ -122,7 +122,7 @@ function PrivacyPolicy() {
 
       <h3>7. Children's Privacy</h3>
       <p>
-        Our app is not intended for children under 13. We do not knowingly collect data from children under 13.
+        Our app is not intended for children under 18. We do not knowingly collect data from children under 18.
       </p>
 
       <h3>8. Changes to This Policy</h3>
