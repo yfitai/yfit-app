@@ -106,7 +106,7 @@ export default function ProgressPhotos({ userId }) {
       // Take photo with camera
       const image = await CapacitorCamera.getPhoto({
         quality: 90,
-        allowEditing: false,
+       allowEditing: true,
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera,
         saveToGallery: false,

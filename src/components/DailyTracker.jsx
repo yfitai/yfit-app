@@ -258,7 +258,7 @@ export default function DailyTracker({ user }) {
           const data = JSON.parse(stored);
           setGoals({
             sleep: data.sleep_hours_goal || 8,
-            water: data.water_ml_goal || 2000,
+           water: data.water_goal_ml || 2000,
             steps: data.steps_goal || 10000,
             bpSystolic: data.bp_systolic_goal || 120,
             bpDiastolic: data.bp_diastolic_goal || 80,
@@ -279,7 +279,7 @@ export default function DailyTracker({ user }) {
       if (data) {
         setGoals({
           sleep: data.sleep_hours_goal || 8,
-          water: data.water_ml_goal || 2000,
+         water: data.water_goal_ml || 2000,
           steps: data.steps_goal || 10000,
           bpSystolic: data.bp_systolic_goal || 120,
           bpDiastolic: data.bp_diastolic_goal || 80,
