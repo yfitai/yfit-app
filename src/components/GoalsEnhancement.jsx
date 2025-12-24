@@ -4,8 +4,11 @@ import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import {
   convertWeightInputToKg,
   convertKgToDisplay,
-  getWeightUnit
+  getWeightUnit,
+  mlToOz,
+  ozToMl
 } from '../lib/unitConversions'
+
 
 /**
  * GoalsEnhancement Component
@@ -154,7 +157,7 @@ export default function GoalsEnhancement({
       fiber_goal_g: fiberGoal ? parseFloat(fiberGoal) : 25,
       sugar_goal_g: sugarGoal ? parseFloat(sugarGoal) : 50,
       sodium_goal_mg: sodiumGoal ? parseFloat(sodiumGoal) : 2300,
-      water_goal_ml: waterGoal ? parseInt(waterGoal) : 2000,
+      water_goal_ml: waterGoal ? (isMetric ? parseInt(waterGoal) : ozToMl(parseInt(waterGoal))) : 2000,
       steps_goal: stepsGoal ? parseInt(stepsGoal) : 10000,
       sleep_hours_goal: sleepGoal ? parseFloat(sleepGoal) : 8
     }
@@ -379,16 +382,18 @@ export default function GoalsEnhancement({
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Water Goal (ml/day)
+              Water Goal ({isMetric ? 'ml' : 'oz'}/day)
             </label>
             <input
               type="number"
               value={waterGoal}
               onChange={(e) => setWaterGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="2000ml recommended"
+           placeholder={isMetric ? "2000ml recommended" : "68oz recommended"}
+
             />
-            <p className="text-xs text-gray-500 mt-1">~8 glasses (2L)</p>
+     <p className="text-xs text-gray-500 mt-1">{isMetric ? '~8 glasses (2L)' : '~8 glasses (68oz)'}</p>
+
           </div>
           
           <div>
