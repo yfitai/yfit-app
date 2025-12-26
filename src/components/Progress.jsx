@@ -226,40 +226,51 @@ export default function Progress({ user: propUser }) {
     }
   }
 
-  const loadGoals = async (userId) => {
-    if (userId.startsWith('demo')) {
-      setCurrentMetrics({
-        weight: 180,
-        bodyFat: 22,
-        bmi: 26.5
-      })
-      setGoalMetrics({
-        weight: 165,
-        bodyFat: 15,
-        bmi: 23.0
-      })
-      return
-    }
-
-    const { data: goalsData } = await supabase
-      .from('user_goals')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
-
-    if (goalsData) {
-      setCurrentMetrics({
-        weight: goalsData.current_weight_kg * 2.20462,
-        bodyFat: goalsData.current_body_fat,
-        bmi: goalsData.current_bmi
-      })
-      setGoalMetrics({
-        weight: goalsData.goal_weight_kg * 2.20462,
-        bodyFat: goalsData.goal_body_fat,
-        bmi: goalsData.goal_bmi
-      })
-    }
+const loadGoals = async (userId) => {
+  if (userId.startsWith('demo')) {
+    setCurrentMetrics({
+      weight: 180,
+      bodyFat: 22,
+      bmi: 26.5
+    })
+    setGoalMetrics({
+      weight: 165,
+      bodyFat: 15,
+      bmi: 23.0
+    })
+    return
   }
+
+  const { data: goalsData } = await supabase
+    .from('user_goals')
+    .select('*')
+    .eq('user_id', userId)
+    .single()
+
+  if (goalsData) {
+    // Calculate current BMI from height and starting weight
+    const currentBMI = goalsData.height_cm && goalsData.weight_kg 
+      ? (goalsData.weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+      : null
+    
+    // Calculate goal BMI from height and target weight
+    const goalBMI = goalsData.height_cm && goalsData.target_weight_kg
+      ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+      : null
+
+    setCurrentMetrics({
+      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
+      bodyFat: goalsData.starting_body_fat_percentage || null,
+      bmi: currentBMI
+    })
+    setGoalMetrics({
+      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
+      bodyFat: goalsData.target_body_fat_percentage || null,
+      bmi: goalBMI
+    })
+  }
+}
+
 
   const calculatePredictions = () => {
     if (weightData.length < 2) return
