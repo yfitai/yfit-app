@@ -276,28 +276,34 @@ export default function Goals({ user: propUser }) {
       // Convert weight to kg
       const weightInKg = convertWeightInputToKg(parseFloat(weight), unitSystem)
 
-      // Prepare measurements in cm (without user_id for now)
+         // Prepare measurements in cm (without user_id for now)
+      // Only include measurements that have values > 0
       const measurementsInCm = {
-        measurement_date: new Date().toISOString().split('T')[0],
-        neck_cm: convertInputToCm(parseFloat(measurements.neck || 0), unitSystem),
-        shoulders_cm: convertInputToCm(parseFloat(measurements.shoulders || 0), unitSystem),
-        chest_cm: convertInputToCm(parseFloat(measurements.chest || 0), unitSystem),
-        waist_cm: convertInputToCm(parseFloat(measurements.waist || 0), unitSystem),
-        hips_cm: convertInputToCm(parseFloat(measurements.hips || 0), unitSystem),
-        biceps_cm: convertInputToCm(parseFloat(measurements.biceps || 0), unitSystem),
-        forearms_cm: convertInputToCm(parseFloat(measurements.forearms || 0), unitSystem),
-        thighs_cm: convertInputToCm(parseFloat(measurements.thighs || 0), unitSystem),
-        calves_cm: convertInputToCm(parseFloat(measurements.calves || 0), unitSystem),
-        neck_goal_cm: convertInputToCm(parseFloat(measurementGoals.neck || 0), unitSystem),
-        shoulders_goal_cm: convertInputToCm(parseFloat(measurementGoals.shoulders || 0), unitSystem),
-        chest_goal_cm: convertInputToCm(parseFloat(measurementGoals.chest || 0), unitSystem),
-        waist_goal_cm: convertInputToCm(parseFloat(measurementGoals.waist || 0), unitSystem),
-        hips_goal_cm: convertInputToCm(parseFloat(measurementGoals.hips || 0), unitSystem),
-        biceps_goal_cm: convertInputToCm(parseFloat(measurementGoals.biceps || 0), unitSystem),
-        forearms_goal_cm: convertInputToCm(parseFloat(measurementGoals.forearms || 0), unitSystem),
-        thighs_goal_cm: convertInputToCm(parseFloat(measurementGoals.thighs || 0), unitSystem),
-        calves_goal_cm: convertInputToCm(parseFloat(measurementGoals.calves || 0), unitSystem)
+        measurement_date: new Date().toISOString().split('T')[0]
       }
+      
+      // Add measurements only if they have values
+      if (measurements.neck) measurementsInCm.neck_cm = convertInputToCm(parseFloat(measurements.neck), unitSystem)
+      if (measurements.shoulders) measurementsInCm.shoulders_cm = convertInputToCm(parseFloat(measurements.shoulders), unitSystem)
+      if (measurements.chest) measurementsInCm.chest_cm = convertInputToCm(parseFloat(measurements.chest), unitSystem)
+      if (measurements.waist) measurementsInCm.waist_cm = convertInputToCm(parseFloat(measurements.waist), unitSystem)
+      if (measurements.hips) measurementsInCm.hips_cm = convertInputToCm(parseFloat(measurements.hips), unitSystem)
+      if (measurements.biceps) measurementsInCm.biceps_cm = convertInputToCm(parseFloat(measurements.biceps), unitSystem)
+      if (measurements.forearms) measurementsInCm.forearms_cm = convertInputToCm(parseFloat(measurements.forearms), unitSystem)
+      if (measurements.thighs) measurementsInCm.thighs_cm = convertInputToCm(parseFloat(measurements.thighs), unitSystem)
+      if (measurements.calves) measurementsInCm.calves_cm = convertInputToCm(parseFloat(measurements.calves), unitSystem)
+      
+      // Add goal measurements only if they have values
+      if (measurementGoals.neck) measurementsInCm.neck_goal_cm = convertInputToCm(parseFloat(measurementGoals.neck), unitSystem)
+      if (measurementGoals.shoulders) measurementsInCm.shoulders_goal_cm = convertInputToCm(parseFloat(measurementGoals.shoulders), unitSystem)
+      if (measurementGoals.chest) measurementsInCm.chest_goal_cm = convertInputToCm(parseFloat(measurementGoals.chest), unitSystem)
+      if (measurementGoals.waist) measurementsInCm.waist_goal_cm = convertInputToCm(parseFloat(measurementGoals.waist), unitSystem)
+      if (measurementGoals.hips) measurementsInCm.hips_goal_cm = convertInputToCm(parseFloat(measurementGoals.hips), unitSystem)
+      if (measurementGoals.biceps) measurementsInCm.biceps_goal_cm = convertInputToCm(parseFloat(measurementGoals.biceps), unitSystem)
+      if (measurementGoals.forearms) measurementsInCm.forearms_goal_cm = convertInputToCm(parseFloat(measurementGoals.forearms), unitSystem)
+      if (measurementGoals.thighs) measurementsInCm.thighs_goal_cm = convertInputToCm(parseFloat(measurementGoals.thighs), unitSystem)
+      if (measurementGoals.calves) measurementsInCm.calves_goal_cm = convertInputToCm(parseFloat(measurementGoals.calves), unitSystem)
+
 
       // Calculate all metrics
       const userData = {
