@@ -162,9 +162,9 @@ export default function NutritionEnhanced({ user: propUser }) {
   const calculateTotals = (meals) => {
     const totals = meals.reduce((acc, meal) => ({
       calories: acc.calories + (meal.calories || 0),
-      protein: acc.protein + (meal.protein || 0),
-      carbs: acc.carbs + (meal.carbs || 0),
-      fat: acc.fat + (meal.fat || 0),
+       protein: acc.protein + (meal.protein_g || meal.protein || 0),
+      carbs: acc.carbs + (meal.carbs_g || meal.carbs || 0),
+      fat: acc.fat + (meal.fat_g || meal.fat || 0),
       fiber: acc.fiber + (meal.fiber || 0),
       sugar: acc.sugar + (meal.sugar || 0),
       sodium: acc.sodium + (meal.sodium || 0)
@@ -230,9 +230,9 @@ export default function NutritionEnhanced({ user: propUser }) {
       meal_date: new Date().toISOString().split('T')[0],
       food_name: selectedFood.name,
       calories: Math.round((selectedFood.calories || 0) * multiplier),
-      protein: Math.round((selectedFood.protein || 0) * multiplier),
-      carbs: Math.round((selectedFood.carbs || 0) * multiplier),
-      fat: Math.round((selectedFood.fat || 0) * multiplier),
+      protein_g: Math.round((selectedFood.protein || 0) * multiplier),
+      carbs_g: Math.round((selectedFood.carbs || 0) * multiplier),
+      fat_g: Math.round((selectedFood.fat || 0) * multiplier),
       fiber: Math.round((selectedFood.fiber || 0) * multiplier),
       sugar: Math.round((selectedFood.sugar || 0) * multiplier),
       sodium: Math.round((selectedFood.sodium || 0) * multiplier),
