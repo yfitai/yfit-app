@@ -19,7 +19,7 @@ android {
     
     signingConfigs {
         release {
-            storeFile file('../yfit-release-key.keystore' )
+            storeFile file('../yfit-release-key.keystore')
             storePassword 'XnsAudW53SP8'
             keyAlias 'yfit-key'
             keyPassword 'XnsAudW53SP8'

@@ -240,7 +240,7 @@ const loadGoals = async (userId) => {
     })
     return
   }
-
+  console.log('Loading goals for user:', userId)
   const { data: goalsData } = await supabase
     .from('user_goals')
     .select('*')
@@ -263,16 +263,28 @@ const loadGoals = async (userId) => {
       bodyFat: goalsData.starting_body_fat_percentage || null,
       bmi: currentBMI
     })
-    setGoalMetrics({
+      setGoalMetrics({
       weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
       bodyFat: goalsData.target_body_fat_percentage || null,
       bmi: goalBMI
     })
+    
+    console.log('Current metrics set:', {
+      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
+      bodyFat: goalsData.starting_body_fat_percentage || null,
+      bmi: currentBMI
+    })
+    console.log('Goal metrics set:', {
+      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
+      bodyFat: goalsData.target_body_fat_percentage || null,
+      bmi: goalBMI
+    })
+    console.log('Goals data from database:', goalsData)
   }
 }
 
+const calculatePredictions = () => {
 
-  const calculatePredictions = () => {
     if (weightData.length < 2) return
 
     // Calculate trend

@@ -268,7 +268,10 @@ export default function NutritionEnhanced({ user: propUser }) {
         .insert(mealData)
 
       if (error) {
-        console.error('Error logging food:', error)
+     console.error('Error logging food:', JSON.stringify(error, null, 2))
+     console.error('Error message:', error.message)
+     console.error('Error details:', error.details)
+     console.error('Error hint:', error.hint)
         alert('Error logging food. Please try again.')
         return
       }
