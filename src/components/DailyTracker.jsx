@@ -123,8 +123,8 @@ export default function DailyTracker({ user }) {
           sleep_quality: data[0].sleep_quality || 'good',
           water_ml: data[0].water_ml || '',
           steps: data[0].steps || '',
-          bp_systolic: data[0].blood_pressure_systolic || '',
-          bp_diastolic: data[0].blood_pressure_diastolic || '',
+          bp_systolic: data[0].bp_systolic || '',
+          bp_diastolic: data[0].bp_diastolic || '',
           glucose_mg_dl: data[0].glucose_mg_dl || '',
           notes: data[0].notes || ''
         });
@@ -303,8 +303,8 @@ export default function DailyTracker({ user }) {
         sleep_quality: formData.sleep_quality,
         water_ml: formData.water_ml ? parseInt(formData.water_ml) : null,
         steps: formData.steps ? parseInt(formData.steps) : null,
-        blood_pressure_systolic: formData.bp_systolic ? parseInt(formData.bp_systolic) : null,
-        blood_pressure_diastolic: formData.bp_diastolic ? parseInt(formData.bp_diastolic) : null,
+        bp_systolic: formData.bp_systolic ? parseInt(formData.bp_systolic) : null,
+        bp_diastolic: formData.bp_diastolic ? parseInt(formData.bp_diastolic) : null,
         glucose_mg_dl: formData.glucose_mg_dl ? parseInt(formData.glucose_mg_dl) : null,
         notes: formData.notes || null
       };
@@ -964,8 +964,8 @@ export default function DailyTracker({ user }) {
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Avg BP</div>
                 <div className="text-2xl font-bold text-red-600">
-                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.blood_pressure_systolic || 0), 0) / weeklyData.filter(d => d.blood_pressure_systolic).length) || '--'}/
-                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.blood_pressure_diastolic || 0), 0) / weeklyData.filter(d => d.blood_pressure_diastolic).length) || '--'}
+                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.bp_systolic || 0), 0) / weeklyData.filter(d => d.bp_systolic).length) || '--'}/
+                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.bp_diastolic || 0), 0) / weeklyData.filter(d => d.bp_diastolic).length) || '--'}
                 </div>
               </div>
               <div className="text-center">
