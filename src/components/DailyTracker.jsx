@@ -952,7 +952,11 @@ export default function DailyTracker({ user }) {
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Avg Water</div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.water_ml || 0), 0) / weeklyData.length)}ml
+                  {(() => {
+                    const avgMl = weeklyData.reduce((sum, d) => sum + (d.water_ml || 0), 0) / weeklyData.length;
+                    const displayValue = convertWaterFromMl(avgMl, waterUnit);
+                    return `${Math.round(displayValue)}${waterUnit}`;
+                  })()}
                 </div>
               </div>
               <div className="text-center">
@@ -971,7 +975,13 @@ export default function DailyTracker({ user }) {
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Avg Glucose</div>
                 <div className="text-2xl font-bold text-purple-600">
-                  {Math.round(weeklyData.reduce((sum, d) => sum + (d.glucose_mg_dl || 0), 0) / weeklyData.filter(d => d.glucose_mg_dl).length) || '--'}
+                  {(() => {
+                    const filteredData = weeklyData.filter(d => d.glucose_mg_dl);
+                    if (filteredData.length === 0) return '--';
+                    const avgMgDl = filteredData.reduce((sum, d) => sum + (d.glucose_mg_dl || 0), 0) / filteredData.length;
+                    const displayValue = convertGlucoseFromMgDl(avgMgDl, glucoseUnit);
+                    return glucoseUnit === 'mmol/l' ? `${displayValue.toFixed(1)} ${glucoseUnit}` : `${Math.round(displayValue)} ${glucoseUnit}`;
+                  })()}
                 </div>
               </div>
             </div>

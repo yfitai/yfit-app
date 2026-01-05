@@ -3,7 +3,7 @@ import { supabase, getCurrentUser } from '../lib/supabase';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { 
   Play, Pause, Square, Plus, Minus, Check, X, Clock, 
-  Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save
+  Dumbbell, TrendingUp, Award, ChevronRight, Timer, Save, Trash2
 } from 'lucide-react';
 
 const WorkoutLogger = ({ onNavigateToBuilder }) => {
@@ -324,6 +324,41 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     setShowWorkoutSelector(true);
   };
 
+  const deleteWorkout = async (workoutId, e) => {
+    // Prevent triggering the card click event
+    e.stopPropagation();
+    
+    if (!confirm('Are you sure you want to delete this workout? This cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      // Delete workout exercises first (foreign key constraint)
+      const { error: exercisesError } = await supabase
+        .from('workout_exercises')
+        .delete()
+        .eq('workout_id', workoutId);
+      
+      if (exercisesError) throw exercisesError;
+      
+      // Delete the workout
+      const { error: workoutError } = await supabase
+        .from('workouts')
+        .delete()
+        .eq('id', workoutId);
+      
+      if (workoutError) throw workoutError;
+      
+      // Refresh the workouts list
+      await fetchWorkouts();
+      
+      alert('Workout deleted successfully');
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      alert('Error deleting workout. Please try again.');
+    }
+  };
+
   const playTimerSound = () => {
     // Simple beep sound
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -394,15 +429,24 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                 {workouts.map(workout => (
                   <div
                     key={workout.id}
-                    className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative"
                     onClick={() => startWorkoutSession(workout)}
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div>
+                      <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900">{workout.name}</h3>
                         <p className="text-sm text-gray-600">{workout.description}</p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => deleteWorkout(workout.id, e)}
+                          className="p-2 hover:bg-red-50 rounded-full transition-colors"
+                          title="Delete workout"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                        </button>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
+                      </div>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span>{workout.workout_exercises?.length || 0} exercises</span>

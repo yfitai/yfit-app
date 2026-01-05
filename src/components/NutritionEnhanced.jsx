@@ -400,9 +400,9 @@ export default function NutritionEnhanced({ user: propUser }) {
 
     // Calculate totals
     const totalCalories = mealsForType.reduce((sum, m) => sum + (m.calories || 0), 0)
-    const totalProtein = mealsForType.reduce((sum, m) => sum + (m.protein || 0), 0)
-    const totalCarbs = mealsForType.reduce((sum, m) => sum + (m.carbs || 0), 0)
-    const totalFat = mealsForType.reduce((sum, m) => sum + (m.fat || 0), 0)
+    const totalProtein = mealsForType.reduce((sum, m) => sum + (m.protein_g || m.protein || 0), 0)
+    const totalCarbs = mealsForType.reduce((sum, m) => sum + (m.carbs_g || m.carbs || 0), 0)
+    const totalFat = mealsForType.reduce((sum, m) => sum + (m.fat_g || m.fat || 0), 0)
 
     const template = {
       id: `template-${Date.now()}-${Math.random()}`,
@@ -416,12 +416,12 @@ export default function NutritionEnhanced({ user: propUser }) {
         food_name: m.food_name,
         brand: m.brand,
         calories: m.calories,
-        protein: m.protein,
-        carbs: m.carbs,
-        fat: m.fat,
-        fiber: m.fiber,
-        sugar: m.sugar,
-        sodium: m.sodium,
+        protein: m.protein_g || m.protein || 0,
+        carbs: m.carbs_g || m.carbs || 0,
+        fat: m.fat_g || m.fat || 0,
+        fiber: m.fiber || 0,
+        sugar: m.sugar || 0,
+        sodium: m.sodium || 0,
         serving_quantity: m.serving_quantity,
         serving_unit: m.serving_unit
       })),
