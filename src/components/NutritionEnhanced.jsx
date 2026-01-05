@@ -224,6 +224,19 @@ export default function NutritionEnhanced({ user: propUser }) {
     const totalGrams = (servingQuantity || 0) * selectedUnit.toGrams
     const multiplier = totalGrams / 100 // All nutrition is per 100g
     
+    // Debug: Log selected food data
+    console.log('🍎 Selected Food Data:', selectedFood)
+    console.log('🍎 Nutrients:', {
+      calories: selectedFood.calories,
+      protein: selectedFood.protein,
+      carbs: selectedFood.carbs,
+      fat: selectedFood.fat,
+      fiber: selectedFood.fiber,
+      sugar: selectedFood.sugar,
+      sodium: selectedFood.sodium
+    })
+    console.log('🍎 Multiplier:', multiplier)
+    
     const mealData = {
       user_id: user.id,
       meal_type: selectedMealType,
@@ -241,6 +254,8 @@ export default function NutritionEnhanced({ user: propUser }) {
       serving_unit: servingUnit,
       created_at: new Date().toISOString()
     }
+    
+    console.log('🍎 Meal Data to Save:', mealData)
 
 
     if (isDemoMode) {
@@ -431,16 +446,31 @@ export default function NutritionEnhanced({ user: propUser }) {
 
     const isDemoMode = user.id.startsWith('demo')
     
+    console.log('[Nutrition] Saving template...', template)
+    console.log('[Nutrition] Is demo mode?', isDemoMode)
+    
     if (isDemoMode) {
-      const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
+      const existingTemplates = localStorage.getItem('yfit_demo_meal_templates')
+      console.log('[Nutrition] Existing templates in localStorage:', existingTemplates)
+      
+      const demoTemplates = JSON.parse(existingTemplates || '[]')
+      console.log('[Nutrition] Parsed templates:', demoTemplates)
+      
       demoTemplates.push(template)
+      console.log('[Nutrition] Templates after push:', demoTemplates)
+      
       localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(demoTemplates))
+      
+      // Verify it was saved
+      const savedTemplates = localStorage.getItem('yfit_demo_meal_templates')
+      console.log('[Nutrition] Verified saved templates:', savedTemplates)
       console.log('[Nutrition] Saved template to localStorage:', template)
     } else {
       // TODO: Save to Supabase
       console.log('[Nutrition] Would save template to Supabase:', template)
     }
 
+    setShowSaveTemplateModal(false)
     alert(`Template "${templateName}" saved successfully!`)
   }
 

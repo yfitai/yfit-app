@@ -16,6 +16,24 @@
 ### Fitness Tracker Issues
 - [x] Add ability to delete workout once created (added delete button with confirmation dialog)
 
+## 🔄 Remaining Issues After Testing
+
+### Workout Deletion
+- [ ] Delete button shows error: "Error deleting workout. Please try again."
+- [ ] Need to check database constraints and error handling
+- [ ] Note: Workout system doesn't support demo mode, only works with Supabase
+
+### Template Saving
+- [x] Added extensive debug logging to template save/load
+- [ ] Need user to test and check browser console for logs
+- [ ] Logs will show if template is being saved and loaded correctly
+
+### Nutrition Data Saving
+- [x] Added debug logging to meal saving
+- [ ] Need user to check console logs when adding food
+- [ ] Logs will show selectedFood data and what's being saved
+- [ ] Will reveal if API data is missing or field mapping is wrong
+
 ## 📝 Notes
 - All fixes need to be tested before saving
 - Make sure changes persist after save
