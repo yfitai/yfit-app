@@ -162,19 +162,18 @@ export default function MealPlanner({ user }) {
     }
     
     try {
-      const newItem = {
-        id: `demo-item-${Date.now()}-${Math.random()}`,
-        meal_plan_id: mealPlan.id,
-        day_of_week: dayOfWeek,
-        meal_type: mealType,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        ...mealData
-      }
-      
       // Demo mode - use localStorage
       if (user.id === 'demo-user-id') {
         console.log('[MealPlanner] Demo mode - saving to localStorage')
+        const newItem = {
+          id: `demo-item-${Date.now()}-${Math.random()}`,
+          meal_plan_id: mealPlan.id,
+          day_of_week: dayOfWeek,
+          meal_type: mealType,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          ...mealData
+        }
         const demoItems = JSON.parse(localStorage.getItem('yfit_demo_meal_items') || '[]')
         demoItems.push(newItem)
         localStorage.setItem('yfit_demo_meal_items', JSON.stringify(demoItems))
@@ -185,7 +184,15 @@ export default function MealPlanner({ user }) {
         return
       }
       
-      // Real user - use Supabase
+      // Real user - use Supabase (let database auto-generate id and created_at)
+      const newItem = {
+        meal_plan_id: mealPlan.id,
+        day_of_week: dayOfWeek,
+        meal_type: mealType,
+        updated_at: new Date().toISOString(),
+        ...mealData
+      }
+      
       console.log('[MealPlanner] Inserting to Supabase:', newItem)
       
       const { data, error } = await supabase
@@ -355,7 +362,8 @@ export default function MealPlanner({ user }) {
       
       // Add each meal from the template to the selected day/meal type
       for (const meal of templateMeals) {
-        await addMealToPlan(dayOfWeek, mealType, {
+        // For real users, use protein_g/carbs_g/fat_g field names
+        const mealData = user.id === 'demo-user-id' ? {
           food_id: meal.food_id,
           food_name: meal.food_name,
           brand: meal.brand,
@@ -366,7 +374,20 @@ export default function MealPlanner({ user }) {
           carbs: meal.carbs,
           fat: meal.fat,
           notes: meal.notes || `From template: ${template.template_name}`
-        })
+        } : {
+          food_id: meal.food_id,
+          food_name: meal.food_name,
+          brand: meal.brand,
+          serving_quantity: meal.serving_quantity,
+          serving_unit: meal.serving_unit,
+          calories: meal.calories,
+          protein_g: meal.protein_g || meal.protein,
+          carbs_g: meal.carbs_g || meal.carbs,
+          fat_g: meal.fat_g || meal.fat,
+          notes: meal.notes || `From template: ${template.template_name}`
+        }
+        
+        await addMealToPlan(dayOfWeek, mealType, mealData)
       }
       
       // Update template use count
