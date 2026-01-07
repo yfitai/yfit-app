@@ -494,16 +494,35 @@ export default function Goals({ user: propUser }) {
         alert('✅ Demo data cleared! You can now set new goals.')
       } else {
         // Delete from database (keeps custom_foods, favorite_foods, templates)
-        const { error: mealsError } = await supabase
-          .from('meals')
+        // Use cascading deletes for tables with foreign key constraints
+        
+        // 1. Delete workout_sessions first (references workouts)
+        const { error: sessionsError } = await supabase
+          .from('workout_sessions')
           .delete()
           .eq('user_id', user.id)
-
+        
+        // 2. Delete workout_exercises (references workouts)
+        const { error: exercisesError } = await supabase
+          .from('workout_exercises')
+          .delete()
+          .in('workout_id', 
+            supabase.from('workouts').select('id').eq('user_id', user.id)
+          )
+        
+        // 3. Now safe to delete workouts
         const { error: workoutsError } = await supabase
           .from('workouts')
           .delete()
           .eq('user_id', user.id)
 
+        // 4. Delete meals
+        const { error: mealsError } = await supabase
+          .from('meals')
+          .delete()
+          .eq('user_id', user.id)
+
+        // 5. Delete other tables (no foreign key issues)
         const { error: metricsError } = await supabase
           .from('calculated_metrics')
           .delete()
@@ -519,7 +538,9 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
-        if (mealsError || workoutsError || metricsError || goalsError || measurementsError) {
+        // Check for any errors
+        if (sessionsError || exercisesError || workoutsError || mealsError || metricsError || goalsError || measurementsError) {
+          console.error('Reset errors:', { sessionsError, exercisesError, workoutsError, mealsError, metricsError, goalsError, measurementsError })
           throw new Error('Error resetting data')
         }
 

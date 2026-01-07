@@ -61,3 +61,21 @@
 - [x] Template actually saves correctly with right values
 - [x] Template list displays correct totals
 - [x] **FIXED:** Updated SaveNutritionTemplateModal.jsx to use protein_g/carbs_g/fat_g fields
+
+
+## 📱 Android App Issues
+
+### Start Fresh Journey Button
+- [x] Error on Android: "Error resetting data. Please try again"
+- [x] Works correctly on desktop/web version
+- [x] Root cause: Foreign key constraint violations (same as workout deletion)
+- [x] **FIXED:** Added cascading deletes - workout_sessions → workout_exercises → workouts
+- [x] Added detailed error logging to console
+
+### Code Sync to Android
+- [ ] Need to sync all today's bug fixes to Android build:
+  - [ ] Nutrition display fixes (protein_g/carbs_g/fat_g)
+  - [ ] Sugar extraction fix (Total Sugars)
+  - [ ] Meal type fix (snack vs snacks)
+  - [ ] Template dialog fix
+  - [ ] Workout deletion fix (cascading delete)
