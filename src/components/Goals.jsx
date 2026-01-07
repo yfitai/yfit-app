@@ -26,6 +26,7 @@ export default function Goals({ user: propUser }) {
   const [saving, setSaving] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [resetKey, setResetKey] = useState(0) // Used to force GoalsEnhancement remount
   const [user, setUser] = useState(propUser || null)
   const [userProfile, setUserProfile] = useState(null)
   const [calculatedMetrics, setCalculatedMetrics] = useState(null)
@@ -601,6 +602,9 @@ export default function Goals({ user: propUser }) {
       setCalculatedMetrics(null)
       setUserProfile(null)
       setShowResetModal(false)
+      
+      // Force GoalsEnhancement to remount with fresh state
+      setResetKey(prev => prev + 1)
 
     } catch (error) {
       console.error('Error resetting data:', error)
@@ -1282,6 +1286,7 @@ export default function Goals({ user: propUser }) {
         {/* Goals Enhancement - Starting Point & Targets */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <GoalsEnhancement
+            key={resetKey}
             currentWeight={weight}
             currentBodyFat={calculatedMetrics?.bodyFatPercentage}
             goalType={goalType}
