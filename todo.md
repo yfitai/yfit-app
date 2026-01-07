@@ -47,7 +47,8 @@
 - [x] Sugar showing 0g even for sugar cookies and sugar cane beverage
 - [x] Added more sugar field name variations: 'sugars, added', 'sugar, total', 'total sugars'
 - [x] Added debug logging to show all nutrient names for foods with 'sugar' or 'cookie' in name
-- [ ] Need user to test and check console for nutrient names
+- [x] User provided console logs - USDA uses 'Total Sugars' (capital T and S)
+- [x] **FIXED:** Added exact match for 'Total Sugars' before lowercase checks
 
 ## 📝 Notes
 - All fixes need to be tested before saving

@@ -191,6 +191,7 @@ function transformUSDAFood(usdaFood) {
     
     usdaFood.foodNutrients.forEach(nutrient => {
       const name = nutrient.nutrientName?.toLowerCase()
+      const exactName = nutrient.nutrientName // Keep original case for exact matching
       const value = nutrient.value || 0
       
       if (name?.includes('protein')) nutrients.protein = value
@@ -198,7 +199,7 @@ function transformUSDAFood(usdaFood) {
       else if (name?.includes('total lipid') || name?.includes('fat, total')) nutrients.fat = value
       else if (name?.includes('energy') && nutrient.unitName === 'KCAL') nutrients.calories = value
       else if (name?.includes('fiber')) nutrients.fiber = value
-      else if (name?.includes('sugars, total') || name?.includes('sugars, added') || name?.includes('sugar, total') || name?.includes('total sugars')) nutrients.sugar = value
+      else if (exactName === 'Total Sugars' || name?.includes('sugars, total') || name?.includes('sugars, added') || name?.includes('sugar, total') || name?.includes('total sugars')) nutrients.sugar = value
       else if (name?.includes('sodium')) nutrients.sodium = value
     })
   }
