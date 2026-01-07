@@ -409,7 +409,7 @@ export default function NutritionEnhanced({ user: propUser }) {
       breakfast: 'breakfast',
       lunch: 'lunch',
       dinner: 'dinner',
-      snacks: 'snack'
+      snack: 'snack'
     }
     const plannerMealType = mealTypeMap[templateMealType] || templateMealType
 
@@ -664,7 +664,7 @@ export default function NutritionEnhanced({ user: propUser }) {
         )}
 
         {/* Meals by Type */}
-        {['breakfast', 'lunch', 'dinner', 'snacks'].map((mealType) => (
+        {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => (
           <MealTypeSection
             key={mealType}
             mealType={mealType}
@@ -739,14 +739,14 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
     breakfast: <Coffee className="w-5 h-5" />,
     lunch: <Sun className="w-5 h-5" />,
     dinner: <Moon className="w-5 h-5" />,
-    snacks: <Cookie className="w-5 h-5" />
+    snack: <Cookie className="w-5 h-5" />
   }
 
   const mealTypeLabels = {
     breakfast: 'Breakfast',
     lunch: 'Lunch',
     dinner: 'Dinner',
-    snacks: 'Snacks'
+    snack: 'Snacks'
   }
 
   const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0)

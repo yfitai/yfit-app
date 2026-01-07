@@ -35,6 +35,20 @@
 - [x] **FIXED:** Updated meal card display to use protein_g/carbs_g/fat_g fields
 - [x] Sugar showing 0 is correct for many foods (eggs, ham, etc. have no sugar)
 
+## 🆕 New Bugs Found During Testing
+
+### Meal Type Constraint Error
+- [x] Database error when saving to "snacks" meal type
+- [x] Error: "meals_meal_type_check" constraint violated
+- [x] App uses "snacks" but database expects "snack" (singular)
+- [x] **FIXED:** Changed all "snacks" to "snack" throughout the app
+
+### Sugar Extraction from USDA
+- [x] Sugar showing 0g even for sugar cookies and sugar cane beverage
+- [x] Added more sugar field name variations: 'sugars, added', 'sugar, total', 'total sugars'
+- [x] Added debug logging to show all nutrient names for foods with 'sugar' or 'cookie' in name
+- [ ] Need user to test and check console for nutrient names
+
 ## 📝 Notes
 - All fixes need to be tested before saving
 - Make sure changes persist after save

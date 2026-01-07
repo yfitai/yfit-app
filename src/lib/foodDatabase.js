@@ -182,6 +182,13 @@ function transformUSDAFood(usdaFood) {
   const nutrients = {}
   
   if (usdaFood.foodNutrients) {
+    // Debug: log all nutrient names to help identify sugar fields
+    const nutrientNames = usdaFood.foodNutrients.map(n => n.nutrientName)
+    if (usdaFood.description?.toLowerCase().includes('sugar') || usdaFood.description?.toLowerCase().includes('cookie')) {
+      console.log('🍬 Food with sugar in name:', usdaFood.description)
+      console.log('🍬 Available nutrients:', nutrientNames)
+    }
+    
     usdaFood.foodNutrients.forEach(nutrient => {
       const name = nutrient.nutrientName?.toLowerCase()
       const value = nutrient.value || 0
@@ -191,7 +198,7 @@ function transformUSDAFood(usdaFood) {
       else if (name?.includes('total lipid') || name?.includes('fat, total')) nutrients.fat = value
       else if (name?.includes('energy') && nutrient.unitName === 'KCAL') nutrients.calories = value
       else if (name?.includes('fiber')) nutrients.fiber = value
-      else if (name?.includes('sugars, total')) nutrients.sugar = value
+      else if (name?.includes('sugars, total') || name?.includes('sugars, added') || name?.includes('sugar, total') || name?.includes('total sugars')) nutrients.sugar = value
       else if (name?.includes('sodium')) nutrients.sodium = value
     })
   }
