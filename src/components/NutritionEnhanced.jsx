@@ -466,8 +466,36 @@ export default function NutritionEnhanced({ user: propUser }) {
       console.log('[Nutrition] Verified saved templates:', savedTemplates)
       console.log('[Nutrition] Saved template to localStorage:', template)
     } else {
-      // TODO: Save to Supabase
-      console.log('[Nutrition] Would save template to Supabase:', template)
+      // Save to Supabase meal_templates table
+      console.log('[Nutrition] Saving template to Supabase:', template)
+      
+      try {
+        const { data, error } = await supabase
+          .from('meal_templates')
+          .insert([{
+            user_id: user.id,
+            name: template.name,
+            meal_type: template.meal_type,
+            total_calories: template.total_calories,
+            total_protein: template.total_protein,
+            total_carbs: template.total_carbs,
+            total_fat: template.total_fat,
+            meals: template.meals,
+            use_count: 0
+          }])
+          .select()
+        
+        if (error) {
+          console.error('[Nutrition] Error saving template to Supabase:', error)
+          throw error
+        }
+        
+        console.log('[Nutrition] Template saved to Supabase successfully:', data)
+      } catch (error) {
+        console.error('[Nutrition] Failed to save template:', error)
+        alert('Error saving template. Please try again.')
+        return
+      }
     }
 
     setShowSaveTemplateModal(false)

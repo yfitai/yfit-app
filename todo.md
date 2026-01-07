@@ -79,3 +79,29 @@
   - [ ] Meal type fix (snack vs snacks)
   - [ ] Template dialog fix
   - [ ] Workout deletion fix (cascading delete)
+
+
+## 🔧 Template System Issues (Daily Tracker)
+
+### Demo Mode Detection Bug
+- [x] demoMode flag stuck on 'true' even when using real Supabase
+- [x] User manually set to 'false' via console
+- [ ] Need to fix auto-detection of demo vs real mode on login
+
+### Template Save/Load Issues
+- [x] Templates were saving to `yfit_demo_meal_templates` (demo key)
+- [x] App was looking in `yfit_nutrition_templates` (real key)
+- [x] After fixing demoMode flag, app now detects Supabase mode correctly
+- [x] **FIXED:** Implemented Supabase template save to `meal_templates` table
+- [x] **FIXED:** Implemented Supabase template load from `meal_templates` table
+- [x] NutritionEnhanced.jsx - handleSaveTemplate now saves to Supabase
+- [x] NutritionTemplateModal.jsx - loadTemplates now loads from Supabase
+
+### Weekly Planner Template Issues
+- [ ] Apply template fails with "Failed to add meal"
+- [ ] Need console logs to debug
+
+### Supabase 406 Errors
+- [x] User profile missing (user deleted goals during Start Fresh test)
+- [ ] User needs to re-enter goals to create profile
+- [ ] Consider using `.maybeSingle()` instead of `.single()` to handle missing profiles gracefully

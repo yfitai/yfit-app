@@ -34,8 +34,38 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
         console.log('[NutritionTemplate] Filtered templates for', mealType, ':', filtered)
         setTemplates(filtered)
       } else {
-        // Real user - use Supabase (TODO)
-        setTemplates([])
+        // Real user - load from Supabase
+        const { createClient } = await import('@supabase/supabase-js')
+        const supabase = createClient(
+          import.meta.env.VITE_SUPABASE_URL,
+          import.meta.env.VITE_SUPABASE_ANON_KEY
+        )
+        
+        // Convert nutrition meal types to planner meal types
+        const mealTypeMap = {
+          breakfast: 'breakfast',
+          lunch: 'lunch',
+          dinner: 'dinner',
+          snacks: 'snack'
+        }
+        const plannerMealType = mealTypeMap[mealType] || mealType
+        
+        console.log('[NutritionTemplate] Loading templates from Supabase for', plannerMealType)
+        
+        const { data, error } = await supabase
+          .from('meal_templates')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('meal_type', plannerMealType)
+          .order('created_at', { ascending: false })
+        
+        if (error) {
+          console.error('[NutritionTemplate] Error loading templates:', error)
+          setTemplates([])
+        } else {
+          console.log('[NutritionTemplate] Loaded templates from Supabase:', data)
+          setTemplates(data || [])
+        }
       }
     } catch (error) {
       console.error('[NutritionTemplate] Error loading templates:', error)
