@@ -787,9 +787,9 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                     <p className="font-medium text-gray-900">{meal.food_name}</p>
                     <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
                       <span>{Math.round(meal.calories || 0)} cal</span>
-                      <span>P: {Math.round(meal.protein || 0)}g</span>
-                      <span>C: {Math.round(meal.carbs || 0)}g</span>
-                      <span>F: {Math.round(meal.fat || 0)}g</span>
+                      <span>P: {Math.round(meal.protein_g || meal.protein || 0)}g</span>
+                      <span>C: {Math.round(meal.carbs_g || meal.carbs || 0)}g</span>
+                      <span>F: {Math.round(meal.fat_g || meal.fat || 0)}g</span>
                     </div>
                     {meal.serving_quantity && (
                       <p className="text-xs text-gray-500 mt-1">

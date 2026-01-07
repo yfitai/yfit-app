@@ -30,9 +30,10 @@
 
 ### Nutrition Data Saving
 - [x] Added debug logging to meal saving
-- [ ] Need user to check console logs when adding food
-- [ ] Logs will show selectedFood data and what's being saved
-- [ ] Will reveal if API data is missing or field mapping is wrong
+- [x] User tested - console shows data IS being saved correctly
+- [x] **BUG FOUND:** Meal display was using `meal.protein` instead of `meal.protein_g`
+- [x] **FIXED:** Updated meal card display to use protein_g/carbs_g/fat_g fields
+- [x] Sugar showing 0 is correct for many foods (eggs, ham, etc. have no sugar)
 
 ## 📝 Notes
 - All fixes need to be tested before saving
