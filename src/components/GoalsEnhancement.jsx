@@ -39,7 +39,7 @@ export default function GoalsEnhancement({
   const [fiberGoal, setFiberGoal] = useState('25')
   const [sugarGoal, setSugarGoal] = useState('50')
   const [sodiumGoal, setSodiumGoal] = useState('2300')
-  const [waterGoal, setWaterGoal] = useState('2000')
+  const [waterGoal, setWaterGoal] = useState('')
   const [stepsGoal, setStepsGoal] = useState('10000')
   const [sleepGoal, setSleepGoal] = useState('8')
   const [dataLoaded, setDataLoaded] = useState(false)
@@ -74,7 +74,11 @@ export default function GoalsEnhancement({
       if (initialData.fiber_goal_g) setFiberGoal(initialData.fiber_goal_g.toString())
       if (initialData.sugar_goal_g) setSugarGoal(initialData.sugar_goal_g.toString())
       if (initialData.sodium_goal_mg) setSodiumGoal(initialData.sodium_goal_mg.toString())
-      if (initialData.water_goal_ml) setWaterGoal(initialData.water_goal_ml.toString())
+      if (initialData.water_goal_ml) {
+        // Convert ml to oz for imperial display
+        const waterValue = isMetric ? initialData.water_goal_ml : mlToOz(initialData.water_goal_ml)
+        setWaterGoal(Math.round(waterValue).toString())
+      }
       if (initialData.steps_goal) setStepsGoal(initialData.steps_goal.toString())
       if (initialData.sleep_hours_goal) setSleepGoal(initialData.sleep_hours_goal.toString())
       setDataLoaded(true)
@@ -98,6 +102,25 @@ export default function GoalsEnhancement({
     }
   }, [weightChangeRate, manuallyEditedGoal])
   
+  // Convert water goal when unit system changes
+  useEffect(() => {
+    if (waterGoal && dataLoaded) {
+      const currentValue = parseInt(waterGoal)
+      if (!isNaN(currentValue) && currentValue > 0) {
+        // Convert between ml and oz based on unit system
+        // Detect which unit the current value is in by checking if it's a typical ml or oz range
+        const isCurrentlyMl = currentValue > 500 // Assume >500 is ml, <500 is oz
+        
+        if (isMetric && !isCurrentlyMl) {
+          // Switching to metric, convert oz → ml
+          setWaterGoal(Math.round(ozToMl(currentValue)).toString())
+        } else if (!isMetric && isCurrentlyMl) {
+          // Switching to imperial, convert ml → oz
+          setWaterGoal(Math.round(mlToOz(currentValue)).toString())
+        }
+      }
+    }
+  }, [unitSystem])
   
   // Target weight and body fat are manually entered by user
   // No auto-calculation to allow full control

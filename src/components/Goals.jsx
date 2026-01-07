@@ -557,17 +557,49 @@ export default function Goals({ user: propUser }) {
         alert('✅ Data reset successfully! You can now start fresh.')
       }
 
-      // Reset form
+      // Reset ALL form state to initial values
       setAge('')
       setWeight('')
       setHeightCm('')
       setHeightFeet('')
       setHeightInches('')
+      setGender('male')
+      setActivityLevel('moderate')
+      setGoalType('lose_weight')
+      setWeightChangeRate('1')
+      
+      setEnhancedGoals({
+        starting_weight_kg: null,
+        target_weight_kg: null,
+        starting_body_fat_percentage: null,
+        target_body_fat_percentage: null,
+        target_date: null,
+        weekly_goal_kg: 0.5,
+        fiber_goal_g: 25,
+        sugar_goal_g: 50,
+        sodium_goal_mg: 2300,
+        water_goal_ml: 2000,
+        steps_goal: 10000,
+        sleep_hours_goal: 8
+      })
+      
+      setUseManualBodyFat(false)
+      setManualBodyFat('')
+      setUseManualTDEE(false)
+      setManualTDEE('')
+      
       setMeasurements({
         neck: '', shoulders: '', chest: '', waist: '', hips: '',
         biceps: '', forearms: '', thighs: '', calves: ''
       })
+      
+      setMeasurementGoals({
+        neck: '', shoulders: '', chest: '', waist: '', hips: '',
+        biceps: '', forearms: '', thighs: '', calves: ''
+      })
+      
       setCalculatedMetrics(null)
+      setUserProfile(null)
       setShowResetModal(false)
 
     } catch (error) {
