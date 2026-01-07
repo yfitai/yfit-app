@@ -350,26 +350,26 @@ export default function NutritionEnhanced({ user: propUser }) {
   const addMealFromTemplate = async (templateMeal, mealType) => {
     const isDemoMode = user.id.startsWith('demo')
     
-    const mealData = {
-      id: isDemoMode ? `demo-meal-${Date.now()}-${Math.random()}` : undefined,
-      user_id: user.id,
-      meal_type: mealType,
-      meal_date: new Date().toISOString().split('T')[0],
-      food_name: templateMeal.food_name,
-      brand: templateMeal.brand || '',
-      calories: templateMeal.calories,
-      protein_g: templateMeal.protein,
-      carbs_g: templateMeal.carbs,
-      fat_g: templateMeal.fat,
-      fiber: templateMeal.fiber || 0,
-      sugar: templateMeal.sugar || 0,
-      sodium: templateMeal.sodium || 0,
-      serving_quantity: templateMeal.serving_quantity,
-      serving_unit: templateMeal.serving_unit
-      // created_at will be set automatically by database default
-    }
-
     if (isDemoMode) {
+      // Demo mode - use localStorage
+      const mealData = {
+        id: `demo-meal-${Date.now()}-${Math.random()}`,
+        user_id: user.id,
+        meal_type: mealType,
+        meal_date: new Date().toISOString().split('T')[0],
+        food_name: templateMeal.food_name,
+        brand: templateMeal.brand || '',
+        calories: templateMeal.calories,
+        protein: templateMeal.protein,
+        carbs: templateMeal.carbs,
+        fat: templateMeal.fat,
+        fiber: templateMeal.fiber || 0,
+        sugar: templateMeal.sugar || 0,
+        sodium: templateMeal.sodium || 0,
+        serving_quantity: templateMeal.serving_quantity,
+        serving_unit: templateMeal.serving_unit
+      }
+      
       const demoMeals = localStorage.getItem('yfit_demo_meals')
       const meals = demoMeals ? JSON.parse(demoMeals) : []
       meals.push(mealData)
@@ -377,6 +377,25 @@ export default function NutritionEnhanced({ user: propUser }) {
       setTodaysMeals(meals)
       calculateTotals(meals)
     } else {
+      // Real mode - use Supabase (id will be auto-generated)
+      const mealData = {
+        user_id: user.id,
+        meal_type: mealType,
+        meal_date: new Date().toISOString().split('T')[0],
+        food_name: templateMeal.food_name,
+        brand: templateMeal.brand || '',
+        calories: templateMeal.calories,
+        protein_g: templateMeal.protein,
+        carbs_g: templateMeal.carbs,
+        fat_g: templateMeal.fat,
+        fiber: templateMeal.fiber || 0,
+        sugar: templateMeal.sugar || 0,
+        sodium: templateMeal.sodium || 0,
+        serving_quantity: templateMeal.serving_quantity,
+        serving_unit: templateMeal.serving_unit
+        // id and created_at will be set automatically by database
+      }
+      
       const { error } = await supabase
         .from('meals')
         .insert([mealData])

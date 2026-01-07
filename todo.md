@@ -135,3 +135,10 @@
 ### logged_at vs created_at
 - [x] Code was using `logged_at` but table has `created_at`
 - [x] **FIXED:** Removed logged_at from insert - created_at auto-set by database
+
+
+### Template Apply id Field Error
+- [x] Error: "null value in column 'id' violates not-null constraint"
+- [x] Code was sending `id: undefined` to Supabase
+- [x] **FIXED:** Split demo/real mode logic - omit id for Supabase (auto-generated)
+- [x] Demo mode uses protein/carbs/fat, real mode uses protein_g/carbs_g/fat_g
