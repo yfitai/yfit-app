@@ -362,28 +362,20 @@ export default function MealPlanner({ user }) {
       
       // Add each meal from the template to the selected day/meal type
       for (const meal of templateMeals) {
-        // For real users, use protein_g/carbs_g/fat_g field names
-        const mealData = user.id === 'demo-user-id' ? {
+        // meal_plan_items table uses plain field names (protein/carbs/fat) for both demo and real users
+        const mealData = {
           food_id: meal.food_id,
           food_name: meal.food_name,
-          brand: meal.brand,
+          brand: meal.brand || '',
           serving_quantity: meal.serving_quantity,
           serving_unit: meal.serving_unit,
           calories: meal.calories,
           protein: meal.protein,
           carbs: meal.carbs,
           fat: meal.fat,
-          notes: meal.notes || `From template: ${template.template_name}`
-        } : {
-          food_id: meal.food_id,
-          food_name: meal.food_name,
-          brand: meal.brand,
-          serving_quantity: meal.serving_quantity,
-          serving_unit: meal.serving_unit,
-          calories: meal.calories,
-          protein_g: meal.protein_g || meal.protein,
-          carbs_g: meal.carbs_g || meal.carbs,
-          fat_g: meal.fat_g || meal.fat,
+          fiber: meal.fiber || 0,
+          sugar: meal.sugar || 0,
+          sodium: meal.sodium || 0,
           notes: meal.notes || `From template: ${template.template_name}`
         }
         
