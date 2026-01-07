@@ -354,8 +354,20 @@ export default function MealPlanner({ user }) {
       if (user.id === 'demo-user-id') {
         templateMeals = template.meals || []
       } else {
-        // Real user - template.meal_template_items contains the items
+        // Real user - check both new format (meal_template_items relationship) and old format (meals JSON)
         templateMeals = template.meal_template_items || []
+        
+        // Backwards compatibility: if meal_template_items is empty, try meals JSON field
+        if (templateMeals.length === 0 && template.meals) {
+          try {
+            // If meals is a string, parse it; if already an array, use it
+            templateMeals = typeof template.meals === 'string' ? JSON.parse(template.meals) : template.meals
+            console.log('[MealPlanner] Using meals JSON field (old format):', templateMeals)
+          } catch (e) {
+            console.error('[MealPlanner] Failed to parse meals JSON:', e)
+            templateMeals = []
+          }
+        }
       }
       
       console.log('[MealPlanner] Template meals:', templateMeals)
@@ -400,6 +412,53 @@ export default function MealPlanner({ user }) {
     } catch (error) {
       console.error('[MealPlanner] Error applying template:', error)
       alert('Failed to apply template. Please try again.')
+    }
+  }
+
+  // Delete template
+  async function deleteTemplate(templateId) {
+    if (!confirm('Are you sure you want to delete this template?')) {
+      return
+    }
+
+    try {
+      // Demo mode - use localStorage
+      if (user.id === 'demo-user-id') {
+        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
+        const filtered = demoTemplates.filter(t => t.id !== templateId)
+        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(filtered))
+        
+        // Trigger reload
+        window.dispatchEvent(new Event('yfit-templates-updated'))
+        return
+      }
+
+      // Real user - delete from Supabase
+      // First delete template items (if using separate table)
+      const { error: itemsError } = await supabase
+        .from('meal_template_items')
+        .delete()
+        .eq('template_id', templateId)
+
+      if (itemsError) {
+        console.error('[MealPlanner] Error deleting template items:', itemsError)
+        // Continue anyway - might not have items in separate table
+      }
+
+      // Then delete the template
+      const { error: templateError } = await supabase
+        .from('meal_templates')
+        .delete()
+        .eq('id', templateId)
+
+      if (templateError) throw templateError
+
+      // Trigger reload
+      window.dispatchEvent(new Event('yfit-templates-updated'))
+      alert('Template deleted successfully!')
+    } catch (error) {
+      console.error('[MealPlanner] Error deleting template:', error)
+      alert('Failed to delete template. Please try again.')
     }
   }
 
@@ -495,6 +554,7 @@ export default function MealPlanner({ user }) {
                 setShowApplyModal(true)
               }}
               onSaveTemplate={saveAsTemplate}
+              onDeleteTemplate={deleteTemplate}
             />
           </div>
         )}

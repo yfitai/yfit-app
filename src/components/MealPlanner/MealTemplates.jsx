@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Star, Plus } from 'lucide-react'
+import { Star, Plus, Trash2 } from 'lucide-react'
 import CreateTemplateModal from './CreateTemplateModal'
 
-export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate }) {
+export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, onDeleteTemplate }) {
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, breakfast, lunch, dinner, snack, favorites
@@ -112,33 +112,49 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate }
           </div>
         ) : (
           filteredTemplates.map((template) => (
-            <button
+            <div
               key={template.id}
-              onClick={() => onSelectTemplate(template)}
-              className="w-full p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left"
+              className="relative group border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
-              <div className="flex items-start justify-between mb-1">
-                <div className="font-medium text-gray-900">{template.template_name}</div>
-                {template.is_favorite && (
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+              <button
+                onClick={() => onSelectTemplate(template)}
+                className="w-full p-3 text-left"
+              >
+                <div className="flex items-start justify-between mb-1">
+                  <div className="font-medium text-gray-900">{template.template_name}</div>
+                  {template.is_favorite && (
+                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  )}
+                </div>
+                
+                {template.description && (
+                  <div className="text-sm text-gray-600 mb-2">{template.description}</div>
                 )}
-              </div>
+                
+                <div className="flex gap-3 text-sm text-gray-600">
+                  <span>{template.total_calories} cal</span>
+                  <span>P: {template.total_protein}g</span>
+                  <span>C: {template.total_carbs}g</span>
+                  <span>F: {template.total_fat}g</span>
+                </div>
+                
+                <div className="mt-2 text-xs text-gray-500">
+                  {(template.meal_template_items?.length || template.meals?.length || 0)} items • Used {template.use_count || 0} times
+                </div>
+              </button>
               
-              {template.description && (
-                <div className="text-sm text-gray-600 mb-2">{template.description}</div>
-              )}
-              
-              <div className="flex gap-3 text-sm text-gray-600">
-                <span>{template.total_calories} cal</span>
-                <span>P: {template.total_protein}g</span>
-                <span>C: {template.total_carbs}g</span>
-                <span>F: {template.total_fat}g</span>
-              </div>
-              
-              <div className="mt-2 text-xs text-gray-500">
-                {(template.meal_template_items?.length || template.meals?.length || 0)} items • Used {template.use_count || 0} times
-              </div>
-            </button>
+              {/* Delete Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteTemplate(template.id)
+                }}
+                className="absolute top-2 right-2 p-1.5 bg-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-600"
+                title="Delete template"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           ))
         )}
       </div>
