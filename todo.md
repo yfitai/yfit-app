@@ -19,9 +19,10 @@
 ## 🔄 Remaining Issues After Testing
 
 ### Workout Deletion
-- [ ] Delete button shows error: "Error deleting workout. Please try again."
-- [ ] Need to check database constraints and error handling
-- [ ] Note: Workout system doesn't support demo mode, only works with Supabase
+- [x] Delete button shows error: "Error deleting workout. Please try again."
+- [x] Error: Foreign key constraint violation - workout_sessions table references workouts
+- [x] Error code 23503: "Key is still referenced from table 'workout_sessions'"
+- [x] **FIXED:** Added cascading delete - deletes workout_sessions first, then workout_exercises, then workout
 
 ### Template Saving
 - [x] Added extensive debug logging to template save/load

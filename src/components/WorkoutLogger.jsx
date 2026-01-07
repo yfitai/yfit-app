@@ -333,7 +333,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     }
     
     try {
-      // Delete workout exercises first (foreign key constraint)
+      // Delete workout_sessions first (foreign key constraint)
+      const { error: sessionsError } = await supabase
+        .from('workout_sessions')
+        .delete()
+        .eq('workout_id', workoutId);
+      
+      if (sessionsError) throw sessionsError;
+      
+      // Delete workout exercises (foreign key constraint)
       const { error: exercisesError } = await supabase
         .from('workout_exercises')
         .delete()
