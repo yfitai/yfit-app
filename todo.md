@@ -105,3 +105,10 @@
 - [x] User profile missing (user deleted goals during Start Fresh test)
 - [ ] User needs to re-enter goals to create profile
 - [ ] Consider using `.maybeSingle()` instead of `.single()` to handle missing profiles gracefully
+
+
+### Supabase API Key Error
+- [x] Template save failing with "No API key found in request"
+- [x] Root cause: NutritionTemplateModal was creating new Supabase client with undefined env vars
+- [x] **FIXED:** Changed to import existing supabase client from lib/supabase.js
+- [x] Both save and load now use the same properly configured client

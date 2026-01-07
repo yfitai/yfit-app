@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Utensils } from 'lucide-react'
+import { supabase } from '../../lib/supabase'
 
 export default function NutritionTemplateModal({ mealType, onSelectTemplate, onClose, user }) {
   const [templates, setTemplates] = useState([])
@@ -35,12 +36,6 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
         setTemplates(filtered)
       } else {
         // Real user - load from Supabase
-        const { createClient } = await import('@supabase/supabase-js')
-        const supabase = createClient(
-          import.meta.env.VITE_SUPABASE_URL,
-          import.meta.env.VITE_SUPABASE_ANON_KEY
-        )
-        
         // Convert nutrition meal types to planner meal types
         const mealTypeMap = {
           breakfast: 'breakfast',
