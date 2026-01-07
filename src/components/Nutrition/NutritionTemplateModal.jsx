@@ -59,7 +59,15 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
           setTemplates([])
         } else {
           console.log('[NutritionTemplate] Loaded templates from Supabase:', data)
-          setTemplates(data || [])
+          // Convert template_name to name and string macros to numbers for display
+          const formattedTemplates = (data || []).map(t => ({
+            ...t,
+            name: t.template_name,
+            total_protein: parseFloat(t.total_protein) || 0,
+            total_carbs: parseFloat(t.total_carbs) || 0,
+            total_fat: parseFloat(t.total_fat) || 0
+          }))
+          setTemplates(formattedTemplates)
         }
       }
     } catch (error) {

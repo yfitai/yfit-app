@@ -474,13 +474,15 @@ export default function NutritionEnhanced({ user: propUser }) {
           .from('meal_templates')
           .insert([{
             user_id: user.id,
-            name: template.name,
+            template_name: template.name,
             meal_type: template.meal_type,
+            description: '',
             total_calories: template.total_calories,
-            total_protein: template.total_protein,
-            total_carbs: template.total_carbs,
-            total_fat: template.total_fat,
+            total_protein: template.total_protein.toString(),
+            total_carbs: template.total_carbs.toString(),
+            total_fat: template.total_fat.toString(),
             meals: template.meals,
+            is_favorite: false,
             use_count: 0
           }])
           .select()

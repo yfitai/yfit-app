@@ -112,3 +112,12 @@
 - [x] Root cause: NutritionTemplateModal was creating new Supabase client with undefined env vars
 - [x] **FIXED:** Changed to import existing supabase client from lib/supabase.js
 - [x] Both save and load now use the same properly configured client
+
+
+### meal_templates Table Schema Mismatch
+- [x] Table uses `template_name` not `name`
+- [x] Table stores macros as strings (text) not numbers
+- [x] Table has `description`, `is_favorite`, `updated_at` fields
+- [x] Missing `meals` column - added via SQL: `ALTER TABLE meal_templates ADD COLUMN meals jsonb`
+- [x] **FIXED:** Updated save to use `template_name` and convert macros to strings
+- [x] **FIXED:** Updated load to convert `template_name` to `name` and strings to numbers
