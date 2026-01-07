@@ -121,3 +121,12 @@
 - [x] Missing `meals` column - added via SQL: `ALTER TABLE meal_templates ADD COLUMN meals jsonb`
 - [x] **FIXED:** Updated save to use `template_name` and convert macros to strings
 - [x] **FIXED:** Updated load to convert `template_name` to `name` and strings to numbers
+
+
+### Template Apply Field Name Mismatch
+- [x] Template apply failing - meals table uses protein_g/carbs_g/fat_g
+- [x] Template stores meals with protein/carbs/fat (no suffix)
+- [x] Missing brand column - added via SQL
+- [x] Missing meal_date field in insert
+- [x] **FIXED:** Updated addMealFromTemplate to map field names correctly
+- [x] protein → protein_g, carbs → carbs_g, fat → fat_g
