@@ -7,9 +7,9 @@ export default function SaveNutritionTemplateModal({ mealType, meals, onSave, on
 
   // Calculate totals
   const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0)
-  const totalProtein = meals.reduce((sum, meal) => sum + (meal.protein || 0), 0)
-  const totalCarbs = meals.reduce((sum, meal) => sum + (meal.carbs || 0), 0)
-  const totalFat = meals.reduce((sum, meal) => sum + (meal.fat || 0), 0)
+  const totalProtein = meals.reduce((sum, meal) => sum + (meal.protein_g || meal.protein || 0), 0)
+  const totalCarbs = meals.reduce((sum, meal) => sum + (meal.carbs_g || meal.carbs || 0), 0)
+  const totalFat = meals.reduce((sum, meal) => sum + (meal.fat_g || meal.fat || 0), 0)
 
   async function handleSave() {
     if (!templateName.trim()) {

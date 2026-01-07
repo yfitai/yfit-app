@@ -53,3 +53,10 @@
 ## 📝 Notes
 - All fixes need to be tested before saving
 - Make sure changes persist after save
+
+
+### Template Save Dialog Display Bug
+- [x] Save template dialog shows 0g for protein, carbs, and fat
+- [x] Template actually saves correctly with right values
+- [x] Template list displays correct totals
+- [x] **FIXED:** Updated SaveNutritionTemplateModal.jsx to use protein_g/carbs_g/fat_g fields
