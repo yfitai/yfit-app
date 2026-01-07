@@ -496,33 +496,43 @@ export default function Goals({ user: propUser }) {
         // Delete from database (keeps custom_foods, favorite_foods, templates)
         // Use cascading deletes for tables with foreign key constraints
         
-        // 1. Delete workout_sessions first (references workouts)
+        // 1. Get all workout IDs for this user first
+        const { data: userWorkouts } = await supabase
+          .from('workouts')
+          .select('id')
+          .eq('user_id', user.id)
+        
+        const workoutIds = userWorkouts?.map(w => w.id) || []
+        
+        // 2. Delete workout_sessions first (references workouts)
         const { error: sessionsError } = await supabase
           .from('workout_sessions')
           .delete()
           .eq('user_id', user.id)
         
-        // 2. Delete workout_exercises (references workouts)
-        const { error: exercisesError } = await supabase
-          .from('workout_exercises')
-          .delete()
-          .in('workout_id', 
-            supabase.from('workouts').select('id').eq('user_id', user.id)
-          )
+        // 3. Delete workout_exercises (references workouts)
+        let exercisesError = null
+        if (workoutIds.length > 0) {
+          const { error } = await supabase
+            .from('workout_exercises')
+            .delete()
+            .in('workout_id', workoutIds)
+          exercisesError = error
+        }
         
-        // 3. Now safe to delete workouts
+        // 4. Now safe to delete workouts
         const { error: workoutsError } = await supabase
           .from('workouts')
           .delete()
           .eq('user_id', user.id)
 
-        // 4. Delete meals
+        // 5. Delete meals
         const { error: mealsError } = await supabase
           .from('meals')
           .delete()
           .eq('user_id', user.id)
 
-        // 5. Delete other tables (no foreign key issues)
+        // 6. Delete other tables (no foreign key issues)
         const { error: metricsError } = await supabase
           .from('calculated_metrics')
           .delete()
