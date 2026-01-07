@@ -365,8 +365,8 @@ export default function NutritionEnhanced({ user: propUser }) {
       sugar: templateMeal.sugar || 0,
       sodium: templateMeal.sodium || 0,
       serving_quantity: templateMeal.serving_quantity,
-      serving_unit: templateMeal.serving_unit,
-      logged_at: new Date().toISOString()
+      serving_unit: templateMeal.serving_unit
+      // created_at will be set automatically by database default
     }
 
     if (isDemoMode) {

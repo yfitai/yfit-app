@@ -130,3 +130,8 @@
 - [x] Missing meal_date field in insert
 - [x] **FIXED:** Updated addMealFromTemplate to map field names correctly
 - [x] protein → protein_g, carbs → carbs_g, fat → fat_g
+
+
+### logged_at vs created_at
+- [x] Code was using `logged_at` but table has `created_at`
+- [x] **FIXED:** Removed logged_at from insert - created_at auto-set by database
