@@ -351,7 +351,7 @@ export default function Dashboard({ user }) {
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Health Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
               <Heart className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
