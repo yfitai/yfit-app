@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain } from 'lucide-react'
+import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain, Lock, Eye, EyeOff } from 'lucide-react'
 import { supabase, signOut, getUserProfile } from '../lib/supabase'
+import { Input } from '@/components/ui/input.jsx'
+import { Label } from '@/components/ui/label.jsx'
+import { Alert, AlertDescription } from '@/components/ui/alert.jsx'
 // Logo is loaded from public/assets/yfit-logo.png
 
 export default function Dashboard({ user }) {
@@ -12,6 +15,18 @@ export default function Dashboard({ user }) {
   const [loading, setLoading] = useState(true)
   const [greeting, setGreeting] = useState('')
   const [motivationalQuote, setMotivationalQuote] = useState('')
+  
+  // Change Password modal state
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState('')
+  const [passwordSuccess, setPasswordSuccess] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   // Motivational quotes database
   const morningQuotes = [
@@ -75,6 +90,60 @@ export default function Dashboard({ user }) {
     window.location.reload()
   }
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+    setPasswordError('')
+    setPasswordSuccess('')
+    
+    // Validation
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters')
+      return
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('New passwords do not match')
+      return
+    }
+    
+    setIsChangingPassword(true)
+    
+    // First verify current password by attempting to sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword
+    })
+    
+    if (signInError) {
+      setPasswordError('Current password is incorrect')
+      setIsChangingPassword(false)
+      return
+    }
+    
+    // Update password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    })
+    
+    if (updateError) {
+      setPasswordError(updateError.message || 'Failed to change password')
+      setIsChangingPassword(false)
+      return
+    }
+    
+    setPasswordSuccess('Password changed successfully!')
+    setIsChangingPassword(false)
+    
+    // Clear form and close modal after 2 seconds
+    setTimeout(() => {
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmNewPassword('')
+      setPasswordSuccess('')
+      setShowChangePassword(false)
+    }, 2000)
+  }
+
   const firstName = profile?.first_name || user?.user_metadata?.first_name || 'there'
 
   if (loading) {
@@ -100,14 +169,24 @@ export default function Dashboard({ user }) {
                 YFIT AI
               </h1>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={handleSignOut}
-              className="flex items-center space-x-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowChangePassword(true)}
+                className="flex items-center space-x-2"
+              >
+                <Lock className="h-4 w-4" />
+                <span className="hidden sm:inline">Change Password</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleSignOut}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -264,6 +343,146 @@ export default function Dashboard({ user }) {
 
 
       </main>
+      
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Lock className="h-5 w-5" />
+                <span>Change Password</span>
+              </CardTitle>
+              <CardDescription>
+                Enter your current password and choose a new one
+              </CardDescription>
+            </CardHeader>
+            
+            <form onSubmit={handleChangePassword}>
+              <CardContent className="space-y-4">
+                {passwordError && (
+                  <Alert className="bg-red-50 border-red-200">
+                    <AlertDescription className="text-red-700 text-sm">
+                      {passwordError}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {passwordSuccess && (
+                  <Alert className="bg-green-50 border-green-200">
+                    <AlertDescription className="text-green-700 text-sm">
+                      {passwordSuccess}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Current Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="current-password"
+                      type={showCurrentPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={currentPassword}
+                      onChange={(e) => {
+                        setCurrentPassword(e.target.value)
+                        setPasswordError('')
+                      }}
+                      required
+                      disabled={isChangingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="new-password"
+                      type={showNewPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => {
+                        setNewPassword(e.target.value)
+                        setPasswordError('')
+                      }}
+                      required
+                      disabled={isChangingPassword}
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">Must be at least 6 characters</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirm-new-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmNewPassword}
+                      onChange={(e) => {
+                        setConfirmNewPassword(e.target.value)
+                        setPasswordError('')
+                      }}
+                      required
+                      disabled={isChangingPassword}
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+              </CardContent>
+              
+              <div className="flex space-x-2 px-6 pb-6">
+                <Button 
+                  type="submit" 
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                  disabled={isChangingPassword}
+                >
+                  {isChangingPassword ? 'Changing...' : 'Change Password'}
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => {
+                    setShowChangePassword(false)
+                    setCurrentPassword('')
+                    setNewPassword('')
+                    setConfirmNewPassword('')
+                    setPasswordError('')
+                    setPasswordSuccess('')
+                  }}
+                  disabled={isChangingPassword}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
