@@ -16,6 +16,14 @@ export default function Dashboard({ user }) {
   const [greeting, setGreeting] = useState('')
   const [motivationalQuote, setMotivationalQuote] = useState('')
   
+  // Dashboard stats
+  const [stepsToday, setStepsToday] = useState(0)
+  const [stepsGoal, setStepsGoal] = useState(10000)
+  const [caloriesToday, setCaloriesToday] = useState(0)
+  const [caloriesGoal, setCaloriesGoal] = useState(2000)
+  const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
+  const [healthScore, setHealthScore] = useState(null)
+  
   // Change Password modal state
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
@@ -55,6 +63,7 @@ export default function Dashboard({ user }) {
 
   useEffect(() => {
     loadUserProfile()
+    loadDashboardStats()
     setGreetingAndQuote()
   }, [user])
 
@@ -64,6 +73,107 @@ export default function Dashboard({ user }) {
     const profileData = await getUserProfile(user.id)
     setProfile(profileData)
     setLoading(false)
+  }
+
+  const loadDashboardStats = async () => {
+    if (!user) return
+    
+    const today = new Date().toISOString().split('T')[0]
+    
+    // Get today's steps from daily_tracker
+    const { data: trackerData } = await supabase
+      .from('daily_tracker')
+      .select('steps')
+      .eq('user_id', user.id)
+      .eq('date', today)
+      .single()
+    
+    if (trackerData?.steps) {
+      setStepsToday(trackerData.steps)
+    }
+    
+    // Get today's calories from meals
+    const { data: mealsData } = await supabase
+      .from('meals')
+      .select('calories')
+      .eq('user_id', user.id)
+      .eq('date', today)
+    
+    if (mealsData) {
+      const totalCalories = mealsData.reduce((sum, meal) => sum + (meal.calories || 0), 0)
+      setCaloriesToday(Math.round(totalCalories))
+    }
+    
+    // Get this week's workouts count
+    const startOfWeek = new Date()
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
+    const startOfWeekStr = startOfWeek.toISOString().split('T')[0]
+    
+    const { data: workoutsData } = await supabase
+      .from('workouts')
+      .select('id')
+      .eq('user_id', user.id)
+      .gte('date', startOfWeekStr)
+    
+    if (workoutsData) {
+      setWorkoutsThisWeek(workoutsData.length)
+    }
+    
+    // Get goals for steps and calories targets
+    const { data: goalsData } = await supabase
+      .from('user_profiles')
+      .select('steps_goal, adjusted_calories')
+      .eq('user_id', user.id)
+      .single()
+    
+    if (goalsData) {
+      if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
+      if (goalsData.adjusted_calories) setCaloriesGoal(Math.round(goalsData.adjusted_calories))
+    }
+    
+    // Calculate health score (0-100)
+    calculateHealthScore(trackerData, mealsData, workoutsData, goalsData)
+  }
+
+  const calculateHealthScore = (trackerData, mealsData, workoutsData, goalsData) => {
+    let score = 0
+    let maxScore = 0
+    
+    // Steps contribution (25 points)
+    if (trackerData?.steps && goalsData?.steps_goal) {
+      const stepsPercent = Math.min(trackerData.steps / goalsData.steps_goal, 1)
+      score += stepsPercent * 25
+    }
+    maxScore += 25
+    
+    // Calories contribution (25 points)
+    if (mealsData && mealsData.length > 0 && goalsData?.adjusted_calories) {
+      const totalCalories = mealsData.reduce((sum, meal) => sum + (meal.calories || 0), 0)
+      const caloriesPercent = Math.min(totalCalories / goalsData.adjusted_calories, 1)
+      score += caloriesPercent * 25
+    }
+    maxScore += 25
+    
+    // Workouts contribution (25 points) - 3+ workouts per week = full points
+    if (workoutsData) {
+      const workoutScore = Math.min(workoutsData.length / 3, 1) * 25
+      score += workoutScore
+    }
+    maxScore += 25
+    
+    // Profile completion (25 points)
+    if (goalsData) {
+      let profileScore = 0
+      if (goalsData.steps_goal) profileScore += 12.5
+      if (goalsData.adjusted_calories) profileScore += 12.5
+      score += profileScore
+    }
+    maxScore += 25
+    
+    // Only show score if user has some data
+    if (maxScore > 0) {
+      setHealthScore(Math.round((score / maxScore) * 100))
+    }
   }
 
   const setGreetingAndQuote = () => {
@@ -212,8 +322,8 @@ export default function Dashboard({ user }) {
               <Activity className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">Goal: 10,000 steps</p>
+              <div className="text-2xl font-bold">{stepsToday.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Goal: {stepsGoal.toLocaleString()} steps</p>
             </CardContent>
           </Card>
 
@@ -223,8 +333,8 @@ export default function Dashboard({ user }) {
               <Apple className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">of 2000 kcal goal</p>
+              <div className="text-2xl font-bold">{caloriesToday.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">of {caloriesGoal.toLocaleString()} kcal goal</p>
             </CardContent>
           </Card>
 
@@ -234,7 +344,7 @@ export default function Dashboard({ user }) {
               <Dumbbell className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{workoutsThisWeek}</div>
               <p className="text-xs text-muted-foreground">This week</p>
             </CardContent>
           </Card>
@@ -245,8 +355,15 @@ export default function Dashboard({ user }) {
               <Heart className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground">Complete profile to see</p>
+              <div className="text-2xl font-bold">
+                {healthScore !== null ? `${healthScore}/100` : '--'}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {healthScore !== null 
+                  ? healthScore >= 75 ? 'Excellent!' : healthScore >= 50 ? 'Good progress' : 'Keep going!'
+                  : 'Complete profile to see'
+                }
+              </p>
             </CardContent>
           </Card>
         </div>
