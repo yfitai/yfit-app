@@ -79,8 +79,6 @@ export default function Dashboard({ user }) {
     if (!user) return
     
     const today = new Date().toISOString().split('T')[0]
-    console.log('[Dashboard] Loading stats for date:', today)
-    console.log('[Dashboard] User ID:', user.id)
     
     // Get today's steps from daily_logs
     const { data: trackerData, error: trackerError } = await supabase
@@ -93,9 +91,6 @@ export default function Dashboard({ user }) {
       .limit(1)
       .single()
     
-    console.log('[Dashboard] Tracker data:', trackerData)
-    console.log('[Dashboard] Tracker error:', trackerError)
-    
     if (trackerData?.steps) {
       setStepsToday(trackerData.steps)
     }
@@ -107,12 +102,8 @@ export default function Dashboard({ user }) {
       .eq('user_id', user.id)
       .eq('meal_date', today)
     
-    console.log('[Dashboard] Meals data:', mealsData)
-    console.log('[Dashboard] Meals error:', mealsError)
-    
     if (mealsData) {
       const totalCalories = mealsData.reduce((sum, meal) => sum + (meal.calories || 0), 0)
-      console.log('[Dashboard] Total calories:', totalCalories)
       setCaloriesToday(Math.round(totalCalories))
     }
     
@@ -120,7 +111,6 @@ export default function Dashboard({ user }) {
     const startOfWeek = new Date()
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
     const startOfWeekStr = startOfWeek.toISOString().split('T')[0]
-    console.log('[Dashboard] Start of week:', startOfWeekStr)
     
     const { data: workoutsData, error: workoutsError } = await supabase
       .from('workouts')
@@ -128,11 +118,7 @@ export default function Dashboard({ user }) {
       .eq('user_id', user.id)
       .gte('created_at', `${startOfWeekStr}T00:00:00`)
     
-    console.log('[Dashboard] Workouts data:', workoutsData)
-    console.log('[Dashboard] Workouts error:', workoutsError)
-    
     if (workoutsData) {
-      console.log('[Dashboard] Workouts count:', workoutsData.length)
       setWorkoutsThisWeek(workoutsData.length)
     }
     
