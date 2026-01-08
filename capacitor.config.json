@@ -3,7 +3,8 @@
   "appName": "YFIT AI",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https"
+    "url": "https://yfit-app.vercel.app",
+    "cleartext": true
   },
   "plugins": {
     "BarcodeScanner": {
