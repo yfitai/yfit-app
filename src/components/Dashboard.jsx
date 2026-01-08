@@ -82,12 +82,15 @@ export default function Dashboard({ user }) {
     console.log('[Dashboard] Loading stats for date:', today)
     console.log('[Dashboard] User ID:', user.id)
     
-    // Get today's steps from daily_tracker
+    // Get today's steps from daily_logs
     const { data: trackerData, error: trackerError } = await supabase
-      .from('daily_tracker')
+      .from('daily_logs')
       .select('steps')
       .eq('user_id', user.id)
-      .eq('date', today)
+      .gte('logged_at', `${today}T00:00:00`)
+      .lte('logged_at', `${today}T23:59:59`)
+      .order('logged_at', { ascending: false })
+      .limit(1)
       .single()
     
     console.log('[Dashboard] Tracker data:', trackerData)
@@ -102,7 +105,7 @@ export default function Dashboard({ user }) {
       .from('meals')
       .select('calories')
       .eq('user_id', user.id)
-      .eq('date', today)
+      .eq('meal_date', today)
     
     console.log('[Dashboard] Meals data:', mealsData)
     console.log('[Dashboard] Meals error:', mealsError)
@@ -123,7 +126,7 @@ export default function Dashboard({ user }) {
       .from('workouts')
       .select('id')
       .eq('user_id', user.id)
-      .gte('date', startOfWeekStr)
+      .gte('created_at', `${startOfWeekStr}T00:00:00`)
     
     console.log('[Dashboard] Workouts data:', workoutsData)
     console.log('[Dashboard] Workouts error:', workoutsError)
