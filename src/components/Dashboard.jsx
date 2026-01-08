@@ -79,28 +79,37 @@ export default function Dashboard({ user }) {
     if (!user) return
     
     const today = new Date().toISOString().split('T')[0]
+    console.log('[Dashboard] Loading stats for date:', today)
+    console.log('[Dashboard] User ID:', user.id)
     
     // Get today's steps from daily_tracker
-    const { data: trackerData } = await supabase
+    const { data: trackerData, error: trackerError } = await supabase
       .from('daily_tracker')
       .select('steps')
       .eq('user_id', user.id)
       .eq('date', today)
       .single()
     
+    console.log('[Dashboard] Tracker data:', trackerData)
+    console.log('[Dashboard] Tracker error:', trackerError)
+    
     if (trackerData?.steps) {
       setStepsToday(trackerData.steps)
     }
     
     // Get today's calories from meals
-    const { data: mealsData } = await supabase
+    const { data: mealsData, error: mealsError } = await supabase
       .from('meals')
       .select('calories')
       .eq('user_id', user.id)
       .eq('date', today)
     
+    console.log('[Dashboard] Meals data:', mealsData)
+    console.log('[Dashboard] Meals error:', mealsError)
+    
     if (mealsData) {
       const totalCalories = mealsData.reduce((sum, meal) => sum + (meal.calories || 0), 0)
+      console.log('[Dashboard] Total calories:', totalCalories)
       setCaloriesToday(Math.round(totalCalories))
     }
     
@@ -108,14 +117,19 @@ export default function Dashboard({ user }) {
     const startOfWeek = new Date()
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
     const startOfWeekStr = startOfWeek.toISOString().split('T')[0]
+    console.log('[Dashboard] Start of week:', startOfWeekStr)
     
-    const { data: workoutsData } = await supabase
+    const { data: workoutsData, error: workoutsError } = await supabase
       .from('workouts')
       .select('id')
       .eq('user_id', user.id)
       .gte('date', startOfWeekStr)
     
+    console.log('[Dashboard] Workouts data:', workoutsData)
+    console.log('[Dashboard] Workouts error:', workoutsError)
+    
     if (workoutsData) {
+      console.log('[Dashboard] Workouts count:', workoutsData.length)
       setWorkoutsThisWeek(workoutsData.length)
     }
     
