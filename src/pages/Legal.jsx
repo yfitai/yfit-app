@@ -52,7 +52,7 @@ export default function Legal() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
-          <p>Last updated: December 16, 2025</p>
+          <p>Last updated: December 31, 2025</p>
           <p className="mt-2">
             Questions? Contact us at{' '}
             <a href="mailto:support@yfitai.com" className="text-blue-600 hover:underline">
@@ -69,71 +69,81 @@ function PrivacyPolicy() {
   return (
     <div className="prose max-w-none">
       <h2>Privacy Policy</h2>
-      <p className="text-gray-600">Effective Date: December 16, 2025</p>
+      <p className="text-gray-600">Last Updated: December 31, 2025</p>
 
       <h3>1. Introduction</h3>
       <p>
-        Welcome to YFIT AI ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our fitness and health tracking application.
+        YFIT AI ("we," "us," "our," or "Company") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and website (collectively, the "Service").
       </p>
 
       <h3>2. Information We Collect</h3>
-      <p>We collect the following types of information:</p>
+      <p>We may collect information about you in a variety of ways. The information we may collect on the Site includes:</p>
       <ul>
-        <li><strong>Personal Information:</strong> Name, email address, date of birth, gender</li>
-        <li><strong>Health Data:</strong> Weight, height, fitness goals, workout logs, nutrition tracking, medication schedules</li>
-        <li><strong>Usage Data:</strong> App interactions, features used, session duration</li>
-        <li><strong>Device Information:</strong> Device type, operating system, unique device identifiers</li>
-        <li><strong>Wearable Data:</strong> Data from connected fitness devices (with your permission)</li>
+        <li><strong>Personal Data:</strong> Name, email address, phone number, age, height, weight, gender, and fitness goals.</li>
+        <li><strong>Health Data:</strong> Body measurements, workout history, nutrition logs, medication information, and progress photos.</li>
+        <li><strong>Device Information:</strong> Device type, operating system, unique device identifiers, and mobile network information.</li>
+        <li><strong>Usage Data:</strong> Pages visited, time spent on pages, links clicked, and other interactions with our Service.</li>
       </ul>
 
-      <h3>3. How We Use Your Information</h3>
-      <p>We use your information to:</p>
-      <ul>
-        <li>Provide personalized fitness and nutrition recommendations</li>
-        <li>Generate AI-powered predictions and insights</li>
-        <li>Track your progress toward health and fitness goals</li>
-        <li>Send you notifications and reminders</li>
-        <li>Improve our services and develop new features</li>
-        <li>Communicate with you about updates and support</li>
-      </ul>
-
-      <h3>4. Data Sharing and Disclosure</h3>
-      <p>We do not sell your personal information. We may share your data with:</p>
-      <ul>
-        <li><strong>Service Providers:</strong> Third-party vendors who help us operate our app (e.g., cloud hosting, analytics)</li>
-        <li><strong>AI Services:</strong> OpenAI for generating personalized insights (data is anonymized)</li>
-        <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
-      </ul>
-
-      <h3>5. Data Security</h3>
+      <h3>3. Age Restrictions</h3>
       <p>
-        We implement industry-standard security measures to protect your data, including encryption, secure servers, and access controls. However, no method of transmission over the internet is 100% secure.
+        YFIT AI is not intended for individuals under the age of 18. We do not knowingly collect personal information from children under 18. If we become aware that we have collected personal information from a child under 18, we will take steps to delete such information and terminate the child's account.
       </p>
 
-      <h3>6. Your Rights</h3>
-      <p>You have the right to:</p>
+      <h3>4. Use of Your Information</h3>
+      <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:</p>
       <ul>
-        <li>Access your personal data</li>
-        <li>Correct inaccurate data</li>
-        <li>Request deletion of your data</li>
-        <li>Export your data</li>
-        <li>Opt-out of marketing communications</li>
+        <li>Provide, operate, and maintain our Service</li>
+        <li>Improve, personalize, and expand our Service</li>
+        <li>Understand and analyze how you use our Service</li>
+        <li>Develop new products, services, features, and functionality</li>
+        <li>Communicate with you, including for customer service and support</li>
+        <li>Process your transactions and send related information</li>
+        <li>Generate personalized fitness recommendations and AI coaching</li>
+        <li>Create provider reports for your healthcare professionals</li>
       </ul>
 
-      <h3>7. Children's Privacy</h3>
+      <h3>5. Disclosure of Your Information</h3>
+      <p>We may share information we have collected about you in certain situations:</p>
+      <ul>
+        <li><strong>By Law or to Protect Rights:</strong> If required by law or if we believe in good faith that disclosure is necessary to protect your rights, our rights, or the rights of others.</li>
+        <li><strong>Third-Party Service Providers:</strong> We may share your information with vendors, consultants, and other service providers who need access to such information to carry out work on our behalf.</li>
+        <li><strong>Business Transfers:</strong> If YFIT AI is involved in a merger, acquisition, or asset sale, your information may be transferred as part of that transaction.</li>
+      </ul>
+
+      <h3>6. Security of Your Information</h3>
       <p>
-        Our app is not intended for children under 18. We do not knowingly collect data from children under 18.
+        We use administrative, technical, and physical security measures to protect your personal information. However, no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security.
       </p>
 
-      <h3>8. Changes to This Policy</h3>
+      <h3>7. Data Retention</h3>
       <p>
-        We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page.
+        We will retain your personal information for as long as your account is active or as needed to provide you services. You may request deletion of your account and associated data at any time.
       </p>
+
+      <h3>8. Your Rights and Data Deletion</h3>
+      <p>
+        You have the right to request deletion of your account and all associated personal data. To request account and data deletion, please contact us. We will process your request within 30 days.
+      </p>
+      <p>Upon deletion, we will remove the following data:</p>
+      <ul>
+        <li>Personal identification information</li>
+        <li>Health and fitness data</li>
+        <li>Workout history and nutrition logs</li>
+        <li>Progress photos and measurements</li>
+        <li>Medication tracking information</li>
+        <li>Account preferences and settings</li>
+      </ul>
 
       <h3>9. Contact Us</h3>
       <p>
-        If you have questions about this Privacy Policy, please contact us at{' '}
+        If you have questions or comments about this Privacy Policy, please contact us at:{' '}
         <a href="mailto:support@yfitai.com">support@yfitai.com</a>
+      </p>
+
+      <h3>10. Changes to This Privacy Policy</h3>
+      <p>
+        We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date above.
       </p>
     </div>
   )
