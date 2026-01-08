@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Auth from './components/Auth'
+import ResetPassword from './components/ResetPassword'
 import LandingPage from './pages/LandingPage'
 import Legal from './pages/Legal'
 import Dashboard from './components/Dashboard'
@@ -98,6 +99,7 @@ function App() {
             <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
             <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
             <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/legal" element={<Legal />} />
 
             {/* Protected Routes - Login required */}
