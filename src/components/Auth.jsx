@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label.jsx'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.jsx'
-import { signIn, signUp, resendConfirmationEmail } from '../lib/supabase'
+import { signIn, signUp, resendConfirmationEmail, resetPassword } from '../lib/supabase'
 import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 
@@ -18,6 +18,11 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
   const [success, setSuccess] = useState('')
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
   const [pendingEmail, setPendingEmail] = useState('')
+  
+  // Forgot Password state
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+  const [resetEmailSent, setResetEmailSent] = useState(false)
   
   // Login state
   const [loginEmail, setLoginEmail] = useState('')
@@ -118,6 +123,147 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     }
     
     setIsLoading(false)
+  }
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+    
+    const { error } = await resetPassword(forgotPasswordEmail)
+    
+    if (error) {
+      setError('Failed to send password reset email. Please try again.')
+      setIsLoading(false)
+      return
+    }
+    
+    setResetEmailSent(true)
+    setSuccess('Password reset email sent! Please check your inbox.')
+    setIsLoading(false)
+  }
+
+  // If showing forgot password modal
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <img src={logo} alt="YFIT AI" className="h-24 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+              YFIT AI
+            </h1>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Reset Your Password</CardTitle>
+              <CardDescription>
+                {resetEmailSent 
+                  ? 'Check your email for the reset link'
+                  : 'Enter your email address and we\'ll send you a password reset link'
+                }
+              </CardDescription>
+            </CardHeader>
+            
+            {!resetEmailSent ? (
+              <form onSubmit={handleForgotPassword}>
+                <CardContent className="space-y-4">
+                  {error && (
+                    <Alert className="bg-red-50 border-red-200">
+                      <AlertDescription className="text-red-700 text-sm">
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">Email</Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={forgotPasswordEmail}
+                      onChange={(e) => {
+                        setForgotPasswordEmail(e.target.value)
+                        setError('')
+                      }}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-2">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Sending...' : 'Send Reset Link'}
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowForgotPassword(false)
+                      setError('')
+                      setSuccess('')
+                      setResetEmailSent(false)
+                      setForgotPasswordEmail('')
+                    }}
+                  >
+                    Back to Sign In
+                  </Button>
+                </CardFooter>
+              </form>
+            ) : (
+              <>
+                <CardContent className="space-y-4">
+                  {success && (
+                    <Alert className="bg-green-50 border-green-200">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-800">Success</AlertTitle>
+                      <AlertDescription className="text-green-700">
+                        {success}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-700">
+                      <strong>Next steps:</strong>
+                    </p>
+                    <ol className="text-sm text-gray-600 mt-2 space-y-1 list-decimal list-inside">
+                      <li>Check your email inbox</li>
+                      <li>Click the password reset link</li>
+                      <li>Enter your new password</li>
+                      <li>Sign in with your new password</li>
+                    </ol>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowForgotPassword(false)
+                      setError('')
+                      setSuccess('')
+                      setResetEmailSent(false)
+                      setForgotPasswordEmail('')
+                    }}
+                  >
+                    Back to Sign In
+                  </Button>
+                </CardFooter>
+              </>
+            )}
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   // If showing email confirmation message
@@ -284,6 +430,19 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
     >
       {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+  <div className="text-right">
+    <button
+      type="button"
+      onClick={() => {
+        setShowForgotPassword(true)
+        setForgotPasswordEmail(loginEmail)
+        setError('')
+      }}
+      className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+    >
+      Forgot Password?
     </button>
   </div>
 </div>

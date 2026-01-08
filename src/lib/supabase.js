@@ -90,6 +90,20 @@ export const signUp = async (email, password, firstName, lastName) => {
   return { data, error: null, needsEmailConfirmation }
 }
 
+// Helper function to request password reset
+export const resetPassword = async (email) => {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`
+  })
+  
+  if (error) {
+    console.error('Error sending password reset email:', error)
+    return { data: null, error }
+  }
+  
+  return { data, error: null }
+}
+
 // Helper function to sign in
 export const signIn = async (email, password) => {
   const { data, error } = await supabase.auth.signInWithPassword({
