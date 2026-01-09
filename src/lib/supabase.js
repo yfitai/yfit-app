@@ -85,6 +85,27 @@ export const signUp = async (email, password, firstName, lastName) => {
       console.error('Error creating profile:', profileError)
       // Don't fail signup if profile creation fails - can be retried
     }
+
+    // 🎉 Send welcome email via Resend
+    try {
+      const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          email: email,
+          firstName: firstName,
+          lastName: lastName
+        }
+      })
+      
+      if (emailError) {
+        console.error('Error sending welcome email:', emailError)
+        // Don't fail signup if email fails - it's not critical
+      } else {
+        console.log('✅ Welcome email sent to', email)
+      }
+    } catch (emailError) {
+      console.error('Error invoking welcome email function:', emailError)
+      // Continue with signup even if email fails
+    }
   }
   
   return { data, error: null, needsEmailConfirmation }

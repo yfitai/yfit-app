@@ -142,3 +142,12 @@
 - [x] Code was sending `id: undefined` to Supabase
 - [x] **FIXED:** Split demo/real mode logic - omit id for Supabase (auto-generated)
 - [x] Demo mode uses protein/carbs/fat, real mode uses protein_g/carbs_g/fat_g
+
+
+## 📧 Email Automation
+
+### Welcome Email on Signup
+- [x] Create Supabase Edge Function: send-welcome-email
+- [x] Update signup code to call welcome email function
+- [ ] Test welcome email delivery via Resend
+- [ ] Deploy to production
