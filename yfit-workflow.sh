@@ -28,6 +28,10 @@ case "$1" in
         echo "🚀 Starting Work Session"
         echo "================================================"
         echo ""
+        
+        # VERIFY PROJECT FIRST
+        source "$PROJECT_DIR/verify-project.sh"
+        
         echo "📥 Pulling latest changes from GitHub..."
         git pull origin main
         echo ""
