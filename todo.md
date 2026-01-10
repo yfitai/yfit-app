@@ -168,3 +168,13 @@
 - [ ] Recreate all RLS policies (as per original plan)
 - [ ] Fix user_profiles INSERT policy to allow signup profile creation
 - [ ] Remove auth metadata fallback workaround from process-email-queue once profiles work
+
+
+## Google Play Store - Android App
+- [ ] Check Google Play Console for review status
+- [ ] Verify yfit email is receiving Google Play notifications
+- [ ] Respond to any pending review requests
+- [ ] Set up closed beta testing track
+- [ ] Configure beta tester list (ready for marketing website signups)
+- [ ] Verify app submission is complete and approved
+- [ ] Test beta distribution flow
