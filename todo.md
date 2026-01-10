@@ -152,5 +152,19 @@
 - [x] Test welcome email delivery via Resend
 - [x] Fix email HTML template JSON parsing error
 - [x] Email delivery working and tested
-- [ ] Improve email styling (solid colors for better email client compatibility)
-- [ ] Review email notes for better template design
+- [x] Improve email styling (solid colors for better email client compatibility)
+- [x] Review email notes for better template design
+- [x] Update verification email template with YFIT branding
+- [x] Upload YFIT logo for email templates
+- [x] Fix queue-email to use user_profiles table for firstName
+- [x] Update welcome_email template with logo, colors, and checkboxes
+- [x] Update all 5 other email templates with consistent branding
+- [x] Fix process-email-queue to use user_profiles for firstName (with auth fallback)
+- [x] Fix email from/reply-to addresses (support@yfitai.com)
+- [x] Add actual checkmark emojis to welcome template
+- [x] Reduce header size in email templates
+
+### Before Stripe Integration & Testing with Real Users
+- [ ] Recreate all RLS policies (as per original plan)
+- [ ] Fix user_profiles INSERT policy to allow signup profile creation
+- [ ] Remove auth metadata fallback workaround from process-email-queue once profiles work
