@@ -236,11 +236,21 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  const handleCheckboxChange = async (itemId, isChecked, isSupplement) => {
+  // Helper function to get number of doses per day from frequency
+  const getDosesPerDay = (frequency) => {
+    if (!frequency) return 1;
+    const freq = frequency.toLowerCase();
+    if (freq.includes('twice')) return 2;
+    if (freq.includes('three')) return 3;
+    if (freq.includes('four')) return 4;
+    return 1;
+  }
+
+  const handleCheckboxChange = async (itemId, isChecked, isSupplement, doseNumber = 1) => {
     try {
       if (isChecked) {
         // Log as taken
-        await logItem(itemId, 'taken');
+        await logItem(itemId, 'taken', doseNumber);
       } else {
         // Remove today's log for this item
         await removeLog(itemId);
@@ -252,8 +262,11 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  const logItem = async (itemId, status) => {
-    const scheduledTime = new Date().toISOString();
+  const logItem = async (itemId, status, doseNumber = 1) => {
+    // Add a few seconds offset for each dose to make them unique
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + (doseNumber - 1));
+    const scheduledTime = now.toISOString();
     
     if (user.id.startsWith('demo')) {
       const stored = localStorage.getItem('yfit_demo_medication_logs');
@@ -293,11 +306,20 @@ export default function MedicationLog({ user }) {
       const logs = stored ? JSON.parse(stored) : [];
       
       const today = new Date().toISOString().split('T')[0];
-      const filtered = logs.filter(log => {
+      // Find today's logs for this item
+      const todayItemLogs = logs.filter(log => {
         const logDate = new Date(log.scheduled_time).toISOString().split('T')[0];
-        return !(log.user_medication_id === itemId && logDate === today);
+        return log.user_medication_id === itemId && logDate === today;
       });
       
+      if (todayItemLogs.length === 0) return;
+      
+      // Remove the most recent log
+      const mostRecent = todayItemLogs.sort((a, b) => 
+        new Date(b.scheduled_time) - new Date(a.scheduled_time)
+      )[0];
+      
+      const filtered = logs.filter(log => log.id !== mostRecent.id);
       localStorage.setItem('yfit_demo_medication_logs', JSON.stringify(filtered));
       return;
     }
@@ -305,20 +327,31 @@ export default function MedicationLog({ user }) {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
-    const { error } = await supabase
+    // Get today's logs for this item
+    const { data: todayItemLogs } = await supabase
       .from('medication_logs')
-      .delete()
+      .select('id')
       .eq('user_medication_id', itemId)
       .eq('user_id', user.id)
       .gte('scheduled_time', startOfDay.toISOString())
+      .order('scheduled_time', { ascending: false })
+      .limit(1);
 
-    if (error) throw error
+    if (!todayItemLogs || todayItemLogs.length === 0) return;
+
+    // Delete the most recent log
+    const { error } = await supabase
+      .from('medication_logs')
+      .delete()
+      .eq('id', todayItemLogs[0].id);
+
+    if (error) throw error;
   }
 
-  const isItemCheckedToday = (itemId) => {
-    return todayLogs.some(log => 
+  const getItemDosesTakenToday = (itemId) => {
+    return todayLogs.filter(log => 
       log.user_medication_id === itemId && log.status === 'taken'
-    );
+    ).length;
   }
 
   const getItemNameFromLog = (log) => {
@@ -386,27 +419,49 @@ export default function MedicationLog({ user }) {
             <p className="text-gray-500 text-sm">No medications added yet</p>
           ) : (
             <div className="space-y-3">
-              {medications.map((med) => (
-                <label
-                  key={med.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={isItemCheckedToday(med.id)}
-                    onChange={(e) => handleCheckboxChange(med.id, e.target.checked, false)}
-                    className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
-                      {med.medication?.name || med.custom_name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {med.dosage} • {med.frequency}
-                    </p>
+              {medications.map((med) => {
+                const dosesPerDay = getDosesPerDay(med.frequency);
+                const dosesTaken = getItemDosesTakenToday(med.id);
+                
+                return (
+                  <div
+                    key={med.id}
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex gap-2 mt-1">
+                      {Array.from({ length: dosesPerDay }).map((_, index) => (
+                        <input
+                          key={index}
+                          type="checkbox"
+                          checked={index < dosesTaken}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              // Only allow checking if this is the next dose
+                              if (index === dosesTaken) {
+                                handleCheckboxChange(med.id, true, false, index + 1);
+                              }
+                            } else {
+                              // Only allow unchecking the last checked box
+                              if (index === dosesTaken - 1) {
+                                handleCheckboxChange(med.id, false, false);
+                              }
+                            }
+                          }}
+                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        />
+                      ))}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">
+                        {med.medication?.name || med.custom_name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {med.dosage} • {med.frequency}
+                      </p>
+                    </div>
                   </div>
-                </label>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -421,27 +476,49 @@ export default function MedicationLog({ user }) {
             <p className="text-gray-500 text-sm">No supplements added yet</p>
           ) : (
             <div className="space-y-3">
-              {supplements.map((supp) => (
-                <label
-                  key={supp.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={isItemCheckedToday(supp.id)}
-                    onChange={(e) => handleCheckboxChange(supp.id, e.target.checked, true)}
-                    className="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
-                      {supp.medication?.name || supp.custom_name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {supp.dosage} • {supp.frequency}
-                    </p>
+              {supplements.map((supp) => {
+                const dosesPerDay = getDosesPerDay(supp.frequency);
+                const dosesTaken = getItemDosesTakenToday(supp.id);
+                
+                return (
+                  <div
+                    key={supp.id}
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex gap-2 mt-1">
+                      {Array.from({ length: dosesPerDay }).map((_, index) => (
+                        <input
+                          key={index}
+                          type="checkbox"
+                          checked={index < dosesTaken}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              // Only allow checking if this is the next dose
+                              if (index === dosesTaken) {
+                                handleCheckboxChange(supp.id, true, true, index + 1);
+                              }
+                            } else {
+                              // Only allow unchecking the last checked box
+                              if (index === dosesTaken - 1) {
+                                handleCheckboxChange(supp.id, false, true);
+                              }
+                            }
+                          }}
+                          className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
+                        />
+                      ))}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">
+                        {supp.medication?.name || supp.custom_name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {supp.dosage} • {supp.frequency}
+                      </p>
+                    </div>
                   </div>
-                </label>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
