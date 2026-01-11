@@ -3,7 +3,7 @@
   "appName": "YFIT AI",
   "webDir": "dist",
   "server": {
-    "url": "https://yfit-app.vercel.app",
+    "url": "https://yfit-deploy.vercel.app",
     "cleartext": true
   },
   "plugins": {
