@@ -25,6 +25,7 @@ export default function MedicationSearch({ user }) {
   const [customForm, setCustomForm] = useState({
     custom_name: '',
     custom_generic_name: '',
+    is_supplement: false,
     dosage: '',
     frequency: '',
     route: 'Oral',
@@ -232,6 +233,7 @@ export default function MedicationSearch({ user }) {
           user_id: user.id,
           custom_name: customForm.custom_name,
           custom_generic_name: customForm.custom_generic_name || null,
+          is_supplement: customForm.is_supplement,
           dosage: customForm.dosage,
           frequency: customForm.frequency,
           route: customForm.route,
@@ -249,6 +251,7 @@ export default function MedicationSearch({ user }) {
         setCustomForm({
           custom_name: '',
           custom_generic_name: '',
+          is_supplement: false,
           dosage: '',
           frequency: '',
           route: 'Oral',
@@ -264,6 +267,7 @@ export default function MedicationSearch({ user }) {
           user_id: user.id,
           custom_name: customForm.custom_name,
           custom_generic_name: customForm.custom_generic_name || null,
+          is_supplement: customForm.is_supplement,
           dosage: customForm.dosage,
           frequency: customForm.frequency,
           route: customForm.route,
