@@ -47,6 +47,7 @@ export default function InteractionChecker({ user }) {
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
+        .eq('is_supplement', false)
 
       if (error) throw error
       setMedications(data || [])
@@ -68,13 +69,14 @@ export default function InteractionChecker({ user }) {
       }
 
       const { data, error } = await supabase
-        .from('user_supplements')
+        .from('user_medications')
         .select(`
           *,
-          supplement:vitamins_supplements(*)
+          medication:medications(*)
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
+        .eq('is_supplement', true)
 
       if (error) throw error
       setSupplements(data || [])
@@ -340,14 +342,14 @@ export default function InteractionChecker({ user }) {
                 className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all"
               >
                 <h4 className="font-semibold text-gray-800">
-                  {supp.supplement?.name || supp.custom_name}
+                  {supp.medication?.name || supp.custom_name}
                 </h4>
                 <p className="text-sm text-gray-600 mt-1">
                   {supp.dosage} • {supp.frequency}
                 </p>
-                {supp.supplement?.type && (
+                {supp.medication?.drug_class && (
                   <p className="text-xs text-gray-500 mt-1 capitalize">
-                    {supp.supplement.type}
+                    {supp.medication.drug_class}
                   </p>
                 )}
               </div>

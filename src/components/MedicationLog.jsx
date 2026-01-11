@@ -349,7 +349,7 @@ export default function MedicationLog({ user }) {
             <span className="text-sm text-blue-700">adherence</span>
           </div>
           <p className="text-sm text-blue-700">
-            {stats.medTaken} taken in last 30 days
+            {stats.medTaken} of {stats.medTotal} doses taken
           </p>
         </div>
 
@@ -363,7 +363,7 @@ export default function MedicationLog({ user }) {
             <span className="text-sm text-green-700">adherence</span>
           </div>
           <p className="text-sm text-green-700">
-            {stats.suppTaken} taken in last 30 days
+            {stats.suppTaken} of {stats.suppTotal} doses taken
           </p>
         </div>
       </div>
