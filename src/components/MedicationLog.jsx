@@ -45,6 +45,7 @@ export default function MedicationLog({ user }) {
         .select('*, medication:medications(name)')
         .eq('user_id', user.id)
         .eq('is_active', true)
+        .eq('is_supplement', false)
         .order('created_at')
 
       if (error) throw error
@@ -180,8 +181,38 @@ export default function MedicationLog({ user }) {
       const medLogs = data?.filter(log => !log.user_medication?.is_supplement) || [];
       const suppLogs = data?.filter(log => log.user_medication?.is_supplement) || [];
       
-      const medTotal = medications.length * 30;
-      const suppTotal = supplements.length * 30;
+      // Calculate expected doses based on days since start date
+      const today = new Date();
+      
+      // For medications
+      let medTotal = 0;
+      medications.forEach(med => {
+        const startDate = new Date(med.start_date || med.created_at);
+        const daysSinceStart = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+        const daysToCount = Math.min(daysSinceStart, 30); // Cap at 30 days
+        
+        // Parse frequency to get doses per day
+        const dosesPerDay = med.frequency?.toLowerCase().includes('twice') ? 2 :
+                           med.frequency?.toLowerCase().includes('three') ? 3 :
+                           med.frequency?.toLowerCase().includes('four') ? 4 : 1;
+        
+        medTotal += daysToCount * dosesPerDay;
+      });
+      
+      // For supplements
+      let suppTotal = 0;
+      supplements.forEach(supp => {
+        const startDate = new Date(supp.start_date || supp.created_at);
+        const daysSinceStart = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+        const daysToCount = Math.min(daysSinceStart, 30); // Cap at 30 days
+        
+        // Parse frequency to get doses per day
+        const dosesPerDay = supp.frequency?.toLowerCase().includes('twice') ? 2 :
+                           supp.frequency?.toLowerCase().includes('three') ? 3 :
+                           supp.frequency?.toLowerCase().includes('four') ? 4 : 1;
+        
+        suppTotal += daysToCount * dosesPerDay;
+      });
       
       const medRate = medTotal > 0 ? Math.round((medLogs.length / medTotal) * 100) : 0;
       const suppRate = suppTotal > 0 ? Math.round((suppLogs.length / suppTotal) * 100) : 0;
