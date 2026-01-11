@@ -495,10 +495,10 @@ const FitnessProgress = () => {
         return;
       }
 
-      // Fetch exercise details separately
+      // Fetch exercise details separately (including category to determine exercise type)
       const { data: exerciseDetails, error: exerciseError } = await supabase
         .from('exercises')
-        .select('id, name, description')
+        .select('id, name, description, category')
         .in('id', exerciseIds);
 
       if (exerciseError) {
@@ -1635,43 +1635,124 @@ const FitnessProgress = () => {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-3">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Weight (lbs)</label>
-                          <input
-                            type="number"
-                            value={exercise.weight || 0}
-                            onChange={(e) => updateExerciseSet(exercise.id, 'weight', parseFloat(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Reps</label>
-                          <input
-                            type="number"
-                            value={exercise.reps || 0}
-                            onChange={(e) => updateExerciseSet(exercise.id, 'reps', parseInt(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">RPE</label>
-                          <input
-                            type="number"
-                            value={exercise.rpe || 5}
-                            onChange={(e) => updateExerciseSet(exercise.id, 'rpe', parseInt(e.target.value))}
-                            min="1"
-                            max="10"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Volume</label>
-                          <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm font-semibold text-gray-900">
-                            {Math.round((exercise.weight || 0) * (exercise.reps || 0))} lbs
-                          </div>
-                        </div>
-                      </div>
+                      {(() => {
+                        // Determine exercise type from category
+                        const category = exercise.exercises?.category || '';
+                        let categoryStr = category;
+                        if (typeof category === 'string' && category.startsWith('[')) {
+                          try {
+                            const parsed = JSON.parse(category);
+                            categoryStr = Array.isArray(parsed) ? parsed[0] : category;
+                          } catch {}
+                        }
+                        const lowerCategory = String(categoryStr).toLowerCase();
+                        const isCardio = lowerCategory.includes('cardio');
+                        const isDuration = lowerCategory.includes('stretch');
+                        
+                        if (isDuration) {
+                          // Duration exercise - show duration only
+                          return (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Duration (minutes)</label>
+                                <input
+                                  type="number"
+                                  value={exercise.duration_minutes || 0}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'duration_minutes', parseFloat(e.target.value))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">RPE</label>
+                                <input
+                                  type="number"
+                                  value={exercise.rpe || 5}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'rpe', parseInt(e.target.value))}
+                                  min="1"
+                                  max="10"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                            </div>
+                          );
+                        } else if (isCardio) {
+                          // Cardio exercise - show distance and duration
+                          return (
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Distance (miles)</label>
+                                <input
+                                  type="number"
+                                  value={exercise.distance || 0}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'distance', parseFloat(e.target.value))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Duration (min)</label>
+                                <input
+                                  type="number"
+                                  value={exercise.duration_minutes || 0}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'duration_minutes', parseFloat(e.target.value))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">RPE</label>
+                                <input
+                                  type="number"
+                                  value={exercise.rpe || 5}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'rpe', parseInt(e.target.value))}
+                                  min="1"
+                                  max="10"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                            </div>
+                          );
+                        } else {
+                          // Strength exercise - show weight, reps, volume
+                          return (
+                            <div className="grid grid-cols-4 gap-3">
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Weight (lbs)</label>
+                                <input
+                                  type="number"
+                                  value={exercise.weight || 0}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'weight', parseFloat(e.target.value))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Reps</label>
+                                <input
+                                  type="number"
+                                  value={exercise.reps || 0}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'reps', parseInt(e.target.value))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">RPE</label>
+                                <input
+                                  type="number"
+                                  value={exercise.rpe || 5}
+                                  onChange={(e) => updateExerciseSet(exercise.id, 'rpe', parseInt(e.target.value))}
+                                  min="1"
+                                  max="10"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-600 mb-1">Volume</label>
+                                <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm font-semibold text-gray-900">
+                                  {Math.round((exercise.weight || 0) * (exercise.reps || 0))} lbs
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
                   ))}
                 </div>
