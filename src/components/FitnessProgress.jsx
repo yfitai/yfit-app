@@ -246,7 +246,15 @@ const FitnessProgress = () => {
       const totalWorkouts = sessionsData?.length || 0;
       const totalVolume = sessionsData?.reduce((sum, s) => sum + (s.total_volume || 0), 0) || 0;
       const totalReps = sessionsData?.reduce((sum, s) => sum + (s.total_reps || 0), 0) || 0;
-      const totalDistance = sessionsData?.reduce((sum, s) => sum + (s.total_distance || 0), 0) || 0;
+      
+      // Calculate total distance from exercise_sets (not from workout_sessions)
+      let totalDistance = 0;
+      if (allSets && allSets.length > 0) {
+        totalDistance = allSets.reduce((sum, set) => {
+          const distance = parseFloat(set.distance) || 0;
+          return sum + distance;
+        }, 0);
+      }
 
       // Fetch form analysis average
       let avgFormScore = 0;
@@ -368,17 +376,23 @@ const FitnessProgress = () => {
             reps: 0,
             sets: 0,
             maxWeight: 0,
+            duration: 0,
+            distance: 0,
             timestamp
           };
         }
         const weight = parseFloat(set.weight) || 0;
         const reps = parseInt(set.reps) || 0;
         const volume = weight * reps;
+        const duration = parseFloat(set.duration_minutes) || 0;
+        const distance = parseFloat(set.distance) || 0;
         
         dataByDate[date].volume += volume;
         dataByDate[date].reps += reps;
         dataByDate[date].sets += 1;
         dataByDate[date].maxWeight = Math.max(dataByDate[date].maxWeight, weight);
+        dataByDate[date].duration += duration;
+        dataByDate[date].distance += distance;
       });
 
       // Transform to array and calculate estimated 1RM
@@ -388,6 +402,8 @@ const FitnessProgress = () => {
         volume: Math.round(d.volume),
         reps: d.reps,
         sets: d.sets,
+        duration: Math.round(d.duration * 10) / 10, // Round to 1 decimal
+        distance: Math.round(d.distance * 100) / 100, // Round to 2 decimals
         estimated1RM: d.maxWeight > 0 ? Math.round(d.maxWeight * (1 + d.reps / 30)) : 0,
         timestamp: d.timestamp
       })).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -1468,7 +1484,13 @@ const FitnessProgress = () => {
                   >
                     <div className="font-semibold text-gray-900">{session.workout?.name || 'Quick Workout'}</div>
                     <div className="text-sm text-gray-600">
-                      {new Date(session.start_time).toLocaleDateString()} • {session.total_exercises} exercises • {session.total_sets} sets
+                      {new Date(session.start_time).toLocaleDateString()}
+                      {session.total_distance > 0 || session.total_duration > 0 ? (
+                        // For cardio/duration exercises, don't show exercises/sets count
+                        null
+                      ) : (
+                        <> • {session.total_exercises} exercises • {session.total_sets} sets</>
+                      )}
                     </div>
                   </div>
                   <div className="text-right flex items-center gap-3">
@@ -1477,6 +1499,11 @@ const FitnessProgress = () => {
                         <>
                           <div className="text-lg font-bold text-blue-600">{session.total_distance.toFixed(2)} miles</div>
                           <div className="text-xs text-gray-600">Total Distance</div>
+                        </>
+                      ) : session.total_duration > 0 ? (
+                        <>
+                          <div className="text-lg font-bold text-blue-600">{Math.round(session.total_duration)} min</div>
+                          <div className="text-xs text-gray-600">Duration</div>
                         </>
                       ) : (
                         <>
