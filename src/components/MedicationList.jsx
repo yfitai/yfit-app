@@ -36,8 +36,7 @@ export default function MedicationList({ user, onAddMedication }) {
         .from('user_medications')
         .select(`
           *,
-          medication:medications(*),
-          prescriber:medical_providers(*)
+          medication:medications(*)
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
