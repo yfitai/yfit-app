@@ -16,14 +16,20 @@ export default function MedicationLog({ user }) {
     loadData()
   }, [user])
 
+  // Recalculate stats whenever medications or supplements change
+  useEffect(() => {
+    if (medications.length > 0 || supplements.length > 0) {
+      calculateStats()
+    }
+  }, [medications, supplements])
+
   const loadData = async () => {
     setLoading(true)
     try {
       await Promise.all([
         loadMedications(),
         loadSupplements(),
-        loadTodayLogs(),
-        calculateStats()
+        loadTodayLogs()
       ])
     } finally {
       setLoading(false)
