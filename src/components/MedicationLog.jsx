@@ -64,13 +64,18 @@ export default function MedicationLog({ user }) {
         return;
       }
 
+      // Supplements feature disabled - is_supplement column doesn't exist
+      setSupplements([]);
+      return;
+      
+      /* Original query - disabled
       const { data, error } = await supabase
         .from('user_medications')
         .select('*, medication:medications(name)')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .eq('is_supplement', true)
         .order('created_at')
+      */
 
       if (error) throw error
       setSupplements(data || [])
@@ -170,15 +175,16 @@ export default function MedicationLog({ user }) {
 
       const { data, error } = await supabase
         .from('medication_logs')
-        .select('*, user_medication:user_medications(is_supplement)')
+        .select('*, user_medication:user_medications(id)')
         .eq('user_id', user.id)
         .eq('status', 'taken')
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
 
       if (error) throw error
 
-      const medLogs = data?.filter(log => !log.user_medication?.is_supplement) || [];
-      const suppLogs = data?.filter(log => log.user_medication?.is_supplement) || [];
+      // All logs are medications (supplements feature disabled)
+      const medLogs = data || [];
+      const suppLogs = [];
       
       const medTotal = medications.length * 30;
       const suppTotal = supplements.length * 30;

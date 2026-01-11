@@ -41,7 +41,6 @@ export default function MedicationList({ user, onAddMedication }) {
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .eq('is_supplement', false)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -61,6 +60,12 @@ export default function MedicationList({ user, onAddMedication }) {
         return;
       }
 
+      // Supplements feature disabled - is_supplement column doesn't exist
+      // Return empty array for now
+      setSupplements([]);
+      return;
+      
+      /* Original query - disabled
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -69,8 +74,8 @@ export default function MedicationList({ user, onAddMedication }) {
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .eq('is_supplement', true)
         .order('created_at', { ascending: false })
+      */
 
       if (error) throw error
       setSupplements(data || [])
