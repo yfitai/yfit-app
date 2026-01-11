@@ -178,3 +178,11 @@
 - [ ] Configure beta tester list (ready for marketing website signups)
 - [ ] Verify app submission is complete and approved
 - [ ] Test beta distribution flow
+
+
+## Duration-Based Exercise Tracking (Before Google Play)
+- [ ] Review walking implementation
+- [ ] Add duration-only exercise type (planks, ab roller, wall sits, etc.)
+- [ ] Update workout logging UI for duration exercises
+- [ ] Create progress card for duration exercise PRs
+- [ ] Test duration tracking and progress display

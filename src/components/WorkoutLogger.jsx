@@ -853,7 +853,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               {exerciseType === 'stretching' && (
                 <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Stretching Session
+                    Duration Exercise
                   </h3>
 
                   {/* Duration Input */}
@@ -875,7 +875,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Check className="w-6 h-6" />
-                    Complete Stretching
+                    Complete Duration Exercise
                   </button>
                 </>
               )}

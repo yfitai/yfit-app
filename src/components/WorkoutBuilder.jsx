@@ -229,7 +229,7 @@ const WorkoutBuilder = () => {
         'Legs': ['quadriceps', 'hamstrings', 'glutes', 'calves', 'adductors', 'abductors'],
         'Core': ['abdominals', 'obliques', 'lower back'],
         'Cardio': [], // Will be handled by exercise name matching
-        'Stretching': [], // Will be handled by exercise name matching
+        'Duration Exercises': [], // Will be handled by exercise name matching
         'Full Body': [] // Will match all if we add special logic
       };
       
@@ -248,7 +248,7 @@ const WorkoutBuilder = () => {
           } catch (e) {}
         }
         matchesCategory = (exCategory || '').toLowerCase() === 'cardio';
-      } else if (filterCategory === 'Stretching') {
+      } else if (filterCategory === 'Duration Exercises') {
         // Match stretching exercises by database category
         let exCategory = ex.category;
         if (typeof exCategory === 'string' && exCategory.startsWith('[')) {
@@ -408,7 +408,7 @@ const WorkoutBuilder = () => {
                           <h3 className="font-semibold text-gray-900">{item.exercise.name}</h3>
                           <p className="text-sm text-gray-600 capitalize">
                             {exerciseType === 'cardio' && '🏃 Cardio Exercise'}
-                            {exerciseType === 'stretching' && '🧘 Stretching Exercise'}
+                            {exerciseType === 'stretching' && '⏱️ Duration Exercise'}
                             {exerciseType === 'strength' && '💪 Strength Exercise'}
                           </p>
                         </div>
@@ -560,7 +560,7 @@ const WorkoutBuilder = () => {
                   <option value="Legs">Legs</option>
                   <option value="Core">Core</option>
                   <option value="Cardio">Cardio</option>
-                  <option value="Stretching">Stretching</option>
+                  <option value="Duration Exercises">Duration Exercises</option>
                   <option value="Full Body">Full Body</option>
                 </select>
 
