@@ -61,31 +61,27 @@ const FitnessProgress = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch exercises from completed sessions
+      // Fetch exercises from completed sessions ONLY (not from templates)
       const { data: sessionExercises } = await supabase
         .from('session_exercises')
         .select('exercise_id, workout_sessions!inner(user_id)')
         .eq('workout_sessions.user_id', user.id);
 
-      // Fetch exercises from workout templates
-      const { data: templateExercises } = await supabase
-        .from('workout_exercises')
-        .select('exercise_id, workouts!inner(user_id)')
-        .eq('workouts.user_id', user.id);
-
-      // Get unique exercise IDs
+      // Get unique exercise IDs from completed sessions only
       const completedExerciseIds = [...new Set((sessionExercises || []).map(se => se.exercise_id))];
-      const templateExerciseIds = [...new Set((templateExercises || []).map(te => te.exercise_id))];
-      const allExerciseIds = [...new Set([...completedExerciseIds, ...templateExerciseIds])];
 
       // Fetch exercise details for these IDs
-      const { data: exercisesData } = await supabase
-        .from('exercises')
-        .select('*')
-        .in('id', allExerciseIds)
-        .order('name');
-      
-      setExercises(exercisesData || []);
+      if (completedExerciseIds.length > 0) {
+        const { data: exercisesData } = await supabase
+          .from('exercises')
+          .select('*')
+          .in('id', completedExerciseIds)
+          .order('name');
+        
+        setExercises(exercisesData || []);
+      } else {
+        setExercises([]);
+      }
 
       // Fetch recent workout sessions
       const { data: sessionsData } = await supabase
@@ -98,11 +94,54 @@ const FitnessProgress = () => {
         .eq('is_completed', true)
         .order('start_time', { ascending: false })
         .limit(10);
+      
+      // Calculate total_duration for each session from exercise_sets
+      if (sessionsData && sessionsData.length > 0) {
+        const sessionIds = sessionsData.map(s => s.id);
+        
+        // Get all session_exercises for these sessions
+        const { data: sessionExercisesForDuration } = await supabase
+          .from('session_exercises')
+          .select('id, session_id')
+          .in('session_id', sessionIds);
+        
+        if (sessionExercisesForDuration && sessionExercisesForDuration.length > 0) {
+          const sessionExerciseIds = sessionExercisesForDuration.map(se => se.id);
+          
+          // Get all exercise_sets with duration
+          const { data: setsWithDuration } = await supabase
+            .from('exercise_sets')
+            .select('session_exercise_id, duration_minutes')
+            .in('session_exercise_id', sessionExerciseIds);
+          
+          // Calculate total duration per session
+          const durationBySession = {};
+          (setsWithDuration || []).forEach(set => {
+            const sessionExercise = sessionExercisesForDuration.find(se => se.id === set.session_exercise_id);
+            if (sessionExercise) {
+              const sessionId = sessionExercise.session_id;
+              if (!durationBySession[sessionId]) {
+                durationBySession[sessionId] = 0;
+              }
+              durationBySession[sessionId] += parseFloat(set.duration_minutes) || 0;
+            }
+          });
+          
+          // Add total_duration to each session
+          sessionsData.forEach(session => {
+            session.total_duration = durationBySession[session.id] || 0;
+          });
+        }
+      }
+      
       setRecentSessions(sessionsData || []);
 
       // Calculate personal records from exercise_sets
       // Get all session_exercises for this user
       const userSessionIds = (sessionsData || []).map(s => s.id);
+      
+      // Declare allSets in outer scope so it's available for stats calculation
+      let allSets = [];
       
       if (userSessionIds.length > 0) {
         const { data: userSessionExercises } = await supabase
@@ -114,10 +153,12 @@ const FitnessProgress = () => {
           const sessionExerciseIds = userSessionExercises.map(se => se.id);
           
           // Get all sets for these exercises
-          const { data: allSets } = await supabase
+          const { data: fetchedSets } = await supabase
             .from('exercise_sets')
             .select('*')
             .in('session_exercise_id', sessionExerciseIds);
+          
+          allSets = fetchedSets || [];
 
           // Calculate PRs by exercise
           const prsByExercise = {};
