@@ -1595,24 +1595,62 @@ const FitnessProgress = () => {
               </div>
               
               {/* Session Stats */}
-              <div className="grid grid-cols-4 gap-4 mt-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
-                  <div className="text-xs text-gray-600">Exercises</div>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{selectedSession.total_sets || 0}</div>
-                  <div className="text-xs text-gray-600">Sets</div>
-                </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">{selectedSession.total_reps || 0}</div>
-                  <div className="text-xs text-gray-600">Reps</div>
-                </div>
-                <div className="text-center p-3 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_volume || 0)}</div>
-                  <div className="text-xs text-gray-600">Volume (lbs)</div>
-                </div>
-              </div>
+              {(() => {
+                const hasDuration = selectedSession.total_duration > 0;
+                const hasDistance = selectedSession.total_distance > 0;
+                
+                if (hasDuration) {
+                  // Duration exercise session - show exercises and duration only
+                  return (
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
+                        <div className="text-xs text-gray-600">Exercises</div>
+                      </div>
+                      <div className="text-center p-3 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_duration)} min</div>
+                        <div className="text-xs text-gray-600">Total Duration</div>
+                      </div>
+                    </div>
+                  );
+                } else if (hasDistance) {
+                  // Cardio session - show exercises and distance
+                  return (
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
+                        <div className="text-xs text-gray-600">Exercises</div>
+                      </div>
+                      <div className="text-center p-3 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">{selectedSession.total_distance.toFixed(2)} mi</div>
+                        <div className="text-xs text-gray-600">Total Distance</div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  // Strength session - show all stats
+                  return (
+                    <div className="grid grid-cols-4 gap-4 mt-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
+                        <div className="text-xs text-gray-600">Exercises</div>
+                      </div>
+                      <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">{selectedSession.total_sets || 0}</div>
+                        <div className="text-xs text-gray-600">Sets</div>
+                      </div>
+                      <div className="text-center p-3 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">{selectedSession.total_reps || 0}</div>
+                        <div className="text-xs text-gray-600">Reps</div>
+                      </div>
+                      <div className="text-center p-3 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_volume || 0)}</div>
+                        <div className="text-xs text-gray-600">Volume (lbs)</div>
+                      </div>
+                    </div>
+                  );
+                }
+              })()}
             </div>
 
             {/* Exercise Details */}
