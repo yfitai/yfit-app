@@ -195,16 +195,24 @@
 - [x] Remove handleDemoMode function from App.jsx
 - [x] Remove demo mode indicator UI from App.jsx
 - [x] Remove onDemoMode prop from Auth component
-- [ ] Test that all data now saves to Supabase correctly with real user IDs
+- [x] Test that all data now saves to Supabase correctly with real user IDs - CONFIRMED WORKING!
+- [x] Verified new workouts save with real user_id (25407413-11a0-4ea6-8d10-d0f6b7c42b6e)
+- [x] Verified data appears in Fitness Progress and Workout Logger
 - [ ] **NEXT SESSION:** Clean up all remaining demo mode code from meal planner components (MealPlanner.jsx, NutritionUnified.jsx, AddMealModal.jsx, MealTemplates.jsx, NutritionTemplateModal.jsx, FormAnalysisHistory.jsx) - currently unreachable but should be removed for code cleanliness
 
 ### Nutrition Logs Not Saving to Database
-- [ ] Investigate why nutrition_logs table is empty
+- [ ] **NEXT SESSION:** Investigate why nutrition_logs table is empty
 - [ ] Verify nutrition logging saves to Supabase (not localStorage)
-- [ ] Fix any localStorage dependencies in nutrition code
+- [ ] Check if nutrition code has demo mode localStorage fallback that needs fixing
+- [ ] Test nutrition logging after demo mode removal
 
 ### Android Auto-Update Not Working
-- [ ] Investigate why APK doesn't load from Vercel URL
-- [ ] Check if server.url in capacitor.config.json is being respected
-- [ ] Test if cleartext:true is causing issues
-- [ ] Consider alternative approaches for live updates
+- [x] Updated capacitor.config.json to use yfit-deploy.vercel.app (was yfit-app.vercel.app)
+- [x] Built new APK with corrected Vercel URL
+- [x] User installed APK but auto-update still not working
+- [ ] **NEXT SESSION - PRIORITY:** Rebuild Android APK with demo mode fix included
+- [ ] User needs to uninstall old APK and install new one (to clear localStorage)
+- [ ] Test if new APK loads from Vercel correctly
+- [ ] If still not working, investigate Capacitor server.url configuration
+- [ ] Consider if cleartext:true is causing issues
+- [ ] May need to test with actual device debugging to see network requests
