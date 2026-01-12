@@ -186,3 +186,25 @@
 - [ ] Update workout logging UI for duration exercises
 - [ ] Create progress card for duration exercise PRs
 - [ ] Test duration tracking and progress display
+
+
+## 🚨 Critical Data Storage Issues (January 11, 2026)
+
+### Demo Mode Causing Data Loss
+- [x] Remove demo mode check from getCurrentUser() in lib/supabase.js
+- [x] Remove handleDemoMode function from App.jsx
+- [x] Remove demo mode indicator UI from App.jsx
+- [x] Remove onDemoMode prop from Auth component
+- [ ] Test that all data now saves to Supabase correctly with real user IDs
+- [ ] **NEXT SESSION:** Clean up all remaining demo mode code from meal planner components (MealPlanner.jsx, NutritionUnified.jsx, AddMealModal.jsx, MealTemplates.jsx, NutritionTemplateModal.jsx, FormAnalysisHistory.jsx) - currently unreachable but should be removed for code cleanliness
+
+### Nutrition Logs Not Saving to Database
+- [ ] Investigate why nutrition_logs table is empty
+- [ ] Verify nutrition logging saves to Supabase (not localStorage)
+- [ ] Fix any localStorage dependencies in nutrition code
+
+### Android Auto-Update Not Working
+- [ ] Investigate why APK doesn't load from Vercel URL
+- [ ] Check if server.url in capacitor.config.json is being respected
+- [ ] Test if cleartext:true is causing issues
+- [ ] Consider alternative approaches for live updates

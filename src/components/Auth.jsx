@@ -9,7 +9,7 @@ import { signIn, signUp, resendConfirmationEmail, resetPassword } from '../lib/s
 import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 
-export default function Auth({ onAuthSuccess, onDemoMode }) {
+export default function Auth({ onAuthSuccess }) {
 const [isLoading, setIsLoading] = useState(false)
 const [showLoginPassword, setShowLoginPassword] = useState(false)
 const [showSignupPassword, setShowSignupPassword] = useState(false)

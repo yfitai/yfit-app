@@ -24,7 +24,6 @@ import './App.css'
 function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [demoMode, setDemoMode] = useState(false)
 
   useEffect(() => {
     // Check for existing session
@@ -45,28 +44,6 @@ function App() {
     setUser(authenticatedUser)
   }
 
-  const handleDemoMode = () => {
-    console.log('handleDemoMode called');
-    // Create a demo user for testing dashboard UI
-    const demoUser = {
-      id: 'demo-user-id',
-      email: 'demo@yfit.ai',
-      user_metadata: {
-        first_name: 'Alex',
-        last_name: 'Demo'
-      },
-      created_at: new Date().toISOString()
-    }
-    console.log('Setting demo user:', demoUser);
-    // Set demo mode in localStorage so getCurrentUser() can detect it
-    localStorage.setItem('demoMode', 'true')
-    console.log('Demo mode set in localStorage');
-    setUser(demoUser)
-    console.log('User state updated');
-    setDemoMode(true)
-    console.log('Demo mode state set to true');
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
@@ -79,7 +56,7 @@ function App() {
   }
 
   if (!user) {
-    return <Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />
+    return <Auth onAuthSuccess={handleAuthSuccess} />
   }
 
   return (
@@ -88,17 +65,12 @@ function App() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
           <Navigation user={user} />
           
-          {/* Demo mode indicator */}
-          {demoMode && (
-            <div className="fixed top-16 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-400 text-yellow-800 px-3 py-1 rounded-full text-xs shadow-md z-50 max-w-fit">
-              🧪 Demo Mode
-            </div>
-          )}
+
                  <Routes>
             {/* Public Routes - No login required */}
             <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-            <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
-            <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} onDemoMode={handleDemoMode} />} />
+            <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+            <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/legal" element={<Legal />} />
 
