@@ -475,13 +475,6 @@ export default function NutritionEnhanced({ user: propUser }) {
           <UnitToggle />
         </div>
         
-        {/* AUTO-UPDATE TEST BANNER */}
-        <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-xl shadow-lg p-6 mb-6 text-center animate-pulse">
-          <h2 className="text-2xl font-bold text-white mb-2">🎉 AUTO-UPDATE TEST 🎉</h2>
-          <p className="text-white text-lg font-semibold">You're seeing the latest version from Vercel!</p>
-          <p className="text-white text-sm mt-2">If you see this, auto-deployment is working perfectly! ✅</p>
-        </div>
-        
         {/* Date Picker */}
         <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
           <div className="flex items-center justify-between gap-4">
