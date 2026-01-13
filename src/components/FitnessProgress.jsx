@@ -1048,7 +1048,7 @@ const FitnessProgress = () => {
     <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-blue-600">Fitness Progress - AUTO-UPDATE TEST</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Fitness Progress</h1>
           
           {/* Time Range Selector */}
           <select
