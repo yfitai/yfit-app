@@ -266,48 +266,27 @@ export default function NutritionEnhanced({ user: propUser }) {
     
     console.log('🍎 Meal Data to Save:', mealData)
 
+    // Save to database
+    const { error } = await supabase
+      .from('meals')
+      .insert(mealData)
 
-    if (isDemoMode) {
-      // Save to localStorage
-      const demoMeals = localStorage.getItem('yfit_demo_meals')
-      const meals = demoMeals ? JSON.parse(demoMeals) : []
-      meals.push({ ...mealData, id: Date.now().toString() })
-      localStorage.setItem('yfit_demo_meals', JSON.stringify(meals))
-      setTodaysMeals(meals)
-      calculateTotals(meals)
-
-      // Update recent foods in localStorage
-      const recentFoods = localStorage.getItem('yfit_recent_foods')
-      const recent = recentFoods ? JSON.parse(recentFoods) : []
-      const existingIndex = recent.findIndex(f => f.id === selectedFood.id)
-      if (existingIndex >= 0) {
-        recent.splice(existingIndex, 1)
-      }
-      recent.unshift(selectedFood)
-      localStorage.setItem('yfit_recent_foods', JSON.stringify(recent.slice(0, 50)))
-    } else {
-      // Save to database
-      const { error } = await supabase
-        .from('meals')
-        .insert(mealData)
-
-      if (error) {
-     console.error('Error logging food:', JSON.stringify(error, null, 2))
-     console.error('Error message:', error.message)
-     console.error('Error details:', error.details)
-     console.error('Error hint:', error.hint)
-        alert('Error logging food. Please try again.')
-        return
-      }
-
-      // Update recent foods
-      if (selectedFood.id) {
-        await updateRecentFood(user.id, selectedFood.id)
-      }
-
-      // Reload meals
-      await loadTodaysMeals(user.id, selectedDate)
+    if (error) {
+      console.error('Error logging food:', JSON.stringify(error, null, 2))
+      console.error('Error message:', error.message)
+      console.error('Error details:', error.details)
+      console.error('Error hint:', error.hint)
+      alert('Error logging food. Please try again.')
+      return
     }
+
+    // Update recent foods
+    if (selectedFood.id) {
+      await updateRecentFood(user.id, selectedFood.id)
+    }
+
+    // Reload meals
+    await loadTodaysMeals(user.id, selectedDate)
 
     // Close serving selector
     setShowServingSelector(false)
@@ -315,28 +294,17 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
   const handleDeleteMeal = async (mealId) => {
-    const isDemoMode = user.id.startsWith('demo')
+    const { error } = await supabase
+      .from('meals')
+      .delete()
+      .eq('id', mealId)
 
-    if (isDemoMode) {
-      const demoMeals = localStorage.getItem('yfit_demo_meals')
-      const meals = demoMeals ? JSON.parse(demoMeals) : []
-      const updated = meals.filter(m => m.id !== mealId)
-      localStorage.setItem('yfit_demo_meals', JSON.stringify(updated))
-      setTodaysMeals(updated)
-      calculateTotals(updated)
-    } else {
-      const { error} = await supabase
-        .from('meals')
-        .delete()
-        .eq('id', mealId)
-
-      if (error) {
-        console.error('Error deleting meal:', error)
-        return
-      }
-
-      await loadTodaysMeals(user.id, selectedDate)
+    if (error) {
+      console.error('Error deleting meal:', error)
+      return
     }
+
+    await loadTodaysMeals(user.id, selectedDate)
   }
 
   // Handle template quick-add
@@ -357,65 +325,35 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
   const addMealFromTemplate = async (templateMeal, mealType) => {
-    const isDemoMode = user.id.startsWith('demo')
-    
-    if (isDemoMode) {
-      // Demo mode - use localStorage
-      const mealData = {
-        id: `demo-meal-${Date.now()}-${Math.random()}`,
-        user_id: user.id,
-        meal_type: mealType,
-        meal_date: new Date().toISOString().split('T')[0],
-        food_name: templateMeal.food_name,
-        brand: templateMeal.brand || '',
-        calories: templateMeal.calories,
-        protein: templateMeal.protein,
-        carbs: templateMeal.carbs,
-        fat: templateMeal.fat,
-        fiber: templateMeal.fiber || 0,
-        sugar: templateMeal.sugar || 0,
-        sodium: templateMeal.sodium || 0,
-        serving_quantity: templateMeal.serving_quantity,
-        serving_unit: templateMeal.serving_unit
-      }
-      
-      const demoMeals = localStorage.getItem('yfit_demo_meals')
-      const meals = demoMeals ? JSON.parse(demoMeals) : []
-      meals.push(mealData)
-      localStorage.setItem('yfit_demo_meals', JSON.stringify(meals))
-      setTodaysMeals(meals)
-      calculateTotals(meals)
-    } else {
-      // Real mode - use Supabase (id will be auto-generated)
-      const mealData = {
-        user_id: user.id,
-        meal_type: mealType,
-        meal_date: selectedDate,
-        food_name: templateMeal.food_name,
-        brand: templateMeal.brand || '',
-        calories: templateMeal.calories,
-        protein_g: templateMeal.protein,
-        carbs_g: templateMeal.carbs,
-        fat_g: templateMeal.fat,
-        fiber: templateMeal.fiber || 0,
-        sugar: templateMeal.sugar || 0,
-        sodium: templateMeal.sodium || 0,
-        serving_quantity: templateMeal.serving_quantity,
-        serving_unit: templateMeal.serving_unit
-        // id and created_at will be set automatically by database
-      }
-      
-      const { error } = await supabase
-        .from('meals')
-        .insert([mealData])
-
-      if (error) {
-        console.error('Error adding meal from template:', error)
-        return
-      }
-
-      await loadTodaysMeals(user.id, selectedDate)
+    // Use Supabase (id will be auto-generated)
+    const mealData = {
+      user_id: user.id,
+      meal_type: mealType,
+      meal_date: selectedDate,
+      food_name: templateMeal.food_name,
+      brand: templateMeal.brand || '',
+      calories: templateMeal.calories,
+      protein_g: templateMeal.protein,
+      carbs_g: templateMeal.carbs,
+      fat_g: templateMeal.fat,
+      fiber: templateMeal.fiber || 0,
+      sugar: templateMeal.sugar || 0,
+      sodium: templateMeal.sodium || 0,
+      serving_quantity: templateMeal.serving_quantity,
+      serving_unit: templateMeal.serving_unit
+      // id and created_at will be set automatically by database
     }
+    
+    const { error } = await supabase
+      .from('meals')
+      .insert([mealData])
+
+    if (error) {
+      console.error('Error adding meal from template:', error)
+      return
+    }
+
+    await loadTodaysMeals(user.id, selectedDate)
   }
 
   // Handle save as template
