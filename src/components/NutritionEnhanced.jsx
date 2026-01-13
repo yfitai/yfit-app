@@ -65,6 +65,7 @@ export default function NutritionEnhanced({ user: propUser }) {
     if (user) {
       loadTodaysMeals(user.id, selectedDate)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, user])
 
   const loadData = async () => {
