@@ -4,7 +4,11 @@
   "webDir": "dist",
   "server": {
     "url": "https://yfit-deploy.vercel.app",
-    "cleartext": true
+    "cleartext": true,
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "hostname": "yfit-deploy.vercel.app",
+    "allowNavigation": ["https://yfit-deploy.vercel.app/*"]
   },
   "plugins": {
     "BarcodeScanner": {
