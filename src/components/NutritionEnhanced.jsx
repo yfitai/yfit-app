@@ -7,7 +7,7 @@ import BarcodeScanner from './BarcodeScanner'
 import MacroSettings from './MacroSettings'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
-import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus } from 'lucide-react'
+import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
@@ -52,10 +52,20 @@ export default function NutritionEnhanced({ user: propUser }) {
   // Serving size state
   const [servingQuantity, setServingQuantity] = useState(1)
   const [servingUnit, setServingUnit] = useState('serving')
+  
+  // Date selection state
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
     loadData()
   }, [])
+  
+  // Reload meals when selected date changes
+  useEffect(() => {
+    if (user) {
+      loadTodaysMeals(user.id, selectedDate)
+    }
+  }, [selectedDate])
 
   const loadData = async () => {
     try {
@@ -143,14 +153,12 @@ export default function NutritionEnhanced({ user: propUser }) {
     }
   }
 
-  const loadTodaysMeals = async (userId) => {
-    const today = new Date().toISOString().split('T')[0]
-    
-    const { data, error } = await supabase
+  const loadTodaysMeals = async (userId, date = selectedDate) => {
+    const { data, error} = await supabase
       .from('meals')
       .select('*')
       .eq('user_id', userId)
-      .eq('meal_date', today)
+      .eq('meal_date', date)
       .order('created_at', { ascending: true })
 
     if (!error && data) {
@@ -240,7 +248,7 @@ export default function NutritionEnhanced({ user: propUser }) {
     const mealData = {
       user_id: user.id,
       meal_type: selectedMealType,
-      meal_date: new Date().toISOString().split('T')[0],
+      meal_date: selectedDate,
       food_name: selectedFood.name,
       calories: Math.round((selectedFood.calories || 0) * multiplier),
       protein_g: Math.round((selectedFood.protein || 0) * multiplier),
@@ -381,7 +389,7 @@ export default function NutritionEnhanced({ user: propUser }) {
       const mealData = {
         user_id: user.id,
         meal_type: mealType,
-        meal_date: new Date().toISOString().split('T')[0],
+        meal_date: selectedDate,
         food_name: templateMeal.food_name,
         brand: templateMeal.brand || '',
         calories: templateMeal.calories,
@@ -563,11 +571,66 @@ export default function NutritionEnhanced({ user: propUser }) {
           </div>
           <UnitToggle />
         </div>
+        
+        {/* Date Picker */}
+        <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+          <div className="flex items-center justify-between gap-4">
+            <button
+              onClick={() => {
+                const date = new Date(selectedDate)
+                date.setDate(date.getDate() - 1)
+                setSelectedDate(date.toISOString().split('T')[0])
+              }}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Previous Day"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            
+            <div className="flex items-center gap-2 flex-1 justify-center">
+              <Calendar className="w-5 h-5 text-blue-500" />
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium"
+              />
+              {selectedDate !== new Date().toISOString().split('T')[0] && (
+                <button
+                  onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                  className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Today
+                </button>
+              )}
+            </div>
+            
+            <button
+              onClick={() => {
+                const date = new Date(selectedDate)
+                const today = new Date().toISOString().split('T')[0]
+                date.setDate(date.getDate() + 1)
+                const nextDate = date.toISOString().split('T')[0]
+                if (nextDate <= today) {
+                  setSelectedDate(nextDate)
+                }
+              }}
+              disabled={selectedDate === new Date().toISOString().split('T')[0]}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Next Day"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
 
         {/* Daily Summary Card */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Today's Summary</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {selectedDate === new Date().toISOString().split('T')[0] ? "Today's Summary" : "Daily Summary"}
+            </h2>
             <Target className="w-6 h-6 text-blue-500" />
           </div>
 

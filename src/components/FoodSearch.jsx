@@ -19,23 +19,12 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   const loadQuickAccessFoods = async () => {
     if (!user) return
 
-    const isDemoMode = !user || user.id?.startsWith('demo')
+    // Load from database
+    const recent = await getRecentFoods(user.id, 5)
+    const favorites = await getFavoriteFoods(user.id)
     
-    if (isDemoMode) {
-      // Load from localStorage for demo mode
-      const recentStr = localStorage.getItem('yfit_recent_foods')
-      const favoritesStr = localStorage.getItem('yfit_favorite_foods')
-      
-      if (recentStr) setRecentFoods(JSON.parse(recentStr).slice(0, 5))
-      if (favoritesStr) setFavoriteFoods(JSON.parse(favoritesStr).slice(0, 5))
-    } else {
-      // Load from database for authenticated users
-      const recent = await getRecentFoods(user.id, 5)
-      const favorites = await getFavoriteFoods(user.id)
-      
-      setRecentFoods(recent)
-      setFavoriteFoods(favorites.slice(0, 5))
-    }
+    setRecentFoods(recent)
+    setFavoriteFoods(favorites.slice(0, 5))
   }
 
   // Debounced search

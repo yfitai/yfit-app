@@ -216,3 +216,26 @@
 - [ ] If still not working, investigate Capacitor server.url configuration
 - [ ] Consider if cleartext:true is causing issues
 - [ ] May need to test with actual device debugging to see network requests
+
+
+## 🧹 Code Cleanup for Public Launch
+
+### Demo Mode Code Removal (24 files affected)
+- [ ] **BEFORE PUBLIC LAUNCH:** Complete removal of all demo mode code from 24 component files
+- [ ] Files to clean: DailyTracker, FitnessProgress, FormAnalysis, FormAnalysisHistory, InteractionChecker, MacroSettings, MealPlanner, AddMealModal, MealTemplates, MedicationList, MedicationLog, MedicationSearch, Nutrition, NutritionTemplateModal, NutritionEnhanced, NutritionProgressCharts, NutritionUnified, PredictionsUnified, Progress, ProgressPhotos, ProviderReport, WaterTracker, WorkoutAnalyticsDashboard
+- [ ] Note: Demo mode is already disabled at authentication level, so this is for code cleanliness only
+- [ ] Estimated time: 30-45 minutes for comprehensive cleanup
+
+
+## 📅 Nutrition Date Picker Feature
+
+- [x] Add date picker UI to NutritionEnhanced component
+- [x] Update loadTodaysMeals to use selected date
+- [x] Update logFood to save with selected date
+- [x] Update template meals to save with selected date
+- [x] Add previous/next day navigation buttons
+- [x] Add "Today" quick button
+- [x] Prevent navigation to future dates
+- [x] Update summary title based on selected date
+- [ ] Test viewing meals from previous days
+- [ ] Test logging meals for past dates

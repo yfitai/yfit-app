@@ -104,12 +104,10 @@ export default function Goals({ user: propUser }) {
       if (currentUser) {
         setUser(currentUser)
         
-        // Only fetch profile and goals if not in demo mode
-        if (!currentUser.id.startsWith('demo')) {
-          const profile = await getUserProfile(currentUser.id)
-          setUserProfile(profile)
-          await loadExistingGoals(currentUser.id)
-        }
+        // Fetch profile and goals
+        const profile = await getUserProfile(currentUser.id)
+        setUserProfile(profile)
+        await loadExistingGoals(currentUser.id)
       }
     } catch (error) {
       console.error('Error loading user data:', error)
@@ -377,26 +375,7 @@ export default function Goals({ user: propUser }) {
       
       setCalculatedMetrics(metrics)
 
-      // Check if demo mode (no user or user id starts with 'demo')
-      const isDemoMode = !user || user.id.startsWith('demo')
-
-      if (isDemoMode) {
-        // In demo mode, save to localStorage
-        localStorage.setItem('yfit_demo_goals', JSON.stringify(userData))
-        localStorage.setItem('yfit_demo_measurements', JSON.stringify(measurementsInCm))
-        localStorage.setItem('yfit_demo_metrics', JSON.stringify(metrics))
-        
-        alert('✅ Goals calculated successfully! (Demo Mode - data saved locally)')
-        
-        // Scroll to results
-        setTimeout(() => {
-          const resultsElement = document.getElementById('goals-results')
-          if (resultsElement) {
-            resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }
-        }, 100)
-      } else {
-        // In real mode, save to database
+      // Save to database
         measurementsInCm.user_id = user.id
 
         const { error: goalsError } = await supabase
@@ -466,11 +445,11 @@ export default function Goals({ user: propUser }) {
         if (bodyTypeError) throw bodyTypeError
 
         alert('✅ Goals saved successfully!')
-      }
-  // Scroll to results
-      setTimeout(() => {
-        document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
+        
+        // Scroll to results
+        setTimeout(() => {
+          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
       
     } catch (error) {
       console.error('Error saving goals:', error)
@@ -483,18 +462,7 @@ export default function Goals({ user: propUser }) {
   const handleStartFresh = async () => {
     setResetting(true)
     try {
-      const isDemoMode = !user || user.id.startsWith('demo')
-
-      if (isDemoMode) {
-        // Clear demo data from localStorage
-        localStorage.removeItem('yfit_demo_meals')
-        localStorage.removeItem('yfit_demo_workouts')
-        localStorage.removeItem('yfit_demo_metrics')
-        localStorage.removeItem('yfit_demo_goals')
-        localStorage.removeItem('yfit_demo_measurements')
-        alert('✅ Demo data cleared! You can now set new goals.')
-      } else {
-        // Delete from database (keeps custom_foods, favorite_foods, templates)
+      // Delete from database (keeps custom_foods, favorite_foods, templates)
         // Use cascading deletes for tables with foreign key constraints
         
         // 1. Get all workout IDs for this user first
@@ -556,7 +524,6 @@ export default function Goals({ user: propUser }) {
         }
 
         alert('✅ Data reset successfully! You can now start fresh.')
-      }
 
       // Reset ALL form state to initial values
       setAge('')

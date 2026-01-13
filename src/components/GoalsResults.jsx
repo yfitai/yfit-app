@@ -75,12 +75,10 @@ export default function Goals({ user: propUser }) {
       if (currentUser) {
         setUser(currentUser)
         
-        // Only fetch profile and goals if not in demo mode
-        if (!currentUser.id.startsWith('demo')) {
-          const profile = await getUserProfile(currentUser.id)
-          setUserProfile(profile)
-          await loadExistingGoals(currentUser.id)
-        }
+        // Fetch profile and goals
+        const profile = await getUserProfile(currentUser.id)
+        setUserProfile(profile)
+        await loadExistingGoals(currentUser.id)
       }
     } catch (error) {
       console.error('Error loading user data:', error)
@@ -313,26 +311,7 @@ export default function Goals({ user: propUser }) {
       
       setCalculatedMetrics(metrics)
 
-      // Check if demo mode (no user or user id starts with 'demo')
-      const isDemoMode = !user || user.id.startsWith('demo')
-
-      if (isDemoMode) {
-        // In demo mode, save to localStorage
-        localStorage.setItem('yfit_demo_goals', JSON.stringify(userData))
-        localStorage.setItem('yfit_demo_measurements', JSON.stringify(measurementsInCm))
-        localStorage.setItem('yfit_demo_metrics', JSON.stringify(metrics))
-        
-        alert('✅ Goals calculated successfully! (Demo Mode - data saved locally)')
-        
-        // Scroll to results
-        setTimeout(() => {
-          const resultsElement = document.getElementById('goals-results')
-          if (resultsElement) {
-            resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }
-        }, 100)
-      } else {
-        // In real mode, save to database
+      // Save to database
         measurementsInCm.user_id = user.id
 
         const { error: goalsError } = await supabase

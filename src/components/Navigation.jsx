@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom'
 export default function Navigation({ user }) {
   const handleSignOut = async () => {
     await signOut()
-    localStorage.removeItem('demoMode')
     window.location.href = '/'
   }
 
