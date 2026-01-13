@@ -68,29 +68,22 @@ Write-Host "   ✅ version.json updated" -ForegroundColor Green
 Write-Host "`n📝 Updating changelog..." -ForegroundColor Yellow
 
 $changelogFile = "CHANGELOG.md"
-$changelogEntry = @"
-
-## [$newVersion] - Build $newBuild - $(Get-Date -Format "yyyy-MM-dd HH:mm")
-
-**Changes:**
-- $Message
-
----
-"@
+$dateStr = Get-Date -Format "yyyy-MM-dd HH:mm"
+$changelogEntry = "`n## [$newVersion] - Build $newBuild - $dateStr`n`n**Changes:**`n- $Message`n`n---`n"
 
 if (Test-Path $changelogFile) {
     $existingChangelog = Get-Content $changelogFile -Raw
-    # Insert new entry after the header
-    $header = "# YFIT Deployment Changelog`n`nAll deployments are tracked here automatically.`n"
+    $headerText = "# YFIT Deployment Changelog`n`nAll deployments are tracked here automatically.`n"
     if ($existingChangelog -match "^# YFIT") {
-        $existingChangelog = $existingChangelog -replace "^(# YFIT.*?\n.*?\n)", "`$1$changelogEntry"
+        $pattern = "^(# YFIT[^\n]*\n[^\n]*\n[^\n]*\n)"
+        $existingChangelog = $existingChangelog -replace $pattern, "`$1$changelogEntry"
     } else {
-        $existingChangelog = $header + $changelogEntry + $existingChangelog
+        $existingChangelog = $headerText + $changelogEntry + $existingChangelog
     }
     $existingChangelog | Set-Content $changelogFile -Encoding UTF8
 } else {
-    $header = "# YFIT Deployment Changelog`n`nAll deployments are tracked here automatically.`n"
-    ($header + $changelogEntry) | Set-Content $changelogFile -Encoding UTF8
+    $headerText = "# YFIT Deployment Changelog`n`nAll deployments are tracked here automatically.`n"
+    ($headerText + $changelogEntry) | Set-Content $changelogFile -Encoding UTF8
 }
 
 Write-Host "   ✅ CHANGELOG.md updated" -ForegroundColor Green
