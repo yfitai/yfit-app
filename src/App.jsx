@@ -19,6 +19,7 @@ import Navigation from './components/Navigation'
 import { supabase, getCurrentUser } from './lib/supabase'
 import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
+import VersionChecker from './utils/VersionChecker'
 import './App.css'
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
 
   return (
     <UnitPreferenceProvider>
+      <VersionChecker />
       <BrowserRouter>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
           <Navigation user={user} />
