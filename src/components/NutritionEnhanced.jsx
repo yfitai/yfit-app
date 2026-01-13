@@ -492,14 +492,25 @@ export default function NutritionEnhanced({ user: propUser }) {
             
             <div className="flex items-center gap-2 flex-1 justify-center">
               <CalendarDays className="w-5 h-5 text-blue-500" />
+              
+              {/* Hidden native date picker */}
               <input
                 type="date"
+                id="date-picker-input"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 max={formatDateString(new Date())}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium min-w-[150px]"
-                style={{ colorScheme: 'light' }}
+                className="hidden"
               />
+              
+              {/* Custom date display that triggers native picker */}
+              <button
+                onClick={() => document.getElementById('date-picker-input').showPicker()}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium min-w-[150px] bg-white hover:bg-gray-50 transition-colors"
+              >
+                {formatDateDisplay(selectedDate)}
+              </button>
+              
               {selectedDate !== formatDateString(new Date()) && (
                 <button
                   onClick={() => setSelectedDate(formatDateString(new Date()))}
