@@ -11,6 +11,22 @@ import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, St
 import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
+  // Helper function to ensure date is properly formatted (YYYY-MM-DD with zero padding)
+  const formatDateString = (date) => {
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+  
+  // Helper function to display date in readable format
+  const formatDateDisplay = (dateStr) => {
+    const date = new Date(dateStr + 'T00:00:00') // Add time to avoid timezone issues
+    const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }
+    return date.toLocaleDateString('en-US', options)
+  }
+  
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
   const [userProfile, setUserProfile] = useState(null)
@@ -54,7 +70,7 @@ export default function NutritionEnhanced({ user: propUser }) {
   const [servingUnit, setServingUnit] = useState('serving')
   
   // Date selection state
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState(formatDateString(new Date()))
 
   useEffect(() => {
     loadData()
@@ -464,9 +480,9 @@ export default function NutritionEnhanced({ user: propUser }) {
           <div className="flex items-center justify-between gap-4">
             <button
               onClick={() => {
-                const date = new Date(selectedDate)
+                const date = new Date(selectedDate + 'T00:00:00')
                 date.setDate(date.getDate() - 1)
-                setSelectedDate(date.toISOString().split('T')[0])
+                setSelectedDate(formatDateString(date))
               }}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Previous Day"
@@ -480,12 +496,13 @@ export default function NutritionEnhanced({ user: propUser }) {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium"
+                max={formatDateString(new Date())}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium min-w-[150px]"
+                style={{ colorScheme: 'light' }}
               />
-              {selectedDate !== new Date().toISOString().split('T')[0] && (
+              {selectedDate !== formatDateString(new Date()) && (
                 <button
-                  onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                  onClick={() => setSelectedDate(formatDateString(new Date()))}
                   className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   Today
@@ -495,15 +512,15 @@ export default function NutritionEnhanced({ user: propUser }) {
             
             <button
               onClick={() => {
-                const date = new Date(selectedDate)
-                const today = new Date().toISOString().split('T')[0]
+                const date = new Date(selectedDate + 'T00:00:00')
+                const today = formatDateString(new Date())
                 date.setDate(date.getDate() + 1)
-                const nextDate = date.toISOString().split('T')[0]
+                const nextDate = formatDateString(date)
                 if (nextDate <= today) {
                   setSelectedDate(nextDate)
                 }
               }}
-              disabled={selectedDate === new Date().toISOString().split('T')[0]}
+              disabled={selectedDate === formatDateString(new Date())}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title="Next Day"
             >
@@ -516,7 +533,7 @@ export default function NutritionEnhanced({ user: propUser }) {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-800">
-              {selectedDate === new Date().toISOString().split('T')[0] ? "Today's Summary" : "Daily Summary"}
+              {selectedDate === formatDateString(new Date()) ? "Today's Summary" : "Daily Summary"}
             </h2>
             <Target className="w-6 h-6 text-blue-500" />
           </div>
