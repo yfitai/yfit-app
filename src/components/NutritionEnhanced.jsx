@@ -7,7 +7,7 @@ import BarcodeScanner from './BarcodeScanner'
 import MacroSettings from './MacroSettings'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
-import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
@@ -588,7 +588,7 @@ export default function NutritionEnhanced({ user: propUser }) {
             </button>
             
             <div className="flex items-center gap-2 flex-1 justify-center">
-              <Calendar className="w-5 h-5 text-blue-500" />
+              <CalendarDays className="w-5 h-5 text-blue-500" />
               <input
                 type="date"
                 value={selectedDate}
