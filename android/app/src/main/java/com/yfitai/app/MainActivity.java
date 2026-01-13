@@ -11,17 +11,44 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Configure WebView to disable caching for development
-        // This ensures the app always fetches the latest version from Vercel
+        // Configure WebView with aggressive cache-busting
+        configureWebViewCaching();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        // Clear cache every time app resumes (comes to foreground)
+        WebView webView = getBridge().getWebView();
+        webView.clearCache(true);
+        
+        // Force reload the current page to fetch fresh content
+        webView.reload();
+    }
+    
+    private void configureWebViewCaching() {
         WebView webView = getBridge().getWebView();
         WebSettings webSettings = webView.getSettings();
         
-        // Disable all caching
+        // Disable all forms of caching
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setAppCacheEnabled(false);
+        webSettings.setDomStorageEnabled(true); // Keep for functionality
+        webSettings.setDatabaseEnabled(false);
         
-        // Clear existing cache on app start
+        // Disable save form data
+        webSettings.setSaveFormData(false);
+        
+        // Enable mixed content (for HTTPS with HTTP resources)
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        
+        // Clear all caches on startup
         webView.clearCache(true);
         webView.clearHistory();
+        webView.clearFormData();
+        
+        // Clear cookies (but keep session for login)
+        // android.webkit.CookieManager.getInstance().removeAllCookies(null);
     }
 }
