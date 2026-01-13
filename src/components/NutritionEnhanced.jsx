@@ -65,7 +65,7 @@ export default function NutritionEnhanced({ user: propUser }) {
     if (user) {
       loadTodaysMeals(user.id, selectedDate)
     }
-  }, [selectedDate])
+  }, [selectedDate, user])
 
   const loadData = async () => {
     try {
