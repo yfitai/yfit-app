@@ -475,13 +475,6 @@ export default function NutritionEnhanced({ user: propUser }) {
           <UnitToggle />
         </div>
         
-        {/* AUTO-UPDATE TEST BANNER - V2 */}
-        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-xl shadow-lg p-6 mb-6 text-center animate-pulse">
-          <h2 className="text-2xl font-bold text-white mb-2">🚀 AUTO-UPDATE V2 TEST 🚀</h2>
-          <p className="text-white text-lg font-semibold">Version checking system is working!</p>
-          <p className="text-white text-sm mt-2">This appeared automatically within 30 seconds! ✅</p>
-        </div>
-        
         {/* Date Picker */}
         <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
           <div className="flex items-center justify-between gap-4">
