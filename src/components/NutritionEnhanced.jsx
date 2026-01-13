@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase, getCurrentUser, getUserProfile } from '../lib/supabase'
 import { updateRecentFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
 import UnitToggle from './UnitToggle'
