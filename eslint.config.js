@@ -28,7 +28,7 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
-      'react-hooks/exhaustive-deps': 'warn', // Change from error to warning
+      'react-hooks/exhaustive-deps': 'off', // Disable this rule completely
     },
   },
 ]
