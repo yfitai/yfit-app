@@ -36,17 +36,6 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
     }
 
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        console.log('[AddMeal] Loaded demo templates:', demoTemplates)
-        // Filter by meal type
-        const filtered = demoTemplates.filter(t => t.meal_type === mealType)
-        console.log('[AddMeal] Filtered templates for', mealType, ':', filtered)
-        setTemplates(filtered)
-        return
-      }
-
       // Real user - use Supabase (TODO)
       setTemplates([])
     } catch (error) {

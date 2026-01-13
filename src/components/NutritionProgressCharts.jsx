@@ -18,11 +18,9 @@ export default function NutritionProgressCharts({ user }) {
   const [timeRange, setTimeRange] = useState('30') // days
 
   useEffect(() => {
-    if (user && !user.id.startsWith('demo')) {
+    if (user) {
       loadNutritionData()
       loadGoals()
-    } else if (user && user.id.startsWith('demo')) {
-      loadDemoData()
     }
   }, [user, timeRange])
 
@@ -99,28 +97,6 @@ export default function NutritionProgressCharts({ user }) {
     } finally {
       setLoading(false)
     }
-  }
-
-  const loadDemoData = () => {
-    // Generate demo data for the selected time range
-    const demoData = []
-    const today = new Date()
-    
-    for (let i = parseInt(timeRange) - 1; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      
-      demoData.push({
-        date: date.toISOString().split('T')[0],
-        dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fiber: parseFloat((15 + Math.random() * 20).toFixed(1)), // 15-35g
-        sugar: parseFloat((30 + Math.random() * 40).toFixed(1)), // 30-70g
-        sodium: parseFloat((1500 + Math.random() * 1500).toFixed(1)) // 1500-3000mg
-      })
-    }
-    
-    setNutritionData(demoData)
-    setLoading(false)
   }
 
   // Custom tooltip to show all three nutrients with proper formatting

@@ -35,13 +35,6 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
   const loadWeeklyAnalytics = async () => {
     try {
-      // Skip Supabase query in demo mode or use demo data
-      if (userId && userId.startsWith('demo')) {
-        console.log('Demo Mode: Loading sample weekly analytics data');
-        setWeeklyAnalytics(generateDemoWeeklyData());
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_analytics')
         .select('*')
@@ -71,13 +64,6 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
   const loadExerciseProgress = async () => {
     try {
-      // Skip Supabase query in demo mode
-      if (userId && userId.startsWith('demo')) {
-        console.log('Demo Mode: No exercise progress data');
-        setExerciseProgress([]);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('exercise_progression')
         .select('*')
@@ -94,13 +80,6 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
   const loadUserGoals = async () => {
     try {
-      // Skip Supabase query in demo mode
-      if (userId && userId.startsWith('demo')) {
-        console.log('Demo Mode: Using default workout goals');
-        setGoals(null);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_goals')
         .select('*')

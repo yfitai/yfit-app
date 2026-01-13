@@ -38,14 +38,6 @@ export default function MedicationLog({ user }) {
 
   const loadMedications = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const meds = allItems.filter(item => !item.is_supplement);
-        setMedications(meds);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .select('*, medication:medications(name)')
@@ -63,14 +55,6 @@ export default function MedicationLog({ user }) {
 
   const loadSupplements = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const supps = allItems.filter(item => item.is_supplement === true);
-        setSupplements(supps);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .select('*, medication:medications(name)')
@@ -88,19 +72,6 @@ export default function MedicationLog({ user }) {
 
   const loadTodayLogs = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medication_logs');
-        const allLogs = stored ? JSON.parse(stored) : [];
-        
-        const today = new Date().toISOString().split('T')[0];
-        const logs = allLogs.filter(log => {
-          const logDate = new Date(log.scheduled_time).toISOString().split('T')[0];
-          return logDate === today;
-        });
-        
-        setTodayLogs(logs);
-        return;
-      }
 
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
@@ -124,53 +95,6 @@ export default function MedicationLog({ user }) {
 
   const calculateStats = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medication_logs');
-        const allLogs = stored ? JSON.parse(stored) : [];
-        
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const recentLogs = allLogs.filter(log => {
-          const logDate = new Date(log.scheduled_time);
-          return logDate >= thirtyDaysAgo && log.status === 'taken';
-        });
-        
-        // Get all items to categorize
-        const storedItems = localStorage.getItem('yfit_demo_medications');
-        const allItems = storedItems ? JSON.parse(storedItems) : [];
-        
-        // Separate med and supp logs
-        const medLogs = recentLogs.filter(log => {
-          const item = allItems.find(i => i.id === log.user_medication_id);
-          return item && !item.is_supplement;
-        });
-        
-        const suppLogs = recentLogs.filter(log => {
-          const item = allItems.find(i => i.id === log.user_medication_id);
-          return item && item.is_supplement;
-        });
-        
-        const medCount = allItems.filter(i => !i.is_supplement).length;
-        const suppCount = allItems.filter(i => i.is_supplement).length;
-        
-        const medTotal = medCount * 30; // Assuming once daily for simplicity
-        const suppTotal = suppCount * 30;
-        
-        const medRate = medTotal > 0 ? Math.round((medLogs.length / medTotal) * 100) : 0;
-        const suppRate = suppTotal > 0 ? Math.round((suppLogs.length / suppTotal) * 100) : 0;
-        
-        setStats({
-          medTaken: medLogs.length,
-          medTotal,
-          medRate,
-          suppTaken: suppLogs.length,
-          suppTotal,
-          suppRate
-        });
-        return;
-      }
-
       // Database mode stats calculation
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -268,25 +192,6 @@ export default function MedicationLog({ user }) {
     now.setSeconds(now.getSeconds() + (doseNumber - 1));
     const scheduledTime = now.toISOString();
     
-    if (user.id.startsWith('demo')) {
-      const stored = localStorage.getItem('yfit_demo_medication_logs');
-      const logs = stored ? JSON.parse(stored) : [];
-      
-      const newLog = {
-        id: `demo-log-${Date.now()}`,
-        user_medication_id: itemId,
-        user_id: user.id,
-        scheduled_time: scheduledTime,
-        actual_time: scheduledTime,
-        status: status,
-        created_at: new Date().toISOString()
-      };
-      
-      logs.push(newLog);
-      localStorage.setItem('yfit_demo_medication_logs', JSON.stringify(logs));
-      return;
-    }
-
     const { error } = await supabase
       .from('medication_logs')
       .insert({
@@ -301,28 +206,6 @@ export default function MedicationLog({ user }) {
   }
 
   const removeLog = async (itemId) => {
-    if (user.id.startsWith('demo')) {
-      const stored = localStorage.getItem('yfit_demo_medication_logs');
-      const logs = stored ? JSON.parse(stored) : [];
-      
-      const today = new Date().toISOString().split('T')[0];
-      // Find today's logs for this item
-      const todayItemLogs = logs.filter(log => {
-        const logDate = new Date(log.scheduled_time).toISOString().split('T')[0];
-        return log.user_medication_id === itemId && logDate === today;
-      });
-      
-      if (todayItemLogs.length === 0) return;
-      
-      // Remove the most recent log
-      const mostRecent = todayItemLogs.sort((a, b) => 
-        new Date(b.scheduled_time) - new Date(a.scheduled_time)
-      )[0];
-      
-      const filtered = logs.filter(log => log.id !== mostRecent.id);
-      localStorage.setItem('yfit_demo_medication_logs', JSON.stringify(filtered));
-      return;
-    }
 
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);

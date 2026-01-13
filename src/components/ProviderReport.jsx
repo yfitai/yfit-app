@@ -42,13 +42,6 @@ export default function ProviderReport({ user }) {
 
   const loadMedications = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const meds = allItems.filter(item => item.is_supplement !== true);
-        setMedications(meds);
-        return;
-      }
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -69,13 +62,6 @@ export default function ProviderReport({ user }) {
 
   const loadSupplements = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const supps = allItems.filter(item => item.is_supplement === true);
-        setSupplements(supps);
-        return;
-      }
       const { data, error } = await supabase
         .from('user_supplements')
         .select(`
@@ -110,12 +96,6 @@ export default function ProviderReport({ user }) {
 
   const loadProviders = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_providers');
-        const providers = stored ? JSON.parse(stored) : [];
-        setProviders(providers);
-        return;
-      }
       const { data, error } = await supabase
         .from('medical_providers')
         .select('*')
@@ -140,31 +120,6 @@ export default function ProviderReport({ user }) {
       let providerName = providerForm.name.trim()
       if (!providerName.toLowerCase().startsWith('dr.') && !providerName.toLowerCase().startsWith('dr ')) {
         providerName = 'Dr. ' + providerName
-      }
-
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_providers');
-        const providers = stored ? JSON.parse(stored) : [];
-        const newProvider = {
-          id: Date.now(),
-          ...providerForm,
-          name: providerName,
-          created_at: new Date().toISOString()
-        };
-        providers.push(newProvider);
-        localStorage.setItem('yfit_demo_providers', JSON.stringify(providers));
-        setProviders(providers);
-        
-        alert('Provider added successfully!')
-        setShowProviderForm(false)
-        setProviderForm({
-          name: '',
-          specialty: '',
-          phone: '',
-          email: '',
-          address: ''
-        })
-        return;
       }
 
       const { error } = await supabase
@@ -199,16 +154,6 @@ export default function ProviderReport({ user }) {
     }
 
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_providers');
-        const providers = stored ? JSON.parse(stored) : [];
-        const updatedProviders = providers.filter(p => p.id !== providerId);
-        localStorage.setItem('yfit_demo_providers', JSON.stringify(updatedProviders));
-        setProviders(updatedProviders);
-        alert('Provider deleted successfully!')
-        return;
-      }
-
       const { error } = await supabase
         .from('medical_providers')
         .delete()

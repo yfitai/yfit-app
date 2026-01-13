@@ -28,24 +28,8 @@ export default function WaterTracker({ user }) {
 
     const today = new Date().toISOString().split('T')[0]
 
-    const isDemoMode = !user || user.id.startsWith('demo')
-
-    if (isDemoMode) {
-      // Load from localStorage
-      const stored = localStorage.getItem('yfit_demo_water')
-      if (stored) {
-        const data = JSON.parse(stored)
-        if (data.date === today) {
-          setWaterIntake(data.amount_ml)
-        }
-      }
-      const storedGoal = localStorage.getItem('yfit_demo_water_goal')
-      if (storedGoal) {
-        setGoal(parseInt(storedGoal))
-      }
-    } else {
-      // Load from database
-      const { data, error } = await supabase
+    // Load from database
+    const { data, error } = await supabase
         .from('water_intake')
         .select('*')
         .eq('user_id', user.id)
@@ -66,7 +50,6 @@ export default function WaterTracker({ user }) {
       if (prefs?.water_goal_ml) {
         setGoal(prefs.water_goal_ml)
       }
-    }
 
     setLoading(false)
   }
@@ -76,17 +59,9 @@ export default function WaterTracker({ user }) {
     setWaterIntake(newAmount)
 
     const today = new Date().toISOString().split('T')[0]
-    const isDemoMode = !user || user.id.startsWith('demo')
 
-    if (isDemoMode) {
-      // Save to localStorage
-      localStorage.setItem('yfit_demo_water', JSON.stringify({
-        date: today,
-        amount_ml: newAmount
-      }))
-    } else {
-      // Save to database
-      await supabase
+    // Save to database
+    await supabase
         .from('water_intake')
         .upsert({
           user_id: user.id,
@@ -95,19 +70,13 @@ export default function WaterTracker({ user }) {
         }, {
           onConflict: 'user_id,date'
         })
-    }
   }
 
   const updateGoal = async (newGoalMl) => {
     setGoal(newGoalMl)
     setShowGoalEdit(false)
 
-    const isDemoMode = !user || user.id.startsWith('demo')
-
-    if (isDemoMode) {
-      localStorage.setItem('yfit_demo_water_goal', newGoalMl.toString())
-    } else {
-      await supabase
+    await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
@@ -115,22 +84,14 @@ export default function WaterTracker({ user }) {
         }, {
           onConflict: 'user_id'
         })
-    }
   }
 
   const resetWater = async () => {
     setWaterIntake(0)
 
     const today = new Date().toISOString().split('T')[0]
-    const isDemoMode = !user || user.id.startsWith('demo')
 
-    if (isDemoMode) {
-      localStorage.setItem('yfit_demo_water', JSON.stringify({
-        date: today,
-        amount_ml: 0
-      }))
-    } else {
-      await supabase
+    await supabase
         .from('water_intake')
         .upsert({
           user_id: user.id,
@@ -139,7 +100,6 @@ export default function WaterTracker({ user }) {
         }, {
           onConflict: 'user_id,date'
         })
-    }
   }
 
   if (loading) {

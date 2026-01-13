@@ -22,28 +22,8 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   const loadMacroSettings = async () => {
     if (!user || !adjustedCalories) return
 
-    const isDemoMode = !user || user.id.startsWith('demo')
-
-    if (isDemoMode) {
-      // Load from localStorage
-      const stored = localStorage.getItem('yfit_demo_macro_settings')
-      if (stored) {
-        const settings = JSON.parse(stored)
-        setUseCustomMacros(settings.useCustom)
-        if (settings.useCustom) {
-          setProteinPercent(settings.protein)
-          setCarbPercent(settings.carbs)
-          setFatPercent(settings.fat)
-          calculateAndSetMacros(true, settings.protein, settings.carbs, settings.fat)
-        } else {
-          calculateAndSetMacros(false)
-        }
-      } else {
-        calculateAndSetMacros(false)
-      }
-    } else {
-      // Load from database
-      const { data } = await supabase
+    // Load from database
+    const { data } = await supabase
         .from('user_preferences')
         .select('use_custom_macros, protein_percent, carb_percent, fat_percent')
         .eq('user_id', user.id)
@@ -58,7 +38,6 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       } else {
         calculateAndSetMacros(false)
       }
-    }
   }
 
   const calculateAndSetMacros = (custom = false, p = null, c = null, f = null) => {
@@ -169,28 +148,17 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   }
 
   const saveMacroSettings = async (useCustom, p, c, f) => {
-    const isDemoMode = !user || user.id.startsWith('demo')
-
-    if (isDemoMode) {
-      localStorage.setItem('yfit_demo_macro_settings', JSON.stringify({
-        useCustom,
-        protein: p,
-        carbs: c,
-        fat: f
-      }))
-    } else {
-      await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: user.id,
-          use_custom_macros: useCustom,
-          protein_percent: p,
-          carb_percent: c,
-          fat_percent: f
-        }, {
-          onConflict: 'user_id'
-        })
-    }
+    await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: user.id,
+        use_custom_macros: useCustom,
+        protein_percent: p,
+        carb_percent: c,
+        fat_percent: f
+      }, {
+        onConflict: 'user_id'
+      })
   }
 
   if (!macros) {

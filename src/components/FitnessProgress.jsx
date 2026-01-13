@@ -300,18 +300,15 @@ const FitnessProgress = () => {
       // Fetch form analysis average
       let avgFormScore = 0;
       
-      // Skip form analysis query in demo mode
-      if (!user.id.startsWith('demo')) {
-        const { data: formData } = await supabase
-          .from('form_analysis_sessions')
-          .select('average_form_score')
-          .eq('user_id', user.id)
-          .eq('analysis_status', 'completed');
-        
-        avgFormScore = formData?.length > 0
-          ? formData.reduce((sum, f) => sum + (f.average_form_score || 0), 0) / formData.length
-          : 0;
-      }
+      const { data: formData } = await supabase
+        .from('form_analysis_sessions')
+        .select('average_form_score')
+        .eq('user_id', user.id)
+        .eq('analysis_status', 'completed');
+      
+      avgFormScore = formData?.length > 0
+        ? formData.reduce((sum, f) => sum + (f.average_form_score || 0), 0) / formData.length
+        : 0;
 
       setStats({
         totalWorkouts,

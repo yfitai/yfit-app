@@ -30,16 +30,6 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
 
     setLoading(true)
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        console.log('[MealTemplates] Loading from localStorage')
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        console.log('[MealTemplates] Loaded templates:', demoTemplates)
-        setTemplates(demoTemplates)
-        setLoading(false)
-        return
-      }
-
       // Real user - use Supabase
       const { data, error } = await supabase
         .from('meal_templates')

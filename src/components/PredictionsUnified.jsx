@@ -57,12 +57,6 @@ export default function PredictionsUnified({ user }) {
 
   const fetchWeightData = async () => {
     try {
-      // Skip in demo mode - no weight data
-      if (user.id.startsWith('demo')) {
-        setWeightData([]);
-        return [];
-      }
-
       const { data, error } = await supabase
         .from('body_measurements')
         .select('*')
@@ -101,12 +95,6 @@ export default function PredictionsUnified({ user }) {
 
   const fetchNutritionData = async () => {
     try {
-      // Skip in demo mode - no nutrition data
-      if (user.id.startsWith('demo')) {
-        setNutritionData([]);
-        return [];
-      }
-
       const { data, error } = await supabase
         .from('nutrition_logs')
         .select('*')
@@ -126,12 +114,6 @@ export default function PredictionsUnified({ user }) {
 
   const fetchMedicationData = async () => {
     try {
-      // Skip in demo mode - no medication data
-      if (user.id.startsWith('demo')) {
-        setMedicationData([]);
-        return [];
-      }
-
       const { data, error } = await supabase
         .from('medication_logs')
         .select('*')

@@ -104,30 +104,6 @@ import { supabase } from '../lib/supabase'
     console.log('Saving template:', templateData)
     
     try {
-      // Demo mode - save to localStorage
-      if (user.id === 'demo-user-id') {
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        
-        const newTemplate = {
-          id: `template_${Date.now()}`,
-          user_id: user.id,
-          ...templateData,
-          use_count: 0,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-        
-        demoTemplates.push(newTemplate)
-        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(demoTemplates))
-        
-        console.log('Template saved to localStorage:', newTemplate)
-        alert('Template saved successfully!')
-        
-        // Force refresh
-        setTemplateRefreshKey(prev => prev + 1)  // ← ADD THIS
-        return
-      }
-      
       // Real user - save to Supabase
       const { data: template, error: templateError } = await supabase
         .from('meal_templates')

@@ -49,39 +49,6 @@ export default function MealPlanner({ user }) {
     try {
       const weekStartStr = currentWeekStart.toISOString().split('T')[0]
       
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        console.log('[MealPlanner] Demo mode - using localStorage')
-        
-        // Load demo meal plans from localStorage
-        const demoPlans = JSON.parse(localStorage.getItem('yfit_demo_meal_plans') || '{}')
-        const demoItems = JSON.parse(localStorage.getItem('yfit_demo_meal_items') || '[]')
-        
-        // Get or create plan for this week
-        let plan = demoPlans[weekStartStr]
-        if (!plan) {
-          plan = {
-            id: `demo-plan-${weekStartStr}`,
-            user_id: user.id,
-            week_start_date: weekStartStr,
-            plan_name: `Week of ${formatWeekRange(currentWeekStart)}`,
-            is_active: true,
-            created_at: new Date().toISOString()
-          }
-          demoPlans[weekStartStr] = plan
-          localStorage.setItem('yfit_demo_meal_plans', JSON.stringify(demoPlans))
-        }
-        
-        setMealPlan(plan)
-        
-        // Load items for this plan
-        const items = demoItems.filter(item => item.meal_plan_id === plan.id)
-        setMealPlanItems(items)
-        
-        setLoading(false)
-        return
-      }
-      
       // Real user - use Supabase
       // Check if meal plan exists for this week
       const { data: existingPlan, error: planError } = await supabase
@@ -162,28 +129,6 @@ export default function MealPlanner({ user }) {
     }
     
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        console.log('[MealPlanner] Demo mode - saving to localStorage')
-        const newItem = {
-          id: `demo-item-${Date.now()}-${Math.random()}`,
-          meal_plan_id: mealPlan.id,
-          day_of_week: dayOfWeek,
-          meal_type: mealType,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          ...mealData
-        }
-        const demoItems = JSON.parse(localStorage.getItem('yfit_demo_meal_items') || '[]')
-        demoItems.push(newItem)
-        localStorage.setItem('yfit_demo_meal_items', JSON.stringify(demoItems))
-        
-        console.log('[MealPlanner] Successfully added to localStorage:', newItem)
-        // Use functional update to avoid race condition when adding multiple items quickly
-        setMealPlanItems(prevItems => [...prevItems, newItem])
-        return
-      }
-      
       // Real user - use Supabase (let database auto-generate id and created_at)
       const newItem = {
         meal_plan_id: mealPlan.id,
@@ -218,15 +163,6 @@ export default function MealPlanner({ user }) {
   // Remove meal from plan
   async function removeMealFromPlan(mealId) {
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        const demoItems = JSON.parse(localStorage.getItem('yfit_demo_meal_items') || '[]')
-        const filtered = demoItems.filter(item => item.id !== mealId)
-        localStorage.setItem('yfit_demo_meal_items', JSON.stringify(filtered))
-        setMealPlanItems(mealPlanItems.filter(item => item.id !== mealId))
-        return
-      }
-      
       // Real user - use Supabase
       const { error } = await supabase
         .from('meal_plan_items')
@@ -244,18 +180,6 @@ export default function MealPlanner({ user }) {
   // Update meal in plan
   async function updateMealInPlan(mealId, updates) {
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        const demoItems = JSON.parse(localStorage.getItem('yfit_demo_meal_items') || '[]')
-        const updated = demoItems.map(item => 
-          item.id === mealId ? { ...item, ...updates, updated_at: new Date().toISOString() } : item
-        )
-        localStorage.setItem('yfit_demo_meal_items', JSON.stringify(updated))
-        setMealPlanItems(mealPlanItems.map(item => 
-          item.id === mealId ? { ...item, ...updates } : item
-        ))
-        return
-      }
       
       // Real user - use Supabase
       const { data, error } = await supabase
@@ -285,19 +209,6 @@ export default function MealPlanner({ user }) {
         use_count: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      }
-
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        console.log('[MealPlanner] Saving template to localStorage:', newTemplate)
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        demoTemplates.push(newTemplate)
-        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(demoTemplates))
-        alert(`Template "${templateData.template_name}" saved successfully!`)
-        
-        // Trigger reload by dispatching custom event
-        window.dispatchEvent(new Event('yfit-templates-updated'))
-        return
       }
 
       // Real user - use Supabase
@@ -350,12 +261,8 @@ export default function MealPlanner({ user }) {
       // Get the template items (meals)
       let templateMeals = []
       
-      // Demo mode - template.meals contains the items
-      if (user.id === 'demo-user-id') {
-        templateMeals = template.meals || []
-      } else {
-        // Real user - check both new format (meal_template_items relationship) and old format (meals JSON)
-        templateMeals = template.meal_template_items || []
+      // Real user - check both new format (meal_template_items relationship) and old format (meals JSON)
+      templateMeals = template.meal_template_items || []
         
         // Backwards compatibility: if meal_template_items is empty, try meals JSON field
         if (templateMeals.length === 0 && template.meals) {
@@ -368,7 +275,6 @@ export default function MealPlanner({ user }) {
             templateMeals = []
           }
         }
-      }
       
       console.log('[MealPlanner] Template meals:', templateMeals)
       
@@ -395,18 +301,10 @@ export default function MealPlanner({ user }) {
       }
       
       // Update template use count
-      if (user.id === 'demo-user-id') {
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        const updated = demoTemplates.map(t => 
-          t.id === template.id ? { ...t, use_count: (t.use_count || 0) + 1 } : t
-        )
-        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(updated))
-      } else {
-        await supabase
-          .from('meal_templates')
-          .update({ use_count: (template.use_count || 0) + 1 })
-          .eq('id', template.id)
-      }
+      await supabase
+        .from('meal_templates')
+        .update({ use_count: (template.use_count || 0) + 1 })
+        .eq('id', template.id)
       
       alert(`Template "${template.template_name}" applied successfully!`)
     } catch (error) {
@@ -422,17 +320,6 @@ export default function MealPlanner({ user }) {
     }
 
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id') {
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        const filtered = demoTemplates.filter(t => t.id !== templateId)
-        localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(filtered))
-        
-        // Trigger reload
-        window.dispatchEvent(new Event('yfit-templates-updated'))
-        return
-      }
-
       // Real user - delete from Supabase
       // First delete template items (if using separate table)
       const { error: itemsError } = await supabase

@@ -24,14 +24,6 @@ export default function MedicationList({ user, onAddMedication }) {
 
   const loadMedications = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const meds = allItems.filter(item => !item.is_supplement);
-        setMedications(meds);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -52,14 +44,6 @@ export default function MedicationList({ user, onAddMedication }) {
 
   const loadSupplements = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const supps = allItems.filter(item => item.is_supplement === true);
-        setSupplements(supps);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -90,18 +74,6 @@ export default function MedicationList({ user, onAddMedication }) {
 
   const handleSaveEdit = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const updated = allItems.map(item =>
-          item.id === editingId ? { ...item, ...editForm } : item
-        );
-        localStorage.setItem('yfit_demo_medications', JSON.stringify(updated));
-        setEditingId(null);
-        await loadData();
-        return;
-      }
-
       const { error } = await supabase
         .from('user_medications')
         .update(editForm)
@@ -122,15 +94,6 @@ export default function MedicationList({ user, onAddMedication }) {
     if (!confirm('Are you sure you want to remove this item?')) return
 
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const allItems = stored ? JSON.parse(stored) : [];
-        const filtered = allItems.filter(item => item.id !== itemId);
-        localStorage.setItem('yfit_demo_medications', JSON.stringify(filtered));
-        await loadData();
-        return;
-      }
-
       const { error } = await supabase
         .from('user_medications')
         .update({ is_active: false })

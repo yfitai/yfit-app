@@ -3,56 +3,6 @@ import { Video, TrendingUp, Award, Calendar, Eye, Filter } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import FormAnalysisResults from './FormAnalysisResults';
 
-// Demo data for demo mode
-const DEMO_VIDEOS = [
-  {
-    id: 'demo-video-1',
-    user_id: 'demo-user-id',
-    exercise_id: '0001',
-    exercise_name: 'Barbell Squat',
-    exercise_gif: 'https://static.exercisedb.dev/media/7aoIH9D.gif',
-    overall_score: 85,
-    form_grade: 'Good',
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  },
-  {
-    id: 'demo-video-2',
-    user_id: 'demo-user-id',
-    exercise_id: '0002',
-    exercise_name: 'Bench Press',
-    exercise_gif: 'https://static.exercisedb.dev/media/1aL2Qbz.gif',
-    overall_score: 92,
-    form_grade: 'Excellent',
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  },
-  {
-    id: 'demo-video-3',
-    user_id: 'demo-user-id',
-    exercise_id: '0003',
-    exercise_name: 'Deadlift',
-    exercise_gif: 'https://static.exercisedb.dev/media/2VoqHJv.gif',
-    overall_score: 78,
-    form_grade: 'Fair',
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    analysis_status: 'completed'
-  }
-];
-
-const DEMO_STATS = {
-  totalVideos: 3,
-  avgScore: '85.0',
-  recentAvg: '85.0',
-  improvement: '+2.5',
-  gradeCounts: {
-    'Excellent': 1,
-    'Good': 1,
-    'Fair': 1,
-    'Needs Improvement': 0
-  }
-};
-
 const FormAnalysisHistory = ({ user: propUser }) => {
   const [user, setUser] = useState(propUser || null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +11,6 @@ const FormAnalysisHistory = ({ user: propUser }) => {
   const [filterExercise, setFilterExercise] = useState('all');
   const [exercises, setExercises] = useState([]);
   const [stats, setStats] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     if (propUser) {
@@ -73,19 +22,8 @@ const FormAnalysisHistory = ({ user: propUser }) => {
 
   useEffect(() => {
     if (user) {
-      if (user.id === 'demo-user-id') {
-        // Demo mode - use sample data
-        console.log('📊 Demo Mode: Loading sample form analysis data');
-        setIsDemoMode(true);
-        setVideos(DEMO_VIDEOS);
-        setStats(DEMO_STATS);
-        setExercises(DEMO_VIDEOS.map(v => ({ id: v.exercise_id, name: v.exercise_name })));
-        setLoading(false);
-      } else {
-        // Real user - load from database
-        loadFormAnalysisHistory();
-        loadStats();
-      }
+      loadFormAnalysisHistory();
+      loadStats();
     }
   }, [user, filterExercise]);
 
@@ -210,7 +148,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
             Form Analysis History
           </h2>
           <p className="text-gray-600 mt-1">
-            {isDemoMode ? 'Sample form analysis data (Demo Mode)' : 'Track your form improvement over time'}
+            Track your form improvement over time
           </p>
         </div>
       </div>
@@ -312,10 +250,8 @@ const FormAnalysisHistory = ({ user: propUser }) => {
           {videos.map((video) => (
             <div
               key={video.id}
-              onClick={() => !isDemoMode && setSelectedVideo(video)}
-              className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${
-                !isDemoMode ? 'hover:border-blue-300 hover:shadow-md transition-all cursor-pointer' : ''
-              }`}
+              onClick={() => setSelectedVideo(video)}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
             >
               {/* Video Thumbnail */}
               <div className="aspect-video bg-gray-100 relative">
@@ -375,12 +311,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
                   {new Date(video.created_at).toLocaleDateString()}
                 </div>
 
-                {/* Demo Mode Notice */}
-                {isDemoMode && (
-                  <div className="mt-3 text-xs text-gray-500 italic">
-                    Sample data - Sign in to upload your own videos
-                  </div>
-                )}
+
               </div>
             </div>
           ))}

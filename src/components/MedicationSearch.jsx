@@ -47,13 +47,6 @@ export default function MedicationSearch({ user }) {
 
   const loadProviders = async () => {
     try {
-      // Skip in demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_providers');
-        setProviders(stored ? JSON.parse(stored) : []);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('medical_providers')
         .select('*')
@@ -137,47 +130,6 @@ export default function MedicationSearch({ user }) {
     }
 
     try {
-      // Handle demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const medications = stored ? JSON.parse(stored) : [];
-        
-        const newMed = {
-          id: `demo-med-${Date.now()}`,
-          user_id: user.id,
-          medication_id: selectedMed.id,
-          medication: selectedMed,
-          dosage: form.dosage,
-          frequency: form.frequency,
-          route: form.route,
-          start_date: form.start_date,
-          prescriber_id: form.prescriber_id || null,
-          pharmacy: form.pharmacy || null,
-          refills_remaining: form.refills_remaining ? parseInt(form.refills_remaining) : null,
-          notes: form.notes || null,
-          is_active: true,
-          created_at: new Date().toISOString()
-        };
-        
-        medications.push(newMed);
-        localStorage.setItem('yfit_demo_medications', JSON.stringify(medications));
-        
-        alert('Medication added successfully!');
-        setSelectedMed(null);
-        setForm({
-          dosage: '',
-          frequency: '',
-          route: 'Oral',
-          start_date: new Date().toISOString().split('T')[0],
-          prescriber_id: '',
-          pharmacy: '',
-          refills_remaining: '',
-          notes: ''
-        });
-        setSafetyAlerts([]);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .insert({
@@ -223,44 +175,6 @@ export default function MedicationSearch({ user }) {
     }
 
     try {
-      // Handle demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_medications');
-        const medications = stored ? JSON.parse(stored) : [];
-        
-        const newMed = {
-          id: `demo-med-${Date.now()}`,
-          user_id: user.id,
-          custom_name: customForm.custom_name,
-          custom_generic_name: customForm.custom_generic_name || null,
-          is_supplement: customForm.is_supplement,
-          dosage: customForm.dosage,
-          frequency: customForm.frequency,
-          route: customForm.route,
-          start_date: customForm.start_date,
-          notes: customForm.notes || null,
-          is_active: true,
-          created_at: new Date().toISOString()
-        };
-        
-        medications.push(newMed);
-        localStorage.setItem('yfit_demo_medications', JSON.stringify(medications));
-        
-        alert('Custom medication added successfully!');
-        setShowCustomForm(false);
-        setCustomForm({
-          custom_name: '',
-          custom_generic_name: '',
-          is_supplement: false,
-          dosage: '',
-          frequency: '',
-          route: 'Oral',
-          start_date: new Date().toISOString().split('T')[0],
-          notes: ''
-        });
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_medications')
         .insert({

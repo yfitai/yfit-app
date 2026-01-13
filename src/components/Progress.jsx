@@ -64,13 +64,6 @@ export default function Progress({ user: propUser }) {
 
   const loadWeightProgress = async (userId) => {
     try {
-      // For demo mode, use localStorage
-      if (userId.startsWith('demo')) {
-        const demoData = generateDemoWeightData()
-        setWeightData(demoData)
-        return
-      }
-
       // Load from Supabase
       const { data, error } = await supabase
         .from('weight_logs')
@@ -101,12 +94,6 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadBodyCompositionProgress = async (userId) => {
-    if (userId.startsWith('demo')) {
-      const demoData = generateDemoBodyFatData()
-      setBodyFatData(demoData)
-      return
-    }
-
     const { data } = await supabase
       .from('body_composition_logs')
       .select('*')
@@ -125,12 +112,6 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadMeasurementsProgress = async (userId) => {
-    if (userId.startsWith('demo')) {
-      const demoData = generateDemoMeasurementsData()
-      setMeasurementsData(demoData)
-      return
-    }
-
     const { data } = await supabase
       .from('body_measurements_logs')
       .select('*')
@@ -144,12 +125,6 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadHealthMetrics = async (userId) => {
-    if (userId.startsWith('demo')) {
-      const demoData = generateDemoHealthMetrics()
-      setHealthMetricsData(demoData)
-      return
-    }
-
     const { data } = await supabase
       .from('health_metrics_logs')
       .select('*')
@@ -170,12 +145,6 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadNutritionCompliance = async (userId) => {
-    if (userId.startsWith('demo')) {
-      const demoData = generateDemoNutritionCompliance()
-      setNutritionComplianceData(demoData)
-      return
-    }
-
     // Calculate compliance from meal logs
     const { data } = await supabase
       .from('meal_logs')
@@ -202,12 +171,6 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadFitnessProgress = async (userId) => {
-    if (userId.startsWith('demo')) {
-      const demoData = generateDemoFitnessData()
-      setFitnessData(demoData)
-      return
-    }
-
     const { data } = await supabase
       .from('workout_sessions')
       .select('*')
@@ -227,19 +190,6 @@ export default function Progress({ user: propUser }) {
   }
 
 const loadGoals = async (userId) => {
-  if (userId.startsWith('demo')) {
-    setCurrentMetrics({
-      weight: 180,
-      bodyFat: 22,
-      bmi: 26.5
-    })
-    setGoalMetrics({
-      weight: 165,
-      bodyFat: 15,
-      bmi: 23.0
-    })
-    return
-  }
   console.log('Loading goals for user:', userId)
   const { data: goalsData } = await supabase
     .from('user_goals')
@@ -306,97 +256,6 @@ const calculatePredictions = () => {
         onTrack: Math.abs(weeklyRate) >= 0.5 && Math.abs(weeklyRate) <= 2
       })
     }
-  }
-
-  // Demo data generators
-  const generateDemoWeightData = () => {
-    const data = []
-    const startWeight = 185
-    const days = parseInt(timeRange)
-    for (let i = 0; i < days; i += Math.ceil(days / 20)) {
-      data.push({
-        date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        weight: parseFloat((startWeight - (i / days) * 15 + (Math.random() - 0.5) * 2).toFixed(1))
-      })
-    }
-    return data
-  }
-
-  const generateDemoBodyFatData = () => {
-    const data = []
-    const startBF = 25
-    const days = parseInt(timeRange)
-    for (let i = 0; i < days; i += Math.ceil(days / 20)) {
-      data.push({
-        date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        bodyFat: parseFloat((startBF - (i / days) * 5 + (Math.random() - 0.5) * 0.5).toFixed(1)),
-        bmi: parseFloat((28 - (i / days) * 3 + (Math.random() - 0.5) * 0.3).toFixed(1))
-      })
-    }
-    return data
-  }
-
-  const generateDemoMeasurementsData = () => {
-    return [
-      { name: 'Neck', current: 15, start: 16, goal: 14.5 },
-      { name: 'Shoulders', current: 46, start: 48, goal: 45 },
-      { name: 'Chest', current: 42, start: 44, goal: 40 },
-      { name: 'Waist', current: 34, start: 38, goal: 32 },
-      { name: 'Hips', current: 40, start: 42, goal: 38 },
-      { name: 'Biceps', current: 14, start: 15, goal: 13.5 },
-      { name: 'Forearms', current: 11, start: 11.5, goal: 10.5 },
-      { name: 'Thighs', current: 24, start: 26, goal: 22 },
-      { name: 'Calves', current: 15, start: 16, goal: 14.5 },
-      { name: 'Ankles', current: 9, start: 9.5, goal: 8.5 }
-    ]
-  }
-
-  const generateDemoHealthMetrics = () => {
-    const data = []
-    const days = parseInt(timeRange)
-    for (let i = 0; i < days; i += Math.ceil(days / 15)) {
-      data.push({
-        date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        systolic: parseFloat((125 + (Math.random() - 0.5) * 10).toFixed(0)),
-        diastolic: parseFloat((80 + (Math.random() - 0.5) * 8).toFixed(0)),
-        glucose: parseFloat((95 + (Math.random() - 0.5) * 15).toFixed(0)),
-        sleep: parseFloat((7 + (Math.random() - 0.5) * 2).toFixed(1))
-      })
-    }
-    return data
-  }
-
-  const generateDemoNutritionCompliance = () => {
-    const data = []
-    const days = parseInt(timeRange)
-    for (let i = 0; i < days; i += Math.ceil(days / 20)) {
-      data.push({
-        date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        protein: parseFloat((140 + (Math.random() - 0.5) * 30).toFixed(1)),
-        carbs: parseFloat((180 + (Math.random() - 0.5) * 40).toFixed(1)),
-        fat: parseFloat((50 + (Math.random() - 0.5) * 15).toFixed(1)),
-        proteinTarget: 150,
-        carbsTarget: 180,
-        fatTarget: 50
-      })
-    }
-    return data
-  }
-
-  const generateDemoFitnessData = () => {
-    const data = []
-    const days = parseInt(timeRange)
-    for (let i = 0; i < days; i += 3) {
-      if (Math.random() > 0.3) { // 70% workout consistency
-        data.push({
-          date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          workouts: 1,
-          duration: parseFloat((45 + Math.random() * 30).toFixed(0)),
-          calories_burned: parseFloat((300 + Math.random() * 200).toFixed(0))
-        })
-      }
-    }
-    return data
   }
 
   if (loading) {

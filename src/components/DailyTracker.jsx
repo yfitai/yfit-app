@@ -84,26 +84,6 @@ export default function DailyTracker({ user }) {
 
   const fetchTodayLog = async () => {
     try {
-      // Skip Supabase query in demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_daily_log');
-        if (stored) {
-          const log = JSON.parse(stored);
-          setTodayLog(log);
-          setFormData({
-            sleep_hours: log.sleep_hours || '',
-            sleep_quality: log.sleep_quality || 'good',
-            water_ml: log.water_ml || '',
-            steps: log.steps || '',
-            bp_systolic: log.bp_systolic || '',
-            bp_diastolic: log.bp_diastolic || '',
-            glucose_mg_dl: log.glucose_mg_dl || '',
-            notes: log.notes || ''
-          });
-        }
-        return;
-      }
-
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
         .from('daily_logs')
@@ -143,15 +123,6 @@ export default function DailyTracker({ user }) {
 
   const fetchWeeklyData = async () => {
     try {
-      // Skip Supabase query in demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_weekly_logs');
-        if (stored) {
-          setWeeklyData(JSON.parse(stored));
-        }
-        return;
-      }
-
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -171,16 +142,6 @@ export default function DailyTracker({ user }) {
 
   const fetchLastMeasurement = async () => {
     try {
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_last_measurement');
-        if (stored) {
-          const data = JSON.parse(stored);
-          setLastMeasurementDate(data.date);
-          setMeasurements(data.measurements);
-        }
-        return;
-      }
-
       const { data, error } = await supabase
         .from('progress_measurements')
         .select('*')
@@ -209,18 +170,6 @@ export default function DailyTracker({ user }) {
     try {
       const now = new Date().toISOString();
       
-      if (user.id.startsWith('demo')) {
-        localStorage.setItem('yfit_demo_last_measurement', JSON.stringify({
-          date: new Date().toLocaleDateString(),
-          measurements
-        }));
-        setLastMeasurementDate(new Date().toLocaleDateString());
-        setShowMeasurements(false);
-        alert('✅ Measurements saved!');
-        setSavingMeasurements(false);
-        return;
-      }
-
       // Save each measurement as a separate row
       const measurementTypes = ['neck', 'shoulders', 'chest', 'waist', 'hips', 'biceps', 'forearms', 'thighs', 'calves'];
       const promises = measurementTypes.map(type => {
@@ -251,23 +200,6 @@ export default function DailyTracker({ user }) {
 
   const fetchGoals = async () => {
     try {
-      // Skip Supabase query in demo mode
-      if (user.id.startsWith('demo')) {
-        const stored = localStorage.getItem('yfit_demo_goals');
-        if (stored) {
-          const data = JSON.parse(stored);
-          setGoals({
-            sleep: data.sleep_hours_goal || 8,
-           water: data.water_goal_ml || 2000,
-            steps: data.steps_goal || 10000,
-            bpSystolic: data.bp_systolic_goal || 120,
-            bpDiastolic: data.bp_diastolic_goal || 80,
-            glucose: data.glucose_goal || 100
-          });
-        }
-        return;
-      }
-
       const { data, error } = await supabase
         .from('user_goals')
         .select('*')
@@ -308,14 +240,6 @@ export default function DailyTracker({ user }) {
         glucose_mg_dl: formData.glucose_mg_dl ? parseInt(formData.glucose_mg_dl) : null,
         notes: formData.notes || null
       };
-
-      // Handle demo mode
-      if (user.id.startsWith('demo')) {
-        localStorage.setItem('yfit_demo_daily_log', JSON.stringify(logData));
-        setTodayLog(logData);
-        alert('Daily log saved! (Demo Mode - data saved locally)');
-        return;
-      }
 
       let result;
       if (todayLog) {

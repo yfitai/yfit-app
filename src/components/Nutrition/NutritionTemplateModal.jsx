@@ -17,27 +17,8 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
     }
 
     try {
-      // Demo mode - use localStorage
-      if (user.id === 'demo-user-id' || user.id.startsWith('demo')) {
-        const demoTemplates = JSON.parse(localStorage.getItem('yfit_demo_meal_templates') || '[]')
-        console.log('[NutritionTemplate] Loaded demo templates:', demoTemplates)
-        
-        // Filter by meal type (convert nutrition meal types to planner meal types)
-        const mealTypeMap = {
-          breakfast: 'breakfast',
-          lunch: 'lunch',
-          dinner: 'dinner',
-          snacks: 'snack'
-        }
-        
-        const plannerMealType = mealTypeMap[mealType] || mealType
-        const filtered = demoTemplates.filter(t => t.meal_type === plannerMealType)
-        console.log('[NutritionTemplate] Filtered templates for', mealType, ':', filtered)
-        setTemplates(filtered)
-      } else {
-        // Real user - load from Supabase
-        // Convert nutrition meal types to planner meal types
-        const mealTypeMap = {
+      // Convert nutrition meal types to planner meal types
+      const mealTypeMap = {
           breakfast: 'breakfast',
           lunch: 'lunch',
           dinner: 'dinner',
@@ -69,7 +50,6 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
           }))
           setTemplates(formattedTemplates)
         }
-      }
     } catch (error) {
       console.error('[NutritionTemplate] Error loading templates:', error)
     } finally {

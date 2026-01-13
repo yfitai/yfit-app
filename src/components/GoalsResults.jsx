@@ -368,12 +368,11 @@ export default function Goals({ user: propUser }) {
         if (bodyTypeError) throw bodyTypeError
 
         alert('✅ Goals saved successfully!')
-      }
 
-      // Scroll to results
-      setTimeout(() => {
-        document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
+        // Scroll to results
+        setTimeout(() => {
+          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
       
     } catch (error) {
       console.error('Error saving goals:', error)

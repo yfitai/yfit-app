@@ -34,11 +34,6 @@ export default function Nutrition({ user: propUser }) {
         setTodaysMeals([])
         setTotalCalories(0)
         
-        // Clear demo mode localStorage meals (but keep templates/favorites if they exist)
-        if (user && user.id.startsWith('demo')) {
-          localStorage.removeItem('yfit_demo_meals')
-        }
-        
         // Reload data for new day
         loadData()
       }
@@ -69,62 +64,10 @@ export default function Nutrition({ user: propUser }) {
 
     setUser(currentUser)
 
-      
-      // Only fetch profile if not in demo mode
-      if (!currentUser.id.startsWith('demo')) {
-        const profile = await getUserProfile(currentUser.id)
-        setUserProfile(profile)
-      }
+      const profile = await getUserProfile(currentUser.id)
+      setUserProfile(profile)
 
-      // Check if demo mode
-      const isDemoMode = currentUser.id.startsWith('demo')
-
-      if (isDemoMode) {
-        // Load from localStorage
-        const demoMetrics = localStorage.getItem('yfit_demo_metrics')
-        if (demoMetrics) {
-          const metrics = JSON.parse(demoMetrics)
-          setTdee(metrics.tdee)
-          setAdjustedCalories(metrics.adjustedCalories)
-        }
-
-// Check app version and force clear if needed
-const APP_VERSION = '1.1.0' // Increment this to force clear old data
-const storedVersion = localStorage.getItem('yfit_app_version')
-
-if (storedVersion !== APP_VERSION) {
-  // New version detected - clear old meal data
-  localStorage.removeItem('yfit_demo_meals')
-  localStorage.setItem('yfit_app_version', APP_VERSION)
-  console.log('App updated - cleared old meal data')
-}
-
-// Load demo meals from localStorage
-const demoMeals = localStorage.getItem('yfit_demo_meals')
-if (demoMeals) {
-  const meals = JSON.parse(demoMeals)
-  const today = new Date().toISOString().split('T')[0]
-  
-  // Filter to only show today's meals
-  const todaysMealsFiltered = meals.filter(meal => meal.meal_date === today)
-  
-  setTodaysMeals(todaysMealsFiltered)
-  const total = todaysMealsFiltered.reduce((sum, meal) => sum + meal.calories, 0)
-  setTotalCalories(total)
-  
-  // Clean up old meals from localStorage (keep only last 7 days)
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-  const recentMeals = meals.filter(meal => {
-    const mealDate = new Date(meal.meal_date)
-    return mealDate >= sevenDaysAgo
-  })
-  localStorage.setItem('yfit_demo_meals', JSON.stringify(recentMeals))
-}
-
-
-      } else {
-        // Load TDEE from calculated_metrics
+      // Load TDEE from calculated_metricsics
         const { data: metricsData } = await supabase
           .from('calculated_metrics')
           .select('tdee, adjusted_calories')
@@ -140,7 +83,6 @@ if (demoMeals) {
 
         // Load today's meals
         await loadTodaysMeals(currentUser.id)
-      }
 
     } catch (error) {
       console.error('Error loading nutrition data:', error)
@@ -173,32 +115,8 @@ if (demoMeals) {
     }
 
     try {
-      const isDemoMode = user.id.startsWith('demo')
-      
-      const newMeal = {
-        id: Date.now().toString(),
-        user_id: user.id,
-        meal_date: new Date().toISOString().split('T')[0],
-        meal_type: mealType,
-        food_name: foodName,
-        calories: parseInt(calories),
-        protein_g: protein ? parseFloat(protein) : null,
-        carbs_g: carbs ? parseFloat(carbs) : null,
-        fat_g: fat ? parseFloat(fat) : null,
-        created_at: new Date().toISOString()
-      }
-
-      if (isDemoMode) {
-        // Save to localStorage
-        const existingMeals = JSON.parse(localStorage.getItem('yfit_demo_meals') || '[]')
-        existingMeals.push(newMeal)
-        localStorage.setItem('yfit_demo_meals', JSON.stringify(existingMeals))
-        
-        setTodaysMeals(existingMeals)
-        setTotalCalories(existingMeals.reduce((sum, meal) => sum + meal.calories, 0))
-      } else {
-        // Save to database
-        const { error } = await supabase
+      // Save to database
+      const { error } = await supabase
           .from('meals')
           .insert({
             user_id: user.id,
@@ -214,7 +132,6 @@ if (demoMeals) {
         if (error) throw error
 
         await loadTodaysMeals(user.id)
-      }
 
       // Reset form
       setFoodName('')
@@ -234,19 +151,8 @@ if (demoMeals) {
     if (!confirm('Delete this meal?')) return
 
     try {
-      const isDemoMode = user.id.startsWith('demo')
-
-      if (isDemoMode) {
-        // Delete from localStorage
-        const existingMeals = JSON.parse(localStorage.getItem('yfit_demo_meals') || '[]')
-        const updatedMeals = existingMeals.filter(meal => meal.id !== mealId)
-        localStorage.setItem('yfit_demo_meals', JSON.stringify(updatedMeals))
-        
-        setTodaysMeals(updatedMeals)
-        setTotalCalories(updatedMeals.reduce((sum, meal) => sum + meal.calories, 0))
-      } else {
-        // Delete from database
-        const { error } = await supabase
+      // Delete from database
+      const { error } = await supabase
           .from('meals')
           .delete()
           .eq('id', mealId)
@@ -254,7 +160,6 @@ if (demoMeals) {
         if (error) throw error
 
         await loadTodaysMeals(user.id)
-      }
     } catch (error) {
       console.error('Error deleting meal:', error)
       alert('Error deleting meal')

@@ -78,74 +78,45 @@ export default function NutritionEnhanced({ user: propUser }) {
 
       setUser(currentUser)
       
-      const isDemoMode = currentUser.id.startsWith('demo')
+      const profile = await getUserProfile(currentUser.id)
+      setUserProfile(profile)
 
-      if (!isDemoMode) {
-        const profile = await getUserProfile(currentUser.id)
-        setUserProfile(profile)
-      }
+      // Load TDEE and lean body mass from calculated_metrics
+      const { data: metricsData } = await supabase
+        .from('calculated_metrics')
+        .select('tdee, adjusted_calories, lean_body_mass_kg')
+        .eq('user_id', currentUser.id)
+        .order('calculated_at', { ascending: false })
+        .limit(1)
+        .single()
 
-      if (isDemoMode) {
-        // Load from localStorage
-        const demoMetrics = localStorage.getItem('yfit_demo_metrics')
-        if (demoMetrics) {
-          const metrics = JSON.parse(demoMetrics)
-          setTdee(metrics.tdee)
-          setAdjustedCalories(metrics.adjustedCalories)
-          setLeanBodyMass(metrics.leanBodyMass) // Load lean body mass for MacroSettings
-          console.log('Loaded demo metrics:', metrics)
-        } else {
-          // Provide default demo values if Goals page not completed
-          console.log('No demo metrics found - using defaults')
-          setTdee(2000)
-          setAdjustedCalories(2000)
-          setLeanBodyMass(60) // ~132 lbs
-        }
-
-        const demoMeals = localStorage.getItem('yfit_demo_meals')
-        if (demoMeals) {
-          const meals = JSON.parse(demoMeals)
-          setTodaysMeals(meals)
-          calculateTotals(meals)
-        }
+      if (metricsData) {
+        console.log('Loaded metrics:', metricsData)
+        setTdee(metricsData.tdee)
+        setAdjustedCalories(metricsData.adjusted_calories)
+        setLeanBodyMass(metricsData.lean_body_mass_kg)
       } else {
-        // Load TDEE and lean body mass from calculated_metrics
-        const { data: metricsData } = await supabase
-          .from('calculated_metrics')
-          .select('tdee, adjusted_calories, lean_body_mass_kg')
-          .eq('user_id', currentUser.id)
-          .order('calculated_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (metricsData) {
-          console.log('Loaded metrics:', metricsData)
-          setTdee(metricsData.tdee)
-          setAdjustedCalories(metricsData.adjusted_calories)
-          setLeanBodyMass(metricsData.lean_body_mass_kg)
-        } else {
-          console.log('No metrics data found - user needs to complete Goals page')
-        }
-
-        // Load goal type and nutrition goals from user_goals
-        const { data: goalsData } = await supabase
-          .from('user_goals')
-          .select('goal_type, fiber_goal_g, sugar_goal_g, sodium_goal_mg')
-          .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (goalsData) {
-          setGoalType(goalsData.goal_type)
-          setFiberGoal(goalsData.fiber_goal_g || 25)
-          setSugarGoal(goalsData.sugar_goal_g || 50)
-          setSodiumGoal(goalsData.sodium_goal_mg || 2300)
-        }
-
-        // Load today's meals
-        await loadTodaysMeals(currentUser.id)
+        console.log('No metrics data found - user needs to complete Goals page')
       }
+
+      // Load goal type and nutrition goals from user_goals
+      const { data: goalsData } = await supabase
+        .from('user_goals')
+        .select('goal_type, fiber_goal_g, sugar_goal_g, sodium_goal_mg')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (goalsData) {
+        setGoalType(goalsData.goal_type)
+        setFiberGoal(goalsData.fiber_goal_g || 25)
+        setSugarGoal(goalsData.sugar_goal_g || 50)
+        setSodiumGoal(goalsData.sodium_goal_mg || 2300)
+      }
+
+      // Load today's meals
+      await loadTodaysMeals(currentUser.id)
 
     } catch (error) {
       console.error('Error loading nutrition data:', error)
@@ -209,8 +180,6 @@ export default function NutritionEnhanced({ user: propUser }) {
 
   const handleLogFood = async () => {
     if (!selectedFood) return
-
-    const isDemoMode = user.id.startsWith('demo')
 
     // Calculate nutrition based on serving quantity and unit
     // Get the unit conversion (same logic as ServingSizeSelector)
@@ -411,60 +380,39 @@ export default function NutritionEnhanced({ user: propUser }) {
       created_at: new Date().toISOString()
     }
 
-    const isDemoMode = user.id.startsWith('demo')
-    
     console.log('[Nutrition] Saving template...', template)
-    console.log('[Nutrition] Is demo mode?', isDemoMode)
     
-    if (isDemoMode) {
-      const existingTemplates = localStorage.getItem('yfit_demo_meal_templates')
-      console.log('[Nutrition] Existing templates in localStorage:', existingTemplates)
+    // Save to Supabase meal_templates table
+    console.log('[Nutrition] Saving template to Supabase:', template)
+    
+    try {
+      const { data, error } = await supabase
+        .from('meal_templates')
+        .insert([{
+          user_id: user.id,
+          template_name: template.name,
+          meal_type: template.meal_type,
+          description: '',
+          total_calories: template.total_calories,
+          total_protein: template.total_protein.toString(),
+          total_carbs: template.total_carbs.toString(),
+          total_fat: template.total_fat.toString(),
+          meals: template.meals,
+          is_favorite: false,
+          use_count: 0
+        }])
+        .select()
       
-      const demoTemplates = JSON.parse(existingTemplates || '[]')
-      console.log('[Nutrition] Parsed templates:', demoTemplates)
-      
-      demoTemplates.push(template)
-      console.log('[Nutrition] Templates after push:', demoTemplates)
-      
-      localStorage.setItem('yfit_demo_meal_templates', JSON.stringify(demoTemplates))
-      
-      // Verify it was saved
-      const savedTemplates = localStorage.getItem('yfit_demo_meal_templates')
-      console.log('[Nutrition] Verified saved templates:', savedTemplates)
-      console.log('[Nutrition] Saved template to localStorage:', template)
-    } else {
-      // Save to Supabase meal_templates table
-      console.log('[Nutrition] Saving template to Supabase:', template)
-      
-      try {
-        const { data, error } = await supabase
-          .from('meal_templates')
-          .insert([{
-            user_id: user.id,
-            template_name: template.name,
-            meal_type: template.meal_type,
-            description: '',
-            total_calories: template.total_calories,
-            total_protein: template.total_protein.toString(),
-            total_carbs: template.total_carbs.toString(),
-            total_fat: template.total_fat.toString(),
-            meals: template.meals,
-            is_favorite: false,
-            use_count: 0
-          }])
-          .select()
-        
-        if (error) {
-          console.error('[Nutrition] Error saving template to Supabase:', error)
-          throw error
-        }
-        
-        console.log('[Nutrition] Template saved to Supabase successfully:', data)
-      } catch (error) {
-        console.error('[Nutrition] Failed to save template:', error)
-        alert('Error saving template. Please try again.')
-        return
+      if (error) {
+        console.error('[Nutrition] Error saving template to Supabase:', error)
+        throw error
       }
+      
+      console.log('[Nutrition] Template saved to Supabase successfully:', data)
+    } catch (error) {
+      console.error('[Nutrition] Failed to save template:', error)
+      alert('Error saving template. Please try again.')
+      return
     }
 
     setShowSaveTemplateModal(false)

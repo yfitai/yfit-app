@@ -57,12 +57,6 @@ const FormAnalysis = () => {
 
   const fetchSessionHistory = async () => {
     try {
-      // Skip in demo mode - form analysis requires camera
-      if (user.id.startsWith('demo')) {
-        setSessionHistory([]);
-        return;
-      }
-
       const { data } = await supabase
         .from('form_analysis_sessions')
         .select(`
@@ -104,12 +98,6 @@ const FormAnalysis = () => {
   const startAnalysis = async () => {
     if (!selectedExercise) {
       alert('Please select an exercise first');
-      return;
-    }
-
-    // Block demo mode from using form analysis
-    if (user.id.startsWith('demo')) {
-      alert('Form Analysis requires camera access and is not available in demo mode. Please sign up for a free account to use this feature!');
       return;
     }
 

@@ -17,12 +17,6 @@ export default function ProgressPhotos({ userId }) {
   }, [userId])
 
   const loadPhotos = async () => {
-    if (userId.startsWith('demo')) {
-      // Load demo photos
-      setPhotos(generateDemoPhotos())
-      return
-    }
-
     // Load from Supabase
     const { data, error } = await supabase
       .from('progress_photos')
@@ -41,20 +35,7 @@ export default function ProgressPhotos({ userId }) {
 
     setUploading(true)
     try {
-      if (userId.startsWith('demo')) {
-        // Demo mode - simulate upload
-        const newPhoto = {
-          id: `demo-photo-${Date.now()}`,
-          user_id: userId,
-          image_url: URL.createObjectURL(file),
-          view_type: viewType,
-          taken_at: new Date().toISOString(),
-          notes: ''
-        }
-        setPhotos([newPhoto, ...photos])
-        alert('Photo uploaded successfully! (Demo mode - not actually saved)')
-      } else {
-        // Upload to Supabase Storage
+      // Upload to Supabase Storage
         const fileExt = file.name.split('.').pop()
         const fileName = `${userId}/${Date.now()}.${fileExt}`
         
@@ -85,7 +66,6 @@ export default function ProgressPhotos({ userId }) {
 
         setPhotos([photoData, ...photos])
         alert('Photo uploaded successfully!')
-      }
     } catch (error) {
       console.error('Error uploading photo:', error)
       alert('Error uploading photo. Please try again.')
@@ -123,20 +103,7 @@ export default function ProgressPhotos({ userId }) {
         throw new Error('No image data');
       }
 
-      if (userId.startsWith('demo')) {
-        // Demo mode - simulate upload
-        const newPhoto = {
-          id: `demo-photo-${Date.now()}`,
-          user_id: userId,
-          image_url: image.dataUrl,
-          view_type: viewType,
-          taken_at: new Date().toISOString(),
-          notes: ''
-        };
-        setPhotos([newPhoto, ...photos]);
-        alert('Photo captured successfully! (Demo mode - not actually saved)');
-      } else {
-        // Convert data URL to blob
+      // Convert data URL to blob
         const response = await fetch(image.dataUrl);
         const blob = await response.blob();
         
@@ -170,7 +137,6 @@ export default function ProgressPhotos({ userId }) {
 
         setPhotos([photoData, ...photos]);
         alert('Photo captured and uploaded successfully!');
-      }
     } catch (error) {
       console.error('Error capturing photo:', error);
       alert('Error capturing photo. Please try again.');
@@ -182,11 +148,6 @@ export default function ProgressPhotos({ userId }) {
   const handleDeletePhoto = async (photoId) => {
     if (!confirm('Are you sure you want to delete this photo?')) return
 
-    if (userId.startsWith('demo')) {
-      setPhotos(photos.filter(p => p.id !== photoId))
-      return
-    }
-
     const { error } = await supabase
       .from('progress_photos')
       .delete()
@@ -195,33 +156,6 @@ export default function ProgressPhotos({ userId }) {
     if (!error) {
       setPhotos(photos.filter(p => p.id !== photoId))
     }
-  }
-
-  const generateDemoPhotos = () => {
-    const today = new Date()
-    return [
-      {
-        id: 'demo-1',
-        taken_at: today.toISOString(),
-        view_type: 'front',
-        image_url: '/api/placeholder/400/600',
-        notes: 'Current progress - feeling great!'
-      },
-      {
-        id: 'demo-2',
-        taken_at: new Date(today - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        view_type: 'front',
-        image_url: '/api/placeholder/400/600',
-        notes: '1 month ago'
-      },
-      {
-        id: 'demo-3',
-        taken_at: new Date(today - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        view_type: 'front',
-        image_url: '/api/placeholder/400/600',
-        notes: 'Starting point'
-      }
-    ]
   }
 
   const getPhotoAnalytics = () => {
