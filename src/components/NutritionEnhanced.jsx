@@ -154,7 +154,7 @@ export default function NutritionEnhanced({ user: propUser }) {
     }
   }
 
-  const loadTodaysMeals = async (userId, date = selectedDate) => {
+  const loadTodaysMeals = async (userId, date) => {
     const { data, error} = await supabase
       .from('meals')
       .select('*')
@@ -306,7 +306,7 @@ export default function NutritionEnhanced({ user: propUser }) {
       }
 
       // Reload meals
-      await loadTodaysMeals(user.id)
+      await loadTodaysMeals(user.id, selectedDate)
     }
 
     // Close serving selector
@@ -335,7 +335,7 @@ export default function NutritionEnhanced({ user: propUser }) {
         return
       }
 
-      await loadTodaysMeals(user.id)
+      await loadTodaysMeals(user.id, selectedDate)
     }
   }
 
@@ -414,7 +414,7 @@ export default function NutritionEnhanced({ user: propUser }) {
         return
       }
 
-      await loadTodaysMeals(user.id)
+      await loadTodaysMeals(user.id, selectedDate)
     }
   }
 
