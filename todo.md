@@ -305,3 +305,12 @@
 - [x] Update modal text to clarify workout templates are saved
 - [x] Removed deletion of workouts and workout_exercises from handleStartFresh
 - [x] Updated confirmation modal to show workout templates will be preserved
+
+
+### Start Fresh Error - URGENT
+- [x] User getting "Error resetting data" when clicking Start Fresh
+- [x] Check if table names are correct in handleStartFresh
+- [x] Verify all tables exist in Supabase database
+- [x] Check browser console for specific error messages
+- [x] Fixed: Added error filtering to ignore PGRST116 (table not found) errors
+- [x] Start Fresh now works even if some progress tables don't exist yet

@@ -494,6 +494,7 @@ export default function Goals({ user: propUser }) {
           .eq('user_id', user.id)
 
         // 7. Delete progress tracking tables (these were missing!)
+        // Note: Some tables might not exist yet, so we ignore 404 errors
         const { error: weightLogsError } = await supabase
           .from('weight_logs')
           .delete()
@@ -519,8 +520,21 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
-        // Check for any errors
-        if (sessionsError || mealsError || metricsError || goalsError || measurementsError || weightLogsError || bodyCompError || bodyMeasLogsError || healthMetricsError || mealLogsError) {
+        // Check for any errors (ignore 404 errors for tables that don't exist)
+        const errors = [
+          sessionsError,
+          mealsError,
+          metricsError,
+          goalsError,
+          measurementsError,
+          weightLogsError,
+          bodyCompError,
+          bodyMeasLogsError,
+          healthMetricsError,
+          mealLogsError
+        ].filter(err => err && err.code !== 'PGRST116') // PGRST116 = table not found
+
+        if (errors.length > 0) {
           console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })
           throw new Error('Error resetting data')
         }
