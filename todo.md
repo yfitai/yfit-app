@@ -252,3 +252,56 @@
 - [x] Update summary title based on selected date
 - [ ] Test viewing meals from previous days
 - [ ] Test logging meals for past dates
+
+
+## 🐛 New Bug Fixes - January 14, 2026
+
+### My Foods Favorites Not Saving
+- [x] Fix My Foods tab not saving favorites from Search foods
+- [x] Investigate if similar to medications fix (reference meds page implementation)
+- [x] Added addCustomFood function to foodDatabase.js
+- [x] Created CustomFoodModal component for creating custom foods
+- [x] Added "Create Custom Food" button to FoodSearch
+- [x] Custom foods now save to custom_foods table and appear in "My Foods" filter
+
+### Medication Adherence Calculation Errors
+- [x] Fix adherence showing 64% when should be different value
+- [x] Fix dose count showing "9 of 14 doses" incorrectly
+- [x] User has: 3 medications + 3 supplements, 2 taken twice daily, rest once = 8 total doses
+- [x] Fix supplements showing "8/8 taken 100%" when second dose hasn't been taken
+- [x] Changed calculation to only count days with active tracking (not full 30 days)
+- [x] Now calculates expected doses based on days user actually logged, not calendar days since start
+
+### Progress Charts Showing Cached Demo Data
+- [ ] Fix progress page showing data from Oct 21 when user only has 1 day logged
+- [ ] Verify demo mode cleanup removed all cached data
+- [ ] Check if localStorage or other cache needs clearing
+- [ ] Ensure charts only show current user's real logged data
+
+
+### Favorites Feature Enhancement
+- [x] Add star button to food search results to favorite individual foods
+- [x] Update "My Foods" filter to show BOTH favorited foods AND custom foods
+- [x] Add visual badges to distinguish favorited foods (🌟) from custom foods (✏️)
+- [x] Implement add/remove favorite functionality
+- [x] Show favorites in quick access section alongside recent foods
+- [x] Star button shows ⭐ when favorited, ☆ when not favorited
+- [x] Updated searchCustomFoods to include both custom and favorited foods
+
+
+### Progress Charts Bug - UPDATED
+- [x] User started fresh yesterday (new support@yfit account)
+- [x] Progress page showing old test data from Oct 21
+- [x] "Start Fresh" button may not have cleared all data tables
+- [x] Need to verify Start Fresh functionality clears all progress data
+- [x] Check which tables are being queried by Progress page
+- [x] Ensure all user data is properly filtered by user_id
+- [x] Added 5 missing tables to Start Fresh: weight_logs, body_composition_logs, body_measurements_logs, health_metrics_logs, meal_logs
+
+
+### Start Fresh Enhancement
+- [x] Modify Start Fresh to preserve workout templates
+- [x] Delete workout_sessions but keep workouts and workout_exercises tables
+- [x] Update modal text to clarify workout templates are saved
+- [x] Removed deletion of workouts and workout_exercises from handleStartFresh
+- [x] Updated confirmation modal to show workout templates will be preserved

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { searchFoods, getRecentFoods, getFavoriteFoods } from '../lib/foodDatabase'
+import { searchFoods, getRecentFoods, getFavoriteFoods, addCustomFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
+import CustomFoodModal from './CustomFoodModal'
 
 export default function FoodSearch({ user, onSelectFood, onClose }) {
   const [query, setQuery] = useState('')
@@ -9,6 +10,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState('all') // 'all', 'branded', 'whole', 'custom'
   const [showQuickAdd, setShowQuickAdd] = useState(true)
+  const [showCustomFoodModal, setShowCustomFoodModal] = useState(false)
   const searchTimeout = useRef(null)
 
   // Load recent and favorite foods on mount
@@ -85,6 +87,44 @@ const handleFilterChange = (newFilter) => {
   }
 }
 
+const handleSaveCustomFood = async (customFood) => {
+  const result = await addCustomFood(user.id, customFood)
+  
+  if (result.success) {
+    setShowCustomFoodModal(false)
+    // Refresh search if on custom filter
+    if (filter === 'custom' && query.length >= 2) {
+      performSearch(query, 'custom')
+    }
+    // Show success message
+    alert('Custom food saved successfully!')
+  } else {
+    alert('Error saving custom food: ' + result.error)
+  }
+}
+
+const handleToggleFavorite = async (food, isFavorited) => {
+  if (isFavorited) {
+    // Remove from favorites
+    const success = await removeFavoriteFood(user.id, food.id)
+    if (success) {
+      // Reload favorites list
+      await loadQuickAccessFoods()
+      // Refresh search if on custom filter
+      if (filter === 'custom' && query.length >= 2) {
+        performSearch(query, 'custom')
+      }
+    }
+  } else {
+    // Add to favorites
+    const success = await addFavoriteFood(user.id, food)
+    if (success) {
+      // Reload favorites list
+      await loadQuickAccessFoods()
+    }
+  }
+}
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -127,7 +167,7 @@ const handleFilterChange = (newFilter) => {
           </div>
 
           {/* Filter Chips */}
-          <div className="flex gap-2 mt-3 flex-wrap">
+          <div className="flex gap-2 mt-3 flex-wrap items-center">
             {['all',  'custom'].map((filterOption) => (
               <button
                 key={filterOption}
@@ -143,6 +183,15 @@ const handleFilterChange = (newFilter) => {
 
               </button>
             ))}
+            
+            {/* Create Custom Food Button */}
+            <button
+              onClick={() => setShowCustomFoodModal(true)}
+              className="ml-auto px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-1"
+            >
+              <span>➕</span>
+              <span>Create Custom Food</span>
+            </button>
           </div>
         </div>
 
@@ -163,6 +212,8 @@ const handleFilterChange = (newFilter) => {
                         key={`recent-${food.id || index}`}
                         food={food}
                         onSelect={handleSelectFood}
+                        onToggleFavorite={handleToggleFavorite}
+                        favoriteFoods={favoriteFoods}
                       />
                     ))}
                   </div>
@@ -181,6 +232,8 @@ const handleFilterChange = (newFilter) => {
                         key={`favorite-${food.id || index}`}
                         food={food}
                         onSelect={handleSelectFood}
+                        onToggleFavorite={handleToggleFavorite}
+                        favoriteFoods={favoriteFoods}
                       />
                     ))}
                   </div>
@@ -217,6 +270,8 @@ const handleFilterChange = (newFilter) => {
                     key={`result-${food.id || food.external_id || index}`}
                     food={food}
                     onSelect={handleSelectFood}
+                    onToggleFavorite={handleToggleFavorite}
+                    favoriteFoods={favoriteFoods}
                   />
                 ))}
               </div>
@@ -257,23 +312,38 @@ const handleFilterChange = (newFilter) => {
           </button>
         </div>
       </div>
+      
+      {/* Custom Food Modal */}
+      {showCustomFoodModal && (
+        <CustomFoodModal
+          user={user}
+          onSave={handleSaveCustomFood}
+          onClose={() => setShowCustomFoodModal(false)}
+        />
+      )}
     </div>
   )
 }
 
 // Food Result Item Component
-function FoodResultItem({ food, onSelect }) {
+function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods }) {
+  // Check if this food is favorited
+  const isFavorited = favoriteFoods?.some(fav => fav.id === food.id) || false
   const displayCalories = food.calories ? Math.round(food.calories) : '—'
   const displayProtein = food.protein ? Math.round(food.protein) : '—'
   const displayCarbs = food.carbs ? Math.round(food.carbs) : '—'
   const displayFat = food.fat ? Math.round(food.fat) : '—'
 
+  const handleStarClick = (e) => {
+    e.stopPropagation() // Prevent food selection when clicking star
+    if (onToggleFavorite) {
+      onToggleFavorite(food, isFavorited)
+    }
+  }
+
   return (
-    <button
-      onClick={() => onSelect(food)}
-      className="w-full text-left p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all"
-    >
-      <div className="flex items-start gap-3">
+    <div className="w-full text-left p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all relative">
+      <div className="flex items-start gap-3 cursor-pointer" onClick={() => onSelect(food)}>
         {/* Food Image or Icon */}
         {food.image_url ? (
           <img
@@ -320,11 +390,22 @@ function FoodResultItem({ food, onSelect }) {
           )}
           {food.source === 'custom' && (
             <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
-              Custom
+              ✏️ Custom
             </span>
           )}
         </div>
       </div>
-    </button>
+      
+      {/* Star Button (only show for non-custom foods) */}
+      {food.source !== 'custom' && onToggleFavorite && (
+        <button
+          onClick={handleStarClick}
+          className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+        >
+          <span className="text-xl">{isFavorited ? '⭐' : '☆'}</span>
+        </button>
+      )}
+    </div>
   )
 }

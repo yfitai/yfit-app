@@ -462,36 +462,12 @@ export default function Goals({ user: propUser }) {
   const handleStartFresh = async () => {
     setResetting(true)
     try {
-      // Delete from database (keeps custom_foods, favorite_foods, templates)
+      // Delete from database (keeps custom_foods, favorite_foods, templates, AND workout templates)
         // Use cascading deletes for tables with foreign key constraints
         
-        // 1. Get all workout IDs for this user first
-        const { data: userWorkouts } = await supabase
-          .from('workouts')
-          .select('id')
-          .eq('user_id', user.id)
-        
-        const workoutIds = userWorkouts?.map(w => w.id) || []
-        
-        // 2. Delete workout_sessions first (references workouts)
+        // 1. Delete workout_sessions ONLY (keep workout templates!)
         const { error: sessionsError } = await supabase
           .from('workout_sessions')
-          .delete()
-          .eq('user_id', user.id)
-        
-        // 3. Delete workout_exercises (references workouts)
-        let exercisesError = null
-        if (workoutIds.length > 0) {
-          const { error } = await supabase
-            .from('workout_exercises')
-            .delete()
-            .in('workout_id', workoutIds)
-          exercisesError = error
-        }
-        
-        // 4. Now safe to delete workouts
-        const { error: workoutsError } = await supabase
-          .from('workouts')
           .delete()
           .eq('user_id', user.id)
 
@@ -517,9 +493,35 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
+        // 7. Delete progress tracking tables (these were missing!)
+        const { error: weightLogsError } = await supabase
+          .from('weight_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: bodyCompError } = await supabase
+          .from('body_composition_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: bodyMeasLogsError } = await supabase
+          .from('body_measurements_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: healthMetricsError } = await supabase
+          .from('health_metrics_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        const { error: mealLogsError } = await supabase
+          .from('meal_logs')
+          .delete()
+          .eq('user_id', user.id)
+
         // Check for any errors
-        if (sessionsError || exercisesError || workoutsError || mealsError || metricsError || goalsError || measurementsError) {
-          console.error('Reset errors:', { sessionsError, exercisesError, workoutsError, mealsError, metricsError, goalsError, measurementsError })
+        if (sessionsError || mealsError || metricsError || goalsError || measurementsError || weightLogsError || bodyCompError || bodyMeasLogsError || healthMetricsError || mealLogsError) {
+          console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })
           throw new Error('Error resetting data')
         }
 
@@ -1314,12 +1316,12 @@ export default function Goals({ user: propUser }) {
                 This will permanently delete:
               </p>
               <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>All meal & workout history</li>
+                <li>All meal logs & completed workout sessions</li>
                 <li>Your current goals and body measurements</li>
                 <li>All progress data and analytics</li>
               </ul>
               <p className="text-green-600 font-medium mb-6">
-                ✅ Your custom foods, favorites, and templates will be saved.
+                ✅ Your workout templates, custom foods, favorites, and meal templates will be saved.
               </p>
               <div className="flex gap-3">
                 <button

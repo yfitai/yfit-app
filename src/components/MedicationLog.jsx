@@ -95,63 +95,62 @@ export default function MedicationLog({ user }) {
 
   const calculateStats = async () => {
     try {
-      // Database mode stats calculation
-      const thirtyDaysAgo = new Date();
+      // Get today's date at start of day
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Get date 30 days ago
+      const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const { data, error } = await supabase
+      // Get all logs from last 30 days (not just 'taken' status)
+      const { data: allLogs, error } = await supabase
         .from('medication_logs')
         .select('*, user_medication:user_medications(is_supplement)')
         .eq('user_id', user.id)
-        .eq('status', 'taken')
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
 
       if (error) throw error
 
-      const medLogs = data?.filter(log => !log.user_medication?.is_supplement) || [];
-      const suppLogs = data?.filter(log => log.user_medication?.is_supplement) || [];
+      // Separate by type and status
+      const medLogsTaken = allLogs?.filter(log => !log.user_medication?.is_supplement && log.status === 'taken') || [];
+      const suppLogsTaken = allLogs?.filter(log => log.user_medication?.is_supplement && log.status === 'taken') || [];
       
-      // Calculate expected doses based on days since start date
-      const today = new Date();
+      // Get unique days that have ANY logs (this tells us which days the user was actively tracking)
+      const daysWithLogs = new Set();
+      allLogs?.forEach(log => {
+        const logDate = new Date(log.scheduled_time);
+        logDate.setHours(0, 0, 0, 0);
+        daysWithLogs.add(logDate.toISOString());
+      });
       
-      // For medications
+      const activeDays = daysWithLogs.size || 1; // At least 1 day to avoid division by zero
+      
+      // Calculate expected doses based on ACTIVE tracking days only
       let medTotal = 0;
       medications.forEach(med => {
-        const startDate = new Date(med.start_date || med.created_at);
-        const daysSinceStart = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
-        const daysToCount = Math.min(daysSinceStart, 30); // Cap at 30 days
-        
-        // Parse frequency to get doses per day
         const dosesPerDay = med.frequency?.toLowerCase().includes('twice') ? 2 :
                            med.frequency?.toLowerCase().includes('three') ? 3 :
                            med.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        
-        medTotal += daysToCount * dosesPerDay;
+        medTotal += activeDays * dosesPerDay;
       });
       
-      // For supplements
       let suppTotal = 0;
       supplements.forEach(supp => {
-        const startDate = new Date(supp.start_date || supp.created_at);
-        const daysSinceStart = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
-        const daysToCount = Math.min(daysSinceStart, 30); // Cap at 30 days
-        
-        // Parse frequency to get doses per day
         const dosesPerDay = supp.frequency?.toLowerCase().includes('twice') ? 2 :
                            supp.frequency?.toLowerCase().includes('three') ? 3 :
                            supp.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        
-        suppTotal += daysToCount * dosesPerDay;
+        suppTotal += activeDays * dosesPerDay;
       });
       
-      const medRate = medTotal > 0 ? Math.round((medLogs.length / medTotal) * 100) : 0;
-      const suppRate = suppTotal > 0 ? Math.round((suppLogs.length / suppTotal) * 100) : 0;
+      const medRate = medTotal > 0 ? Math.round((medLogsTaken.length / medTotal) * 100) : 0;
+      const suppRate = suppTotal > 0 ? Math.round((suppLogsTaken.length / suppTotal) * 100) : 0;
       
       setStats({
-        medTaken: medLogs.length,
+        medTaken: medLogsTaken.length,
         medTotal,
         medRate,
-        suppTaken: suppLogs.length,
+        suppTaken: suppLogsTaken.length,
         suppTotal,
         suppRate
       });

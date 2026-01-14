@@ -332,25 +332,50 @@ function transformOpenFoodFactsProduct(product) {
  
 
 /**
- * Search custom foods created by user
+ * Search custom foods created by user AND favorited foods
  */
 async function searchCustomFoods(query, limit) {
   try {
-    const { data, error } = await supabase
+    // Get user ID from current session
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const results = []
+
+    // 1. Search custom foods
+    const { data: customData, error: customError } = await supabase
       .from('custom_foods')
       .select('*')
+      .eq('user_id', user.id)
       .ilike('name', `%${query}%`)
       .limit(limit)
 
-    if (error) throw error
+    if (!customError && customData) {
+      results.push(...customData.map(food => ({
+        ...food,
+        source: 'custom',
+        id: `custom-${food.id}`
+      })))
+    }
 
-    return (data || []).map(food => ({
-      ...food,
-      source: 'custom',
-      id: `custom-${food.id}`
-    }))
+    // 2. Search favorited foods
+    const { data: favData, error: favError } = await supabase
+      .from('favorite_foods')
+      .select('food_data')
+      .eq('user_id', user.id)
+
+    if (!favError && favData) {
+      const favoritedFoods = favData
+        .map(entry => entry.food_data)
+        .filter(food => food.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, limit - results.length)
+      
+      results.push(...favoritedFoods)
+    }
+
+    return results
   } catch (error) {
-    console.error('Error searching custom foods:', error)
+    console.error('Error searching custom/favorite foods:', error)
     return []
   }
 }
@@ -497,6 +522,38 @@ function deduplicateFoods(foods) {
 
   return unique
 }
+/**
+ * Add custom food created by user
+ */
+export async function addCustomFood(userId, foodData) {
+  try {
+    const { data, error } = await supabase
+      .from('custom_foods')
+      .insert({
+        user_id: userId,
+        name: foodData.name,
+        brand: foodData.brand || null,
+        calories: foodData.calories || 0,
+        protein: foodData.protein || 0,
+        carbs: foodData.carbs || 0,
+        fat: foodData.fat || 0,
+        fiber: foodData.fiber || 0,
+        sugar: foodData.sugar || 0,
+        sodium: foodData.sodium || 0,
+        serving_size: foodData.serving_size || 100,
+        serving_unit: foodData.serving_unit || 'g'
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error adding custom food:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 /**
  * Update recent food (for backward compatibility)
  */
