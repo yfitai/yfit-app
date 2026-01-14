@@ -314,3 +314,11 @@
 - [x] Check browser console for specific error messages
 - [x] Fixed: Added error filtering to ignore PGRST116 (table not found) errors
 - [x] Start Fresh now works even if some progress tables don't exist yet
+
+
+### Start Fresh - Preserve Medications
+- [x] Update Start Fresh to keep user_medications table
+- [x] Delete medication_logs (adherence history) but keep medication list
+- [x] Update modal text to clarify medications are preserved
+- [x] Added medication_logs deletion to handleStartFresh
+- [x] user_medications table already preserved (not deleted)

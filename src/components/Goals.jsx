@@ -493,7 +493,13 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
-        // 7. Delete progress tracking tables (these were missing!)
+        // 7. Delete medication adherence logs (keep medication list)
+        const { error: medicationLogsError } = await supabase
+          .from('medication_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        // 8. Delete progress tracking tables (these were missing!)
         // Note: Some tables might not exist yet, so we ignore 404 errors
         const { error: weightLogsError } = await supabase
           .from('weight_logs')
@@ -527,6 +533,7 @@ export default function Goals({ user: propUser }) {
           metricsError,
           goalsError,
           measurementsError,
+          medicationLogsError,
           weightLogsError,
           bodyCompError,
           bodyMeasLogsError,
@@ -535,7 +542,7 @@ export default function Goals({ user: propUser }) {
         ].filter(err => err && err.code !== 'PGRST116') // PGRST116 = table not found
 
         if (errors.length > 0) {
-          console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })
+          console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, medicationLogsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })
           throw new Error('Error resetting data')
         }
 
@@ -1335,7 +1342,7 @@ export default function Goals({ user: propUser }) {
                 <li>All progress data and analytics</li>
               </ul>
               <p className="text-green-600 font-medium mb-6">
-                ✅ Your workout templates, custom foods, favorites, and meal templates will be saved.
+                ✅ Your workout templates, medications list, custom foods, favorites, and meal templates will be saved.
               </p>
               <div className="flex gap-3">
                 <button
