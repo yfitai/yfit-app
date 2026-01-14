@@ -40,7 +40,7 @@ export default defineConfig({
 
    build: {
   outDir: 'dist',
-
+    // Force new build - timestamp: 2026-01-14-23:30
     // Generate unique filenames for all assets with content hash
     rollupOptions: {
 

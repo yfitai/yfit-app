@@ -335,3 +335,10 @@
 - [ ] Vercel deployed but browser still loading old JS file
 - [ ] Need to force cache invalidation
 - [ ] Consider adding cache-busting query parameter to version.json check
+
+
+### Vercel Build Issue - CRITICAL
+- [ ] Vercel is not rebuilding JavaScript files
+- [ ] Same index-DFudI4c0.js hash across multiple deployments
+- [ ] Check vite.config.js for build cache issues
+- [ ] May need to clear Vercel build cache
