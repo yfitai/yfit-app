@@ -526,7 +526,7 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
-        // Check for any errors (ignore 404 errors for tables that don't exist)
+        // Check for any errors (ignore 404/406 errors for tables that don't exist)
         const errors = [
           sessionsError,
           mealsError,
@@ -539,7 +539,14 @@ export default function Goals({ user: propUser }) {
           bodyMeasLogsError,
           healthMetricsError,
           mealLogsError
-        ].filter(err => err && err.code !== 'PGRST116') // PGRST116 = table not found
+        ].filter(err => {
+          if (!err) return false
+          // Ignore table not found errors (PGRST116 or 406 status)
+          if (err.code === 'PGRST116') return false
+          if (err.message && err.message.includes('406')) return false
+          if (err.status === 406) return false
+          return true
+        })
 
         if (errors.length > 0) {
           console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, medicationLogsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })

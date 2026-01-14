@@ -322,3 +322,10 @@
 - [x] Update modal text to clarify medications are preserved
 - [x] Added medication_logs deletion to handleStartFresh
 - [x] user_medications table already preserved (not deleted)
+
+
+### Start Fresh 406 Errors
+- [x] Handle 406 (Not Acceptable) errors in addition to 404 errors
+- [x] Some tables returning 406 instead of 404
+- [x] Update error filter to ignore both PGRST116 and 406-related errors
+- [x] Updated error filter to check err.status === 406 and err.message.includes('406')
