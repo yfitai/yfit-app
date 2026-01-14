@@ -2,6 +2,31 @@
 
 All deployments are tracked here automatically.
 
+## [1.0.3] - Build 4 - 2026-01-14 22:33
+
+**Changes:**
+- **Bug Fix:** My Foods - Added custom food creation + favorites system
+  - New CustomFoodModal component for creating custom foods
+  - Added star button (⭐/☆) to favorite any food from search results
+  - "My Foods" filter now shows both custom foods (✏️) and favorites (🌟)
+  - Quick access section displays your favorite foods
+  
+- **Bug Fix:** Medication Adherence - Fixed calculation accuracy
+  - Now counts only active tracking days instead of assuming 30 days
+  - Fixes incorrect adherence percentages for new users
+  - More accurate dose counting based on actual logged days
+  
+- **Bug Fix:** Progress Charts - Fixed Start Fresh missing tables
+  - Added 5 missing tables to Start Fresh: weight_logs, body_composition_logs, body_measurements_logs, health_metrics_logs, meal_logs
+  - Progress page will now show clean data after using Start Fresh
+  
+- **Enhancement:** Start Fresh now preserves workout templates
+  - Workout templates (exercises) are no longer deleted when starting fresh
+  - Only completed workout sessions are deleted
+  - Updated confirmation modal to clarify what gets saved vs deleted
+
+---
+
 ## [1.0.2] - Build 3 - 2026-01-13 19:00
 
 **Changes:**
