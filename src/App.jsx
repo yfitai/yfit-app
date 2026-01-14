@@ -16,6 +16,7 @@ import WorkoutSessionTracker from './components/WorkoutSessionTracker'
 import AICoachFAQ from './components/AICoachFAQ'
 import PredictionsUnified from './components/PredictionsUnified'
 import Navigation from './components/Navigation'
+import ManualCleanup from './pages/ManualCleanup'
 import { supabase, getCurrentUser } from './lib/supabase'
 import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
@@ -90,6 +91,7 @@ function App() {
                 <Route path="/progress" element={<Progress user={user} />} />
                 <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
                 <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                <Route path="/manual-cleanup" element={<ManualCleanup />} />
               </>
             ) : (
               <Route path="*" element={<Navigate to="/login" replace />} />

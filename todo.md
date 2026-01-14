@@ -342,3 +342,12 @@
 - [ ] Same index-DFudI4c0.js hash across multiple deployments
 - [ ] Check vite.config.js for build cache issues
 - [ ] May need to clear Vercel build cache
+
+
+### Manual Cleanup Workaround
+- [x] Create standalone cleanup page that directly deletes data
+- [x] Bypass Start Fresh button entirely
+- [x] User visits page once to clear old data
+- [x] Works regardless of Vercel caching issues
+- [x] Created /manual-cleanup route with ManualCleanup component
+- [x] Deletes all data tables while preserving templates and favorites
