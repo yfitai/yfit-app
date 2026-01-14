@@ -329,3 +329,9 @@
 - [x] Some tables returning 406 instead of 404
 - [x] Update error filter to ignore both PGRST116 and 406-related errors
 - [x] Updated error filter to check err.status === 406 and err.message.includes('406')
+
+
+### Browser Cache Issue
+- [ ] Vercel deployed but browser still loading old JS file
+- [ ] Need to force cache invalidation
+- [ ] Consider adding cache-busting query parameter to version.json check
