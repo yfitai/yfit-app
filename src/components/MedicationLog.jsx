@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Check, X, Clock, TrendingUp, Pill } from 'lucide-react'
 
-const BUILD_VERSION = '2026-01-14-v3-FORCE-NEW-BUNDLE'; // Force rebuild
+const BUILD_VERSION = '2026-01-15-daily-average-fix'; // New calculation approach
 console.log('MedicationLog loaded - version:', BUILD_VERSION);
 
 export default function MedicationLog({ user }) {
@@ -75,19 +75,18 @@ export default function MedicationLog({ user }) {
 
   const loadTodayLogs = async () => {
     try {
-
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
 
       const { data, error } = await supabase
         .from('medication_logs')
-        .select('*')
+        .select('*, user_medication:user_medications(*, medication:medications(name))')
         .eq('user_id', user.id)
-        .gte('scheduled_time', startOfDay.toISOString())
-        .lte('scheduled_time', endOfDay.toISOString())
-        .order('scheduled_time', { ascending: false })
+        .gte('scheduled_time', today.toISOString())
+        .lt('scheduled_time', tomorrow.toISOString())
+        .order('scheduled_time')
 
       if (error) throw error
       setTodayLogs(data || [])
@@ -96,7 +95,7 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  // Updated: 2026-01-14 - Fixed medication adherence calculation
+  // NEW APPROACH: Calculate daily adherence percentages and average them
   const calculateStats = async () => {
     try {
       // Get today's date at start of day
@@ -107,10 +106,10 @@ export default function MedicationLog({ user }) {
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      // Get all logs from last 30 days (not just 'taken' status)
+      // Get all logs from last 30 days
       const { data: allLogs, error } = await supabase
         .from('medication_logs')
-        .select('*, user_medication:user_medications(is_supplement)')
+        .select('*, user_medication:user_medications(is_supplement, frequency)')
         .eq('user_id', user.id)
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
 
@@ -119,67 +118,87 @@ export default function MedicationLog({ user }) {
       console.log('[DEBUG] allLogs from database:', allLogs);
       console.log('[DEBUG] allLogs count:', allLogs?.length || 0);
 
-      // Separate by type and status
-      const medLogsTaken = allLogs?.filter(log => !log.user_medication?.is_supplement && log.status === 'taken') || [];
-      const suppLogsTaken = allLogs?.filter(log => log.user_medication?.is_supplement && log.status === 'taken') || [];
-      
-      // Get unique days that have logs for medications
-      const daysWithMedLogs = new Set();
-      allLogs?.forEach(log => {
-        if (!log.user_medication?.is_supplement) {
-          const logDate = new Date(log.scheduled_time);
-          logDate.setHours(0, 0, 0, 0);
-          daysWithMedLogs.add(logDate.toISOString());
-        }
-      });
-      
-      // Get unique days that have logs for supplements
-      const daysWithSuppLogs = new Set();
-      allLogs?.forEach(log => {
+      // If no logs, show 0%
+      if (!allLogs || allLogs.length === 0) {
+        setStats({
+          medTaken: 0,
+          medTotal: 0,
+          medRate: 0,
+          suppTaken: 0,
+          suppTotal: 0,
+          suppRate: 0
+        });
+        return;
+      }
+
+      // Group logs by date and type (medication vs supplement)
+      const medLogsByDate = {};
+      const suppLogsByDate = {};
+
+      allLogs.forEach(log => {
+        const logDate = new Date(log.scheduled_time);
+        logDate.setHours(0, 0, 0, 0);
+        const dateKey = logDate.toISOString();
+
         if (log.user_medication?.is_supplement) {
-          const logDate = new Date(log.scheduled_time);
-          logDate.setHours(0, 0, 0, 0);
-          daysWithSuppLogs.add(logDate.toISOString());
+          if (!suppLogsByDate[dateKey]) suppLogsByDate[dateKey] = [];
+          suppLogsByDate[dateKey].push(log);
+        } else {
+          if (!medLogsByDate[dateKey]) medLogsByDate[dateKey] = [];
+          medLogsByDate[dateKey].push(log);
         }
       });
-      
-      const medActiveDays = daysWithMedLogs.size || 1; // At least 1 day to avoid division by zero
-      const suppActiveDays = daysWithSuppLogs.size || 1;
-      
-      console.log('[DEBUG] medActiveDays:', medActiveDays, 'daysWithMedLogs:', Array.from(daysWithMedLogs));
-      console.log('[DEBUG] suppActiveDays:', suppActiveDays, 'daysWithSuppLogs:', Array.from(daysWithSuppLogs));
-      console.log('[DEBUG] medLogsTaken count:', medLogsTaken.length);
-      console.log('[DEBUG] suppLogsTaken count:', suppLogsTaken.length);
-      
-      // Calculate expected doses based on ACTIVE tracking days for each type
-      let medTotal = 0;
-      medications.forEach(med => {
-        const dosesPerDay = med.frequency?.toLowerCase().includes('twice') ? 2 :
-                           med.frequency?.toLowerCase().includes('three') ? 3 :
-                           med.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        medTotal += medActiveDays * dosesPerDay;
+
+      // Calculate daily adherence for medications
+      const medDailyRates = [];
+      let totalMedTaken = 0;
+      let totalMedExpected = 0;
+
+      Object.values(medLogsByDate).forEach(dayLogs => {
+        const taken = dayLogs.filter(log => log.status === 'taken').length;
+        const expected = dayLogs.length;
+        totalMedTaken += taken;
+        totalMedExpected += expected;
+        if (expected > 0) {
+          medDailyRates.push((taken / expected) * 100);
+        }
       });
-      
-      let suppTotal = 0;
-      supplements.forEach(supp => {
-        const dosesPerDay = supp.frequency?.toLowerCase().includes('twice') ? 2 :
-                           supp.frequency?.toLowerCase().includes('three') ? 3 :
-                           supp.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        suppTotal += suppActiveDays * dosesPerDay;
+
+      // Calculate daily adherence for supplements
+      const suppDailyRates = [];
+      let totalSuppTaken = 0;
+      let totalSuppExpected = 0;
+
+      Object.values(suppLogsByDate).forEach(dayLogs => {
+        const taken = dayLogs.filter(log => log.status === 'taken').length;
+        const expected = dayLogs.length;
+        totalSuppTaken += taken;
+        totalSuppExpected += expected;
+        if (expected > 0) {
+          suppDailyRates.push((taken / expected) * 100);
+        }
       });
-      
-      const medRate = medTotal > 0 ? Math.round((medLogsTaken.length / medTotal) * 100) : 0;
-      const suppRate = suppTotal > 0 ? Math.round((suppLogsTaken.length / suppTotal) * 100) : 0;
-      
-      console.log('[DEBUG] Final calculation - medTaken:', medLogsTaken.length, 'medTotal:', medTotal, 'medRate:', medRate);
-      console.log('[DEBUG] Final calculation - suppTaken:', suppLogsTaken.length, 'suppTotal:', suppTotal, 'suppRate:', suppRate);
-      
+
+      // Average the daily rates
+      const medRate = medDailyRates.length > 0
+        ? Math.round(medDailyRates.reduce((a, b) => a + b, 0) / medDailyRates.length)
+        : 0;
+
+      const suppRate = suppDailyRates.length > 0
+        ? Math.round(suppDailyRates.reduce((a, b) => a + b, 0) / suppDailyRates.length)
+        : 0;
+
+      console.log('[DEBUG] Med daily rates:', medDailyRates, 'Average:', medRate);
+      console.log('[DEBUG] Supp daily rates:', suppDailyRates, 'Average:', suppRate);
+      console.log('[DEBUG] Final - medTaken:', totalMedTaken, 'medTotal:', totalMedExpected, 'medRate:', medRate);
+      console.log('[DEBUG] Final - suppTaken:', totalSuppTaken, 'suppTotal:', totalSuppExpected, 'suppRate:', suppRate);
+
       setStats({
-        medTaken: medLogsTaken.length,
-        medTotal,
+        medTaken: totalMedTaken,
+        medTotal: totalMedExpected,
         medRate,
-        suppTaken: suppLogsTaken.length,
-        suppTotal,
+        suppTaken: totalSuppTaken,
+        suppTotal: totalSuppExpected,
         suppRate
       });
     } catch (error) {
@@ -187,286 +206,170 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  // Helper function to get number of doses per day from frequency
-  const getDosesPerDay = (frequency) => {
-    if (!frequency) return 1;
-    const freq = frequency.toLowerCase();
-    if (freq.includes('twice')) return 2;
-    if (freq.includes('three')) return 3;
-    if (freq.includes('four')) return 4;
-    return 1;
-  }
-
-  const handleCheckboxChange = async (itemId, isChecked, isSupplement, doseNumber = 1) => {
+  const handleToggleLog = async (logId, currentStatus) => {
     try {
-      if (isChecked) {
-        // Log as taken
-        await logItem(itemId, 'taken', doseNumber);
-      } else {
-        // Remove today's log for this item
-        await removeLog(itemId);
-      }
-      await loadData();
+      const newStatus = currentStatus === 'taken' ? 'pending' : 'taken'
+      const actualTime = newStatus === 'taken' ? new Date().toISOString() : null
+
+      const { error } = await supabase
+        .from('medication_logs')
+        .update({ 
+          status: newStatus,
+          actual_time: actualTime
+        })
+        .eq('id', logId)
+
+      if (error) throw error
+
+      // Reload data
+      await Promise.all([
+        loadTodayLogs(),
+        calculateStats()
+      ])
     } catch (error) {
-      console.error('Error updating checkbox:', error)
-      alert('Failed to update')
+      console.error('Error toggling log:', error)
     }
-  }
-
-  const logItem = async (itemId, status, doseNumber = 1) => {
-    // Add a few seconds offset for each dose to make them unique
-    const now = new Date();
-    now.setSeconds(now.getSeconds() + (doseNumber - 1));
-    const scheduledTime = now.toISOString();
-    
-    const { error } = await supabase
-      .from('medication_logs')
-      .insert({
-        user_medication_id: itemId,
-        user_id: user.id,
-        scheduled_time: scheduledTime,
-        actual_time: scheduledTime,
-        status: status
-      })
-
-    if (error) throw error
-  }
-
-  const removeLog = async (itemId) => {
-
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    // Get today's logs for this item
-    const { data: todayItemLogs } = await supabase
-      .from('medication_logs')
-      .select('id')
-      .eq('user_medication_id', itemId)
-      .eq('user_id', user.id)
-      .gte('scheduled_time', startOfDay.toISOString())
-      .order('scheduled_time', { ascending: false })
-      .limit(1);
-
-    if (!todayItemLogs || todayItemLogs.length === 0) return;
-
-    // Delete the most recent log
-    const { error } = await supabase
-      .from('medication_logs')
-      .delete()
-      .eq('id', todayItemLogs[0].id);
-
-    if (error) throw error;
-  }
-
-  const getItemDosesTakenToday = (itemId) => {
-    return todayLogs.filter(log => 
-      log.user_medication_id === itemId && log.status === 'taken'
-    ).length;
-  }
-
-  const getItemNameFromLog = (log) => {
-    const allItems = [...medications, ...supplements];
-    const item = allItems.find(i => i.id === log.user_medication_id);
-    if (!item) return 'Unknown';
-    return item.medication?.name || item.custom_name || 'Unknown';
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Daily Tracking</h2>
-        <p className="text-gray-600 mt-1">Check off medications and supplements as you take them</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-blue-900">Medications</h3>
-            <Pill className="w-6 h-6 text-blue-600" />
+    <div className="space-y-6">
+      {/* Adherence Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-blue-900">Medications</h3>
+            <Pill className="w-5 h-5 text-blue-600" />
           </div>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-3xl font-bold text-blue-900">{stats.medRate}%</span>
-            <span className="text-sm text-blue-700">adherence</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-blue-600">{stats.medRate}%</span>
+            <span className="text-sm text-blue-600">adherence</span>
           </div>
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-blue-700 mt-1">
             {stats.medTaken} of {stats.medTotal} doses taken
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-green-900">Supplements</h3>
-            <TrendingUp className="w-6 h-6 text-green-600" />
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-green-900">Supplements</h3>
+            <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-3xl font-bold text-green-900">{stats.suppRate}%</span>
-            <span className="text-sm text-green-700">adherence</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-green-600">{stats.suppRate}%</span>
+            <span className="text-sm text-green-600">adherence</span>
           </div>
-          <p className="text-sm text-green-700">
+          <p className="text-sm text-green-700 mt-1">
             {stats.suppTaken} of {stats.suppTotal} doses taken
           </p>
         </div>
       </div>
 
-      {/* Today's Checklist */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Medications */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <Pill className="w-5 h-5 text-blue-600" />
-            Today's Medications
-          </h3>
-          {medications.length === 0 ? (
-            <p className="text-gray-500 text-sm">No medications added yet</p>
-          ) : (
-            <div className="space-y-3">
-              {medications.map((med) => {
-                const dosesPerDay = getDosesPerDay(med.frequency);
-                const dosesTaken = getItemDosesTakenToday(med.id);
-                
-                return (
-                  <div
-                    key={med.id}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex gap-2 mt-1">
-                      {Array.from({ length: dosesPerDay }).map((_, index) => (
-                        <input
-                          key={index}
-                          type="checkbox"
-                          checked={index < dosesTaken}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              // Only allow checking if this is the next dose
-                              if (index === dosesTaken) {
-                                handleCheckboxChange(med.id, true, false, index + 1);
-                              }
-                            } else {
-                              // Only allow unchecking the last checked box
-                              if (index === dosesTaken - 1) {
-                                handleCheckboxChange(med.id, false, false);
-                              }
-                            }
-                          }}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                        />
-                      ))}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
-                        {med.medication?.name || med.custom_name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {med.dosage} • {med.frequency}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Supplements */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            Today's Supplements
-          </h3>
-          {supplements.length === 0 ? (
-            <p className="text-gray-500 text-sm">No supplements added yet</p>
-          ) : (
-            <div className="space-y-3">
-              {supplements.map((supp) => {
-                const dosesPerDay = getDosesPerDay(supp.frequency);
-                const dosesTaken = getItemDosesTakenToday(supp.id);
-                
-                return (
-                  <div
-                    key={supp.id}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex gap-2 mt-1">
-                      {Array.from({ length: dosesPerDay }).map((_, index) => (
-                        <input
-                          key={index}
-                          type="checkbox"
-                          checked={index < dosesTaken}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              // Only allow checking if this is the next dose
-                              if (index === dosesTaken) {
-                                handleCheckboxChange(supp.id, true, true, index + 1);
-                              }
-                            } else {
-                              // Only allow unchecking the last checked box
-                              if (index === dosesTaken - 1) {
-                                handleCheckboxChange(supp.id, false, true);
-                              }
-                            }
-                          }}
-                          className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
-                        />
-                      ))}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
-                        {supp.medication?.name || supp.custom_name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {supp.dosage} • {supp.frequency}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Today's Log */}
+      {/* Today's Medications */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Today's Activity</h3>
-        {todayLogs.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-8">
-            No activity logged today. Check off items above as you take them!
-          </p>
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5" />
+          Today's Medications
+        </h3>
+        
+        {todayLogs.filter(log => !log.user_medication?.is_supplement).length === 0 ? (
+          <p className="text-gray-500 text-sm">No medications scheduled for today</p>
         ) : (
-          <div className="space-y-2">
-            {todayLogs.map((log) => (
-              <div
-                key={log.id}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  log.status === 'taken' ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  {log.status === 'taken' ? (
-                    <Check className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <X className="w-5 h-5 text-red-600" />
+          <div className="space-y-3">
+            {todayLogs
+              .filter(log => !log.user_medication?.is_supplement)
+              .map(log => (
+                <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleToggleLog(log.id, log.status)}
+                      className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                        log.status === 'taken'
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'border-gray-300 hover:border-blue-400'
+                      }`}
+                    >
+                      {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
+                    </button>
+                    <div>
+                      <p className="font-medium">{log.user_medication?.medication?.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(log.scheduled_time).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  {log.status === 'taken' && log.actual_time && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Taken at {new Date(log.actual_time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
                   )}
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">
-                    {getItemNameFromLog(log)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {log.status === 'taken' ? 'Taken' : 'Missed'} at {new Date(log.scheduled_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                  </p>
+              ))}
+          </div>
+        )}
+      </div>
+
+      {/* Today's Supplements */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5" />
+          Today's Supplements
+        </h3>
+        
+        {todayLogs.filter(log => log.user_medication?.is_supplement).length === 0 ? (
+          <p className="text-gray-500 text-sm">No supplements scheduled for today</p>
+        ) : (
+          <div className="space-y-3">
+            {todayLogs
+              .filter(log => log.user_medication?.is_supplement)
+              .map(log => (
+                <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleToggleLog(log.id, log.status)}
+                      className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                        log.status === 'taken'
+                          ? 'bg-green-600 border-green-600'
+                          : 'border-gray-300 hover:border-green-400'
+                      }`}
+                    >
+                      {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
+                    </button>
+                    <div>
+                      <p className="font-medium">{log.user_medication?.medication?.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(log.scheduled_time).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  {log.status === 'taken' && log.actual_time && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Taken at {new Date(log.actual_time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>
