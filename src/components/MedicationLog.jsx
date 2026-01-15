@@ -162,7 +162,7 @@ export default function MedicationLog({ user }) {
             user_id: user.id,
             user_medication_id: med.id,
             scheduled_time: scheduledTime.toISOString(),
-            status: 'pending',
+            status: 'scheduled',
             actual_time: null
           })
         }
