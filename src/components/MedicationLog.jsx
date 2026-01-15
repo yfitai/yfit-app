@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Check, X, Clock, TrendingUp, Pill } from 'lucide-react'
 
+const BUILD_VERSION = '2026-01-14-v2'; // Force rebuild
+
 export default function MedicationLog({ user }) {
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
