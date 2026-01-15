@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Check, X, Clock, TrendingUp, Pill } from 'lucide-react'
 
-const BUILD_VERSION = '2026-01-15-daily-average-fix'; // New calculation approach
-console.log('MedicationLog loaded - version:', BUILD_VERSION);
+const BUILD_VERSION = '2026-01-15-daily-average-fix-v2'; // New calculation approach
+console.log('🔥🔥🔥 MedicationLog loaded - version:', BUILD_VERSION, '🔥🔥🔥');
 
 export default function MedicationLog({ user }) {
   const [medications, setMedications] = useState([])
@@ -30,11 +30,18 @@ export default function MedicationLog({ user }) {
   const loadData = async () => {
     setLoading(true)
     try {
-      await Promise.all([
-        loadMedications(),
-        loadSupplements(),
-        loadTodayLogs()
-      ])
+      // Load medications and supplements first, get their data
+      console.log('[DEBUG] loadData - Starting to load medications and supplements...')
+      const medsPromise = loadMedications()
+      const suppsPromise = loadSupplements()
+      
+      const [medsData, suppsData] = await Promise.all([medsPromise, suppsPromise])
+      
+      console.log('[DEBUG] loadData - medsData:', medsData, 'length:', medsData?.length)
+      console.log('[DEBUG] loadData - suppsData:', suppsData, 'length:', suppsData?.length)
+      
+      // Then load today's logs, passing the loaded data
+      await loadTodayLogs(medsData, suppsData)
     } finally {
       setLoading(false)
     }
@@ -48,12 +55,14 @@ export default function MedicationLog({ user }) {
         .eq('user_id', user.id)
         .eq('is_active', true)
         .eq('is_supplement', false)
-        .order('created_at')
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setMedications(data || [])
+      return data || [] // Return the data
     } catch (error) {
       console.error('Error loading medications:', error)
+      return []
     }
   }
 
@@ -65,16 +74,18 @@ export default function MedicationLog({ user }) {
         .eq('user_id', user.id)
         .eq('is_active', true)
         .eq('is_supplement', true)
-        .order('created_at')
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setSupplements(data || [])
+      return data || [] // Return the data
     } catch (error) {
       console.error('Error loading supplements:', error)
+      return []
     }
   }
 
-  const loadTodayLogs = async () => {
+  const loadTodayLogs = async (medsData, suppsData) => {
     try {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -94,7 +105,7 @@ export default function MedicationLog({ user }) {
 
       // If no logs exist for today, generate them from active medications
       if (!existingLogs || existingLogs.length === 0) {
-        await generateTodayLogs()
+        await generateTodayLogs(medsData, suppsData)
         // Fetch again after generation
         const { data: newLogs, error: refetchError } = await supabase
           .from('medication_logs')
@@ -114,13 +125,15 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  const generateTodayLogs = async () => {
+  const generateTodayLogs = async (medsData, suppsData) => {
     try {
+      console.log('[DEBUG] generateTodayLogs called with medsData:', medsData?.length, 'suppsData:', suppsData?.length)
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
-      // Get all active medications and supplements
-      const allMeds = [...medications, ...supplements]
+      // Get all active medications and supplements from parameters
+      const allMeds = [...(medsData || []), ...(suppsData || [])]
+      console.log('[DEBUG] generateTodayLogs - allMeds count:', allMeds.length)
       
       const logsToCreate = []
       
