@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { Check, X, Clock, TrendingUp, Pill, Calendar } from 'lucide-react'
+import { Check, X, Clock, TrendingUp, Pill } from 'lucide-react'
 
-const BUILD_VERSION = '2026-01-15-daily-breakdown-v2';
+const BUILD_VERSION = '2026-01-15-daily-average-fix'; // New calculation approach
 console.log('MedicationLog loaded - version:', BUILD_VERSION);
 
 export default function MedicationLog({ user }) {
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [todayLogs, setTodayLogs] = useState([])
-  const [dailyBreakdown, setDailyBreakdown] = useState([])
   const [stats, setStats] = useState({ 
-    medDaysLogged: 0,
-    medAvgRate: 0,
-    suppDaysLogged: 0,
-    suppAvgRate: 0
+    medTaken: 0, medTotal: 0, medRate: 0,
+    suppTaken: 0, suppTotal: 0, suppRate: 0
   })
   const [loading, setLoading] = useState(true)
 
@@ -22,6 +19,7 @@ export default function MedicationLog({ user }) {
     loadData()
   }, [user])
 
+  // Recalculate stats whenever medications or supplements change
   useEffect(() => {
     if (medications.length > 0 || supplements.length > 0) {
       calculateStats()
@@ -58,7 +56,7 @@ export default function MedicationLog({ user }) {
     }
   }
 
-  const loadSupplements = async () {
+  const loadSupplements = async () => {
     try {
       const { data, error } = await supabase
         .from('user_medications')
@@ -97,106 +95,112 @@ export default function MedicationLog({ user }) {
     }
   }
 
+  // NEW APPROACH: Calculate daily adherence percentages and average them
   const calculateStats = async () => {
     try {
+      // Get today's date at start of day
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
+      // Get date 30 days ago
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+      // Get all logs from last 30 days
       const { data: allLogs, error } = await supabase
         .from('medication_logs')
         .select('*, user_medication:user_medications(is_supplement, frequency)')
         .eq('user_id', user.id)
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
-        .order('scheduled_time', { ascending: false })
 
       if (error) throw error
 
+      console.log('[DEBUG] allLogs from database:', allLogs);
+      console.log('[DEBUG] allLogs count:', allLogs?.length || 0);
+
+      // If no logs, show 0%
       if (!allLogs || allLogs.length === 0) {
         setStats({
-          medDaysLogged: 0,
-          medAvgRate: 0,
-          suppDaysLogged: 0,
-          suppAvgRate: 0
+          medTaken: 0,
+          medTotal: 0,
+          medRate: 0,
+          suppTaken: 0,
+          suppTotal: 0,
+          suppRate: 0
         });
-        setDailyBreakdown([]);
         return;
       }
 
-      // Group logs by date
-      const logsByDate = {};
-      
+      // Group logs by date and type (medication vs supplement)
+      const medLogsByDate = {};
+      const suppLogsByDate = {};
+
       allLogs.forEach(log => {
         const logDate = new Date(log.scheduled_time);
         logDate.setHours(0, 0, 0, 0);
-        const dateKey = logDate.toISOString().split('T')[0];
-
-        if (!logsByDate[dateKey]) {
-          logsByDate[dateKey] = {
-            date: logDate,
-            medications: [],
-            supplements: []
-          };
-        }
+        const dateKey = logDate.toISOString();
 
         if (log.user_medication?.is_supplement) {
-          logsByDate[dateKey].supplements.push(log);
+          if (!suppLogsByDate[dateKey]) suppLogsByDate[dateKey] = [];
+          suppLogsByDate[dateKey].push(log);
         } else {
-          logsByDate[dateKey].medications.push(log);
+          if (!medLogsByDate[dateKey]) medLogsByDate[dateKey] = [];
+          medLogsByDate[dateKey].push(log);
         }
       });
 
-      // Calculate daily percentages
-      const breakdown = [];
+      // Calculate daily adherence for medications
       const medDailyRates = [];
-      const suppDailyRates = [];
+      let totalMedTaken = 0;
+      let totalMedExpected = 0;
 
-      Object.entries(logsByDate).forEach(([dateKey, dayData]) => {
-        const medTaken = dayData.medications.filter(l => l.status === 'taken').length;
-        const medTotal = dayData.medications.length;
-        const medRate = medTotal > 0 ? Math.round((medTaken / medTotal) * 100) : 0;
-
-        const suppTaken = dayData.supplements.filter(l => l.status === 'taken').length;
-        const suppTotal = dayData.supplements.length;
-        const suppRate = suppTotal > 0 ? Math.round((suppTaken / suppTotal) * 100) : 0;
-
-        if (medTotal > 0) medDailyRates.push(medRate);
-        if (suppTotal > 0) suppDailyRates.push(suppRate);
-
-        breakdown.push({
-          date: dayData.date,
-          dateKey,
-          medTaken,
-          medTotal,
-          medRate,
-          suppTaken,
-          suppTotal,
-          suppRate,
-          medications: dayData.medications,
-          supplements: dayData.supplements
-        });
+      Object.values(medLogsByDate).forEach(dayLogs => {
+        const taken = dayLogs.filter(log => log.status === 'taken').length;
+        const expected = dayLogs.length;
+        totalMedTaken += taken;
+        totalMedExpected += expected;
+        if (expected > 0) {
+          medDailyRates.push((taken / expected) * 100);
+        }
       });
 
-      // Calculate overall averages
-      const medAvgRate = medDailyRates.length > 0
+      // Calculate daily adherence for supplements
+      const suppDailyRates = [];
+      let totalSuppTaken = 0;
+      let totalSuppExpected = 0;
+
+      Object.values(suppLogsByDate).forEach(dayLogs => {
+        const taken = dayLogs.filter(log => log.status === 'taken').length;
+        const expected = dayLogs.length;
+        totalSuppTaken += taken;
+        totalSuppExpected += expected;
+        if (expected > 0) {
+          suppDailyRates.push((taken / expected) * 100);
+        }
+      });
+
+      // Average the daily rates
+      const medRate = medDailyRates.length > 0
         ? Math.round(medDailyRates.reduce((a, b) => a + b, 0) / medDailyRates.length)
         : 0;
 
-      const suppAvgRate = suppDailyRates.length > 0
+      const suppRate = suppDailyRates.length > 0
         ? Math.round(suppDailyRates.reduce((a, b) => a + b, 0) / suppDailyRates.length)
         : 0;
 
+      console.log('[DEBUG] Med daily rates:', medDailyRates, 'Average:', medRate);
+      console.log('[DEBUG] Supp daily rates:', suppDailyRates, 'Average:', suppRate);
+      console.log('[DEBUG] Final - medTaken:', totalMedTaken, 'medTotal:', totalMedExpected, 'medRate:', medRate);
+      console.log('[DEBUG] Final - suppTaken:', totalSuppTaken, 'suppTotal:', totalSuppExpected, 'suppRate:', suppRate);
+
       setStats({
-        medDaysLogged: medDailyRates.length,
-        medAvgRate,
-        suppDaysLogged: suppDailyRates.length,
-        suppAvgRate
+        medTaken: totalMedTaken,
+        medTotal: totalMedExpected,
+        medRate,
+        suppTaken: totalSuppTaken,
+        suppTotal: totalSuppExpected,
+        suppRate
       });
-
-      setDailyBreakdown(breakdown);
-
     } catch (error) {
       console.error('Error calculating stats:', error)
     }
@@ -217,6 +221,7 @@ export default function MedicationLog({ user }) {
 
       if (error) throw error
 
+      // Reload data
       await Promise.all([
         loadTodayLogs(),
         calculateStats()
@@ -224,25 +229,6 @@ export default function MedicationLog({ user }) {
     } catch (error) {
       console.error('Error toggling log:', error)
     }
-  }
-
-  const formatDate = (date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-
-    if (compareDate.getTime() === today.getTime()) return 'Today';
-    if (compareDate.getTime() === yesterday.getTime()) return 'Yesterday';
-    
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric'
-    });
   }
 
   if (loading) {
@@ -255,7 +241,7 @@ export default function MedicationLog({ user }) {
 
   return (
     <div className="space-y-6">
-      {/* Overall Adherence Stats */}
+      {/* Adherence Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
@@ -263,11 +249,11 @@ export default function MedicationLog({ user }) {
             <Pill className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-blue-600">{stats.medAvgRate}%</span>
-            <span className="text-sm text-blue-600">average adherence</span>
+            <span className="text-3xl font-bold text-blue-600">{stats.medRate}%</span>
+            <span className="text-sm text-blue-600">adherence</span>
           </div>
           <p className="text-sm text-blue-700 mt-1">
-            {stats.medDaysLogged} {stats.medDaysLogged === 1 ? 'day' : 'days'} logged
+            {stats.medTaken} of {stats.medTotal} doses taken
           </p>
         </div>
 
@@ -277,11 +263,11 @@ export default function MedicationLog({ user }) {
             <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-green-600">{stats.suppAvgRate}%</span>
-            <span className="text-sm text-green-600">average adherence</span>
+            <span className="text-3xl font-bold text-green-600">{stats.suppRate}%</span>
+            <span className="text-sm text-green-600">adherence</span>
           </div>
           <p className="text-sm text-green-700 mt-1">
-            {stats.suppDaysLogged} {stats.suppDaysLogged === 1 ? 'day' : 'days'} logged
+            {stats.suppTaken} of {stats.suppTotal} doses taken
           </p>
         </div>
       </div>
@@ -387,79 +373,6 @@ export default function MedicationLog({ user }) {
           </div>
         )}
       </div>
-
-      {/* Daily Breakdown */}
-      {dailyBreakdown.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Daily Breakdown
-          </h3>
-          
-          <div className="space-y-4">
-            {dailyBreakdown.map((day) => (
-              <div key={day.dateKey} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-900">{formatDate(day.date)}</h4>
-                  <span className="text-sm text-gray-500">{day.date.toLocaleDateString('en-US')}</span>
-                </div>
-
-                {/* Medications for this day */}
-                {day.medTotal > 0 && (
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-blue-900">Medications</span>
-                      <span className={`text-sm font-semibold ${day.medRate === 100 ? 'text-green-600' : day.medRate >= 80 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {day.medRate}% ({day.medTaken}/{day.medTotal})
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {day.medications.map(log => (
-                        <div 
-                          key={log.id}
-                          className={`text-xs px-2 py-1 rounded ${
-                            log.status === 'taken' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}
-                        >
-                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Supplements for this day */}
-                {day.suppTotal > 0 && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-green-900">Supplements</span>
-                      <span className={`text-sm font-semibold ${day.suppRate === 100 ? 'text-green-600' : day.suppRate >= 80 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {day.suppRate}% ({day.suppTaken}/{day.suppTotal})
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {day.supplements.map(log => (
-                        <div 
-                          key={log.id}
-                          className={`text-xs px-2 py-1 rounded ${
-                            log.status === 'taken' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}
-                        >
-                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
