@@ -57,8 +57,8 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       }
     } catch (error) {
       console.error('Error loading weekly analytics:', error);
-      // Generate demo data if no real data exists
-      setWeeklyAnalytics(generateDemoWeeklyData());
+      // Don't generate demo data - show empty charts instead
+      setWeeklyAnalytics([]);
     }
   };
 

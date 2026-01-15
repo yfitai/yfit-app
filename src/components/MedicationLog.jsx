@@ -116,23 +116,36 @@ export default function MedicationLog({ user }) {
       const medLogsTaken = allLogs?.filter(log => !log.user_medication?.is_supplement && log.status === 'taken') || [];
       const suppLogsTaken = allLogs?.filter(log => log.user_medication?.is_supplement && log.status === 'taken') || [];
       
-      // Get unique days that have ANY logs (this tells us which days the user was actively tracking)
-      const daysWithLogs = new Set();
+      // Get unique days that have logs for medications
+      const daysWithMedLogs = new Set();
       allLogs?.forEach(log => {
-        const logDate = new Date(log.scheduled_time);
-        logDate.setHours(0, 0, 0, 0);
-        daysWithLogs.add(logDate.toISOString());
+        if (!log.user_medication?.is_supplement) {
+          const logDate = new Date(log.scheduled_time);
+          logDate.setHours(0, 0, 0, 0);
+          daysWithMedLogs.add(logDate.toISOString());
+        }
       });
       
-      const activeDays = daysWithLogs.size || 1; // At least 1 day to avoid division by zero
+      // Get unique days that have logs for supplements
+      const daysWithSuppLogs = new Set();
+      allLogs?.forEach(log => {
+        if (log.user_medication?.is_supplement) {
+          const logDate = new Date(log.scheduled_time);
+          logDate.setHours(0, 0, 0, 0);
+          daysWithSuppLogs.add(logDate.toISOString());
+        }
+      });
       
-      // Calculate expected doses based on ACTIVE tracking days only
+      const medActiveDays = daysWithMedLogs.size || 1; // At least 1 day to avoid division by zero
+      const suppActiveDays = daysWithSuppLogs.size || 1;
+      
+      // Calculate expected doses based on ACTIVE tracking days for each type
       let medTotal = 0;
       medications.forEach(med => {
         const dosesPerDay = med.frequency?.toLowerCase().includes('twice') ? 2 :
                            med.frequency?.toLowerCase().includes('three') ? 3 :
                            med.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        medTotal += activeDays * dosesPerDay;
+        medTotal += medActiveDays * dosesPerDay;
       });
       
       let suppTotal = 0;
@@ -140,7 +153,7 @@ export default function MedicationLog({ user }) {
         const dosesPerDay = supp.frequency?.toLowerCase().includes('twice') ? 2 :
                            supp.frequency?.toLowerCase().includes('three') ? 3 :
                            supp.frequency?.toLowerCase().includes('four') ? 4 : 1;
-        suppTotal += activeDays * dosesPerDay;
+        suppTotal += suppActiveDays * dosesPerDay;
       });
       
       const medRate = medTotal > 0 ? Math.round((medLogsTaken.length / medTotal) * 100) : 0;
