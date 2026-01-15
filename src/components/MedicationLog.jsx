@@ -169,12 +169,18 @@ export default function MedicationLog({ user }) {
       }
 
       if (logsToCreate.length > 0) {
-        const { error } = await supabase
+        console.log('[DEBUG] About to insert logs:', JSON.stringify(logsToCreate, null, 2))
+        const { data, error } = await supabase
           .from('medication_logs')
           .insert(logsToCreate)
+          .select()
         
-        if (error) throw error
+        if (error) {
+          console.error('[DEBUG] Insert error:', JSON.stringify(error, null, 2))
+          throw error
+        }
         console.log('[DEBUG] Generated', logsToCreate.length, 'logs for today')
+        console.log('[DEBUG] Insert response:', data)
       }
     } catch (error) {
       console.error('Error generating today logs:', error)
