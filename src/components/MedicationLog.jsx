@@ -13,6 +13,7 @@ export default function MedicationLog({ user }) {
     medTaken: 0, medTotal: 0, medRate: 0,
     suppTaken: 0, suppTotal: 0, suppRate: 0
   })
+  const [dailyBreakdown, setDailyBreakdown] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -192,6 +193,39 @@ export default function MedicationLog({ user }) {
       console.log('[DEBUG] Supp daily rates:', suppDailyRates, 'Average:', suppRate);
       console.log('[DEBUG] Final - medTaken:', totalMedTaken, 'medTotal:', totalMedExpected, 'medRate:', medRate);
       console.log('[DEBUG] Final - suppTaken:', totalSuppTaken, 'suppTotal:', totalSuppExpected, 'suppRate:', suppRate);
+
+      // Build daily breakdown for UI
+      const breakdown = [];
+      const allDates = new Set([...Object.keys(medLogsByDate), ...Object.keys(suppLogsByDate)]);
+      
+      allDates.forEach(dateKey => {
+        const medLogs = medLogsByDate[dateKey] || [];
+        const suppLogs = suppLogsByDate[dateKey] || [];
+        
+        const medTaken = medLogs.filter(l => l.status === 'taken').length;
+        const medTotal = medLogs.length;
+        const medRate = medTotal > 0 ? Math.round((medTaken / medTotal) * 100) : 0;
+        
+        const suppTaken = suppLogs.filter(l => l.status === 'taken').length;
+        const suppTotal = suppLogs.length;
+        const suppRate = suppTotal > 0 ? Math.round((suppTaken / suppTotal) * 100) : 0;
+        
+        breakdown.push({
+          date: new Date(dateKey),
+          medLogs,
+          medTaken,
+          medTotal,
+          medRate,
+          suppLogs,
+          suppTaken,
+          suppTotal,
+          suppRate
+        });
+      });
+      
+      // Sort by date descending (most recent first)
+      breakdown.sort((a, b) => b.date - a.date);
+      setDailyBreakdown(breakdown);
 
       setStats({
         medTaken: totalMedTaken,
@@ -373,6 +407,83 @@ export default function MedicationLog({ user }) {
           </div>
         )}
       </div>
+
+      {/* Daily Breakdown */}
+      {dailyBreakdown.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4">Daily Breakdown</h3>
+          
+          <div className="space-y-4">
+            {dailyBreakdown.map((day, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-medium text-gray-900">
+                    {day.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                  </h4>
+                </div>
+
+                {/* Medications for this day */}
+                {day.medTotal > 0 && (
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-blue-900">Medications</span>
+                      <span className={`text-sm font-semibold ${
+                        day.medRate === 100 ? 'text-green-600' : 
+                        day.medRate >= 80 ? 'text-yellow-600' : 'text-red-600'
+                      }`}>
+                        {day.medRate}% ({day.medTaken}/{day.medTotal})
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {day.medLogs.map(log => (
+                        <div 
+                          key={log.id}
+                          className={`text-xs px-2 py-1 rounded ${
+                            log.status === 'taken' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Supplements for this day */}
+                {day.suppTotal > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-green-900">Supplements</span>
+                      <span className={`text-sm font-semibold ${
+                        day.suppRate === 100 ? 'text-green-600' : 
+                        day.suppRate >= 80 ? 'text-yellow-600' : 'text-red-600'
+                      }`}>
+                        {day.suppRate}% ({day.suppTaken}/{day.suppTotal})
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {day.suppLogs.map(log => (
+                        <div 
+                          key={log.id}
+                          className={`text-xs px-2 py-1 rounded ${
+                            log.status === 'taken' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
