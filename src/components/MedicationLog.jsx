@@ -93,6 +93,7 @@ export default function MedicationLog({ user }) {
     }
   }
 
+  // Updated: 2026-01-14 - Fixed medication adherence calculation
   const calculateStats = async () => {
     try {
       // Get today's date at start of day
