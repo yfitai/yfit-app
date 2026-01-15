@@ -116,6 +116,9 @@ export default function MedicationLog({ user }) {
 
       if (error) throw error
 
+      console.log('[DEBUG] allLogs from database:', allLogs);
+      console.log('[DEBUG] allLogs count:', allLogs?.length || 0);
+
       // Separate by type and status
       const medLogsTaken = allLogs?.filter(log => !log.user_medication?.is_supplement && log.status === 'taken') || [];
       const suppLogsTaken = allLogs?.filter(log => log.user_medication?.is_supplement && log.status === 'taken') || [];
@@ -143,6 +146,11 @@ export default function MedicationLog({ user }) {
       const medActiveDays = daysWithMedLogs.size || 1; // At least 1 day to avoid division by zero
       const suppActiveDays = daysWithSuppLogs.size || 1;
       
+      console.log('[DEBUG] medActiveDays:', medActiveDays, 'daysWithMedLogs:', Array.from(daysWithMedLogs));
+      console.log('[DEBUG] suppActiveDays:', suppActiveDays, 'daysWithSuppLogs:', Array.from(daysWithSuppLogs));
+      console.log('[DEBUG] medLogsTaken count:', medLogsTaken.length);
+      console.log('[DEBUG] suppLogsTaken count:', suppLogsTaken.length);
+      
       // Calculate expected doses based on ACTIVE tracking days for each type
       let medTotal = 0;
       medications.forEach(med => {
@@ -162,6 +170,9 @@ export default function MedicationLog({ user }) {
       
       const medRate = medTotal > 0 ? Math.round((medLogsTaken.length / medTotal) * 100) : 0;
       const suppRate = suppTotal > 0 ? Math.round((suppLogsTaken.length / suppTotal) * 100) : 0;
+      
+      console.log('[DEBUG] Final calculation - medTaken:', medLogsTaken.length, 'medTotal:', medTotal, 'medRate:', medRate);
+      console.log('[DEBUG] Final calculation - suppTaken:', suppLogsTaken.length, 'suppTotal:', suppTotal, 'suppRate:', suppRate);
       
       setStats({
         medTaken: medLogsTaken.length,
