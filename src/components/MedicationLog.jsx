@@ -81,7 +81,8 @@ export default function MedicationLog({ user }) {
       const tomorrow = new Date(today)
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      const { data, error } = await supabase
+      // First, check if logs exist for today
+      const { data: existingLogs, error: fetchError } = await supabase
         .from('medication_logs')
         .select('*, user_medication:user_medications(*, medication:medications(name))')
         .eq('user_id', user.id)
@@ -89,14 +90,86 @@ export default function MedicationLog({ user }) {
         .lt('scheduled_time', tomorrow.toISOString())
         .order('scheduled_time')
 
-      if (error) throw error
-      setTodayLogs(data || [])
+      if (fetchError) throw fetchError
+
+      // If no logs exist for today, generate them from active medications
+      if (!existingLogs || existingLogs.length === 0) {
+        await generateTodayLogs()
+        // Fetch again after generation
+        const { data: newLogs, error: refetchError } = await supabase
+          .from('medication_logs')
+          .select('*, user_medication:user_medications(*, medication:medications(name))')
+          .eq('user_id', user.id)
+          .gte('scheduled_time', today.toISOString())
+          .lt('scheduled_time', tomorrow.toISOString())
+          .order('scheduled_time')
+        
+        if (refetchError) throw refetchError
+        setTodayLogs(newLogs || [])
+      } else {
+        setTodayLogs(existingLogs)
+      }
     } catch (error) {
       console.error('Error loading today logs:', error)
     }
   }
 
+  const generateTodayLogs = async () => {
+    try {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      // Get all active medications and supplements
+      const allMeds = [...medications, ...supplements]
+      
+      const logsToCreate = []
+      
+      for (const med of allMeds) {
+        // Determine how many doses per day based on frequency
+        let dosesPerDay = 1
+        if (med.frequency === 'twice_daily') {
+          dosesPerDay = 2
+        } else if (med.frequency === 'three_times_daily') {
+          dosesPerDay = 3
+        }
+
+        // Create log entries for each dose
+        for (let i = 0; i < dosesPerDay; i++) {
+          const scheduledTime = new Date(today)
+          // Spread doses throughout the day
+          if (dosesPerDay === 2) {
+            scheduledTime.setHours(i === 0 ? 8 : 20) // 8 AM and 8 PM
+          } else if (dosesPerDay === 3) {
+            scheduledTime.setHours(i === 0 ? 8 : i === 1 ? 14 : 20) // 8 AM, 2 PM, 8 PM
+          } else {
+            scheduledTime.setHours(8) // 8 AM for once daily
+          }
+
+          logsToCreate.push({
+            user_id: user.id,
+            user_medication_id: med.id,
+            scheduled_time: scheduledTime.toISOString(),
+            status: 'pending',
+            actual_time: null
+          })
+        }
+      }
+
+      if (logsToCreate.length > 0) {
+        const { error } = await supabase
+          .from('medication_logs')
+          .insert(logsToCreate)
+        
+        if (error) throw error
+        console.log('[DEBUG] Generated', logsToCreate.length, 'logs for today')
+      }
+    } catch (error) {
+      console.error('Error generating today logs:', error)
+    }
+  }
+
   // NEW APPROACH: Calculate daily adherence percentages and average them
+  // This version generates expected doses for each day based on active medications
   const calculateStats = async () => {
     try {
       // Get today's date at start of day
@@ -110,7 +183,7 @@ export default function MedicationLog({ user }) {
       // Get all logs from last 30 days
       const { data: allLogs, error } = await supabase
         .from('medication_logs')
-        .select('*, user_medication:user_medications(is_supplement, frequency)')
+        .select('*, user_medication:user_medications(medication_id, is_supplement, frequency, medication:medications(name))')
         .eq('user_id', user.id)
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
 
@@ -119,8 +192,12 @@ export default function MedicationLog({ user }) {
       console.log('[DEBUG] allLogs from database:', allLogs);
       console.log('[DEBUG] allLogs count:', allLogs?.length || 0);
 
-      // If no logs, show 0%
-      if (!allLogs || allLogs.length === 0) {
+      // Get all active medications and supplements
+      const allMeds = [...medications, ...supplements]
+      console.log('[DEBUG] Active medications:', medications.length, 'supplements:', supplements.length)
+
+      // If no active medications, show 0%
+      if (allMeds.length === 0) {
         setStats({
           medTaken: 0,
           medTotal: 0,
@@ -129,104 +206,152 @@ export default function MedicationLog({ user }) {
           suppTotal: 0,
           suppRate: 0
         });
+        setDailyBreakdown([]);
         return;
       }
 
-      // Group logs by date and type (medication vs supplement)
-      const medLogsByDate = {};
-      const suppLogsByDate = {};
-
-      allLogs.forEach(log => {
+      // Group actual logs by date
+      const logsByDate = {};
+      (allLogs || []).forEach(log => {
         const logDate = new Date(log.scheduled_time);
         logDate.setHours(0, 0, 0, 0);
         const dateKey = logDate.toISOString();
-
-        if (log.user_medication?.is_supplement) {
-          if (!suppLogsByDate[dateKey]) suppLogsByDate[dateKey] = [];
-          suppLogsByDate[dateKey].push(log);
-        } else {
-          if (!medLogsByDate[dateKey]) medLogsByDate[dateKey] = [];
-          medLogsByDate[dateKey].push(log);
-        }
+        if (!logsByDate[dateKey]) logsByDate[dateKey] = [];
+        logsByDate[dateKey].push(log);
       });
 
-      // Calculate daily adherence for medications
-      const medDailyRates = [];
+      // Get all unique dates that have logs
+      const loggedDates = Object.keys(logsByDate).map(d => new Date(d)).sort((a, b) => b - a);
+      
+      console.log('[DEBUG] Found', loggedDates.length, 'days with logs');
+
+      // For each logged date, calculate expected vs actual
+      const breakdown = [];
       let totalMedTaken = 0;
       let totalMedExpected = 0;
-
-      Object.values(medLogsByDate).forEach(dayLogs => {
-        const taken = dayLogs.filter(log => log.status === 'taken').length;
-        const expected = dayLogs.length;
-        totalMedTaken += taken;
-        totalMedExpected += expected;
-        if (expected > 0) {
-          medDailyRates.push((taken / expected) * 100);
-        }
-      });
-
-      // Calculate daily adherence for supplements
-      const suppDailyRates = [];
       let totalSuppTaken = 0;
       let totalSuppExpected = 0;
+      const medDailyRates = [];
+      const suppDailyRates = [];
 
-      Object.values(suppLogsByDate).forEach(dayLogs => {
-        const taken = dayLogs.filter(log => log.status === 'taken').length;
-        const expected = dayLogs.length;
-        totalSuppTaken += taken;
-        totalSuppExpected += expected;
-        if (expected > 0) {
-          suppDailyRates.push((taken / expected) * 100);
+      for (const date of loggedDates) {
+        const dateKey = new Date(date);
+        dateKey.setHours(0, 0, 0, 0);
+        const dateKeyStr = dateKey.toISOString();
+        
+        // Get actual logs for this date
+        const dayLogs = logsByDate[dateKeyStr] || [];
+        
+        // Generate expected doses for this date
+        const expectedMeds = [];
+        const expectedSupps = [];
+        
+        for (const med of allMeds) {
+          // Check if medication was active on this date
+          const medStartDate = med.start_date ? new Date(med.start_date) : null;
+          if (medStartDate && medStartDate > dateKey) {
+            continue; // Medication not started yet on this date
+          }
+          
+          // Determine how many doses per day
+          let dosesPerDay = 1;
+          if (med.frequency === 'twice_daily') {
+            dosesPerDay = 2;
+          } else if (med.frequency === 'three_times_daily') {
+            dosesPerDay = 3;
+          }
+          
+          // Add to expected list
+          for (let i = 0; i < dosesPerDay; i++) {
+            const expectedDose = {
+              medication_id: med.medication_id,
+              medication_name: med.medication?.name || 'Unknown',
+              user_medication_id: med.id,
+              is_supplement: med.is_supplement,
+              dose_number: i + 1
+            };
+            
+            if (med.is_supplement) {
+              expectedSupps.push(expectedDose);
+            } else {
+              expectedMeds.push(expectedDose);
+            }
+          }
         }
-      });
-
-      // Average the daily rates
+        
+        // Match actual logs against expected doses
+        const medLogs = [];
+        const suppLogs = [];
+        
+        // Separate actual logs by type
+        dayLogs.forEach(log => {
+          if (log.user_medication?.is_supplement) {
+            suppLogs.push(log);
+          } else {
+            medLogs.push(log);
+          }
+        });
+        
+        // Calculate medication adherence for this day
+        const medTaken = medLogs.filter(l => l.status === 'taken').length;
+        const medExpected = expectedMeds.length;
+        const medMissed = Math.max(0, medExpected - medTaken);
+        const medRate = medExpected > 0 ? Math.round((medTaken / medExpected) * 100) : 0;
+        
+        // Calculate supplement adherence for this day
+        const suppTaken = suppLogs.filter(l => l.status === 'taken').length;
+        const suppExpected = expectedSupps.length;
+        const suppMissed = Math.max(0, suppExpected - suppTaken);
+        const suppRate = suppExpected > 0 ? Math.round((suppTaken / suppExpected) * 100) : 0;
+        
+        // Identify which medications were missed
+        const takenMedIds = new Set(medLogs.filter(l => l.status === 'taken').map(l => l.user_medication?.medication_id));
+        const missedMeds = expectedMeds.filter(exp => !takenMedIds.has(exp.medication_id));
+        
+        const takenSuppIds = new Set(suppLogs.filter(l => l.status === 'taken').map(l => l.user_medication?.medication_id));
+        const missedSupps = expectedSupps.filter(exp => !takenSuppIds.has(exp.medication_id));
+        
+        breakdown.push({
+          date: dateKey,
+          medLogs,
+          medTaken,
+          medTotal: medExpected,
+          medMissed,
+          medRate,
+          missedMeds,
+          suppLogs,
+          suppTaken,
+          suppTotal: suppExpected,
+          suppMissed,
+          suppRate,
+          missedSupps
+        });
+        
+        // Accumulate totals
+        totalMedTaken += medTaken;
+        totalMedExpected += medExpected;
+        totalSuppTaken += suppTaken;
+        totalSuppExpected += suppExpected;
+        
+        if (medExpected > 0) medDailyRates.push(medRate);
+        if (suppExpected > 0) suppDailyRates.push(suppRate);
+      }
+      
+      // Calculate overall adherence as average of daily rates
       const medRate = medDailyRates.length > 0
         ? Math.round(medDailyRates.reduce((a, b) => a + b, 0) / medDailyRates.length)
         : 0;
-
+      
       const suppRate = suppDailyRates.length > 0
         ? Math.round(suppDailyRates.reduce((a, b) => a + b, 0) / suppDailyRates.length)
         : 0;
-
+      
       console.log('[DEBUG] Med daily rates:', medDailyRates, 'Average:', medRate);
       console.log('[DEBUG] Supp daily rates:', suppDailyRates, 'Average:', suppRate);
       console.log('[DEBUG] Final - medTaken:', totalMedTaken, 'medTotal:', totalMedExpected, 'medRate:', medRate);
       console.log('[DEBUG] Final - suppTaken:', totalSuppTaken, 'suppTotal:', totalSuppExpected, 'suppRate:', suppRate);
-
-      // Build daily breakdown for UI
-      const breakdown = [];
-      const allDates = new Set([...Object.keys(medLogsByDate), ...Object.keys(suppLogsByDate)]);
       
-      allDates.forEach(dateKey => {
-        const medLogs = medLogsByDate[dateKey] || [];
-        const suppLogs = suppLogsByDate[dateKey] || [];
-        
-        const medTaken = medLogs.filter(l => l.status === 'taken').length;
-        const medTotal = medLogs.length;
-        const medRate = medTotal > 0 ? Math.round((medTaken / medTotal) * 100) : 0;
-        
-        const suppTaken = suppLogs.filter(l => l.status === 'taken').length;
-        const suppTotal = suppLogs.length;
-        const suppRate = suppTotal > 0 ? Math.round((suppTaken / suppTotal) * 100) : 0;
-        
-        breakdown.push({
-          date: new Date(dateKey),
-          medLogs,
-          medTaken,
-          medTotal,
-          medRate,
-          suppLogs,
-          suppTaken,
-          suppTotal,
-          suppRate
-        });
-      });
-      
-      // Sort by date descending (most recent first)
-      breakdown.sort((a, b) => b.date - a.date);
       setDailyBreakdown(breakdown);
-
       setStats({
         medTaken: totalMedTaken,
         medTotal: totalMedExpected,
@@ -435,16 +560,22 @@ export default function MedicationLog({ user }) {
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {day.medLogs.map(log => (
+                      {/* Show taken medications */}
+                      {day.medLogs.filter(log => log.status === 'taken').map(log => (
                         <div 
                           key={log.id}
-                          className={`text-xs px-2 py-1 rounded ${
-                            log.status === 'taken' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
                         >
-                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
+                          {log.user_medication?.medication?.name} ✓
+                        </div>
+                      ))}
+                      {/* Show missed medications */}
+                      {day.missedMeds && day.missedMeds.map((missed, idx) => (
+                        <div 
+                          key={`missed-${idx}`}
+                          className="text-xs px-2 py-1 rounded bg-red-100 text-red-800"
+                        >
+                          {missed.medication_name} ✗
                         </div>
                       ))}
                     </div>
@@ -464,16 +595,22 @@ export default function MedicationLog({ user }) {
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {day.suppLogs.map(log => (
+                      {/* Show taken supplements */}
+                      {day.suppLogs.filter(log => log.status === 'taken').map(log => (
                         <div 
                           key={log.id}
-                          className={`text-xs px-2 py-1 rounded ${
-                            log.status === 'taken' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
                         >
-                          {log.user_medication?.medication?.name} {log.status === 'taken' ? '✓' : '✗'}
+                          {log.user_medication?.medication?.name} ✓
+                        </div>
+                      ))}
+                      {/* Show missed supplements */}
+                      {day.missedSupps && day.missedSupps.map((missed, idx) => (
+                        <div 
+                          key={`missed-supp-${idx}`}
+                          className="text-xs px-2 py-1 rounded bg-red-100 text-red-800"
+                        >
+                          {missed.medication_name} ✗
                         </div>
                       ))}
                     </div>
