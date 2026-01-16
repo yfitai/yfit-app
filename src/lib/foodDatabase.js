@@ -427,6 +427,10 @@ export async function getRecentFoods(userId, limit = 10) {
 
     return uniqueFoods
   } catch (error) {
+    // Silently ignore if table doesn't exist yet
+    if (error.code === 'PGRST205') {
+      return []
+    }
     console.error('Error getting recent foods:', error)
     return []
   }
