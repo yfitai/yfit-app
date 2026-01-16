@@ -528,27 +528,42 @@ export default function Goals({ user: propUser }) {
           .eq('user_id', user.id)
 
         // Check for any errors (ignore 404/406 errors for tables that don't exist)
-        const errors = [
-          sessionsError,
-          mealsError,
-          metricsError,
-          goalsError,
-          measurementsError,
-          medicationLogsError,
-          weightLogsError,
-          bodyCompError,
-          bodyMeasLogsError,
-          healthMetricsError,
-          mealLogsError
-        ].filter(err => {
+        const allErrors = [
+          { name: 'sessionsError', error: sessionsError },
+          { name: 'mealsError', error: mealsError },
+          { name: 'metricsError', error: metricsError },
+          { name: 'goalsError', error: goalsError },
+          { name: 'measurementsError', error: measurementsError },
+          { name: 'medicationLogsError', error: medicationLogsError },
+          { name: 'weightLogsError', error: weightLogsError },
+          { name: 'bodyCompError', error: bodyCompError },
+          { name: 'bodyMeasLogsError', error: bodyMeasLogsError },
+          { name: 'healthMetricsError', error: healthMetricsError },
+          { name: 'mealLogsError', error: mealLogsError }
+        ];
+        
+        // Log all errors for debugging
+        allErrors.forEach(({ name, error }) => {
+          if (error) {
+            console.log(`${name}:`, JSON.stringify(error));
+          }
+        });
+        
+        const errors = allErrors.filter(({ error: err }) => {
           if (!err) return false
-          // Ignore table not found errors (PGRST116, 404, or 406 status)
+          // Ignore table not found errors - check multiple possible error formats
           if (err.code === 'PGRST116') return false
-          if (err.code === 'PGRST106') return false // Table not found
-          if (err.message && err.message.includes('404')) return false
+          if (err.code === 'PGRST106') return false
+          if (err.code === '42P01') return false // PostgreSQL table not found
+          if (err.message && (err.message.includes('404') || err.message.includes('Not Found'))) return false
           if (err.message && err.message.includes('406')) return false
+          if (err.message && err.message.includes('relation') && err.message.includes('does not exist')) return false
           if (err.status === 404) return false
           if (err.status === 406) return false
+          if (err.statusCode === 404) return false
+          if (err.statusCode === 406) return false
+          // Check if error details contain 404
+          if (err.details && (err.details.includes('404') || err.details.includes('Not Found'))) return false
           return true
         })
 
