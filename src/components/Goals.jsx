@@ -551,7 +551,17 @@ export default function Goals({ user: propUser }) {
 
         if (errors.length > 0) {
           console.error('Reset errors:', { sessionsError, mealsError, metricsError, goalsError, measurementsError, medicationLogsError, weightLogsError, bodyCompError, bodyMeasLogsError, healthMetricsError, mealLogsError })
-          throw new Error('Error resetting data')
+          
+          // Show detailed error message
+          const errorDetails = [];
+          if (sessionsError && sessionsError.code !== 'PGRST116') errorDetails.push('workout sessions');
+          if (mealsError && mealsError.code !== 'PGRST116') errorDetails.push('meals');
+          if (metricsError && metricsError.code !== 'PGRST116') errorDetails.push('metrics');
+          if (goalsError && goalsError.code !== 'PGRST116') errorDetails.push('goals');
+          if (measurementsError && measurementsError.code !== 'PGRST116') errorDetails.push('measurements');
+          if (medicationLogsError && medicationLogsError.code !== 'PGRST116') errorDetails.push('medication logs');
+          
+          throw new Error(`Failed to delete: ${errorDetails.join(', ')}`);
         }
 
         alert('✅ Data reset successfully! You can now start fresh.')
