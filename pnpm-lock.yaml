@@ -12,8 +12,8 @@ importers:
         specifier: ^7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
       '@capacitor/app':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@7.4.4)
+        specifier: ^7.0.0
+        version: 7.1.1(@capacitor/core@7.4.4)
       '@capacitor/barcode-scanner':
         specifier: ^2.2.0
         version: 2.2.0(@capacitor/core@7.4.4)
@@ -338,10 +338,10 @@ packages:
     peerDependencies:
       '@capacitor/core': ^7.4.0
 
-  '@capacitor/app@8.0.0':
-    resolution: {integrity: sha512-OwzIkUs4w433Bu9WWAEbEYngXEfJXZ9Wmdb8eoaqzYBgB0W9/3Ed/mh6sAYPNBAZlpyarmewgP7Nb+d3Vrh+xA==}
+  '@capacitor/app@7.1.1':
+    resolution: {integrity: sha512-H4rmMXlL6GEDs2Yds5JvYqZxz4mdp7R4XdGJ7p+oGV+YapuQ2kW38UabuhdP6qSrKfIeLde6qx+8FEX02krypA==}
     peerDependencies:
-      '@capacitor/core': '>=8.0.0'
+      '@capacitor/core': '>=7.0.0'
 
   '@capacitor/barcode-scanner@2.2.0':
     resolution: {integrity: sha512-9KkjQAJ0TyvNT3W6b4dPbyeJ4ibVmjTPhqA9BP47f6rocwyOSAJCIoPJ7Vok7S4GqSYehaxFCvojuDUGk4vOpw==}
@@ -2962,7 +2962,7 @@ snapshots:
     dependencies:
       '@capacitor/core': 7.4.4
 
-  '@capacitor/app@8.0.0(@capacitor/core@7.4.4)':
+  '@capacitor/app@7.1.1(@capacitor/core@7.4.4)':
     dependencies:
       '@capacitor/core': 7.4.4
 
