@@ -332,7 +332,8 @@ function transformOpenFoodFactsProduct(product) {
  
 
 /**
- * Search custom foods created by user AND favorited foods
+ * Search custom foods created by user
+ * Note: Favorited foods are NOT included in search results - they only appear in "My Foods" section
  */
 async function searchCustomFoods(query, limit) {
   try {
@@ -342,7 +343,7 @@ async function searchCustomFoods(query, limit) {
 
     const results = []
 
-    // 1. Search custom foods
+    // Search custom foods only (favorites are shown separately in My Foods section)
     const { data: customData, error: customError } = await supabase
       .from('custom_foods')
       .select('*')
@@ -358,24 +359,9 @@ async function searchCustomFoods(query, limit) {
       })))
     }
 
-    // 2. Search favorited foods
-    const { data: favData, error: favError } = await supabase
-      .from('favorite_foods')
-      .select('food_data')
-      .eq('user_id', user.id)
-
-    if (!favError && favData) {
-      const favoritedFoods = favData
-        .map(entry => entry.food_data)
-        .filter(food => food.name.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, limit - results.length)
-      
-      results.push(...favoritedFoods)
-    }
-
     return results
   } catch (error) {
-    console.error('Error searching custom/favorite foods:', error)
+    console.error('Error searching custom foods:', error)
     return []
   }
 }
