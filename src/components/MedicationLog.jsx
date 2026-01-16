@@ -458,16 +458,19 @@ export default function MedicationLog({ user }) {
           Today's Medications
         </h3>
         
-        {todayLogs.filter(log => !log.user_medication?.is_supplement).length === 0 ? (
+        {medications.length === 0 ? (
           <p className="text-gray-500 text-sm">No medications scheduled for today</p>
         ) : (
           <div className="space-y-3">
-            {todayLogs
-              .filter(log => !log.user_medication?.is_supplement)
-              .map(log => (
-                <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
+            {medications.map(med => {
+              const medLogs = todayLogs.filter(log => 
+                log.user_medication_id === med.id && !log.user_medication?.is_supplement
+              )
+              return (
+                <div key={med.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  {medLogs.map(log => (
                     <button
+                      key={log.id}
                       onClick={() => handleToggleLog(log.id, log.status)}
                       className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
                         log.status === 'taken'
@@ -477,27 +480,11 @@ export default function MedicationLog({ user }) {
                     >
                       {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
                     </button>
-                    <div>
-                      <p className="font-medium">{log.user_medication?.medication?.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(log.scheduled_time).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  {log.status === 'taken' && log.actual_time && (
-                    <span className="text-xs text-green-600 flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Taken at {new Date(log.actual_time).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  )}
+                  ))}
+                  <p className="font-medium">{med.medication?.name || 'Unknown'}</p>
                 </div>
-              ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -509,16 +496,19 @@ export default function MedicationLog({ user }) {
           Today's Supplements
         </h3>
         
-        {todayLogs.filter(log => log.user_medication?.is_supplement).length === 0 ? (
+        {supplements.length === 0 ? (
           <p className="text-gray-500 text-sm">No supplements scheduled for today</p>
         ) : (
           <div className="space-y-3">
-            {todayLogs
-              .filter(log => log.user_medication?.is_supplement)
-              .map(log => (
-                <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
+            {supplements.map(supp => {
+              const suppLogs = todayLogs.filter(log => 
+                log.user_medication_id === supp.id && log.user_medication?.is_supplement
+              )
+              return (
+                <div key={supp.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  {suppLogs.map(log => (
                     <button
+                      key={log.id}
                       onClick={() => handleToggleLog(log.id, log.status)}
                       className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
                         log.status === 'taken'
@@ -528,27 +518,11 @@ export default function MedicationLog({ user }) {
                     >
                       {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
                     </button>
-                    <div>
-                      <p className="font-medium">{log.user_medication?.medication?.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(log.scheduled_time).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  {log.status === 'taken' && log.actual_time && (
-                    <span className="text-xs text-green-600 flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Taken at {new Date(log.actual_time).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  )}
+                  ))}
+                  <p className="font-medium">{supp.medication?.name || 'Unknown'}</p>
                 </div>
-              ))}
+              )
+            })}
           </div>
         )}
       </div>
