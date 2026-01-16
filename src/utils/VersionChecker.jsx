@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
-const VERSION_CHECK_INTERVAL = 30000; // Check every 30 seconds
+const VERSION_CHECK_INTERVAL = 60000; // Check every 60 seconds (reduced from 30s)
 const CURRENT_VERSION_KEY = 'app_version';
 
 export const VersionChecker = () => {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [newVersion, setNewVersion] = useState(null);
+
   useEffect(() => {
     // Only run on mobile (Capacitor)
     if (!Capacitor.isNativePlatform()) {
@@ -36,37 +40,11 @@ export const VersionChecker = () => {
           stored: storedVersion
         });
 
-        // If version changed, force reload
+        // If version changed, show update banner instead of auto-reloading
         if (storedVersion && storedVersion !== String(serverVersion.buildNumber)) {
-          console.log('New version detected! Forcing reload...');
-          
-          // Store new version
-          localStorage.setItem(CURRENT_VERSION_KEY, String(serverVersion.buildNumber));
-          
-          // Show brief notification (optional)
-          const notification = document.createElement('div');
-          notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            font-weight: 600;
-            animation: slideDown 0.3s ease-out;
-          `;
-          notification.textContent = '🎉 Updating to latest version...';
-          document.body.appendChild(notification);
-
-          // Wait a moment for user to see notification
-          setTimeout(() => {
-            // Force hard reload
-            window.location.reload(true);
-          }, 1000);
+          console.log('New version detected!');
+          setUpdateAvailable(true);
+          setNewVersion(serverVersion);
         } else if (!storedVersion) {
           // First time, just store the version
           localStorage.setItem(CURRENT_VERSION_KEY, String(serverVersion.buildNumber));
@@ -82,10 +60,63 @@ export const VersionChecker = () => {
     // Check periodically
     const interval = setInterval(checkVersion, VERSION_CHECK_INTERVAL);
 
-    return () => clearInterval(interval);
+    // Listen for app state changes (when user returns to app)
+    let appStateListener;
+    
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        console.log('App resumed - checking for updates...');
+        checkVersion();
+      }
+    }).then(listener => {
+      appStateListener = listener;
+    });
+
+    return () => {
+      clearInterval(interval);
+      if (appStateListener) {
+        appStateListener.remove();
+      }
+    };
   }, []);
 
-  return null; // This component doesn't render anything
+  const handleUpdate = () => {
+    if (newVersion) {
+      // Store new version
+      localStorage.setItem(CURRENT_VERSION_KEY, String(newVersion.buildNumber));
+      
+      // Force reload
+      window.location.reload(true);
+    }
+  };
+
+  // Render update banner if update is available
+  if (updateAvailable) {
+    return (
+      <div 
+        onClick={handleUpdate}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          padding: '12px 16px',
+          textAlign: 'center',
+          zIndex: 10000,
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          fontWeight: 600,
+          fontSize: '14px'
+        }}
+      >
+        🎉 New version available! Tap to update
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default VersionChecker;
