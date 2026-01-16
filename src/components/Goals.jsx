@@ -554,6 +554,7 @@ export default function Goals({ user: propUser }) {
           // Ignore table not found errors - check multiple possible error formats
           if (err.code === 'PGRST116') return false
           if (err.code === 'PGRST106') return false
+          if (err.code === 'PGRST205') return false // Table not found in schema cache
           if (err.code === '42P01') return false // PostgreSQL table not found
           if (err.message && (err.message.includes('404') || err.message.includes('Not Found'))) return false
           if (err.message && err.message.includes('406')) return false
