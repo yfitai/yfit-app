@@ -5,7 +5,7 @@ import { App } from '@capacitor/app';
 // Test version bump - 2026-01-16 22:28
 
 const VERSION_CHECK_INTERVAL = 60000; // Check every 60 seconds (reduced from 30s)
-const CURRENT_VERSION_KEY = 'app_version';
+const CURRENT_VERSION_KEY = 'app_version_timestamp';
 
 export const VersionChecker = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -38,18 +38,21 @@ export const VersionChecker = () => {
         const storedVersion = localStorage.getItem(CURRENT_VERSION_KEY);
 
         console.log('Version check:', {
-          server: serverVersion.buildNumber,
+          server: serverVersion.timestamp,
           stored: storedVersion
         });
 
         // If version changed, show update banner instead of auto-reloading
-        if (storedVersion && storedVersion !== String(serverVersion.buildNumber)) {
-          console.log('New version detected!');
+        if (storedVersion && storedVersion !== serverVersion.timestamp) {
+          console.log('New version detected!', {
+            old: storedVersion,
+            new: serverVersion.timestamp
+          });
           setUpdateAvailable(true);
           setNewVersion(serverVersion);
         } else if (!storedVersion) {
-          // First time, just store the version
-          localStorage.setItem(CURRENT_VERSION_KEY, String(serverVersion.buildNumber));
+          // First time, just store the timestamp
+          localStorage.setItem(CURRENT_VERSION_KEY, serverVersion.timestamp);
         }
       } catch (error) {
         console.error('Version check error:', error);
@@ -84,8 +87,8 @@ export const VersionChecker = () => {
 
   const handleUpdate = () => {
     if (newVersion) {
-      // Store new version
-      localStorage.setItem(CURRENT_VERSION_KEY, String(newVersion.buildNumber));
+      // Store new timestamp
+      localStorage.setItem(CURRENT_VERSION_KEY, newVersion.timestamp);
       
       // Force reload
       window.location.reload(true);
