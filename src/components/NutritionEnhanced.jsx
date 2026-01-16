@@ -292,6 +292,28 @@ export default function NutritionEnhanced({ user: propUser }) {
     await loadTodaysMeals(user.id, selectedDate)
   }
 
+  const handleSaveToMyFoods = async (alsoLog) => {
+    if (!selectedFood || !user) return
+
+    // Save to favorite_foods
+    const success = await addFavoriteFood(user.id, selectedFood)
+    
+    if (success) {
+      alert('⭐ Saved to My Foods!')
+      
+      // If also logging, call handleLogFood
+      if (alsoLog) {
+        await handleLogFood()
+      } else {
+        // Just close the modal
+        setShowServingSelector(false)
+        setSelectedFood(null)
+      }
+    } else {
+      alert('Failed to save to My Foods. Please try again.')
+    }
+  }
+
   // Handle template quick-add
   const handleUseTemplate = (mealType) => {
     setTemplateMealType(mealType)
@@ -733,6 +755,8 @@ export default function NutritionEnhanced({ user: propUser }) {
               setShowServingSelector(false)
               setSelectedFood(null)
             }}
+            user={user}
+            onSaveToMyFoods={handleSaveToMyFoods}
           />
         )}
 
@@ -882,7 +906,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 }
 
 // Serving Size Selector Component
-function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel }) {
+function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel, user, onSaveToMyFoods }) {
 
   // Available units - show different options based on food type
   const isLiquid = food.foodType === 'liquid'
@@ -1014,19 +1038,40 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={onCancel}
-              className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
-            >
-              Log Food
-            </button>
+          <div className="space-y-2">
+            {/* Primary Actions Row */}
+            <div className="flex gap-2">
+              <button
+                onClick={onCancel}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
+              >
+                Log Food
+              </button>
+            </div>
+            
+            {/* Save to My Foods Row */}
+            {food.source !== 'custom' && onSaveToMyFoods && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onSaveToMyFoods(false)}
+                  className="flex-1 px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors font-medium text-sm"
+                >
+                  ⭐ Save to My Foods
+                </button>
+                <button
+                  onClick={() => onSaveToMyFoods(true)}
+                  className="flex-1 px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 rounded-lg hover:bg-purple-200 transition-colors font-medium text-sm"
+                >
+                  ⭐ Log & Save
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

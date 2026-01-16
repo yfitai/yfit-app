@@ -220,11 +220,11 @@ const handleToggleFavorite = async (food, isFavorited) => {
                 </div>
               )}
 
-              {/* Favorite Foods */}
+              {/* Favorite Foods (My Foods) */}
               {favoriteFoods.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                    ⭐ Favorites
+                    ⭐ My Foods
                   </h3>
                   <div className="space-y-2">
                     {favoriteFoods.map((food, index) => (
@@ -234,6 +234,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
                         onSelect={handleSelectFood}
                         onToggleFavorite={handleToggleFavorite}
                         favoriteFoods={favoriteFoods}
+                        showDelete={true}
                       />
                     ))}
                   </div>
@@ -326,7 +327,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
 }
 
 // Food Result Item Component
-function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods }) {
+function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showDelete }) {
   // Check if this food is favorited
   const isFavorited = favoriteFoods?.some(fav => fav.id === food.id) || false
   const displayCalories = food.calories ? Math.round(food.calories) : '—'
@@ -338,6 +339,13 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods }) {
     e.stopPropagation() // Prevent food selection when clicking star
     if (onToggleFavorite) {
       onToggleFavorite(food, isFavorited)
+    }
+  }
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation() // Prevent food selection when clicking delete
+    if (onToggleFavorite && window.confirm(`Remove "${food.name}" from My Foods?`)) {
+      onToggleFavorite(food, true) // true = remove from favorites
     }
   }
 
@@ -396,14 +404,16 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods }) {
         </div>
       </div>
       
-      {/* Star Button (only show for non-custom foods) */}
-      {food.source !== 'custom' && onToggleFavorite && (
+      {/* Delete button for My Foods section */}
+      {showDelete && onToggleFavorite && (
         <button
-          onClick={handleStarClick}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
-          title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+          onClick={handleDeleteClick}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-red-100 hover:bg-red-200 transition-colors"
+          title="Remove from My Foods"
         >
-          <span className="text-xl">{isFavorited ? '⭐' : '☆'}</span>
+          <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
         </button>
       )}
     </div>
