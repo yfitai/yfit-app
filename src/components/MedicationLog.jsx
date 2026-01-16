@@ -199,6 +199,7 @@ export default function MedicationLog({ user }) {
   // NEW APPROACH: Calculate daily adherence percentages and average them
   // This version generates expected doses for each day based on active medications
   const calculateStats = async () => {
+    // Calculate adherence statistics for medications and supplements
     try {
       // Get today's date at start of day
       const today = new Date();
