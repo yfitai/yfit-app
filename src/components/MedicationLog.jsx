@@ -483,7 +483,7 @@ export default function MedicationLog({ user }) {
                       {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
                     </button>
                   ))}
-                  <p className="font-medium">{med.medication?.name || 'Unknown'}</p>
+                  <p className="font-medium">{med.custom_name || med.medication?.name || 'Unknown'}</p>
                 </div>
               )
             })}
@@ -521,7 +521,7 @@ export default function MedicationLog({ user }) {
                       {log.status === 'taken' && <Check className="w-4 h-4 text-white" />}
                     </button>
                   ))}
-                  <p className="font-medium">{supp.medication?.name || 'Unknown'}</p>
+                  <p className="font-medium">{supp.custom_name || supp.medication?.name || 'Unknown'}</p>
                 </div>
               )
             })}
