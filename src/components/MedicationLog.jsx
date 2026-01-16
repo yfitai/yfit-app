@@ -94,22 +94,32 @@ export default function MedicationLog({ user }) {
       const tomorrow = new Date(today)
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      // ALWAYS delete and regenerate today's logs to ensure correct frequency
-      console.log('[DEBUG] Deleting existing logs for today...')
-      const { error: deleteError } = await supabase
+      // First, check if today's logs already exist
+      const { data: existingLogs, error: checkError } = await supabase
         .from('medication_logs')
-        .delete()
+        .select('*, user_medication:user_medications(*, medication:medications(name))')
         .eq('user_id', user.id)
         .gte('scheduled_time', today.toISOString())
         .lt('scheduled_time', tomorrow.toISOString())
+        .order('scheduled_time')
       
-      if (deleteError) {
-        console.error('[DEBUG] Delete error:', deleteError)
-        throw deleteError
+      if (checkError) throw checkError
+      
+      // If logs exist, just use them (don't regenerate)
+      if (existingLogs && existingLogs.length > 0) {
+        console.log('[DEBUG] Today logs already exist, using them:', existingLogs.length)
+        setTodayLogs(existingLogs)
+        return
       }
       
-      console.log('[DEBUG] Generating fresh logs for today...')
-      await generateTodayLogs(medsData, suppsData)
+      // Only generate if logs don't exist
+      console.log('[DEBUG] No logs found for today, generating...')
+      
+      // Use passed data or load fresh if not provided
+      const meds = medsData || await loadMedications()
+      const supps = suppsData || await loadSupplements()
+      
+      await generateTodayLogs(meds, supps)
       
       // Fetch the newly generated logs
       const { data: newLogs, error: refetchError } = await supabase
@@ -430,11 +440,10 @@ export default function MedicationLog({ user }) {
 
       if (error) throw error
 
-      // Reload data
-      await Promise.all([
-        loadTodayLogs(),
-        calculateStats()
-      ])
+      // Reload today's logs (will use existing ones, not regenerate)
+      await loadTodayLogs()
+      // Recalculate stats
+      await calculateStats()
     } catch (error) {
       console.error('Error toggling log:', error)
     }
