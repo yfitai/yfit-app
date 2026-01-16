@@ -283,10 +283,13 @@ export default function MedicationLog({ user }) {
           
           // Determine how many doses per day
           let dosesPerDay = 1;
-          if (med.frequency === 'twice_daily') {
+          const freq = (med.frequency || '').toLowerCase();
+          if (freq.includes('twice') || freq.includes('2')) {
             dosesPerDay = 2;
-          } else if (med.frequency === 'three_times_daily') {
+          } else if (freq.includes('three') || freq.includes('3')) {
             dosesPerDay = 3;
+          } else if (freq.includes('four') || freq.includes('4')) {
+            dosesPerDay = 4;
           }
           
           // Add to expected list
@@ -374,19 +377,37 @@ export default function MedicationLog({ user }) {
         ? Math.round(suppDailyRates.reduce((a, b) => a + b, 0) / suppDailyRates.length)
         : 0;
       
+      // Calculate today's adherence separately
+      const todayKey = new Date();
+      todayKey.setHours(0, 0, 0, 0);
+      const todayData = breakdown.find(d => d.date.getTime() === todayKey.getTime());
+      
+      const todayMedTaken = todayData?.medTaken || 0;
+      const todayMedTotal = todayData?.medTotal || 0;
+      const todayMedRate = todayData?.medRate || 0;
+      const todaySuppTaken = todayData?.suppTaken || 0;
+      const todaySuppTotal = todayData?.suppTotal || 0;
+      const todaySuppRate = todayData?.suppRate || 0;
+      
       console.log('[DEBUG] Med daily rates:', medDailyRates, 'Average:', medRate);
       console.log('[DEBUG] Supp daily rates:', suppDailyRates, 'Average:', suppRate);
-      console.log('[DEBUG] Final - medTaken:', totalMedTaken, 'medTotal:', totalMedExpected, 'medRate:', medRate);
-      console.log('[DEBUG] Final - suppTaken:', totalSuppTaken, 'suppTotal:', totalSuppExpected, 'suppRate:', suppRate);
+      console.log('[DEBUG] Today - medTaken:', todayMedTaken, 'medTotal:', todayMedTotal, 'medRate:', todayMedRate);
+      console.log('[DEBUG] Today - suppTaken:', todaySuppTaken, 'suppTotal:', todaySuppTotal, 'suppRate:', todaySuppRate);
+      console.log('[DEBUG] Overall - medRate:', medRate, 'suppRate:', suppRate, 'daysTracked:', loggedDates.length);
       
       setDailyBreakdown(breakdown);
       setStats({
-        medTaken: totalMedTaken,
-        medTotal: totalMedExpected,
-        medRate,
-        suppTaken: totalSuppTaken,
-        suppTotal: totalSuppExpected,
-        suppRate
+        // Today's stats
+        todayMedTaken,
+        todayMedTotal,
+        todayMedRate,
+        todaySuppTaken,
+        todaySuppTotal,
+        todaySuppRate,
+        // Overall stats
+        overallMedRate: medRate,
+        overallSuppRate: suppRate,
+        daysTracked: loggedDates.length
       });
     } catch (error) {
       console.error('Error calculating stats:', error)
@@ -429,32 +450,64 @@ export default function MedicationLog({ user }) {
   return (
     <div className="space-y-6">
       {/* Adherence Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Today's Medications */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-blue-900">Medications</h3>
+            <h3 className="text-sm font-medium text-blue-900">Today's Medications</h3>
             <Pill className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-blue-600">{stats.medRate}%</span>
+            <span className="text-3xl font-bold text-blue-600">{stats.todayMedRate}%</span>
             <span className="text-sm text-blue-600">adherence</span>
           </div>
           <p className="text-sm text-blue-700 mt-1">
-            {stats.medTaken} of {stats.medTotal} doses taken
+            {stats.todayMedTaken} of {stats.todayMedTotal} doses taken today
           </p>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        {/* Overall Medication Adherence */}
+        <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-green-900">Supplements</h3>
-            <TrendingUp className="w-5 h-5 text-green-600" />
+            <h3 className="text-sm font-medium text-blue-900">Overall Medications</h3>
+            <TrendingUp className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-green-600">{stats.suppRate}%</span>
+            <span className="text-3xl font-bold text-blue-600">{stats.overallMedRate}%</span>
+            <span className="text-sm text-blue-600">average</span>
+          </div>
+          <p className="text-sm text-blue-700 mt-1">
+            Across {stats.daysTracked} days tracked
+          </p>
+        </div>
+
+        {/* Today's Supplements */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-green-900">Today's Supplements</h3>
+            <Pill className="w-5 h-5 text-green-600" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-green-600">{stats.todaySuppRate}%</span>
             <span className="text-sm text-green-600">adherence</span>
           </div>
           <p className="text-sm text-green-700 mt-1">
-            {stats.suppTaken} of {stats.suppTotal} doses taken
+            {stats.todaySuppTaken} of {stats.todaySuppTotal} doses taken today
+          </p>
+        </div>
+
+        {/* Overall Supplement Adherence */}
+        <div className="bg-green-100 border border-green-300 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-green-900">Overall Supplements</h3>
+            <TrendingUp className="w-5 h-5 text-green-600" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-green-600">{stats.overallSuppRate}%</span>
+            <span className="text-sm text-green-600">average</span>
+          </div>
+          <p className="text-sm text-green-700 mt-1">
+            Across {stats.daysTracked} days tracked
           </p>
         </div>
       </div>
