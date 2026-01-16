@@ -116,6 +116,7 @@ export default function MedicationLog({ user }) {
           .order('scheduled_time')
         
         if (refetchError) throw refetchError
+        console.log('[DEBUG] Today logs after generation:', JSON.stringify(newLogs, null, 2))
         setTodayLogs(newLogs || [])
       } else {
         setTodayLogs(existingLogs)
