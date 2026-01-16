@@ -477,11 +477,27 @@ export async function addFavoriteFood(userId, foodData) {
  */
 export async function removeFavoriteFood(userId, foodId) {
   try {
+    // First, get all favorites for this user
+    const { data: favorites, error: fetchError } = await supabase
+      .from('favorite_foods')
+      .select('id, food_data')
+      .eq('user_id', userId)
+    
+    if (fetchError) throw fetchError
+    
+    // Find the favorite with matching food ID
+    const favoriteToDelete = favorites?.find(fav => fav.food_data?.id === foodId)
+    
+    if (!favoriteToDelete) {
+      console.warn('Favorite food not found:', foodId)
+      return false
+    }
+    
+    // Delete by the favorite_foods table ID (not the food ID)
     const { error } = await supabase
       .from('favorite_foods')
       .delete()
-      .eq('user_id', userId)
-      .eq('food_data->id', foodId)
+      .eq('id', favoriteToDelete.id)
 
     if (error) throw error
     return true
