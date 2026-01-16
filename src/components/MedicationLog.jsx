@@ -94,35 +94,35 @@ export default function MedicationLog({ user }) {
       const tomorrow = new Date(today)
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      // First, check if logs exist for today
-      const { data: existingLogs, error: fetchError } = await supabase
+      // ALWAYS delete and regenerate today's logs to ensure correct frequency
+      console.log('[DEBUG] Deleting existing logs for today...')
+      const { error: deleteError } = await supabase
+        .from('medication_logs')
+        .delete()
+        .eq('user_id', user.id)
+        .gte('scheduled_time', today.toISOString())
+        .lt('scheduled_time', tomorrow.toISOString())
+      
+      if (deleteError) {
+        console.error('[DEBUG] Delete error:', deleteError)
+        throw deleteError
+      }
+      
+      console.log('[DEBUG] Generating fresh logs for today...')
+      await generateTodayLogs(medsData, suppsData)
+      
+      // Fetch the newly generated logs
+      const { data: newLogs, error: refetchError } = await supabase
         .from('medication_logs')
         .select('*, user_medication:user_medications(*, medication:medications(name))')
         .eq('user_id', user.id)
         .gte('scheduled_time', today.toISOString())
         .lt('scheduled_time', tomorrow.toISOString())
         .order('scheduled_time')
-
-      if (fetchError) throw fetchError
-
-      // If no logs exist for today, generate them from active medications
-      if (!existingLogs || existingLogs.length === 0) {
-        await generateTodayLogs(medsData, suppsData)
-        // Fetch again after generation
-        const { data: newLogs, error: refetchError } = await supabase
-          .from('medication_logs')
-          .select('*, user_medication:user_medications(*, medication:medications(name))')
-          .eq('user_id', user.id)
-          .gte('scheduled_time', today.toISOString())
-          .lt('scheduled_time', tomorrow.toISOString())
-          .order('scheduled_time')
-        
-        if (refetchError) throw refetchError
-        console.log('[DEBUG] Today logs after generation:', JSON.stringify(newLogs, null, 2))
-        setTodayLogs(newLogs || [])
-      } else {
-        setTodayLogs(existingLogs)
-      }
+      
+      if (refetchError) throw refetchError
+      console.log('[DEBUG] Today logs after generation:', JSON.stringify(newLogs, null, 2))
+      setTodayLogs(newLogs || [])
     } catch (error) {
       console.error('Error loading today logs:', error)
     }
