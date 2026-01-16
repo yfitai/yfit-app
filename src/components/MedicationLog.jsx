@@ -143,10 +143,13 @@ export default function MedicationLog({ user }) {
       for (const med of allMeds) {
         // Determine how many doses per day based on frequency
         let dosesPerDay = 1
-        if (med.frequency === 'twice_daily') {
+        const freq = (med.frequency || '').toLowerCase()
+        if (freq.includes('twice') || freq.includes('2')) {
           dosesPerDay = 2
-        } else if (med.frequency === 'three_times_daily') {
+        } else if (freq.includes('three') || freq.includes('3')) {
           dosesPerDay = 3
+        } else if (freq.includes('four') || freq.includes('4')) {
+          dosesPerDay = 4
         }
 
         // Create log entries for each dose
