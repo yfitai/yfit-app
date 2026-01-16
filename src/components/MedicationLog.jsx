@@ -162,7 +162,7 @@ export default function MedicationLog({ user }) {
             user_id: user.id,
             user_medication_id: med.id,
             scheduled_time: scheduledTime.toISOString(),
-            status: 'pending',
+            status: 'skipped', // Valid statuses: 'taken', 'missed', 'skipped', 'late'
             actual_time: null
           })
         }
@@ -386,7 +386,7 @@ export default function MedicationLog({ user }) {
 
   const handleToggleLog = async (logId, currentStatus) => {
     try {
-      const newStatus = currentStatus === 'taken' ? 'pending' : 'taken'
+      const newStatus = currentStatus === 'taken' ? 'skipped' : 'taken'
       const actualTime = newStatus === 'taken' ? new Date().toISOString() : null
 
       const { error } = await supabase
