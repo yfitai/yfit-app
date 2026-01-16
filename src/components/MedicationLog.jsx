@@ -346,7 +346,7 @@ export default function MedicationLog({ user }) {
           for (let i = 0; i < dosesPerDay; i++) {
             const expectedDose = {
               medication_id: med.medication_id,
-              medication_name: med.medication?.name || 'Unknown',
+              medication_name: med.custom_name || med.medication?.name || 'Unknown',
               user_medication_id: med.id,
               is_supplement: med.is_supplement,
               dose_number: i + 1
