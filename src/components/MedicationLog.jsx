@@ -261,7 +261,7 @@ export default function MedicationLog({ user }) {
       // Get all logs from last 30 days
       const { data: allLogs, error } = await supabase
         .from('medication_logs')
-        .select('*, user_medication:user_medications(medication_id, is_supplement, frequency, medication:medications(name))')
+        .select('*, user_medication:user_medications(medication_id, is_supplement, frequency, custom_name, medication:medications(name))')
         .eq('user_id', user.id)
         .gte('scheduled_time', thirtyDaysAgo.toISOString())
 
@@ -666,14 +666,17 @@ export default function MedicationLog({ user }) {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {/* Show taken medications */}
-                      {day.medLogs.filter(log => log.status === 'taken').map(log => (
-                        <div 
-                          key={log.id}
-                          className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
-                        >
-                          {log.user_medication?.medication?.name} ✓
-                        </div>
-                      ))}
+                      {day.medLogs.filter(log => log.status === 'taken').map(log => {
+                        const medName = log.user_medication?.custom_name || log.user_medication?.medication?.name || 'Unknown';
+                        return (
+                          <div 
+                            key={log.id}
+                            className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
+                          >
+                            ✓ {medName}
+                          </div>
+                        );
+                      })}
                       {/* Show missed medications */}
                       {day.missedMeds && day.missedMeds.map((missed, idx) => (
                         <div 
@@ -701,14 +704,17 @@ export default function MedicationLog({ user }) {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {/* Show taken supplements */}
-                      {day.suppLogs.filter(log => log.status === 'taken').map(log => (
-                        <div 
-                          key={log.id}
-                          className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
-                        >
-                          {log.user_medication?.medication?.name} ✓
-                        </div>
-                      ))}
+                      {day.suppLogs.filter(log => log.status === 'taken').map(log => {
+                        const suppName = log.user_medication?.custom_name || log.user_medication?.medication?.name || 'Unknown';
+                        return (
+                          <div 
+                            key={log.id}
+                            className="text-xs px-2 py-1 rounded bg-green-100 text-green-800"
+                          >
+                            ✓ {suppName}
+                          </div>
+                        );
+                      })}
                       {/* Show missed supplements */}
                       {day.missedSupps && day.missedSupps.map((missed, idx) => (
                         <div 
