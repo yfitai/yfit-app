@@ -91,13 +91,26 @@ const handleSaveCustomFood = async (customFood) => {
   const result = await addCustomFood(user.id, customFood)
   
   if (result.success) {
+    // Auto-save custom food to My Foods (favorite_foods)
+    const customFoodWithSource = {
+      ...result.data,
+      source: 'custom',
+      id: `custom-${result.data.id}`
+    }
+    await addFavoriteFood(user.id, customFoodWithSource)
+    
     setShowCustomFoodModal(false)
+    
+    // Reload My Foods to show the new custom food
+    await loadQuickAccessFoods()
+    
     // Refresh search if on custom filter
     if (filter === 'custom' && query.length >= 2) {
       performSearch(query, 'custom')
     }
+    
     // Show success message
-    alert('Custom food saved successfully!')
+    alert('✏️ Custom food saved to My Foods!')
   } else {
     alert('Error saving custom food: ' + result.error)
   }
@@ -224,7 +237,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               {favoriteFoods.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                    ⭐ My Foods
+                    My Foods (⭐ Saved | ✏️ Custom)
                   </h3>
                   <div className="space-y-2">
                     {favoriteFoods.map((food, index) => (
@@ -367,7 +380,11 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showD
 
         {/* Food Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-gray-900 truncate">{food.name}</h4>
+          <h4 className="font-medium text-gray-900 truncate">
+            {showDelete && food.source === 'custom' && '✏️ '}
+            {showDelete && food.source !== 'custom' && '⭐ '}
+            {food.name}
+          </h4>
           {food.brand && (
             <p className="text-sm text-gray-600 truncate">{food.brand}</p>
           )}
