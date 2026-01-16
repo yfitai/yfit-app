@@ -94,7 +94,30 @@ export default function MedicationLog({ user }) {
       const tomorrow = new Date(today)
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      // First, check if today's logs already exist
+      // Use passed data or load fresh if not provided
+      const meds = medsData || medications
+      const supps = suppsData || supplements
+      
+      // Calculate how many logs SHOULD exist based on current medications
+      let expectedLogCount = 0
+      const allMeds = [...meds, ...supps]
+      
+      for (const med of allMeds) {
+        let dosesPerDay = 1
+        const freq = (med.frequency || '').toLowerCase()
+        if (freq.includes('twice') || freq.includes('2')) {
+          dosesPerDay = 2
+        } else if (freq.includes('three') || freq.includes('3')) {
+          dosesPerDay = 3
+        } else if (freq.includes('four') || freq.includes('4')) {
+          dosesPerDay = 4
+        }
+        expectedLogCount += dosesPerDay
+      }
+      
+      console.log('[DEBUG] Expected log count for today:', expectedLogCount)
+
+      // Check if today's logs already exist
       const { data: existingLogs, error: checkError } = await supabase
         .from('medication_logs')
         .select('*, user_medication:user_medications(*, medication:medications(name))')
@@ -105,20 +128,36 @@ export default function MedicationLog({ user }) {
       
       if (checkError) throw checkError
       
-      // If logs exist, just use them (don't regenerate)
-      if (existingLogs && existingLogs.length > 0) {
-        console.log('[DEBUG] Today logs already exist, using them:', existingLogs.length)
+      const actualLogCount = existingLogs?.length || 0
+      console.log('[DEBUG] Actual log count in database:', actualLogCount)
+      
+      // If log count matches expected, use existing logs
+      if (actualLogCount === expectedLogCount && actualLogCount > 0) {
+        console.log('[DEBUG] Log count matches, using existing logs')
         setTodayLogs(existingLogs)
         return
       }
       
-      // Only generate if logs don't exist
-      console.log('[DEBUG] No logs found for today, generating...')
+      // Log count mismatch or no logs - regenerate
+      console.log('[DEBUG] Log count mismatch or no logs. Regenerating...')
       
-      // Use passed data or load fresh if not provided
-      const meds = medsData || await loadMedications()
-      const supps = suppsData || await loadSupplements()
+      // Delete existing logs for today
+      if (actualLogCount > 0) {
+        console.log('[DEBUG] Deleting', actualLogCount, 'existing logs...')
+        const { error: deleteError } = await supabase
+          .from('medication_logs')
+          .delete()
+          .eq('user_id', user.id)
+          .gte('scheduled_time', today.toISOString())
+          .lt('scheduled_time', tomorrow.toISOString())
+        
+        if (deleteError) {
+          console.error('[DEBUG] Delete error:', deleteError)
+          throw deleteError
+        }
+      }
       
+      // Generate fresh logs
       await generateTodayLogs(meds, supps)
       
       // Fetch the newly generated logs
