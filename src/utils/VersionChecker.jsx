@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
-// Test timestamp-based version checking - 2026-01-16 23:32
+// Test update banner - 2026-01-16 23:44
 
 const VERSION_CHECK_INTERVAL = 60000; // Check every 60 seconds (reduced from 30s)
 const CURRENT_VERSION_KEY = 'app_version_timestamp';
