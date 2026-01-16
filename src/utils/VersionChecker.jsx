@@ -17,6 +17,14 @@ export const VersionChecker = () => {
       return;
     }
 
+    // One-time migration: clear old buildNumber-based storage
+    const oldKey = 'app_version';
+    if (localStorage.getItem(oldKey)) {
+      console.log('Migrating from buildNumber to timestamp-based versioning');
+      localStorage.removeItem(oldKey);
+      // This will force the app to detect the next update
+    }
+
     const checkVersion = async () => {
       try {
         // Fetch version from server with cache-busting timestamp
