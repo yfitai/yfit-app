@@ -385,12 +385,53 @@ export default function MedicationLog({ user }) {
         const suppMissed = Math.max(0, suppExpected - suppTaken);
         const suppRate = suppExpected > 0 ? Math.round((suppTaken / suppExpected) * 100) : 0;
         
-        // Identify which medications were missed
-        const takenMedIds = new Set(medLogs.filter(l => l.status === 'taken').map(l => l.user_medication?.medication_id));
-        const missedMeds = expectedMeds.filter(exp => !takenMedIds.has(exp.medication_id));
+        // Identify which individual doses were missed
+        // For each expected dose, check if there's a corresponding taken log
+        const takenMedLogs = medLogs.filter(l => l.status === 'taken');
+        const missedMeds = [];
         
-        const takenSuppIds = new Set(suppLogs.filter(l => l.status === 'taken').map(l => l.user_medication?.medication_id));
-        const missedSupps = expectedSupps.filter(exp => !takenSuppIds.has(exp.medication_id));
+        // Group expected meds by user_medication_id
+        const expectedByMedId = {};
+        expectedMeds.forEach(exp => {
+          if (!expectedByMedId[exp.user_medication_id]) {
+            expectedByMedId[exp.user_medication_id] = [];
+          }
+          expectedByMedId[exp.user_medication_id].push(exp);
+        });
+        
+        // For each medication, check how many doses were taken vs expected
+        Object.keys(expectedByMedId).forEach(medId => {
+          const expected = expectedByMedId[medId];
+          const taken = takenMedLogs.filter(l => l.user_medication_id === medId);
+          const missedCount = expected.length - taken.length;
+          
+          // Add missed doses
+          for (let i = 0; i < missedCount; i++) {
+            missedMeds.push(expected[0]); // Use first expected dose for name
+          }
+        });
+        
+        // Same logic for supplements
+        const takenSuppLogs = suppLogs.filter(l => l.status === 'taken');
+        const missedSupps = [];
+        
+        const expectedSuppsById = {};
+        expectedSupps.forEach(exp => {
+          if (!expectedSuppsById[exp.user_medication_id]) {
+            expectedSuppsById[exp.user_medication_id] = [];
+          }
+          expectedSuppsById[exp.user_medication_id].push(exp);
+        });
+        
+        Object.keys(expectedSuppsById).forEach(suppId => {
+          const expected = expectedSuppsById[suppId];
+          const taken = takenSuppLogs.filter(l => l.user_medication_id === suppId);
+          const missedCount = expected.length - taken.length;
+          
+          for (let i = 0; i < missedCount; i++) {
+            missedSupps.push(expected[0]);
+          }
+        });
         
         breakdown.push({
           date: dateKey,
