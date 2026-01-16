@@ -542,9 +542,12 @@ export default function Goals({ user: propUser }) {
           mealLogsError
         ].filter(err => {
           if (!err) return false
-          // Ignore table not found errors (PGRST116 or 406 status)
+          // Ignore table not found errors (PGRST116, 404, or 406 status)
           if (err.code === 'PGRST116') return false
+          if (err.code === 'PGRST106') return false // Table not found
+          if (err.message && err.message.includes('404')) return false
           if (err.message && err.message.includes('406')) return false
+          if (err.status === 404) return false
           if (err.status === 406) return false
           return true
         })
