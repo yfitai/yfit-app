@@ -468,6 +468,7 @@ export default function MedicationLog({ user }) {
               const medLogs = todayLogs.filter(log => 
                 log.user_medication_id === med.id && !log.user_medication?.is_supplement
               )
+              console.log(`[DEBUG] ${med.custom_name || med.medication?.name}: ${medLogs.length} logs, frequency: ${med.frequency}`)
               return (
                 <div key={med.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   {medLogs.map(log => (
