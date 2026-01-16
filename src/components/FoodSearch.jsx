@@ -210,49 +210,44 @@ const handleToggleFavorite = async (food, isFavorited) => {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {/* Quick Add Section */}
-          {showQuickAdd && (recentFoods.length > 0 || favoriteFoods.length > 0) && (
+          {/* My Foods Section - Only show when custom filter is active */}
+          {filter === 'custom' && favoriteFoods.length > 0 && (
             <div className="mb-6">
-              {/* Recent Foods */}
-              {recentFoods.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                    🕐 Recent Foods
-                  </h3>
-                  <div className="space-y-2">
-                    {recentFoods.map((food, index) => (
-                      <FoodResultItem
-                        key={`recent-${food.id || index}`}
-                        food={food}
-                        onSelect={handleSelectFood}
-                        onToggleFavorite={handleToggleFavorite}
-                        favoriteFoods={favoriteFoods}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Favorite Foods (My Foods) */}
-              {favoriteFoods.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                    My Foods (⭐ Saved | ✏️ Custom)
-                  </h3>
-                  <div className="space-y-2">
-                    {favoriteFoods.map((food, index) => (
-                      <FoodResultItem
-                        key={`favorite-${food.id || index}`}
-                        food={food}
-                        onSelect={handleSelectFood}
-                        onToggleFavorite={handleToggleFavorite}
-                        favoriteFoods={favoriteFoods}
-                        showDelete={true}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">
+                My Foods (⭐ Saved | ✏️ Custom)
+              </h3>
+              <div className="space-y-2">
+                {favoriteFoods.map((food, index) => (
+                  <FoodResultItem
+                    key={`favorite-${food.id || index}`}
+                    food={food}
+                    onSelect={handleSelectFood}
+                    onToggleFavorite={handleToggleFavorite}
+                    favoriteFoods={favoriteFoods}
+                    showDelete={true}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Empty state for My Foods tab */}
+          {filter === 'custom' && favoriteFoods.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg mb-2">⭐ No saved foods yet</p>
+              <p className="text-gray-500 text-sm">
+                Save foods from search or create custom foods to see them here
+              </p>
+            </div>
+          )}
+          
+          {/* Empty state for All Foods tab */}
+          {filter === 'all' && query.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg mb-2">🔍 Start searching</p>
+              <p className="text-gray-500 text-sm">
+                Type at least 2 characters to search for foods
+              </p>
             </div>
           )}
 
@@ -292,28 +287,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
             </div>
           )}
 
-          {/* Empty State */}
-          {!loading && query.length === 0 && recentFoods.length === 0 && favoriteFoods.length === 0 && (
-            <div className="text-center py-8">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <p className="text-gray-600 mt-4">Start typing to search for foods</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Search our database of millions of foods
-              </p>
-            </div>
-          )}
+          {/* Old empty state removed - now handled by filter-specific empty states above */}
         </div>
 
         {/* Footer */}
