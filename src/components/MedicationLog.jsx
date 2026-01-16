@@ -58,6 +58,7 @@ export default function MedicationLog({ user }) {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      console.log('[DEBUG] Loaded medications:', JSON.stringify(data, null, 2))
       setMedications(data || [])
       return data || [] // Return the data
     } catch (error) {
@@ -77,6 +78,7 @@ export default function MedicationLog({ user }) {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      console.log('[DEBUG] Loaded supplements:', JSON.stringify(data, null, 2))
       setSupplements(data || [])
       return data || [] // Return the data
     } catch (error) {
