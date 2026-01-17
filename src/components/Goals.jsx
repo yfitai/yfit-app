@@ -484,10 +484,12 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
-        const { error: goalsError } = await supabase
+        console.log('🔍 Attempting to delete user_goals for user:', user.id)
+        const { data: goalsDeleteData, error: goalsError } = await supabase
           .from('user_goals')
           .delete()
           .eq('user_id', user.id)
+        console.log('🔍 user_goals delete result:', { data: goalsDeleteData, error: goalsError })
 
         const { error: measurementsError } = await supabase
           .from('body_measurements')
