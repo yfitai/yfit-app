@@ -123,7 +123,7 @@ export default function Goals({ user: propUser }) {
       .from('user_goals')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
     if (goalsData) {
       setAge(goalsData.age.toString())
@@ -166,7 +166,7 @@ export default function Goals({ user: propUser }) {
       .eq('user_id', userId)
       .order('measurement_date', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (measurementsData) {
       setMeasurements({
