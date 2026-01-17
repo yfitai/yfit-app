@@ -119,11 +119,13 @@ export default function Goals({ user: propUser }) {
 
   const loadExistingGoals = async (userId) => {
     // Load existing goals if any
-    const { data: goalsData } = await supabase
+    console.log('🔍 Loading existing goals for user:', userId)
+    const { data: goalsData, error: goalsError } = await supabase
       .from('user_goals')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle()
+    console.log('🔍 Goals data loaded:', { goalsData, goalsError })
 
     if (goalsData) {
       setAge(goalsData.age.toString())
