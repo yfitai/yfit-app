@@ -110,11 +110,8 @@ export default function DailyTracker({ user }) {
           body_fat_percent: data[0].body_fat_percent || '',
           notes: data[0].notes || ''
         });
-        // Check if log is marked as done (has notes with done marker or has all main fields)
-        const hasMainFields = data[0].sleep_hours && data[0].water_ml && data[0].steps;
-        if (hasMainFields) {
-          setIsDoneForDay(true);
-        }
+        // Note: isDoneForDay should only be set when user explicitly clicks the button
+        // Do not auto-trigger based on filled fields
       }
     } catch (error) {
       console.error('Error fetching today log:', error);
