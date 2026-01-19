@@ -284,11 +284,13 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
               {(currentWeekStats.total_volume / 1000).toFixed(1)}k
             </div>
             <div className="text-sm text-gray-600 mt-1">lbs lifted</div>
-            {currentWeekStats.volume_change_percent && (
+            {currentWeekStats.volume_change_percent !== undefined && currentWeekStats.volume_change_percent !== 0 ? (
               <div className={`mt-2 flex items-center gap-1 text-sm ${currentWeekStats.volume_change_percent > 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {currentWeekStats.volume_change_percent > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                 {Math.abs(currentWeekStats.volume_change_percent).toFixed(1)}% vs last week
               </div>
+            ) : (
+              <div className="mt-2 text-xs text-gray-500">First week of tracking</div>
             )}
           </div>
 
