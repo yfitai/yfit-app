@@ -629,11 +629,18 @@ export default function DailyTracker({ user }) {
                   onChange={(e) => {
                     const value = e.target.value;
                     // Allow clearing the field
-                    if (value === '' || value === null) {
+                    if (value === '' || value === null || value === undefined) {
                       setFormData({...formData, weight_kg: ''});
                       return;
                     }
-                    const kgValue = unitSystem === 'imperial' ? (parseFloat(value) / 2.20462).toFixed(1) : value;
+                    // Convert to number and check if valid
+                    const numValue = parseFloat(value);
+                    if (isNaN(numValue)) {
+                      setFormData({...formData, weight_kg: ''});
+                      return;
+                    }
+                    // Convert lbs to kg if imperial, otherwise use value as-is
+                    const kgValue = unitSystem === 'imperial' ? (numValue / 2.20462).toFixed(1) : numValue.toFixed(1);
                     setFormData({...formData, weight_kg: kgValue});
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
