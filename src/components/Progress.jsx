@@ -198,15 +198,20 @@ const loadGoals = async (userId) => {
     .single()
 
   if (goalsData) {
-    // Get latest weight and body fat from body_measurements
+    // Get latest weight and body fat from daily_logs
     const { data: measurementData, error: measurementError } = await supabase
-      .from('body_measurements')
-      .select('weight_kg, body_fat_percentage, measurement_date')
+      .from('daily_logs')
+      .select('weight_kg, body_fat_percent, logged_at')
       .eq('user_id', userId)
-      .order('measurement_date', { ascending: false })
+      .not('weight_kg', 'is', null)
+      .order('logged_at', { ascending: false })
       .limit(1)
     
-    const latestMeasurement = measurementData && measurementData.length > 0 ? measurementData[0] : null
+    const latestMeasurement = measurementData && measurementData.length > 0 ? {
+      weight_kg: measurementData[0].weight_kg,
+      body_fat_percentage: measurementData[0].body_fat_percent,
+      measurement_date: measurementData[0].logged_at
+    } : null
     
     console.log('Latest measurement query result:', { latestMeasurement, measurementError })
     console.log('Goals data:', { weight: goalsData.weight_kg, bf: goalsData.starting_body_fat_percentage })
