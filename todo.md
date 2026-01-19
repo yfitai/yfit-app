@@ -356,10 +356,16 @@
 ## 📊 Progress Page Chart Issues - January 19, 2026
 
 ### Blank Charts
-- [ ] Fix Volume Progression chart showing blank/white page
-- [ ] Fix Strength and Consistency chart showing blank/white page
-- [ ] Fix Weekly Workout Frequency chart showing blank/white page
-- [ ] Fix Nutrition Progress chart showing blank/white page
+- [x] Fix Volume Progression chart showing blank/white page
+- [x] Fix Strength and Consistency chart showing blank/white page
+- [x] Fix Weekly Workout Frequency chart showing blank/white page
+- [x] Fix Nutrition Progress chart showing blank/white page
 - [x] Fitness Activity chart working correctly (shows data from today and yesterday)
-- [ ] Progress Photos working correctly (saving successfully)
+- [x] Progress Photos working correctly (saving successfully)
 - [ ] Form Analysis - not tested yet
+
+**Solution:** Charts were querying non-existent tables (user_analytics, nutrition_entries, exercise_progression). Fixed by:
+- NutritionProgressCharts: Now queries `meals` table with fiber_g, sugar_g, sodium_mg columns
+- WorkoutAnalyticsDashboard: Calculates weekly analytics from `workout_sessions` table
+- Computes volume, strength, and consistency scores from actual workout data
+- Exercise progression disabled (requires complex multi-table calculation)
