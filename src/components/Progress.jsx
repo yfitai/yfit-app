@@ -199,17 +199,22 @@ const loadGoals = async (userId) => {
 
   if (goalsData) {
     // Get latest weight and body fat from body_measurements
-    const { data: latestMeasurement } = await supabase
+    const { data: latestMeasurement, error: measurementError } = await supabase
       .from('body_measurements')
-      .select('weight_kg, body_fat_percentage')
+      .select('weight_kg, body_fat_percentage, measurement_date')
       .eq('user_id', userId)
       .order('measurement_date', { ascending: false })
       .limit(1)
       .single()
     
+    console.log('Latest measurement query result:', { latestMeasurement, measurementError })
+    console.log('Goals data:', { weight: goalsData.weight_kg, bf: goalsData.starting_body_fat_percentage })
+    
     // Use latest measurement if available, otherwise fall back to starting values
     const currentWeight = latestMeasurement?.weight_kg || goalsData.weight_kg
     const currentBodyFat = latestMeasurement?.body_fat_percentage || goalsData.starting_body_fat_percentage
+    
+    console.log('Final current values:', { currentWeight, currentBodyFat })
     
     // Calculate current BMI from height and current weight
     const currentBMI = goalsData.height_cm && currentWeight
