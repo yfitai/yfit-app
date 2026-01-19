@@ -56,7 +56,7 @@ export default function NutritionProgressCharts({ user }) {
       // Load meals grouped by date
       const { data, error } = await supabase
         .from('meals')
-        .select('meal_date, fiber_g, sugar_g, sodium_mg')
+        .select('meal_date, fiber, sugar, sodium')
         .eq('user_id', user.id)
         .gte('meal_date', startDate.toISOString().split('T')[0])
         .lte('meal_date', endDate.toISOString().split('T')[0])
@@ -85,9 +85,9 @@ export default function NutritionProgressCharts({ user }) {
             sodium: 0
           }
         }
-        groupedData[date].fiber += meal.fiber_g || 0
-        groupedData[date].sugar += meal.sugar_g || 0
-        groupedData[date].sodium += meal.sodium_mg || 0
+        groupedData[date].fiber += meal.fiber || 0
+        groupedData[date].sugar += meal.sugar || 0
+        groupedData[date].sodium += meal.sodium || 0
       })
 
       // Convert to array and format dates

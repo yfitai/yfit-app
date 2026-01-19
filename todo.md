@@ -369,3 +369,17 @@
 - WorkoutAnalyticsDashboard: Calculates weekly analytics from `workout_sessions` table
 - Computes volume, strength, and consistency scores from actual workout data
 - Exercise progression disabled (requires complex multi-table calculation)
+
+
+## 🔧 Progress Page Remaining Issues - January 19, 2026
+
+### Chart Bugs
+- [ ] Fix Nutrition Progress chart - wrong column names (fiber_g → fiber, sugar_g → sugar, sodium_mg → sodium)
+- [ ] Fix Volume card showing "lbs lifted: 0" (should show 3.6k)
+- [ ] Clear demo data from Jan 11 (app was reset Jan 18, should only show Jan 18-19 data)
+- [ ] Fix Predictions page showing medication adherence 0% (Medications page shows 100%)
+
+### Documentation Needed
+- [ ] Explain significance of each chart and how they work
+- [ ] Document how Volume Progression ties to predictions
+- [ ] Add tooltips or help text to charts
