@@ -190,8 +190,7 @@ export default function Progress({ user: propUser }) {
   }
 
 const loadGoals = async (userId) => {
-  console.log('Loading goals for user:', userId)
-  // Fetch latest measurements from body_measurements table (cache cleared)
+  console.log('📊 Loading goals and latest measurements for user:', userId)
   const { data: goalsData } = await supabase
     .from('user_goals')
     .select('*')
