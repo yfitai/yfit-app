@@ -44,6 +44,7 @@ export default function DailyTracker({ user }) {
     return localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
   }); // 'mg/dl', 'mmol/l'
   const [isDoneForDay, setIsDoneForDay] = useState(false);
+  const [weightDisplay, setWeightDisplay] = useState(''); // Display value for weight input
   
   // Weekly body measurements state
   const [showMeasurements, setShowMeasurements] = useState(false);
@@ -110,6 +111,13 @@ export default function DailyTracker({ user }) {
           body_fat_percent: data[0].body_fat_percent || '',
           notes: data[0].notes || ''
         });
+        // Set display value for weight
+        if (data[0].weight_kg) {
+          const displayValue = unitSystem === 'imperial' 
+            ? (parseFloat(data[0].weight_kg) * 2.20462).toFixed(1)
+            : data[0].weight_kg;
+          setWeightDisplay(displayValue);
+        }
         // Note: isDoneForDay should only be set when user explicitly clicks the button
         // Do not auto-trigger based on filled fields
       }
@@ -625,21 +633,20 @@ export default function DailyTracker({ user }) {
                   type="number"
                   min="0"
                   step="0.1"
-                  value={formData.weight_kg ? (unitSystem === 'imperial' ? (parseFloat(formData.weight_kg) * 2.20462).toFixed(1) : formData.weight_kg) : ''}
+                  value={weightDisplay}
                   onChange={(e) => {
+                    setWeightDisplay(e.target.value);
+                    // Convert and store in kg
                     const value = e.target.value;
-                    // Allow clearing the field
                     if (value === '' || value === null || value === undefined) {
                       setFormData({...formData, weight_kg: ''});
                       return;
                     }
-                    // Convert to number and check if valid
                     const numValue = parseFloat(value);
                     if (isNaN(numValue)) {
                       setFormData({...formData, weight_kg: ''});
                       return;
                     }
-                    // Convert lbs to kg if imperial, otherwise use value as-is
                     const kgValue = unitSystem === 'imperial' ? (numValue / 2.20462).toFixed(1) : numValue.toFixed(1);
                     setFormData({...formData, weight_kg: kgValue});
                   }}
