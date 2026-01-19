@@ -628,6 +628,11 @@ export default function DailyTracker({ user }) {
                   value={formData.weight_kg ? (unitSystem === 'imperial' ? (parseFloat(formData.weight_kg) * 2.20462).toFixed(1) : formData.weight_kg) : ''}
                   onChange={(e) => {
                     const value = e.target.value;
+                    // Allow clearing the field
+                    if (value === '' || value === null) {
+                      setFormData({...formData, weight_kg: ''});
+                      return;
+                    }
                     const kgValue = unitSystem === 'imperial' ? (parseFloat(value) / 2.20462).toFixed(1) : value;
                     setFormData({...formData, weight_kg: kgValue});
                   }}
