@@ -106,6 +106,8 @@ export default function DailyTracker({ user }) {
           bp_systolic: data[0].bp_systolic || '',
           bp_diastolic: data[0].bp_diastolic || '',
           glucose_mg_dl: data[0].glucose_mg_dl || '',
+          weight_kg: data[0].weight_kg || '',
+          body_fat_percent: data[0].body_fat_percent || '',
           notes: data[0].notes || ''
         });
         // Check if log is marked as done (has notes with done marker or has all main fields)
@@ -238,6 +240,8 @@ export default function DailyTracker({ user }) {
         bp_systolic: formData.bp_systolic ? parseInt(formData.bp_systolic) : null,
         bp_diastolic: formData.bp_diastolic ? parseInt(formData.bp_diastolic) : null,
         glucose_mg_dl: formData.glucose_mg_dl ? parseInt(formData.glucose_mg_dl) : null,
+        weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
+        body_fat_percent: formData.body_fat_percent ? parseFloat(formData.body_fat_percent) : null,
         notes: formData.notes || null
       };
 
@@ -676,11 +680,29 @@ export default function DailyTracker({ user }) {
               </button>
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (!isDoneForDay) {
-                    handleSubmit(new Event('submit'));
+                    // Save daily log
+                    await handleSubmit(new Event('submit'));
+                    
+                    // Save weight to body_measurements for progression tracking
+                    if (formData.weight_kg) {
+                      try {
+                        await supabase
+                          .from('body_measurements')
+                          .insert([{
+                            user_id: user.id,
+                            measurement_date: new Date().toISOString().split('T')[0],
+                            weight_kg: parseFloat(formData.weight_kg),
+                            body_fat_percentage: formData.body_fat_percent ? parseFloat(formData.body_fat_percent) : null
+                          }]);
+                      } catch (error) {
+                        console.error('Error saving to body_measurements:', error);
+                      }
+                    }
+                    
                     setIsDoneForDay(true);
-                    alert('✅ Day complete! Your log is saved and locked.');
+                    alert('✅ Day complete! Your log is saved and weight tracked for progression.');
                   }
                 }}
                 disabled={isDoneForDay}
