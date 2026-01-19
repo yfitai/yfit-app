@@ -351,3 +351,15 @@
 - [x] Works regardless of Vercel caching issues
 - [x] Created /manual-cleanup route with ManualCleanup component
 - [x] Deletes all data tables while preserving templates and favorites
+
+
+## 📊 Progress Page Chart Issues - January 19, 2026
+
+### Blank Charts
+- [ ] Fix Volume Progression chart showing blank/white page
+- [ ] Fix Strength and Consistency chart showing blank/white page
+- [ ] Fix Weekly Workout Frequency chart showing blank/white page
+- [ ] Fix Nutrition Progress chart showing blank/white page
+- [x] Fitness Activity chart working correctly (shows data from today and yesterday)
+- [ ] Progress Photos working correctly (saving successfully)
+- [ ] Form Analysis - not tested yet

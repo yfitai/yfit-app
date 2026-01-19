@@ -35,46 +35,112 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
   const loadWeeklyAnalytics = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_analytics')
+      // Calculate how many weeks to load
+      const weeksToLoad = parseInt(timeRange);
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - (weeksToLoad * 7));
+
+      // Load all workout sessions in the time range
+      const { data: sessions, error } = await supabase
+        .from('workout_sessions')
         .select('*')
         .eq('user_id', userId)
-        .order('week_start_date', { ascending: false })
-        .limit(parseInt(timeRange));
+        .eq('is_completed', true)
+        .gte('start_time', startDate.toISOString())
+        .order('start_time', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading workout sessions:', error);
+        setWeeklyAnalytics([]);
+        return;
+      }
 
-      if (data && data.length > 0) {
-        // Reverse to show oldest first in charts
-        const reversed = [...data].reverse();
-        setWeeklyAnalytics(reversed);
-        setCurrentWeekStats(data[0]); // Most recent week
+      if (!sessions || sessions.length === 0) {
+        setWeeklyAnalytics([]);
+        return;
+      }
+
+      // Group sessions by week
+      const weeklyData = {};
+      sessions.forEach(session => {
+        const sessionDate = new Date(session.start_time);
+        // Get Monday of the week
+        const weekStart = new Date(sessionDate);
+        const day = weekStart.getDay();
+        const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+        weekStart.setDate(diff);
+        weekStart.setHours(0, 0, 0, 0);
+        const weekKey = weekStart.toISOString().split('T')[0];
+
+        if (!weeklyData[weekKey]) {
+          weeklyData[weekKey] = {
+            week_start_date: weekKey,
+            workouts_completed: 0,
+            total_volume: 0,
+            total_duration_minutes: 0,
+            total_sets: 0,
+            total_reps: 0
+          };
+        }
+
+        weeklyData[weekKey].workouts_completed += 1;
+        weeklyData[weekKey].total_volume += session.total_volume || 0;
         
-        // Calculate predictions based on trends
-        if (data.length >= 4) {
-          calculatePredictions(data);
+        // Calculate duration
+        if (session.end_time) {
+          const duration = (new Date(session.end_time) - new Date(session.start_time)) / 60000;
+          weeklyData[weekKey].total_duration_minutes += Math.round(duration);
+        }
+      });
+
+      // Convert to array and sort by date
+      const weeklyArray = Object.values(weeklyData).sort((a, b) => 
+        new Date(a.week_start_date) - new Date(b.week_start_date)
+      );
+
+      // Calculate strength and consistency scores
+      weeklyArray.forEach((week, index) => {
+        // Strength score: based on volume progression
+        if (index > 0) {
+          const prevVolume = weeklyArray[index - 1].total_volume;
+          const volumeChange = prevVolume > 0 ? ((week.total_volume - prevVolume) / prevVolume) * 100 : 0;
+          week.strength_score = Math.max(0, Math.min(100, 70 + volumeChange));
+          week.volume_change_percent = volumeChange;
+        } else {
+          week.strength_score = 70;
+          week.volume_change_percent = 0;
+        }
+
+        // Consistency score: based on workouts completed (assuming 4 workouts/week goal)
+        const workoutGoal = goals?.workouts_per_week || 4;
+        week.consistency_score = Math.min(100, (week.workouts_completed / workoutGoal) * 100);
+        week.goal_status = week.workouts_completed >= workoutGoal ? 'goal_met' : 'close_to_goal';
+      });
+
+      setWeeklyAnalytics(weeklyArray);
+      if (weeklyArray.length > 0) {
+        setCurrentWeekStats(weeklyArray[weeklyArray.length - 1]);
+        
+        // Calculate predictions if we have enough data
+        if (weeklyArray.length >= 4) {
+          calculatePredictions(weeklyArray.slice(-4).reverse());
         }
       }
     } catch (error) {
       console.error('Error loading weekly analytics:', error);
-      // Don't generate demo data - show empty charts instead
       setWeeklyAnalytics([]);
     }
   };
 
   const loadExerciseProgress = async () => {
     try {
-      const { data, error } = await supabase
-        .from('exercise_progression')
-        .select('*')
-        .eq('user_id', userId)
-        .order('last_workout_date', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      setExerciseProgress(data || []);
+      // Note: exercise_progression table doesn't exist yet
+      // This would require complex calculation from workout_sessions and session_exercises
+      // For now, set empty array
+      setExerciseProgress([]);
     } catch (error) {
       console.error('Error loading exercise progress:', error);
+      setExerciseProgress([]);
     }
   };
 

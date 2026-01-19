@@ -53,21 +53,30 @@ export default function NutritionProgressCharts({ user }) {
       const startDate = new Date()
       startDate.setDate(startDate.getDate() - parseInt(timeRange))
 
-      // Load nutrition entries grouped by date
+      // Load meals grouped by date
       const { data, error } = await supabase
-        .from('nutrition_entries')
-        .select('entry_date, fiber, sugar, sodium')
+        .from('meals')
+        .select('meal_date, fiber_g, sugar_g, sodium_mg')
         .eq('user_id', user.id)
-        .gte('entry_date', startDate.toISOString().split('T')[0])
-        .lte('entry_date', endDate.toISOString().split('T')[0])
-        .order('entry_date', { ascending: true })
+        .gte('meal_date', startDate.toISOString().split('T')[0])
+        .lte('meal_date', endDate.toISOString().split('T')[0])
+        .order('meal_date', { ascending: true })
 
-      if (error) throw error
+      if (error) {
+        console.error('Error loading nutrition data:', error)
+        setNutritionData([])
+        return
+      }
+
+      if (!data || data.length === 0) {
+        setNutritionData([])
+        return
+      }
 
       // Group by date and sum nutrients
       const groupedData = {}
-      data.forEach(entry => {
-        const date = entry.entry_date
+      data.forEach(meal => {
+        const date = meal.meal_date
         if (!groupedData[date]) {
           groupedData[date] = {
             date,
@@ -76,9 +85,9 @@ export default function NutritionProgressCharts({ user }) {
             sodium: 0
           }
         }
-        groupedData[date].fiber += entry.fiber || 0
-        groupedData[date].sugar += entry.sugar || 0
-        groupedData[date].sodium += entry.sodium || 0
+        groupedData[date].fiber += meal.fiber_g || 0
+        groupedData[date].sugar += meal.sugar_g || 0
+        groupedData[date].sodium += meal.sodium_mg || 0
       })
 
       // Convert to array and format dates
