@@ -647,7 +647,7 @@ export default function DailyTracker({ user }) {
                       setFormData({...formData, weight_kg: ''});
                       return;
                     }
-                    const kgValue = unitSystem === 'imperial' ? (numValue / 2.20462).toFixed(1) : numValue.toFixed(1);
+                    const kgValue = unitSystem === 'imperial' ? (numValue / 2.20462).toFixed(2) : numValue.toFixed(2);
                     setFormData({...formData, weight_kg: kgValue});
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
