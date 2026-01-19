@@ -7,7 +7,7 @@ import {
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 
 export default function DailyTracker({ user }) {
-  const { units } = useUnitPreference();
+  const { unitSystem } = useUnitPreference();
   const [loading, setLoading] = useState(true);
   const [todayLog, setTodayLog] = useState(null);
   const [weeklyData, setWeeklyData] = useState([]);
@@ -33,12 +33,12 @@ export default function DailyTracker({ user }) {
     notes: ''
   });
 
-  // Unit preferences - load from localStorage or default based on global units
+  // Unit preferences - load from localStorage or default based on global unitSystem
   const [waterUnit, setWaterUnit] = useState(() => {
     const stored = localStorage.getItem('yfit_water_unit');
     if (stored) return stored;
     // Default based on global Imperial/Metric setting
-    return units === 'imperial' ? 'oz' : 'ml';
+    return unitSystem === 'imperial' ? 'oz' : 'ml';
   }); // 'ml', 'oz', 'cups'
   const [glucoseUnit, setGlucoseUnit] = useState(() => {
     return localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
@@ -178,7 +178,7 @@ export default function DailyTracker({ user }) {
             user_id: user.id,
             measurement_type: type,
             measurement_value: parseFloat(value),
-            unit: units === 'imperial' ? 'in' : 'cm',
+            unit: unitSystem === 'imperial' ? 'in' : 'cm',
             measured_at: now
           });
         }
@@ -619,20 +619,20 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ⚖️ Weight ({units === 'imperial' ? 'lbs' : 'kg'})
+                  ⚖️ Weight ({unitSystem === 'imperial' ? 'lbs' : 'kg'})
                 </label>
                 <input
                   type="number"
                   min="0"
                   step="0.1"
-                  value={formData.weight_kg ? (units === 'imperial' ? (parseFloat(formData.weight_kg) * 2.20462).toFixed(1) : formData.weight_kg) : ''}
+                  value={formData.weight_kg ? (unitSystem === 'imperial' ? (parseFloat(formData.weight_kg) * 2.20462).toFixed(1) : formData.weight_kg) : ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const kgValue = units === 'imperial' ? (parseFloat(value) / 2.20462).toFixed(1) : value;
+                    const kgValue = unitSystem === 'imperial' ? (parseFloat(value) / 2.20462).toFixed(1) : value;
                     setFormData({...formData, weight_kg: kgValue});
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder={units === 'imperial' ? '155.0' : '70.5'}
+                  placeholder={unitSystem === 'imperial' ? '155.0' : '70.5'}
                 />
               </div>
               <div>
@@ -746,7 +746,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Torso</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Neck ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Neck ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -757,7 +757,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Shoulders ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Shoulders ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -768,7 +768,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Chest ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chest ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -786,7 +786,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Core</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Waist ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Waist ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -797,7 +797,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Hips ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Hips ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -815,7 +815,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Arms</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Biceps ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Biceps ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -826,7 +826,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Forearms ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Forearms ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -844,7 +844,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Legs</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Thighs ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thighs ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -855,7 +855,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Calves ({units === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Calves ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
