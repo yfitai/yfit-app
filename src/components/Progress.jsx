@@ -198,9 +198,22 @@ const loadGoals = async (userId) => {
     .single()
 
   if (goalsData) {
-    // Calculate current BMI from height and starting weight
-    const currentBMI = goalsData.height_cm && goalsData.weight_kg 
-      ? (goalsData.weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+    // Get latest weight and body fat from body_measurements
+    const { data: latestMeasurement } = await supabase
+      .from('body_measurements')
+      .select('weight_kg, body_fat_percentage')
+      .eq('user_id', userId)
+      .order('measurement_date', { ascending: false })
+      .limit(1)
+      .single()
+    
+    // Use latest measurement if available, otherwise fall back to starting values
+    const currentWeight = latestMeasurement?.weight_kg || goalsData.weight_kg
+    const currentBodyFat = latestMeasurement?.body_fat_percentage || goalsData.starting_body_fat_percentage
+    
+    // Calculate current BMI from height and current weight
+    const currentBMI = goalsData.height_cm && currentWeight
+      ? (currentWeight / Math.pow(goalsData.height_cm / 100, 2))
       : null
     
     // Calculate goal BMI from height and target weight
@@ -209,8 +222,8 @@ const loadGoals = async (userId) => {
       : null
 
     setCurrentMetrics({
-      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
-      bodyFat: goalsData.starting_body_fat_percentage || null,
+      weight: currentWeight ? currentWeight * 2.20462 : null,
+      bodyFat: currentBodyFat || null,
       bmi: currentBMI
     })
       setGoalMetrics({
