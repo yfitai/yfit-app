@@ -445,3 +445,140 @@
 - [x] Change Fitness Activity chart from BarChart to LineChart
 - [x] Add exercise type breakdown (Weighted, Time-Based, Cardio)
 - [x] Remove the old simple duration-only chart (replaced by WorkoutAnalyticsDashboard)
+
+
+---
+
+## 🚀 FUTURE: Marketing Website & Stripe Integration
+
+### When Working on Marketing Website:
+- [ ] Implement Stripe Integration
+  - [ ] Set up Stripe products (Free, Pro Monthly, Pro Yearly, Pro Lifetime)
+  - [ ] Add YFIT blue-purple gradient logo to each Stripe product
+  - [ ] Configure tax settings for each product
+  - [ ] Create Stripe prices in USD ($0, $12.99/mo, $99.99/yr, $249.99 one-time)
+  - [ ] Set up webhook handlers for subscription events
+  - [ ] Test webhook endpoints
+
+- [ ] Implement Subscription Database Schema
+  - [ ] Create `subscriptions` table with RLS
+  - [ ] Create `prices` table with RLS
+  - [ ] Create `products` table with RLS
+  - [ ] Create `payments` table with RLS
+  - [ ] Create `usage_records` table with RLS (for tracking Form Analysis limits)
+  - [ ] Set up automatic timestamp management (created_at, updated_at)
+
+- [ ] Implement Feature Gating in Main App
+  - [ ] Add subscription status check to user context
+  - [ ] Gate Barcode Scanner (Pro only)
+  - [ ] Gate Medication Tracking (Pro only)
+  - [ ] Gate Micronutrient Tracking (Pro only - fiber, sugar, sodium, glucose)
+  - [ ] Gate Meal Planning & Templates (Pro only)
+  - [ ] Gate Grocery List Generation (Pro only)
+  - [ ] Implement Form Analysis usage limits (5/month for free, unlimited for Pro)
+  - [ ] Implement AI Coach usage limits (limited for free, unlimited for Pro)
+  - [ ] Gate Advanced Analytics & Predictions (Pro only)
+  - [ ] Gate Provider Reports (Pro only)
+  - [ ] Limit saved routines to 3 for free users
+
+- [ ] Add Subscription UI to Main App
+  - [ ] Add subscription status display in Dashboard
+  - [ ] Add "Upgrade to Pro" prompts when hitting limits
+  - [ ] Add usage indicators (e.g., "3/5 Form Analysis sessions used this month")
+  - [ ] Create Billing/Subscription Management page
+  - [ ] Add subscription cancellation flow
+  - [ ] Add plan upgrade/downgrade flow
+
+- [ ] Testing & Validation
+  - [ ] Test free user limits (5 Form Analysis sessions/month)
+  - [ ] Test Pro user unlimited access
+  - [ ] Test subscription webhook handling
+  - [ ] Test upgrade flow (Free → Pro)
+  - [ ] Test downgrade flow (Pro → Free)
+  - [ ] Test payment failures and retry logic
+  - [ ] Verify RLS policies prevent unauthorized access
+
+**Reference Document:** `/home/ubuntu/yfit/PRICING_FEATURES_BREAKDOWN.md`
+
+---
+
+
+---
+
+## 🧪 Google Play Beta Testing (URGENT - Required for Production Launch)
+
+### Current Status:
+- ✅ App uploaded to Google Play (Closed Testing)
+- ⚠️ Need 12+ beta testers for 14 days before production approval
+- ⚠️ Currently: 0 testers opted-in
+
+### Phase 1: Recruit Beta Testers (Days 1-3)
+- [ ] Review recruitment message templates in `BETA_TESTER_RECRUITMENT.md`
+- [ ] Make list of 15-20 potential testers (aim for 12+, have backups)
+- [ ] Send personalized messages using templates
+  - [ ] Tier 1: Close friends & family (target: 6-8 people)
+  - [ ] Tier 2: Extended network (target: 4-6 people)
+  - [ ] Tier 3: Online communities if needed (target: 2-4 people)
+- [ ] Track responses in `BETA_TESTER_TRACKING.csv`
+- [ ] Follow up with non-responders after 2 days
+- [ ] Collect Gmail addresses from 12+ people
+
+### Phase 2: Add Testers to Google Play Console (Day 3-4)
+- [ ] Log into Google Play Console
+- [ ] Navigate to: Testing → Closed testing → Testers tab
+- [ ] Create email list or add to existing list
+- [ ] Add all 12+ Gmail addresses
+- [ ] Click Save
+- [ ] Verify Google sent opt-in emails to testers
+- [ ] Update `BETA_TESTER_TRACKING.csv` with "Date Added to Play Console"
+
+### Phase 3: Monitor Opt-Ins (Days 4-7)
+- [ ] Check Play Console daily for opt-in count
+- [ ] Send reminders to testers who haven't opted in after 2 days
+- [ ] Update spreadsheet as people opt in
+- [ ] Goal: 12+ people with "Opted In" status
+- [ ] Verify testers have installed the app
+
+### Phase 4: Run 14-Day Testing Period (Days 7-21)
+- [ ] Note START DATE when 12th tester opts in
+- [ ] Calculate END DATE (START DATE + 14 days)
+- [ ] Monitor tester activity weekly in Supabase/analytics
+- [ ] Send gentle engagement reminders if testers inactive 3+ days
+- [ ] Track activity in `BETA_TESTER_TRACKING.csv`
+- [ ] Ensure 12+ testers remain active throughout period
+
+### Phase 5: Apply for Production (Day 21+)
+- [ ] Verify 14 days have passed with 12+ active testers
+- [ ] Go to Play Console → Dashboard → Production
+- [ ] Click "Apply for production" button (should now be enabled)
+- [ ] Answer Google's questions about closed test
+- [ ] Submit application
+- [ ] Wait for Google's production approval (typically 1-3 days)
+
+### Phase 6: Thank Testers & Grant Rewards
+- [ ] Grant lifetime Pro access to all beta testers in Supabase
+- [ ] Update `BETA_TESTER_TRACKING.csv` Column 12 to "Yes"
+- [ ] Send personalized thank you messages
+- [ ] Confirm Pro access is working for each tester
+- [ ] Ask if they'd like to stay on beta for future updates
+
+### Resources Created:
+- 📄 `BETA_TESTER_RECRUITMENT.md` - 6 message templates for different audiences
+- 📊 `BETA_TESTER_TRACKING.csv` - Spreadsheet to track all 20 potential testers
+- 📖 `BETA_TESTER_TRACKING_GUIDE.md` - Complete guide for using the tracking system
+
+### Timeline Summary:
+- **Days 1-3:** Recruit 12+ testers
+- **Day 3-4:** Add to Play Console
+- **Days 4-7:** Monitor opt-ins
+- **Days 7-21:** Run 14-day test (START when 12th person opts in)
+- **Day 21+:** Apply for production
+- **Day 24+:** Production approval (estimated)
+
+### Important Notes:
+- ⚠️ **No social media or Stripe needed** - Just Gmail addresses
+- ⚠️ **Over-recruit** - Aim for 15-20 people (some will drop out)
+- ⚠️ **14-day timer starts** when 12th person opts in (not when you add them)
+- ✅ **Promise lifetime Pro access** ($249.99 value) as thank you
+
+---
