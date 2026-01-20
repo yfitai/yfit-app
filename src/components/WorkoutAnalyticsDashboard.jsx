@@ -22,10 +22,13 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   const loadAnalyticsData = async () => {
     setLoading(true);
     try {
+      // Load goals first to get chart_start_date before loading chart data
+      await loadUserGoals();
+      
+      // Then load chart data (will use chartStartDate if set)
       await Promise.all([
         loadWeeklyAnalytics(),
         loadExerciseProgress(),
-        loadUserGoals(),
       ]);
     } catch (error) {
       console.error('Error loading analytics:', error);
@@ -216,7 +219,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   const formatChartData = () => {
     return weeklyAnalytics.map(week => ({
       week: new Date(week.week_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      volume: Math.round(week.total_volume / 1000), // Convert to thousands
+      volume: Math.round(week.total_volume), // Keep as actual lbs
       strength: week.strength_score,
       workouts: week.workouts_completed,
       consistency: week.consistency_score
@@ -292,7 +295,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
               <TrendingUp className="text-green-600" size={20} />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              {(currentWeekStats.total_volume / 1000).toFixed(1)}k
+              {currentWeekStats.total_volume.toLocaleString('en-US', { maximumFractionDigits: 0 })}
             </div>
             <div className="text-sm text-gray-600 mt-1">lbs lifted</div>
             {currentWeekStats.volume_change_percent !== undefined && currentWeekStats.volume_change_percent !== 0 ? (
@@ -399,10 +402,16 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="week" stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} label={{ value: 'Volume (1000 lbs)', angle: -90, position: 'insideLeft' }} />
+            <YAxis 
+              stroke="#6b7280" 
+              style={{ fontSize: '12px' }} 
+              label={{ value: 'Volume (lbs)', angle: -90, position: 'insideLeft' }}
+              tickFormatter={(value) => value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+            />
             <Tooltip 
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+              formatter={(value) => [value.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' lbs', 'Volume']}
             />
             <Area 
               type="monotone" 
@@ -410,7 +419,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
               stroke="#3b82f6" 
               strokeWidth={2}
               fill="url(#volumeGradient)" 
-              name="Volume (1000 lbs)"
+              name="Volume"
             />
           </AreaChart>
         </ResponsiveContainer>
