@@ -493,7 +493,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
               💡 Shows total workout time per day (includes all exercise types)
               <div className="mt-1">
                 <span className="font-semibold">Weighted:</span> Bench press, squats, etc. (tracks weight × reps) |
-                <span className="font-semibold"> Duration:</span> Planks, ab roller, wall sits (tracks time) |
+                <span className="font-semibold"> Time-Based:</span> Planks, ab roller, wall sits (tracks time) |
                 <span className="font-semibold"> Cardio:</span> Walking, running (tracks time + pace)
               </div>
             </div>
@@ -533,7 +533,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <div className="mt-3 text-xs text-gray-500">
           💡 Only tracks <span className="font-semibold">weighted exercises</span> (bench press, squats, rows, etc.) where volume = weight × reps.
           <div className="mt-1">
-            Duration exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.
+            Time-based exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.
           </div>
         </div>
       </div>

@@ -36,7 +36,7 @@ const WorkoutBuilder = () => {
     
     const categoryLower = (category || '').toLowerCase();
     if (categoryLower === 'cardio') return 'cardio';
-    if (categoryLower === 'stretching' || categoryLower === 'flexibility') return 'stretching';
+    if (categoryLower === 'stretching' || categoryLower === 'flexibility' || categoryLower === 'time_based') return 'time_based';
     return 'strength';
   };
 
@@ -257,7 +257,7 @@ const WorkoutBuilder = () => {
             exCategory = Array.isArray(parsed) ? parsed[0] : exCategory;
           } catch (e) {}
         }
-        matchesCategory = (exCategory || '').toLowerCase() === 'stretching' || (exCategory || '').toLowerCase() === 'flexibility';
+        matchesCategory = (exCategory || '').toLowerCase() === 'stretching' || (exCategory || '').toLowerCase() === 'flexibility' || (exCategory || '').toLowerCase() === 'time_based';
       } else {
         matchesCategory = muscleArray.some(muscle => 
           targetMuscles.some(target => muscle.toLowerCase().includes(target.toLowerCase()))
@@ -408,7 +408,7 @@ const WorkoutBuilder = () => {
                           <h3 className="font-semibold text-gray-900">{item.exercise.name}</h3>
                           <p className="text-sm text-gray-600 capitalize">
                             {exerciseType === 'cardio' && '🏃 Cardio Exercise'}
-                            {exerciseType === 'stretching' && '⏱️ Duration Exercise'}
+                            {exerciseType === 'time_based' && '⏱️ Time-Based Exercise'}
                             {exerciseType === 'strength' && '💪 Strength Exercise'}
                           </p>
                         </div>
@@ -468,12 +468,12 @@ const WorkoutBuilder = () => {
 
                       )}
 
-                      {/* Cardio/Stretching message */}
-                      {(exerciseType === 'cardio' || exerciseType === 'stretching') && (
+                      {/* Cardio/Time-Based message */}
+                      {(exerciseType === 'cardio' || exerciseType === 'time_based') && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                           <p className="text-sm text-blue-800">
                             {exerciseType === 'cardio' && '⏱️ Duration and pace will be tracked when you log this workout'}
-                            {exerciseType === 'stretching' && '⏱️ Duration will be tracked when you log this workout'}
+                            {exerciseType === 'time_based' && '⏱️ Duration will be tracked when you log this workout'}
                           </p>
                         </div>
                       )}

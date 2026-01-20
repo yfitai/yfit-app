@@ -30,8 +30,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
   // Cardio tracking state
   const [cardioData, setCardioData] = useState({ duration: '', pace: '', distance: 0 });
   
-  // Stretching tracking state
-  const [stretchingData, setStretchingData] = useState({ duration: '' });
+  // Time-based exercise tracking state
+  const [timeBasedData, setTimeBasedData] = useState({ duration: '' });
 
   useEffect(() => {
     initializeUser();
@@ -163,7 +163,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       alert('Please enter duration and pace');
       return;
     }
-    if (type === 'stretching' && !stretchingData.duration) {
+    if (type === 'time_based' && !timeBasedData.duration) {
       alert('Please enter duration');
       return;
     }
@@ -218,15 +218,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           totalVolume: prev.totalVolume,
           totalDistance: prev.totalDistance + parseFloat(cardioData.distance)
         }));
-      } else if (type === 'stretching') {
+      } else if (type === 'time_based') {
         await supabase.from('exercise_sets').insert({
           session_exercise_id: sessionExercises.id,
           set_number: 1,
-          duration_minutes: parseFloat(stretchingData.duration),
+          duration_minutes: parseFloat(timeBasedData.duration),
           rpe: 5
         });
 
-        // Update stats for stretching
+        // Update stats for time-based exercises
         setSessionStats(prev => ({
           ...prev,
           totalSets: prev.totalSets + 1,
@@ -260,8 +260,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         setSetData({ weight: '', reps: '', rpe: 5 });
       } else if (type === 'cardio') {
         setCardioData({ duration: '', pace: '', distance: 0 });
-      } else if (type === 'stretching') {
-        setStretchingData({ duration: '' });
+      } else if (type === 'time_based') {
+        setTimeBasedData({ duration: '' });
       }
     } catch (error) {
       console.error('Error logging set:', error);
@@ -492,7 +492,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     
     const categoryLower = (category || '').toLowerCase();
     if (categoryLower === 'cardio') return 'cardio';
-    if (categoryLower === 'stretching' || categoryLower === 'flexibility') return 'stretching';
+    if (categoryLower === 'stretching' || categoryLower === 'flexibility' || categoryLower === 'time_based') return 'time_based';
     return 'strength';
   };
   
@@ -850,11 +850,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                 </>
               )}
 
-              {exerciseType === 'stretching' && (
+              {exerciseType === 'time_based' && (
                 <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Duration Exercise
-                  </h3>
+                    ⏱️ Log Time-Based Exercise
+                  </h3>3>
 
                   {/* Duration Input */}
                   <div className="mb-6">
@@ -862,16 +862,16 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     <input
                       type="number"
                       placeholder="Enter duration in minutes"
-                      value={stretchingData.duration}
-                      onChange={(e) => setStretchingData({ duration: e.target.value })}
+                      value={timeBasedData.duration}
+                      onChange={(e) => setTimeBasedData({ duration: e.target.value })}
                       className="w-full text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
                     />
                   </div>
 
-                  {/* Log Stretching Button */}
+                  {/* Log Time-Based Exercise Button */}
                   <button
                     onClick={logSet}
-                    disabled={!stretchingData.duration}
+                    disabled={!timeBasedData.duration}
                     className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Check className="w-6 h-6" />

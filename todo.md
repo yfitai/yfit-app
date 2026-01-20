@@ -431,3 +431,12 @@
   - [x] Investigate how exercises are categorized (weighted vs duration)
   - [x] Update tooltips to clearly explain what counts as "weighted" vs "duration"
   - [x] Added detailed explanations: Weighted (weight × reps), Duration (planks, ab roller), Cardio (time + pace)
+
+### Phase 5: Chart Consistency and Exercise Type Renaming
+- [x] Fix Daily Workout Summary - verify it's using LineChart not BarChart
+- [x] Rename "Stretching" to "Time-Based" exercises throughout app
+  - [x] Update WorkoutLogger.jsx exercise type labels
+  - [x] Update WorkoutBuilder.jsx exercise type labels
+  - [x] Update database exercise categories (stretching → time_based)
+  - [x] Update all UI tooltips and help text
+  - [x] Update SQL file (add_duration_exercises.sql)
