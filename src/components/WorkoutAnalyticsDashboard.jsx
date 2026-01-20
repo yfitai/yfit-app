@@ -11,12 +11,13 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   const [currentWeekStats, setCurrentWeekStats] = useState(null);
   const [predictions, setPredictions] = useState(null);
   const [goals, setGoals] = useState(null);
+  const [chartStartDate, setChartStartDate] = useState(null);
 
   useEffect(() => {
     if (userId) {
       loadAnalyticsData();
     }
-  }, [userId, timeRange]);
+  }, [userId, timeRange, chartStartDate]);
 
   const loadAnalyticsData = async () => {
     setLoading(true);
@@ -40,13 +41,18 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - (weeksToLoad * 7));
 
+      // Apply chart_start_date filter if set
+      const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
+        ? new Date(chartStartDate) 
+        : startDate;
+
       // Load all workout sessions in the time range
       const { data: sessions, error } = await supabase
         .from('workout_sessions')
         .select('*')
         .eq('user_id', userId)
         .eq('is_completed', true)
-        .gte('start_time', startDate.toISOString())
+        .gte('start_time', effectiveStartDate.toISOString())
         .order('start_time', { ascending: true });
 
       if (error) {
@@ -154,6 +160,11 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
       if (error && error.code !== 'PGRST116') throw error;
       setGoals(data);
+      
+      // Set chart start date if available
+      if (data?.chart_start_date) {
+        setChartStartDate(data.chart_start_date);
+      }
     } catch (error) {
       console.error('Error loading goals:', error);
     }

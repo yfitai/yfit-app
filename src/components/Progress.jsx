@@ -6,6 +6,7 @@ import ProgressPhotos from './Progress/ProgressPhotos'
 import WorkoutAnalyticsDashboard from './WorkoutAnalyticsDashboard'
 import FormAnalysisHistory from './FormAnalysisHistory'
 import NutritionProgressCharts from './NutritionProgressCharts'
+import ChartSettings from './ChartSettings'
 
 export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -300,21 +301,24 @@ const calculatePredictions = () => {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
         <p className="text-gray-600">Track your journey and see how far you've come</p>
         
-        {/* Time Range Selector */}
-        <div className="mt-4 grid grid-cols-2 sm:flex gap-2">
-          {['7', '30', '90', '365'].map(days => (
-            <button
-              key={days}
-              onClick={() => setTimeRange(days)}
-              className={`px-3 py-2 rounded-lg font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
-                timeRange === days
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {days === '7' ? '1 Week' : days === '30' ? '1 Month' : days === '90' ? '3 Months' : '1 Year'}
-            </button>
-          ))}
+        {/* Time Range Selector & Settings */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:flex gap-2 flex-1">
+            {['7', '30', '90', '365'].map(days => (
+              <button
+                key={days}
+                onClick={() => setTimeRange(days)}
+                className={`px-3 py-2 rounded-lg font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  timeRange === days
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {days === '7' ? '1 Week' : days === '30' ? '1 Month' : days === '90' ? '3 Months' : '1 Year'}
+              </button>
+            ))}
+          </div>
+          <ChartSettings userId={user?.id} onUpdate={loadProgressData} />
         </div>
       </div>
 

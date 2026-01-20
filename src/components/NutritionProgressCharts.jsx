@@ -16,19 +16,20 @@ export default function NutritionProgressCharts({ user }) {
   })
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('30') // days
+  const [chartStartDate, setChartStartDate] = useState(null)
 
   useEffect(() => {
     if (user) {
       loadNutritionData()
       loadGoals()
     }
-  }, [user, timeRange])
+  }, [user, timeRange, chartStartDate])
 
   const loadGoals = async () => {
     try {
       const { data, error } = await supabase
         .from('user_goals')
-        .select('fiber_goal_g, sugar_goal_g, sodium_goal_mg')
+        .select('fiber_goal_g, sugar_goal_g, sodium_goal_mg, chart_start_date')
         .eq('user_id', user.id)
         .single()
 
@@ -38,6 +39,11 @@ export default function NutritionProgressCharts({ user }) {
           sugar: data.sugar_goal_g || 50,
           sodium: data.sodium_goal_mg || 2300
         })
+        
+        // Set chart start date if available
+        if (data.chart_start_date) {
+          setChartStartDate(data.chart_start_date)
+        }
       }
     } catch (error) {
       console.error('Error loading goals:', error)
@@ -53,12 +59,17 @@ export default function NutritionProgressCharts({ user }) {
       const startDate = new Date()
       startDate.setDate(startDate.getDate() - parseInt(timeRange))
 
+      // Apply chart_start_date filter if set
+      const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
+        ? new Date(chartStartDate) 
+        : startDate
+
       // Load meals grouped by date
       const { data, error } = await supabase
         .from('meals')
         .select('meal_date, fiber, sugar, sodium')
         .eq('user_id', user.id)
-        .gte('meal_date', startDate.toISOString().split('T')[0])
+        .gte('meal_date', effectiveStartDate.toISOString().split('T')[0])
         .lte('meal_date', endDate.toISOString().split('T')[0])
         .order('meal_date', { ascending: true })
 
