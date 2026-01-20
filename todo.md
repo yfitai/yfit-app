@@ -408,3 +408,17 @@
 ### Phase 3: Keep Working Sections
 - [ ] Keep Weight, Body Fat, BMI cards (working well)
 - [ ] Keep Volume Progression chart (working correctly)
+
+### Phase 3: Complete Workout Analytics Redesign
+- [x] Change Daily Macros from stacked bar chart to line chart (like Micros)
+- [x] Fix Workout Analytics showing only Jan 20 data (should show all 3 days)
+- [x] Add Daily Workout Summary (line chart)
+  - [x] Show total workout duration per day
+  - [x] Tooltip: "Jan 20: Push workout (30 min) + Planks (4 min) = 34 min total"
+  - [x] No confusing workout count
+- [x] Keep Volume Progression chart (working correctly)
+  - [x] Add tooltip explaining it only tracks weighted exercises
+- [x] Add Workout Streak card (NEW)
+  - [x] Show current streak: "🔥 3 days in a row!"
+  - [x] Show longest streak
+  - [x] More motivating than "25% consistency"

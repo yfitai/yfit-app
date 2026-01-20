@@ -150,7 +150,21 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
 
       setWeeklyAnalytics(weeklyArray);
       if (weeklyArray.length > 0) {
-        setCurrentWeekStats(weeklyArray[weeklyArray.length - 1]);
+        // Calculate total stats across ALL days in the time range
+        const totalStats = weeklyArray.reduce((acc, week) => ({
+          total_volume: acc.total_volume + week.total_volume,
+          workouts_completed: acc.workouts_completed + week.workouts_completed,
+          total_duration_minutes: acc.total_duration_minutes + week.total_duration_minutes
+        }), { total_volume: 0, workouts_completed: 0, total_duration_minutes: 0 });
+        
+        // Calculate volume change vs previous period
+        const lastWeek = weeklyArray[weeklyArray.length - 1];
+        const prevWeek = weeklyArray.length > 1 ? weeklyArray[weeklyArray.length - 2] : null;
+        if (prevWeek && prevWeek.total_volume > 0) {
+          totalStats.volume_change_percent = ((lastWeek.total_volume - prevWeek.total_volume) / prevWeek.total_volume) * 100;
+        }
+        
+        setCurrentWeekStats(totalStats);
         
         // Calculate predictions if we have enough data
         if (weeklyArray.length >= 4) {
@@ -367,6 +381,124 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         </div>
       )}
 
+      {/* Workout Streak Card */}
+      {weeklyAnalytics.length > 0 && (() => {
+        // Calculate current streak
+        let currentStreak = 0;
+        let longestStreak = 0;
+        let tempStreak = 0;
+        
+        // Sort by date ascending
+        const sortedDays = [...weeklyAnalytics].sort((a, b) => 
+          new Date(a.week_start_date) - new Date(b.week_start_date)
+        );
+        
+        // Calculate streaks
+        for (let i = 0; i < sortedDays.length; i++) {
+          const currentDate = new Date(sortedDays[i].week_start_date);
+          const prevDate = i > 0 ? new Date(sortedDays[i-1].week_start_date) : null;
+          
+          // Check if consecutive day
+          if (prevDate) {
+            const dayDiff = Math.round((currentDate - prevDate) / (1000 * 60 * 60 * 24));
+            if (dayDiff === 1) {
+              tempStreak++;
+            } else {
+              tempStreak = 1;
+            }
+          } else {
+            tempStreak = 1;
+          }
+          
+          if (tempStreak > longestStreak) {
+            longestStreak = tempStreak;
+          }
+          
+          // If this is the most recent day, set current streak
+          if (i === sortedDays.length - 1) {
+            currentStreak = tempStreak;
+          }
+        }
+        
+        return (
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow-sm p-6 border border-orange-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Workout Streak</h3>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <div className="text-3xl font-bold text-orange-600">🔥 {currentStreak}</div>
+                    <div className="text-sm text-gray-600 mt-1">days in a row!</div>
+                  </div>
+                  <div className="ml-6 pl-6 border-l border-orange-200">
+                    <div className="text-xl font-bold text-gray-700">{longestStreak}</div>
+                    <div className="text-xs text-gray-600">longest streak</div>
+                  </div>
+                </div>
+              </div>
+              <Award className="text-orange-400" size={48} />
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Daily Workout Summary Chart */}
+      {weeklyAnalytics.length > 0 && (() => {
+        // Prepare data for duration chart
+        const durationData = weeklyAnalytics.map(week => {
+          const date = new Date(week.week_start_date + 'T00:00:00Z');
+          const groupByDay = parseInt(timeRange) <= 30;
+          const label = groupByDay 
+            ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+            : 'Week of ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+          
+          return {
+            date: label,
+            duration: week.total_duration_minutes,
+            workouts: week.workouts_completed
+          };
+        });
+        
+        return (
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Workout Summary</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={durationData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
+                <YAxis 
+                  stroke="#6b7280" 
+                  style={{ fontSize: '12px' }} 
+                  label={{ value: 'Duration (min)', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                  formatter={(value, name, props) => {
+                    if (name === 'duration') {
+                      return [`${value} minutes total`, 'Duration'];
+                    }
+                    return [value, name];
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="duration" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                  name="duration"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-3 text-xs text-gray-500">
+              💡 Shows total workout time per day (includes all exercises: weighted, duration, and cardio)
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Volume Trend Chart */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Volume Progression</h3>
@@ -401,6 +533,9 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             />
           </AreaChart>
         </ResponsiveContainer>
+        <div className="mt-3 text-xs text-gray-500">
+          💡 Only tracks weighted exercises (push/pull movements). Duration exercises like planks and cardio are shown in Daily Workout Summary above.
+        </div>
       </div>
 
 

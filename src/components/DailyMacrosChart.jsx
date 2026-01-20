@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { supabase } from '../lib/supabase';
 
 const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
@@ -180,7 +180,7 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
       </div>
       
       <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={macrosData}>
+        <LineChart data={macrosData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="dateLabel" />
           <YAxis label={{ value: 'Amount', angle: -90, position: 'insideLeft' }} />
@@ -197,12 +197,44 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
             />
           )}
           
-          {/* Stacked bars - Note: Recharts stacks by default when using multiple Bar components */}
-          <Bar dataKey="calories" stackId="a" fill="#3b82f6" name="Calories" />
-          <Bar dataKey="protein" stackId="b" fill="#ef4444" name="Protein (g)" />
-          <Bar dataKey="carbs" stackId="b" fill="#fbbf24" name="Carbs (g)" />
-          <Bar dataKey="fat" stackId="b" fill="#10b981" name="Fat (g)" />
-        </BarChart>
+          {/* Line charts for each macro */}
+          <Line 
+            type="monotone" 
+            dataKey="calories" 
+            stroke="#3b82f6" 
+            strokeWidth={2} 
+            name="Calories"
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="protein" 
+            stroke="#ef4444" 
+            strokeWidth={2} 
+            name="Protein (g)"
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="carbs" 
+            stroke="#fbbf24" 
+            strokeWidth={2} 
+            name="Carbs (g)"
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="fat" 
+            stroke="#10b981" 
+            strokeWidth={2} 
+            name="Fat (g)"
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+        </LineChart>
       </ResponsiveContainer>
 
       {/* Goals Reference */}
