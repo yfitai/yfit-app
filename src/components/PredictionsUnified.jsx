@@ -275,10 +275,12 @@ export default function PredictionsUnified({ user }) {
 
   // 3. Medication Adherence Prediction
   const predictMedicationAdherence = (data = medicationData) => {
-    if (data.length < 14) return null;
+    // Require at least 3 logs (reduced from 14 for early tracking)
+    if (data.length < 3) return null;
 
     try {
-      const taken = data.filter(log => log.taken).length;
+      // Check for 'status' field (new schema) or 'taken' field (old schema)
+      const taken = data.filter(log => log.status === 'taken' || log.taken === true).length;
       const total = data.length;
       const adherenceRate = (taken / total) * 100;
 
@@ -297,7 +299,7 @@ export default function PredictionsUnified({ user }) {
         byDayOfWeek[dayOfWeek].total++;
         byTimeOfDay[hour].total++;
         
-        if (log.taken) {
+        if (log.status === 'taken' || log.taken === true) {
           byDayOfWeek[dayOfWeek].taken++;
           byTimeOfDay[hour].taken++;
         }
