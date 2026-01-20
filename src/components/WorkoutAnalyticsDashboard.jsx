@@ -112,6 +112,12 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       const weeklyArray = Object.values(weeklyData).sort((a, b) => 
         new Date(a.week_start_date) - new Date(b.week_start_date)
       );
+      
+      console.log('📊 Weekly workout data:', weeklyArray.map(w => ({
+        week_start: w.week_start_date,
+        workouts: w.workouts_completed,
+        volume: w.total_volume
+      })));
 
       // Calculate strength and consistency scores
       weeklyArray.forEach((week, index) => {
