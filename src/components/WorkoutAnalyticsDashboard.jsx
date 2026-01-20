@@ -22,12 +22,13 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   const loadAnalyticsData = async () => {
     setLoading(true);
     try {
-      // Load goals first to get chart_start_date before loading chart data
-      await loadUserGoals();
+      // Load goals first to get chart_start_date
+      const goalsData = await loadUserGoals();
+      const startDate = goalsData?.chart_start_date || null;
       
-      // Then load chart data (will use chartStartDate if set)
+      // Then load chart data with the start date
       await Promise.all([
-        loadWeeklyAnalytics(),
+        loadWeeklyAnalytics(startDate),
         loadExerciseProgress(),
       ]);
     } catch (error) {
@@ -37,7 +38,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
     }
   };
 
-  const loadWeeklyAnalytics = async () => {
+  const loadWeeklyAnalytics = async (chartStartDateParam = chartStartDate) => {
     try {
       // Calculate how many weeks to load
       const weeksToLoad = parseInt(timeRange);
@@ -45,11 +46,11 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       startDate.setDate(startDate.getDate() - (weeksToLoad * 7));
 
       // Apply chart_start_date filter if set
-      console.log('📊 WorkoutAnalytics - chartStartDate state:', chartStartDate);
+      console.log('📊 WorkoutAnalytics - chartStartDate param:', chartStartDateParam);
       console.log('📊 WorkoutAnalytics - calculated startDate:', startDate.toISOString());
       
-      const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
-        ? new Date(chartStartDate) 
+      const effectiveStartDate = chartStartDateParam && new Date(chartStartDateParam) > startDate 
+        ? new Date(chartStartDateParam) 
         : startDate;
       
       console.log('📊 WorkoutAnalytics - effectiveStartDate:', effectiveStartDate.toISOString());
@@ -176,8 +177,12 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       } else {
         console.log('📅 No chart start date set in user_goals');
       }
+      
+      // Return data so it can be used immediately
+      return data;
     } catch (error) {
       console.error('Error loading goals:', error);
+      return null;
     }
   };
 

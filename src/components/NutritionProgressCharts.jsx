@@ -20,10 +20,15 @@ export default function NutritionProgressCharts({ user }) {
 
   useEffect(() => {
     if (user) {
-      loadNutritionData()
-      loadGoals()
+      loadData()
     }
   }, [user, timeRange, chartStartDate])
+
+  const loadData = async () => {
+    const goalsData = await loadGoals()
+    const startDate = goalsData?.chart_start_date || null
+    await loadNutritionData(startDate)
+  }
 
   const loadGoals = async () => {
     try {
@@ -48,12 +53,15 @@ export default function NutritionProgressCharts({ user }) {
           console.log('📅 Nutrition - No chart start date set');
         }
       }
+      
+      return data
     } catch (error) {
       console.error('Error loading goals:', error)
+      return null
     }
   }
 
-  const loadNutritionData = async () => {
+  const loadNutritionData = async (chartStartDateParam = chartStartDate) => {
     try {
       setLoading(true)
       
@@ -63,11 +71,11 @@ export default function NutritionProgressCharts({ user }) {
       startDate.setDate(startDate.getDate() - parseInt(timeRange))
 
       // Apply chart_start_date filter if set
-      console.log('📊 Nutrition - chartStartDate state:', chartStartDate);
+      console.log('📊 Nutrition - chartStartDate param:', chartStartDateParam);
       console.log('📊 Nutrition - calculated startDate:', startDate.toISOString());
       
-      const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
-        ? new Date(chartStartDate) 
+      const effectiveStartDate = chartStartDateParam && new Date(chartStartDateParam) > startDate 
+        ? new Date(chartStartDateParam) 
         : startDate;
       
       console.log('📊 Nutrition - effectiveStartDate:', effectiveStartDate.toISOString())
