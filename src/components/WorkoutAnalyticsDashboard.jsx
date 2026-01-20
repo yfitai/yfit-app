@@ -298,25 +298,9 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <p className="text-sm text-gray-600 mt-1">Showing {timeRange === '7' ? '1 week' : timeRange === '30' ? '1 month' : timeRange === '90' ? '3 months' : '1 year'} of data</p>
       </div>
 
-      {/* Current Week Stats */}
+      {/* Total Volume Card - Keep this one */}
       {currentWeekStats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-600">Workouts This Week</div>
-              <Activity className="text-blue-600" size={20} />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">
-              {currentWeekStats.workouts_completed}
-            </div>
-            <div className="text-sm text-gray-600 mt-1">
-              Goal: {goals?.target_workouts_per_week || 3}/week
-            </div>
-            <div className={`mt-2 px-2 py-1 rounded text-xs border ${getGoalStatusColor(currentWeekStats.goal_status)}`}>
-              {getGoalStatusText(currentWeekStats.goal_status)}
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm text-gray-600">Total Volume</div>
@@ -334,40 +318,6 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             ) : (
               <div className="mt-2 text-xs text-gray-500">First week of tracking</div>
             )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-600">Strength Score</div>
-              <Award className="text-yellow-600" size={20} />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">
-              {currentWeekStats.strength_score?.toFixed(0) || '—'}
-            </div>
-            <div className="text-sm text-gray-600 mt-1">out of 100</div>
-            {currentWeekStats.strength_change_percent && (
-              <div className={`mt-2 flex items-center gap-1 text-sm ${currentWeekStats.strength_change_percent > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {currentWeekStats.strength_change_percent > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                {Math.abs(currentWeekStats.strength_change_percent).toFixed(1)}% change
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-600">Consistency</div>
-              <Target className="text-purple-600" size={20} />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">
-              {currentWeekStats.consistency_score?.toFixed(0) || '—'}%
-            </div>
-            <div className="text-sm text-gray-600 mt-1">adherence rate</div>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-purple-600 h-2 rounded-full transition-all"
-                style={{ width: `${currentWeekStats.consistency_score || 0}%` }}
-              />
-            </div>
           </div>
         </div>
       )}
@@ -453,55 +403,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         </ResponsiveContainer>
       </div>
 
-      {/* Strength & Consistency Chart */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Strength & Consistency</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="week" stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-              labelStyle={{ color: '#374151', fontWeight: 'bold' }}
-            />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="strength" 
-              stroke="#f59e0b" 
-              strokeWidth={2}
-              dot={{ fill: '#f59e0b', r: 4 }}
-              name="Strength Score"
-            />
-            <Line 
-              type="monotone" 
-              dataKey="consistency" 
-              stroke="#8b5cf6" 
-              strokeWidth={2}
-              dot={{ fill: '#8b5cf6', r: 4 }}
-              name="Consistency %"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
 
-      {/* Workout Frequency Chart */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Workout Frequency</h3>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="week" stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-              labelStyle={{ color: '#374151', fontWeight: 'bold' }}
-            />
-            <Bar dataKey="workouts" fill="#10b981" name="Workouts Completed" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
 
       {/* Exercise Progress Table */}
       {exerciseProgress.length > 0 && (

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { supabase } from '../lib/supabase'
-import { Apple, Candy, Droplet } from 'lucide-react'
+import { ChartNoAxesCombined } from 'lucide-react'
+
 
 /**
  * NutritionProgressCharts Component
  * Displays a COMBINED chart for Fiber, Sugar, and Sodium intake (like Protein/Carbs/Fat)
  */
-export default function NutritionProgressCharts({ user }) {
+export default function NutritionProgressCharts({ user, timeRange = '30' }) {
   const [nutritionData, setNutritionData] = useState([])
   const [goals, setGoals] = useState({
     fiber: 25,
@@ -15,7 +16,6 @@ export default function NutritionProgressCharts({ user }) {
     sodium: 2300
   })
   const [loading, setLoading] = useState(true)
-  const [timeRange, setTimeRange] = useState('30') // days
   const [chartStartDate, setChartStartDate] = useState(null)
 
   useEffect(() => {
@@ -170,9 +170,9 @@ export default function NutritionProgressCharts({ user }) {
   if (nutritionData.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Nutrition Progress</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Micronutrients</h3>
         <div className="text-center py-12">
-          <Apple className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <ChartNoAxesCombined className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-600">No nutrition data yet</p>
           <p className="text-sm text-gray-500 mt-2">Start logging meals to see your progress!</p>
         </div>
@@ -180,35 +180,13 @@ export default function NutritionProgressCharts({ user }) {
     )
   }
 
-  // Calculate averages with 1 decimal place
-  const avgFiber = (nutritionData.reduce((sum, d) => sum + d.fiber, 0) / nutritionData.length).toFixed(1)
-  const avgSugar = (nutritionData.reduce((sum, d) => sum + d.sugar, 0) / nutritionData.length).toFixed(1)
-  const avgSodium = (nutritionData.reduce((sum, d) => sum + d.sodium, 0) / nutritionData.length).toFixed(1)
-
   return (
     <div className="space-y-6">
       {/* Combined Chart */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">Micronutrient Progress</h3>
-            <p className="text-sm text-gray-600">Fiber, Sugar & Sodium Tracking</p>
-          </div>
-          <div className="grid grid-cols-2 sm:flex gap-2">
-            {['7', '14', '30', '90'].map(days => (
-              <button
-                key={days}
-                onClick={() => setTimeRange(days)}
-                className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                  timeRange === days
-                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {days === '7' ? '1 Week' : days === '14' ? '2 Weeks' : days === '30' ? '1 Month' : '3 Months'}
-              </button>
-            ))}
-          </div>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Daily Micronutrients</h3>
+          <p className="text-sm text-gray-600">Fiber, Sugar & Sodium Tracking</p>
         </div>
 
         {/* Combined Chart - All Three Nutrients */}
@@ -279,35 +257,7 @@ export default function NutritionProgressCharts({ user }) {
         </div>
       </div>
 
-      {/* Summary Statistics */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h4 className="text-md font-semibold text-gray-800 mb-4">Average Daily Intake ({timeRange} days)</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Fiber Average */}
-          <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
-            <Apple className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-xl sm:text-2xl font-bold text-green-600 break-words">{avgFiber}g</p>
-            <p className="text-xs text-gray-600 mt-1">Avg Fiber</p>
-            <p className="text-xs text-gray-500">Goal: {goals.fiber}g</p>
-          </div>
 
-          {/* Sugar Average */}
-          <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-            <Candy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 mx-auto mb-2" />
-            <p className="text-xl sm:text-2xl font-bold text-yellow-600 break-words">{avgSugar}g</p>
-            <p className="text-xs text-gray-600 mt-1">Avg Sugar</p>
-            <p className="text-xs text-gray-500">Limit: {goals.sugar}g</p>
-          </div>
-
-          {/* Sodium Average */}
-          <div className="text-center p-3 sm:p-4 bg-red-50 rounded-lg border border-red-200">
-            <Droplet className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 mx-auto mb-2" />
-            <p className="text-xl sm:text-2xl font-bold text-red-600 break-words">{avgSodium}mg</p>
-            <p className="text-xs text-gray-600 mt-1">Avg Sodium</p>
-            <p className="text-xs text-gray-500">Limit: {goals.sodium}mg</p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

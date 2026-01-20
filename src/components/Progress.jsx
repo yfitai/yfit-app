@@ -7,6 +7,7 @@ import WorkoutAnalyticsDashboard from './WorkoutAnalyticsDashboard'
 import FormAnalysisHistory from './FormAnalysisHistory'
 import NutritionProgressCharts from './NutritionProgressCharts'
 import ChartSettings from './ChartSettings'
+import DailyMacrosChart from './DailyMacrosChart'
 
 export default function Progress({ user: propUser }) {
   const [loading, setLoading] = useState(true)
@@ -556,9 +557,15 @@ const calculatePredictions = () => {
         {user && <FormAnalysisHistory user={user} />}
       </div>
       
-      {/* Nutrition Progress Charts */}
-      <div className="mt-8">
-        {user && <NutritionProgressCharts user={user} />}
+      {/* Nutrition Progress Section */}
+      <div className="mt-8 space-y-6">
+        <h2 className="text-2xl font-bold text-gray-900">Nutrition Progress</h2>
+        
+        {/* Daily Macros Chart */}
+        {user && <DailyMacrosChart userId={user.id} timeRange={timeRange} />}
+        
+        {/* Daily Micros Chart */}
+        {user && <NutritionProgressCharts user={user} timeRange={timeRange} />}
       </div>
       
       {/* Progress Photos */}

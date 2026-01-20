@@ -383,3 +383,28 @@
 - [ ] Explain significance of each chart and how they work
 - [ ] Document how Volume Progression ties to predictions
 - [ ] Add tooltips or help text to charts
+
+
+## 📊 Progress Page Simplification (January 20, 2026)
+
+### Phase 1: Remove Confusing Metrics
+- [ ] Remove "Workouts This Week" card (confusing with duration exercises)
+- [ ] Remove "Consistency %" card (unclear what it means)
+- [ ] Remove "Strength Score" card (arbitrary number)
+- [ ] Remove "Strength & Consistency" chart (too complex)
+- [ ] Remove "Weekly Workout Frequency" chart (double-counts duration exercises)
+
+### Phase 2: Add Nutrition Progress Section
+- [x] Add Daily Macros Chart (stacked bar chart)
+  - [x] Show Calories, Protein, Carbs, Fat per day
+  - [x] Color-code: Calories (blue), Protein (red), Carbs (yellow), Fat (green)
+  - [x] Add target line for goals
+  - [x] Respond to 1 Week/1 Month selector
+- [x] Update Daily Micros Chart
+  - [x] Keep Fiber, Sugar, Sodium line chart
+  - [x] Fix timezone issues
+- [x] Remove "Average Daily Intake" card (confusing 30-day average)
+
+### Phase 3: Keep Working Sections
+- [ ] Keep Weight, Body Fat, BMI cards (working well)
+- [ ] Keep Volume Progression chart (working correctly)
