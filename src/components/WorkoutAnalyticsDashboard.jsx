@@ -79,12 +79,12 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       const weeklyData = {};
       sessions.forEach(session => {
         const sessionDate = new Date(session.start_time);
-        // Get Monday of the week (treating Sunday as end of week, not start)
+        // Get Sunday of the week (week starts on Sunday)
         const weekStart = new Date(sessionDate);
         const day = weekStart.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-        // Calculate days to subtract to get to Monday
-        // Sunday (0) should go back 6 days, Monday (1) stays same, Saturday (6) goes back 5 days
-        const daysToSubtract = day === 0 ? 6 : day - 1;
+        // Calculate days to subtract to get to Sunday
+        // Sunday (0) stays same, Monday (1) goes back 1 day, Saturday (6) goes back 6 days
+        const daysToSubtract = day; // Simply subtract the day number
         weekStart.setDate(weekStart.getDate() - daysToSubtract);
         weekStart.setHours(0, 0, 0, 0);
         const weekKey = weekStart.toISOString().split('T')[0];
