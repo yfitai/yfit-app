@@ -549,7 +549,7 @@ const calculatePredictions = () => {
       )}
 
       {/* Workout Analytics Dashboard */}
-      {user && <WorkoutAnalyticsDashboard userId={user.id} />}
+      {user && <WorkoutAnalyticsDashboard userId={user.id} timeRange={timeRange} />}
 
       {/* Form Analysis History */}
       <div className="mt-8 bg-white rounded-lg shadow-sm p-6 border border-gray-200">

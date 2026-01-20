@@ -118,14 +118,18 @@ export default function NutritionProgressCharts({ user }) {
       })
 
       // Convert to array and format dates
-      const formattedData = Object.values(groupedData).map(item => ({
-        ...item,
-        dateLabel: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        // Round to 1 decimal place
-        fiber: parseFloat(item.fiber.toFixed(1)),
-        sugar: parseFloat(item.sugar.toFixed(1)),
-        sodium: parseFloat(item.sodium.toFixed(1))
-      }))
+      const formattedData = Object.values(groupedData).map(item => {
+        // Parse date as UTC to prevent timezone shifts
+        const date = new Date(item.date + 'T00:00:00Z');
+        return {
+          ...item,
+          dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+          // Round to 1 decimal place
+          fiber: parseFloat(item.fiber.toFixed(1)),
+          sugar: parseFloat(item.sugar.toFixed(1)),
+          sodium: parseFloat(item.sodium.toFixed(1))
+        };
+      })
 
       setNutritionData(formattedData)
     } catch (error) {

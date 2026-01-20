@@ -3,9 +3,9 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { TrendingUp, TrendingDown, Target, Activity, Award, Calendar, Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const WorkoutAnalyticsDashboard = ({ userId }) => {
+const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }) => {
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('12'); // weeks
+  const timeRange = parentTimeRange; // Use parent's time range (7, 30, 90, 365 days)
   const [weeklyAnalytics, setWeeklyAnalytics] = useState([]);
   const [exerciseProgress, setExerciseProgress] = useState([]);
   const [currentWeekStats, setCurrentWeekStats] = useState(null);
@@ -17,7 +17,7 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
     if (userId) {
       loadAnalyticsData();
     }
-  }, [userId, timeRange, chartStartDate]);
+  }, [userId, parentTimeRange, chartStartDate]);
 
   const loadAnalyticsData = async () => {
     setLoading(true);
@@ -40,10 +40,10 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
 
   const loadWeeklyAnalytics = async (chartStartDateParam = chartStartDate) => {
     try {
-      // Calculate how many weeks to load
-      const weeksToLoad = parseInt(timeRange);
+      // Calculate date range based on days (timeRange is now in days: 7, 30, 90, 365)
+      const daysToLoad = parseInt(timeRange);
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - (weeksToLoad * 7));
+      startDate.setDate(startDate.getDate() - daysToLoad);
 
       // Apply chart_start_date filter if set
       console.log('📊 WorkoutAnalytics - chartStartDate param:', chartStartDateParam);
@@ -75,19 +75,27 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
         return;
       }
 
-      // Group sessions by week
+      // Group sessions by day or week depending on time range
+      const groupByDay = daysToLoad <= 30; // Daily for 7 and 30 days, weekly for 90+ days
       const weeklyData = {};
       sessions.forEach(session => {
         const sessionDate = new Date(session.start_time);
-        // Get Sunday of the week (week starts on Sunday)
-        const weekStart = new Date(sessionDate);
-        const day = weekStart.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-        // Calculate days to subtract to get to Sunday
-        // Sunday (0) stays same, Monday (1) goes back 1 day, Saturday (6) goes back 6 days
-        const daysToSubtract = day; // Simply subtract the day number
-        weekStart.setDate(weekStart.getDate() - daysToSubtract);
-        weekStart.setHours(0, 0, 0, 0);
-        const weekKey = weekStart.toISOString().split('T')[0];
+        
+        let weekKey;
+        if (groupByDay) {
+          // Group by individual day
+          const dayStart = new Date(sessionDate);
+          dayStart.setHours(0, 0, 0, 0);
+          weekKey = dayStart.toISOString().split('T')[0];
+        } else {
+          // Group by week (Sunday start)
+          const weekStart = new Date(sessionDate);
+          const day = weekStart.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+          const daysToSubtract = day; // Sunday (0) stays same, others go back to Sunday
+          weekStart.setDate(weekStart.getDate() - daysToSubtract);
+          weekStart.setHours(0, 0, 0, 0);
+          weekKey = weekStart.toISOString().split('T')[0];
+        }
 
         if (!weeklyData[weekKey]) {
           weeklyData[weekKey] = {
@@ -238,11 +246,15 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   };
 
   const formatChartData = () => {
+    const groupByDay = parseInt(timeRange) <= 30;
     return weeklyAnalytics.map(week => {
       // Parse date as UTC to prevent timezone shifts
       const date = new Date(week.week_start_date + 'T00:00:00Z');
+      const label = groupByDay 
+        ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+        : 'Week of ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
       return {
-        week: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+        week: label,
         volume: Math.round(week.total_volume), // Keep as actual lbs
         strength: week.strength_score,
         workouts: week.workouts_completed,
@@ -281,18 +293,9 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Workout Analytics</h2>
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="4">Last 4 Weeks</option>
-          <option value="8">Last 8 Weeks</option>
-          <option value="12">Last 12 Weeks</option>
-          <option value="24">Last 6 Months</option>
-        </select>
+        <p className="text-sm text-gray-600 mt-1">Showing {timeRange === '7' ? '1 week' : timeRange === '30' ? '1 month' : timeRange === '90' ? '3 months' : '1 year'} of data</p>
       </div>
 
       {/* Current Week Stats */}
