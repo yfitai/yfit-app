@@ -422,3 +422,12 @@
   - [x] Show current streak: "🔥 3 days in a row!"
   - [x] Show longest streak
   - [x] More motivating than "25% consistency"
+
+### Phase 4: Fix Remaining Progress Page Issues
+- [x] Fix Total Volume card showing "78.3% vs last week" when no previous week exists
+  - [x] Should show "First week of tracking" instead
+- [x] Change Volume Progression from area chart to line chart (consistency with other charts)
+- [x] Clarify exercise type differentiation
+  - [x] Investigate how exercises are categorized (weighted vs duration)
+  - [x] Update tooltips to clearly explain what counts as "weighted" vs "duration"
+  - [x] Added detailed explanations: Weighted (weight × reps), Duration (planks, ab roller), Cardio (time + pace)

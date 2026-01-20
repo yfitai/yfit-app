@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Target, Activity, Award, Calendar, Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -157,12 +157,9 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
           total_duration_minutes: acc.total_duration_minutes + week.total_duration_minutes
         }), { total_volume: 0, workouts_completed: 0, total_duration_minutes: 0 });
         
-        // Calculate volume change vs previous period
-        const lastWeek = weeklyArray[weeklyArray.length - 1];
-        const prevWeek = weeklyArray.length > 1 ? weeklyArray[weeklyArray.length - 2] : null;
-        if (prevWeek && prevWeek.total_volume > 0) {
-          totalStats.volume_change_percent = ((lastWeek.total_volume - prevWeek.total_volume) / prevWeek.total_volume) * 100;
-        }
+        // Don't calculate volume change - we're showing total for the entire period
+        // Volume change would only make sense if comparing this period to a previous period
+        // For now, leave it undefined so the card shows "First week of tracking"
         
         setCurrentWeekStats(totalStats);
         
@@ -493,7 +490,12 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
               </LineChart>
             </ResponsiveContainer>
             <div className="mt-3 text-xs text-gray-500">
-              💡 Shows total workout time per day (includes all exercises: weighted, duration, and cardio)
+              💡 Shows total workout time per day (includes all exercise types)
+              <div className="mt-1">
+                <span className="font-semibold">Weighted:</span> Bench press, squats, etc. (tracks weight × reps) |
+                <span className="font-semibold"> Duration:</span> Planks, ab roller, wall sits (tracks time) |
+                <span className="font-semibold"> Cardio:</span> Walking, running (tracks time + pace)
+              </div>
             </div>
           </div>
         );
@@ -503,13 +505,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Volume Progression</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="week" stroke="#6b7280" style={{ fontSize: '12px' }} />
             <YAxis 
@@ -523,18 +519,22 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
               labelStyle={{ color: '#374151', fontWeight: 'bold' }}
               formatter={(value) => [value.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' lbs', 'Volume']}
             />
-            <Area 
+            <Line 
               type="monotone" 
               dataKey="volume" 
               stroke="#3b82f6" 
               strokeWidth={2}
-              fill="url(#volumeGradient)" 
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
               name="Volume"
             />
-          </AreaChart>
+          </LineChart>
         </ResponsiveContainer>
         <div className="mt-3 text-xs text-gray-500">
-          💡 Only tracks weighted exercises (push/pull movements). Duration exercises like planks and cardio are shown in Daily Workout Summary above.
+          💡 Only tracks <span className="font-semibold">weighted exercises</span> (bench press, squats, rows, etc.) where volume = weight × reps.
+          <div className="mt-1">
+            Duration exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.
+          </div>
         </div>
       </div>
 
