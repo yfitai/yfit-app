@@ -45,9 +45,14 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       startDate.setDate(startDate.getDate() - (weeksToLoad * 7));
 
       // Apply chart_start_date filter if set
+      console.log('📊 WorkoutAnalytics - chartStartDate state:', chartStartDate);
+      console.log('📊 WorkoutAnalytics - calculated startDate:', startDate.toISOString());
+      
       const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
         ? new Date(chartStartDate) 
         : startDate;
+      
+      console.log('📊 WorkoutAnalytics - effectiveStartDate:', effectiveStartDate.toISOString());
 
       // Load all workout sessions in the time range
       const { data: sessions, error } = await supabase
@@ -166,7 +171,10 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
       
       // Set chart start date if available
       if (data?.chart_start_date) {
+        console.log('📅 Chart start date loaded from DB:', data.chart_start_date);
         setChartStartDate(data.chart_start_date);
+      } else {
+        console.log('📅 No chart start date set in user_goals');
       }
     } catch (error) {
       console.error('Error loading goals:', error);

@@ -42,7 +42,10 @@ export default function NutritionProgressCharts({ user }) {
         
         // Set chart start date if available
         if (data.chart_start_date) {
+          console.log('📅 Nutrition - Chart start date loaded from DB:', data.chart_start_date);
           setChartStartDate(data.chart_start_date)
+        } else {
+          console.log('📅 Nutrition - No chart start date set');
         }
       }
     } catch (error) {
@@ -60,9 +63,14 @@ export default function NutritionProgressCharts({ user }) {
       startDate.setDate(startDate.getDate() - parseInt(timeRange))
 
       // Apply chart_start_date filter if set
+      console.log('📊 Nutrition - chartStartDate state:', chartStartDate);
+      console.log('📊 Nutrition - calculated startDate:', startDate.toISOString());
+      
       const effectiveStartDate = chartStartDate && new Date(chartStartDate) > startDate 
         ? new Date(chartStartDate) 
-        : startDate
+        : startDate;
+      
+      console.log('📊 Nutrition - effectiveStartDate:', effectiveStartDate.toISOString())
 
       // Load meals grouped by date
       const { data, error } = await supabase
