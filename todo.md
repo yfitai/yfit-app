@@ -440,3 +440,8 @@
   - [x] Update database exercise categories (stretching → time_based)
   - [x] Update all UI tooltips and help text
   - [x] Update SQL file (add_duration_exercises.sql)
+
+### Phase 6: Fix Fitness Activity Chart in Progress.jsx
+- [x] Change Fitness Activity chart from BarChart to LineChart
+- [x] Add exercise type breakdown (Weighted, Time-Based, Cardio)
+- [x] Remove the old simple duration-only chart (replaced by WorkoutAnalyticsDashboard)

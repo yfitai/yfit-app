@@ -21,7 +21,7 @@ export default function Progress({ user: propUser }) {
   const [measurementsData, setMeasurementsData] = useState([])
   const [healthMetricsData, setHealthMetricsData] = useState([])
   const [nutritionComplianceData, setNutritionComplianceData] = useState([])
-  const [fitnessData, setFitnessData] = useState([])
+  // const [fitnessData, setFitnessData] = useState([]) // Removed - WorkoutAnalyticsDashboard handles this
   
   // Current vs Goal
   const [currentMetrics, setCurrentMetrics] = useState(null)
@@ -48,7 +48,7 @@ export default function Progress({ user: propUser }) {
           loadMeasurementsProgress(currentUser.id),
           loadHealthMetrics(currentUser.id),
           loadNutritionCompliance(currentUser.id),
-          loadFitnessProgress(currentUser.id),
+          // loadFitnessProgress(currentUser.id), // Removed - WorkoutAnalyticsDashboard handles this now
           loadGoals(currentUser.id)
         ])
         
@@ -172,24 +172,7 @@ export default function Progress({ user: propUser }) {
     }
   }
 
-  const loadFitnessProgress = async (userId) => {
-    const { data } = await supabase
-      .from('workout_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_completed', true)
-      .gte('start_time', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
-      .order('start_time', { ascending: true })
-
-    if (data) {
-      setFitnessData(data.map(d => ({
-        date: new Date(d.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        workouts: 1,
-        duration: Math.round((new Date(d.end_time) - new Date(d.start_time)) / 60000) || 0,
-        calories_burned: Math.round((d.total_volume || 0) * 0.05) || 0 // Rough estimate
-      })))
-    }
-  }
+  // loadFitnessProgress removed - WorkoutAnalyticsDashboard handles workout analytics now
 
 const loadGoals = async (userId) => {
   console.log('📊 Loading goals and latest measurements for user:', userId)
@@ -533,23 +516,7 @@ const calculatePredictions = () => {
         </div>
       )}
 
-      {/* Fitness Progress */}
-      {fitnessData.length > 0 && (
-        <ChartCard title="Fitness Activity" icon={<Dumbbell className="w-5 h-5 text-orange-500" />}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={fitnessData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="duration" fill="#f97316" name="Duration (min)" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      )}
-
-      {/* Workout Analytics Dashboard */}
+      {/* Workout Analytics Dashboard - Replaces old Fitness Activity chart */}
       {user && <WorkoutAnalyticsDashboard userId={user.id} timeRange={timeRange} />}
 
       {/* Form Analysis History */}
