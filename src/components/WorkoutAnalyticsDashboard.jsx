@@ -238,13 +238,17 @@ const WorkoutAnalyticsDashboard = ({ userId }) => {
   };
 
   const formatChartData = () => {
-    return weeklyAnalytics.map(week => ({
-      week: new Date(week.week_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      volume: Math.round(week.total_volume), // Keep as actual lbs
-      strength: week.strength_score,
-      workouts: week.workouts_completed,
-      consistency: week.consistency_score
-    }));
+    return weeklyAnalytics.map(week => {
+      // Parse date as UTC to prevent timezone shifts
+      const date = new Date(week.week_start_date + 'T00:00:00Z');
+      return {
+        week: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+        volume: Math.round(week.total_volume), // Keep as actual lbs
+        strength: week.strength_score,
+        workouts: week.workouts_completed,
+        consistency: week.consistency_score
+      };
+    });
   };
 
   const getGoalStatusColor = (status) => {
