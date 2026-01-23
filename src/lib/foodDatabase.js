@@ -289,11 +289,12 @@ async function searchOpenFoodFacts(query, limit) {
         const hasCJKChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(name)
         if (hasCJKChars) return false
         
-        // Filter out products without actual nutrition data (must have at least protein OR carbs OR fat)
-        const hasNutrition = (nutriments.proteins_100g && nutriments.proteins_100g > 0) ||
-                            (nutriments.carbohydrates_100g && nutriments.carbohydrates_100g > 0) ||
-                            (nutriments.fat_100g && nutriments.fat_100g > 0) ||
-                            (nutriments['energy-kcal_100g'] && nutriments['energy-kcal_100g'] > 0)
+        // Filter out products without nutrition data fields (check for field existence, not value)
+        const hasNutrition = (nutriments.proteins_100g !== undefined) ||
+                            (nutriments.carbohydrates_100g !== undefined) ||
+                            (nutriments.fat_100g !== undefined) ||
+                            (nutriments['energy-kcal_100g'] !== undefined) ||
+                            (nutriments.energy_100g !== undefined)
         
         return hasNutrition
       })
