@@ -164,7 +164,7 @@ async function searchUSDA(query, limit) {
           nameLower.includes(keyword) && !queryLower.includes(keyword)
         )
         
-        if (hasIrrelevantKeyword) relevanceScore -= 40
+        if (hasIrrelevantKeyword) relevanceScore -= 60 // Increased penalty from 40 to 60
         
         // Boost simple, whole foods
         const isSimpleFood = nameLower.split(',').length === 1 && nameLower.split(' ').length <= 3
@@ -277,17 +277,25 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // Minimal filtering: only block Chinese/Japanese/Korean characters
+    // Filter: block CJK characters and products without nutrition data
     const products = data.products
       .filter(product => {
         if (!product.product_name || !product.nutriments) return false
         
         const name = product.product_name || ''
+        const nutriments = product.nutriments
         
-        // Only filter out products with Chinese/Japanese/Korean characters
+        // Filter out products with Chinese/Japanese/Korean characters
         const hasCJKChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(name)
+        if (hasCJKChars) return false
         
-        return !hasCJKChars
+        // Filter out products without actual nutrition data (must have at least protein OR carbs OR fat)
+        const hasNutrition = (nutriments.proteins_100g && nutriments.proteins_100g > 0) ||
+                            (nutriments.carbohydrates_100g && nutriments.carbohydrates_100g > 0) ||
+                            (nutriments.fat_100g && nutriments.fat_100g > 0) ||
+                            (nutriments['energy-kcal_100g'] && nutriments['energy-kcal_100g'] > 0)
+        
+        return hasNutrition
       })
       .slice(0, limit)
       .map(product => transformOpenFoodFactsProduct(product))
