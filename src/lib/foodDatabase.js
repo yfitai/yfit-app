@@ -134,6 +134,8 @@ async function searchUSDA(query, limit) {
 
     // Filter and rank results by relevance
     const queryLower = query.toLowerCase()
+    const queryWords = queryLower.split(' ')
+    
     const results = data.foods
       .map(food => {
         const nameLower = (food.description || '').toLowerCase()
@@ -148,9 +150,29 @@ async function searchUSDA(query, limit) {
         if (nameLower.startsWith(queryLower)) relevanceScore += 50
         
         // Contains all query words
-        const queryWords = queryLower.split(' ')
         const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
         relevanceScore += (matchedWords / queryWords.length) * 30
+        
+        // Penalize overly processed or irrelevant items
+        const irrelevantKeywords = [
+          'spread', 'dip', 'sauce', 'dressing', 'mix', 'prepared',
+          'frozen meal', 'tv dinner', 'baby food', 'infant formula',
+          'dietary supplement', 'protein powder', 'shake mix'
+        ]
+        
+        const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
+          nameLower.includes(keyword) && !queryLower.includes(keyword)
+        )
+        
+        if (hasIrrelevantKeyword) relevanceScore -= 40
+        
+        // Boost simple, whole foods
+        const isSimpleFood = nameLower.split(',').length === 1 && nameLower.split(' ').length <= 3
+        if (isSimpleFood) relevanceScore += 10
+        
+        // Penalize foods with too many descriptors (likely not what user wants)
+        const wordCount = nameLower.split(' ').length
+        if (wordCount > 6) relevanceScore -= 15
         
         return {
           food,
@@ -228,8 +250,17 @@ function transformUSDAFood(usdaFood) {
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
+    // Add language and country filtering to get English-only results
+    const params = new URLSearchParams({
+      search_terms: query,
+      page_size: limit * 2, // Get more results to filter
+      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
+      countries: 'United States,Canada,United Kingdom,Australia', // English-speaking countries
+      json: 1
+    })
+    
     const response = await fetch(
-      `${OPEN_FOOD_FACTS_API}/search?search_terms=${encodeURIComponent(query)}&page_size=${limit}&fields=product_name,brands,nutriments,serving_size,code`,
+      `${OPEN_FOOD_FACTS_API}/search?${params}`,
       {
         headers: {
           'User-Agent': USER_AGENT
@@ -247,9 +278,33 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    return data.products
-      .filter(product => product.product_name && product.nutriments)
+    // Filter for English-language products only
+    const englishProducts = data.products
+      .filter(product => {
+        if (!product.product_name || !product.nutriments) return false
+        
+        // Check if product has English language code
+        const hasEnglish = product.languages_codes?.includes('en') || 
+                          product.languages_codes?.includes('en-US') ||
+                          product.languages_codes?.includes('en-GB') ||
+                          product.languages_codes?.includes('en-CA')
+        
+        // Check if product name contains mostly English characters (not French/Chinese)
+        const name = product.product_name || ''
+        const hasNonLatinChars = /[\u0080-\uFFFF]/.test(name) && !/[àâäéèêëïîôùûüÿœæç]/i.test(name)
+        
+        // Filter out products with French accents in majority of words or non-Latin characters
+        const words = name.split(' ')
+        const frenchWords = words.filter(w => /[àâäéèêëïîôùûüÿœæç]/i.test(w)).length
+        const hasMostlyFrench = frenchWords > words.length / 2
+        
+        return hasEnglish && !hasNonLatinChars && !hasMostlyFrench
+      })
+      .slice(0, limit) // Limit after filtering
       .map(product => transformOpenFoodFactsProduct(product))
+    
+    console.log(`📦 Filtered ${data.products.length} results to ${englishProducts.length} English products`)
+    return englishProducts
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
     return []

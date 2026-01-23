@@ -137,9 +137,12 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
           const volumeChange = prevVolume > 0 ? ((week.total_volume - prevVolume) / prevVolume) * 100 : 0;
           week.strength_score = Math.max(0, Math.min(100, 70 + volumeChange));
           week.volume_change_percent = volumeChange;
+          // Strength change is the same as volume change (volume = weight × reps)
+          week.strength_change_percent = volumeChange;
         } else {
           week.strength_score = 70;
           week.volume_change_percent = 0;
+          week.strength_change_percent = 0;
         }
 
         // Consistency score: based on workouts completed (assuming 4 workouts/week goal)
@@ -157,9 +160,15 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
           total_duration_minutes: acc.total_duration_minutes + week.total_duration_minutes
         }), { total_volume: 0, workouts_completed: 0, total_duration_minutes: 0 });
         
-        // Don't calculate volume change - we're showing total for the entire period
-        // Volume change would only make sense if comparing this period to a previous period
-        // For now, leave it undefined so the card shows "First week of tracking"
+        // Calculate goal progress percentage based on workout consistency
+        const workoutGoal = goals?.workouts_per_week || 4;
+        const weeksInPeriod = weeklyArray.length;
+        const expectedWorkouts = workoutGoal * weeksInPeriod;
+        const goalProgressPercent = expectedWorkouts > 0 
+          ? Math.min(100, (totalStats.workouts_completed / expectedWorkouts) * 100)
+          : 0;
+        
+        totalStats.goal_progress_percent = goalProgressPercent;
         
         setCurrentWeekStats(totalStats);
         
@@ -215,10 +224,12 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
 
   const calculatePredictions = (data) => {
     // Simple linear regression for volume prediction
+    // Note: data is passed in reversed order (most recent first), so data[0] is most recent
     const recentWeeks = data.slice(0, 4);
     const avgVolumeChange = recentWeeks.reduce((sum, week) => 
       sum + (week.volume_change_percent || 0), 0) / recentWeeks.length;
     
+    // Use most recent week (data[0] since array is reversed)
     const currentVolume = data[0].total_volume || 0;
     const predictedVolume = Math.round(currentVolume * (1 + avgVolumeChange / 100));
 
