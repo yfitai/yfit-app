@@ -277,13 +277,22 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // TEMPORARY: No filtering to diagnose issue
+    // Minimal filtering: only block Chinese/Japanese/Korean characters
     const products = data.products
-      .filter(product => product.product_name && product.nutriments)
+      .filter(product => {
+        if (!product.product_name || !product.nutriments) return false
+        
+        const name = product.product_name || ''
+        
+        // Only filter out products with Chinese/Japanese/Korean characters
+        const hasCJKChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(name)
+        
+        return !hasCJKChars
+      })
       .slice(0, limit)
       .map(product => transformOpenFoodFactsProduct(product))
     
-    console.log(`📦 Open Food Facts returned ${data.products.length} results, showing ${products.length}`)
+    console.log(`📦 Open Food Facts: ${data.products.length} results → ${products.length} after filtering`)
     return products
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
