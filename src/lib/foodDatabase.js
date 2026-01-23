@@ -280,37 +280,71 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // Strong filtering: block non-English products and products without nutrition data
-    const products = data.products
-      .filter(product => {
-        if (!product.product_name || !product.nutriments) return false
+    // Filter and score products by relevance to search query
+    const queryLower = query.toLowerCase()
+    const queryWords = queryLower.split(' ').filter(w => w.length > 2)
+    
+    const scoredProducts = data.products
+      .map(product => {
+        if (!product.product_name || !product.nutriments) return null
         
         const name = product.product_name || ''
+        const nameLower = name.toLowerCase()
         const brand = (product.brands || '').toLowerCase()
         const nutriments = product.nutriments
         
         // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
         const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
-        if (hasNonLatinChars) return false
+        if (hasNonLatinChars) return null
         
-        // Filter out specific non-English brands that keep appearing
+        // Filter out specific non-English brands
         const nonEnglishBrands = ['sidi ali', 'sidi-ali']
-        if (nonEnglishBrands.some(b => brand.includes(b))) return false
+        if (nonEnglishBrands.some(b => brand.includes(b))) return null
         
-        // Filter out products without nutrition data fields (check for field existence, not value)
+        // Filter out products without nutrition data
         const hasNutrition = (nutriments.proteins_100g !== undefined) ||
                             (nutriments.carbohydrates_100g !== undefined) ||
                             (nutriments.fat_100g !== undefined) ||
                             (nutriments['energy-kcal_100g'] !== undefined) ||
                             (nutriments.energy_100g !== undefined)
+        if (!hasNutrition) return null
         
-        return hasNutrition
+        // Calculate relevance score
+        let relevanceScore = 0
+        
+        // Exact match gets highest score
+        if (nameLower === queryLower) relevanceScore += 100
+        
+        // Starts with query gets high score
+        if (nameLower.startsWith(queryLower)) relevanceScore += 50
+        
+        // Contains all query words
+        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
+        if (queryWords.length > 0) {
+          relevanceScore += (matchedWords / queryWords.length) * 40
+        }
+        
+        // Boost if brand matches query
+        if (brand && queryWords.some(word => brand.includes(word))) {
+          relevanceScore += 20
+        }
+        
+        // Penalize very long product names (likely not what user wants)
+        const wordCount = nameLower.split(' ').length
+        if (wordCount > 8) relevanceScore -= 10
+        
+        return {
+          product,
+          relevanceScore
+        }
       })
+      .filter(item => item !== null && item.relevanceScore > 15) // Filter out low relevance
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
-      .map(product => transformOpenFoodFactsProduct(product))
+      .map(item => transformOpenFoodFactsProduct(item.product))
     
-    console.log(`📦 Open Food Facts: ${data.products.length} results → ${products.length} after filtering`)
-    return products
+    console.log(`📦 Open Food Facts: ${data.products.length} results → ${scoredProducts.length} after filtering`)
+    return scoredProducts
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
     return []
