@@ -278,27 +278,34 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // Filter for English-language products only
+    // Filter for English-language products - less aggressive filtering
     const englishProducts = data.products
       .filter(product => {
         if (!product.product_name || !product.nutriments) return false
         
-        // Check if product has English language code
+        const name = product.product_name || ''
+        
+        // Filter out products with Chinese/Japanese/Korean characters
+        const hasCJKChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(name)
+        if (hasCJKChars) return false
+        
+        // Filter out products that are ENTIRELY in French (all words have accents)
+        const words = name.split(' ').filter(w => w.length > 2) // Only check words longer than 2 chars
+        if (words.length > 0) {
+          const frenchWords = words.filter(w => /[àâäéèêëïîôùûüÿœæç]/i.test(w)).length
+          const allFrench = frenchWords === words.length
+          if (allFrench) return false
+        }
+        
+        // Allow products with English language code OR basic Latin characters
         const hasEnglish = product.languages_codes?.includes('en') || 
                           product.languages_codes?.includes('en-US') ||
                           product.languages_codes?.includes('en-GB') ||
                           product.languages_codes?.includes('en-CA')
         
-        // Check if product name contains mostly English characters (not French/Chinese)
-        const name = product.product_name || ''
-        const hasNonLatinChars = /[\u0080-\uFFFF]/.test(name) && !/[àâäéèêëïîôùûüÿœæç]/i.test(name)
+        const hasBasicLatin = /[a-zA-Z]/.test(name)
         
-        // Filter out products with French accents in majority of words or non-Latin characters
-        const words = name.split(' ')
-        const frenchWords = words.filter(w => /[àâäéèêëïîôùûüÿœæç]/i.test(w)).length
-        const hasMostlyFrench = frenchWords > words.length / 2
-        
-        return hasEnglish && !hasNonLatinChars && !hasMostlyFrench
+        return hasEnglish || hasBasicLatin
       })
       .slice(0, limit) // Limit after filtering
       .map(product => transformOpenFoodFactsProduct(product))
