@@ -7,7 +7,7 @@
 import { supabase } from './supabase'
 
 // API Configuration
-const OPEN_FOOD_FACTS_API = 'https://world.openfoodfacts.net/api/v2'
+const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subdomain for English products
 const USDA_API_BASE = 'https://api.nal.usda.gov/fdc/v1'
 
 // Get USDA API key from environment variable
@@ -253,8 +253,11 @@ async function searchOpenFoodFacts(query, limit) {
     // Get more results and filter client-side for better coverage
     const params = new URLSearchParams({
       search_terms: query,
-      page_size: limit * 3, // Get more results to filter client-side
+      page_size: limit * 5, // Get even more results to filter
       fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
+      tagtype_0: 'languages',
+      tag_contains_0: 'contains',
+      tag_0: 'en', // Filter for products with English language tag
       json: 1
     })
     
@@ -277,17 +280,22 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // Filter: block CJK characters and products without nutrition data
+    // Strong filtering: block non-English products and products without nutrition data
     const products = data.products
       .filter(product => {
         if (!product.product_name || !product.nutriments) return false
         
         const name = product.product_name || ''
+        const brand = (product.brands || '').toLowerCase()
         const nutriments = product.nutriments
         
-        // Filter out products with Chinese/Japanese/Korean characters
-        const hasCJKChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(name)
-        if (hasCJKChars) return false
+        // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
+        const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
+        if (hasNonLatinChars) return false
+        
+        // Filter out specific non-English brands that keep appearing
+        const nonEnglishBrands = ['sidi ali', 'sidi-ali']
+        if (nonEnglishBrands.some(b => brand.includes(b))) return false
         
         // Filter out products without nutrition data fields (check for field existence, not value)
         const hasNutrition = (nutriments.proteins_100g !== undefined) ||
