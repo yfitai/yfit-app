@@ -250,12 +250,11 @@ function transformUSDAFood(usdaFood) {
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // Add language and country filtering to get English-only results
+    // Get more results and filter client-side for better coverage
     const params = new URLSearchParams({
       search_terms: query,
-      page_size: limit * 2, // Get more results to filter
+      page_size: limit * 3, // Get more results to filter client-side
       fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
-      countries: 'United States,Canada,United Kingdom,Australia', // English-speaking countries
       json: 1
     })
     
