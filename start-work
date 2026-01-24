@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# ============================================================
+# YFIT Main App - Start Work Script
+# Run this at the beginning of each work session
+# ============================================================
+
+cd /home/ubuntu/yfit
+
+# Run verification
+bash verify-project.sh
+
+echo "🔄 Pulling latest changes from GitHub..."
+git pull origin main
+
+echo ""
+echo "📊 Current Status:"
+git status --short
+
+echo ""
+echo "✅ Ready to work! You're in the main YFIT app."
+echo ""

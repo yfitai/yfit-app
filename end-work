@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# ============================================================
+# YFIT Main App - End Work Script
+# Run this at the end of each work session
+# ============================================================
+
+cd /home/ubuntu/yfit
+
+# Run verification
+bash verify-project.sh
+
+echo "📊 Changes made:"
+git status --short
+
+echo ""
+read -p "📝 Enter commit message (or press Enter for default): " COMMIT_MSG
+
+if [ -z "$COMMIT_MSG" ]; then
+    COMMIT_MSG="Update from work session $(date +%Y-%m-%d\ %H:%M)"
+fi
+
+echo ""
+echo "💾 Saving changes..."
+git add .
+git commit -m "$COMMIT_MSG"
+
+echo ""
+echo "🚀 Pushing to GitHub..."
+git push origin main
+
+echo ""
+echo "✅ All changes saved and pushed to GitHub!"
+echo ""
