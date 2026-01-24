@@ -16,7 +16,7 @@ public class MainActivity extends BridgeActivity {
     }
     
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         
         // Clear cache every time app resumes (comes to foreground)
@@ -33,7 +33,7 @@ public class MainActivity extends BridgeActivity {
         
         // Disable all forms of caching
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setAppCacheEnabled(false);
+        // Note: setAppCacheEnabled() is deprecated and removed in API 33+
         webSettings.setDomStorageEnabled(true); // Keep for functionality
         webSettings.setDatabaseEnabled(false);
         
