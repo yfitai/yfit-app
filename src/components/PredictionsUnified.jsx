@@ -11,6 +11,7 @@ export default function PredictionsUnified({ user }) {
   const [workoutData, setWorkoutData] = useState([]);
   const [nutritionData, setNutritionData] = useState([]);
   const [medicationData, setMedicationData] = useState([]);
+  const [dailyLogsData, setDailyLogsData] = useState([]);
   
   const [predictions, setPredictions] = useState({
     weightLoss: null,
@@ -32,22 +33,24 @@ export default function PredictionsUnified({ user }) {
     setLoading(true);
     try {
       // Fetch data and get results directly
-      const [weightResults, workoutResults, nutritionResults, medicationResults] = await Promise.all([
+      const [weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults] = await Promise.all([
         fetchWeightData(),
         fetchWorkoutData(),
         fetchNutritionData(),
-        fetchMedicationData()
+        fetchMedicationData(),
+        fetchDailyLogs()
       ]);
       
       console.log('📊 Data fetched:', {
         weight: weightResults.length,
         workouts: workoutResults.length,
         nutrition: nutritionResults.length,
-        medication: medicationResults.length
+        medication: medicationResults.length,
+        dailyLogs: dailyLogsResults.length
       });
       
       // Calculate predictions with fetched data (not state)
-      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults);
+      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -131,8 +134,27 @@ export default function PredictionsUnified({ user }) {
     }
   };
 
-  const calculatePredictionsDirectly = (wData, woData, nData, mData) => {
-    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length });
+  const fetchDailyLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('daily_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('log_date', { ascending: false })
+        .limit(30);
+      
+      if (error) throw error;
+      setDailyLogsData(data || []);
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching daily logs:', error);
+      setDailyLogsData([]);
+      return [];
+    }
+  };
+
+  const calculatePredictionsDirectly = (wData, woData, nData, mData, dlData) => {
+    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length, dlData: dlData.length });
     
     // Check for compressed data (workouts within short timeframe)
     let isCompressedData = false;
@@ -157,8 +179,8 @@ export default function PredictionsUnified({ user }) {
       sleepImpact: analyzeSleepImpact([], woData), // No sleep data yet
       bodyRecomp: forecastBodyRecomposition(wData, woData, nData),
       habitStreak: predictHabitStreak(woData),
-      bpGoal: predictBPGoal(wData),
-      glucoseGoal: predictGlucoseGoal(wData),
+      bpGoal: predictBPGoal(dlData),
+      glucoseGoal: predictGlucoseGoal(dlData),
       isCompressedData // Add flag for UI
     });
   };
@@ -180,14 +202,14 @@ export default function PredictionsUnified({ user }) {
 
     try {
       const sortedWeights = [...data].sort((a, b) => 
-        new Date(a.date).getTime() - new Date(b.date).getTime()
+        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
       );
 
       // Calculate weekly weight change rate
-      const firstWeight = parseFloat(sortedWeights[0].weight);
-      const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight);
-      const firstDate = new Date(sortedWeights[0].date).getTime();
-      const lastDate = new Date(sortedWeights[sortedWeights.length - 1].date).getTime();
+      const firstWeight = parseFloat(sortedWeights[0].weight_kg);
+      const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg);
+      const firstDate = new Date(sortedWeights[0].measurement_date).getTime();
+      const lastDate = new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime();
       
       const daysBetween = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
       const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
@@ -229,13 +251,13 @@ export default function PredictionsUnified({ user }) {
 
       // Calculate weight change over period
       const sortedWeights = [...wData].sort((a, b) => 
-        new Date(a.date).getTime() - new Date(b.date).getTime()
+        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
       );
       
-      const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight) - 
-                          parseFloat(sortedWeights[0].weight);
-      const days = (new Date(sortedWeights[sortedWeights.length - 1].date).getTime() - 
-                   new Date(sortedWeights[0].date).getTime()) / (1000 * 60 * 60 * 24);
+      const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
+                          parseFloat(sortedWeights[0].weight_kg);
+      const days = (new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime() - 
+                   new Date(sortedWeights[0].measurement_date).getTime()) / (1000 * 60 * 60 * 24);
 
       // 1 lb = 3500 calories
       const caloriesDelta = (weightChange * 3500) / days;
@@ -437,14 +459,22 @@ export default function PredictionsUnified({ user }) {
     console.log('Workout data length:', data.length);
     console.log('Workout data sample:', data.slice(0, 2));
     
-    if (data.length < 7) {
-      console.log('❌ Not enough workouts for injury risk (need 7, have ' + data.length + ')');
+    // Filter out duration exercises and stretching - only count strength workouts
+    const strengthWorkouts = data.filter(w => {
+      const name = (w.session_name || '').toLowerCase();
+      return !name.includes('walking') && !name.includes('duration') && !name.includes('stretching');
+    });
+    
+    console.log('Filtered to strength workouts only:', strengthWorkouts.length, 'of', data.length);
+    
+    if (strengthWorkouts.length < 7) {
+      console.log('❌ Not enough strength workouts for injury risk (need 7, have ' + strengthWorkouts.length + ')');
       return null;
     }
 
     try {
-      const recentWorkouts = data.slice(0, 7);
-      const olderWorkouts = data.slice(7, 14);
+      const recentWorkouts = strengthWorkouts.slice(0, 7);
+      const olderWorkouts = strengthWorkouts.slice(7, 14);
 
       const recentAvgVolume = recentWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / recentWorkouts.length;
       const olderAvgVolume = olderWorkouts.length > 0 
@@ -454,10 +484,10 @@ export default function PredictionsUnified({ user }) {
       const rawVolumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
       const volumeIncrease = Math.max(-200, Math.min(200, rawVolumeIncrease)); // Cap at ±200%
 
-      // Calculate workout frequency
-      const dates = data.map(w => new Date(w.start_time));
+      // Calculate workout frequency (using filtered strength workouts only)
+      const dates = strengthWorkouts.map(w => new Date(w.start_time));
       const daysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-      const rawFrequency = (data.length / daysBetween) * 7;
+      const rawFrequency = (strengthWorkouts.length / daysBetween) * 7;
       const frequency = Math.min(7, rawFrequency); // Cap at 7x/week
 
       // Risk factors
@@ -676,14 +706,14 @@ export default function PredictionsUnified({ user }) {
     try {
       // Calculate current trends
       const sortedWeights = [...wData].sort((a, b) => 
-        new Date(a.date).getTime() - new Date(b.date).getTime()
+        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
       );
 
-      const firstWeight = parseFloat(sortedWeights[0].weight);
-      const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight);
+      const firstWeight = parseFloat(sortedWeights[0].weight_kg);
+      const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg);
       const weightChange = lastWeight - firstWeight;
-      const days = (new Date(sortedWeights[sortedWeights.length - 1].date).getTime() - 
-                   new Date(sortedWeights[0].date).getTime()) / (1000 * 60 * 60 * 24);
+      const days = (new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime() - 
+                   new Date(sortedWeights[0].measurement_date).getTime()) / (1000 * 60 * 60 * 24);
       const weeklyWeightChange = (weightChange / days) * 7;
 
       // Calculate training volume trend
@@ -800,28 +830,28 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 9. Blood Pressure Goal Prediction
-  const predictBPGoal = (healthData = weightData) => {
+  const predictBPGoal = (healthData = dailyLogsData) => {
     if (healthData.length < 7) return null;
 
     try {
-      const bpLogs = healthData.filter(d => d.blood_pressure_systolic && d.blood_pressure_diastolic);
+      const bpLogs = healthData.filter(d => d.bp_systolic && d.bp_diastolic);
       if (bpLogs.length < 7) return null;
 
       // Sort by date
-      const sorted = bpLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
+      const sorted = bpLogs.sort((a, b) => new Date(a.log_date) - new Date(b.log_date));
       
       // Calculate averages and trends
-      const avgSystolic = sorted.reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / sorted.length;
-      const avgDiastolic = sorted.reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / sorted.length;
+      const avgSystolic = sorted.reduce((sum, d) => sum + d.bp_systolic, 0) / sorted.length;
+      const avgDiastolic = sorted.reduce((sum, d) => sum + d.bp_diastolic, 0) / sorted.length;
 
       // Calculate trend (recent vs older)
       const mid = Math.floor(sorted.length / 2);
-      const olderSystolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / mid;
-      const recentSystolic = sorted.slice(mid).reduce((sum, d) => sum + d.blood_pressure_systolic, 0) / (sorted.length - mid);
+      const olderSystolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.bp_systolic, 0) / mid;
+      const recentSystolic = sorted.slice(mid).reduce((sum, d) => sum + d.bp_systolic, 0) / (sorted.length - mid);
       const systolicChange = recentSystolic - olderSystolic;
 
-      const olderDiastolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / mid;
-      const recentDiastolic = sorted.slice(mid).reduce((sum, d) => sum + d.blood_pressure_diastolic, 0) / (sorted.length - mid);
+      const olderDiastolic = sorted.slice(0, mid).reduce((sum, d) => sum + d.bp_diastolic, 0) / mid;
+      const recentDiastolic = sorted.slice(mid).reduce((sum, d) => sum + d.bp_diastolic, 0) / (sorted.length - mid);
       const diastolicChange = recentDiastolic - olderDiastolic;
 
       // Determine status
@@ -878,7 +908,7 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 10. Blood Glucose Goal Prediction
-  const predictGlucoseGoal = (healthData = weightData) => {
+  const predictGlucoseGoal = (healthData = dailyLogsData) => {
     if (healthData.length < 7) return null;
 
     try {
@@ -886,7 +916,7 @@ export default function PredictionsUnified({ user }) {
       if (glucoseLogs.length < 7) return null;
 
       // Sort by date
-      const sorted = glucoseLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
+      const sorted = glucoseLogs.sort((a, b) => new Date(a.log_date) - new Date(b.log_date));
       
       // Calculate average
       const avgGlucose = sorted.reduce((sum, d) => sum + d.glucose_mg_dl, 0) / sorted.length;

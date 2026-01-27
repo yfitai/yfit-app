@@ -2,7 +2,12 @@
   "appId": "com.yfitai.app",
   "appName": "YFIT AI",
   "webDir": "dist",
+  "server": {
+    "url": "https://yfit-deploy.vercel.app",
+    "cleartext": true
+  },
   "plugins": {
+
     "BarcodeScanner": {
       "cameraDirection": "back"
     },

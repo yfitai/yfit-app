@@ -94,11 +94,42 @@ import { supabase } from '../lib/supabase'
       </p>
     </div>
 <MealTemplates 
-  key={templateRefreshKey}  // ← Make sure this is here
+  key={templateRefreshKey}
   user={user}
   onSelectTemplate={async (template) => {
     console.log('Selected template:', template)
     alert('Template selected! (Adding to daily tracker coming soon)')
+  }}
+  onDeleteTemplate={async (templateId) => {
+    try {
+      // Delete template items first (foreign key constraint)
+      const { error: itemsError } = await supabase
+        .from('meal_template_items')
+        .delete()
+        .eq('template_id', templateId)
+      
+      if (itemsError) throw itemsError
+      
+      // Then delete the template
+      const { error: templateError } = await supabase
+        .from('meal_templates')
+        .delete()
+        .eq('id', templateId)
+        .eq('user_id', user.id)
+      
+      if (templateError) throw templateError
+      
+      console.log('Template deleted successfully')
+      
+      // Force refresh
+      setTemplateRefreshKey(prev => prev + 1)
+      
+      return true
+    } catch (error) {
+      console.error('Error deleting template:', error)
+      alert('Failed to delete template: ' + error.message)
+      return false
+    }
   }}
   onSaveTemplate={async (templateData) => {
     console.log('Saving template:', templateData)
@@ -148,7 +179,7 @@ import { supabase } from '../lib/supabase'
       alert('Template saved successfully!')
       
       // Force refresh
-      setTemplateRefreshKey(prev => prev + 1)  // ← ADD THIS
+      setTemplateRefreshKey(prev => prev + 1)
     } catch (error) {
       console.error('Error saving template:', error)
       alert('Failed to save template: ' + error.message)
@@ -159,12 +190,9 @@ import { supabase } from '../lib/supabase'
 
   </div>
 )}
-
       </div>
     </div>
   )
 }
 
 export default NutritionUnified
-
-

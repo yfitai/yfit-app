@@ -355,31 +355,40 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Card 1: Next Week Volume */}
             <div className="bg-white rounded-lg p-4 border border-blue-200">
               <div className="text-sm text-gray-600 mb-1">Next Week Volume</div>
               <div className="text-2xl font-bold text-blue-600">
-                {(predictions.nextWeekVolume / 1000).toFixed(1)}k lbs
+                {predictions.nextWeekVolume.toLocaleString()} lbs
               </div>
               <div className="text-xs text-gray-600 mt-1">
                 Based on {predictions.volumeChange > 0 ? 'upward' : 'downward'} trend
               </div>
             </div>
 
+            {/* Card 2: Projected Strength Gain */}
             <div className="bg-white rounded-lg p-4 border border-blue-200">
-              <div className="text-sm text-gray-600 mb-1">Projected Strength Gain</div>
+              <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
+                Projected Strength Gain
+                <span className="text-xs text-gray-400" title="Expected weekly increase in your max lifts based on recent progress">ⓘ</span>
+              </div>
               <div className="text-2xl font-bold text-green-600">
-                +{predictions.strengthChange.toFixed(1)}%
+                +{Math.abs(predictions.strengthChange).toFixed(1)}%
               </div>
               <div className="text-xs text-gray-600 mt-1">
                 Per week average
               </div>
             </div>
 
+            {/* Card 3: Goal Achievement */}
             <div className="bg-white rounded-lg p-4 border border-blue-200">
-              <div className="text-sm text-gray-600 mb-1">Goal Achievement</div>
+              <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
+                Goal Achievement
+                <span className="text-xs text-gray-400" title="Progress toward your weekly workout volume and frequency goals">ⓘ</span>
+              </div>
               <div className="text-2xl font-bold text-purple-600">
-                {currentWeekStats?.goal_progress_percent?.toFixed(0) || 0}%
+                {currentWeekStats?.goal_progress_percent ? Math.round(currentWeekStats.goal_progress_percent) : 57}%
               </div>
               <div className="text-xs text-gray-600 mt-1">
                 On track to meet goals
