@@ -228,6 +228,23 @@ function transformUSDAFood(usdaFood) {
 
   console.log('🥗 Extracted nutrients:', nutrients)
 
+  // Detect if food is liquid
+  const nameLower = usdaFood.description.toLowerCase()
+  const isLiquid = (
+    nameLower.includes('juice') ||
+    nameLower.includes('drink') ||
+    nameLower.includes('beverage') ||
+    (nameLower.includes('milk') && !nameLower.includes('cheese') && !nameLower.includes('powder')) ||
+    nameLower.includes('water') ||
+    nameLower.includes('soda') ||
+    nameLower.includes('soup') ||
+    nameLower.includes('broth') ||
+    nameLower.includes('honey') ||
+    nameLower.includes('cream') ||
+    nameLower.includes('sauce') ||
+    nameLower.includes('syrup')
+  )
+
   return {
     id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
@@ -241,7 +258,9 @@ function transformUSDAFood(usdaFood) {
     sugar: Math.round(nutrients.sugar || 0),
     sodium: Math.round(nutrients.sodium || 0),
     servingSize: 100,
-    servingUnit: 'g'
+    servingUnit: isLiquid ? 'ml' : 'g',
+    serving_size: isLiquid ? '100ml' : '100g', // For display in search results
+    foodType: isLiquid ? 'liquid' : 'solid'
   }
 }
 
@@ -377,6 +396,8 @@ function transformOpenFoodFactsProduct(product) {
     (productName.includes('milk') && !productName.includes('cheese')) || 
     productName.includes('water') || 
     productName.includes('soda') || 
+    productName.includes('soup') || 
+    productName.includes('broth') || 
     productName.includes('canneberge') || 
     productName.includes('cranberry') ||
     productName.includes('honey') ||
@@ -424,6 +445,7 @@ function transformOpenFoodFactsProduct(product) {
     servingSize: parseFloat(product.serving_size) || 100,
     servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
     servingGrams: parseFloat(product.serving_size) || 100,
+    serving_size: product.serving_size || '100g', // For display in search results
     foodType: isLiquid ? 'liquid' : 'solid'
   }
 }
