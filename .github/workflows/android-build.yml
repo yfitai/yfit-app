@@ -16,12 +16,11 @@ jobs:
         with:
           node-version: '20'
       
-           - name: Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-
       
       - name: Install dependencies
         run: npm install
@@ -47,7 +46,7 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file=$(pwd)/yfit-release-key.keystore \
+            -Pandroid.injected.signing.store.file=$(pwd )/yfit-release-key.keystore \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
