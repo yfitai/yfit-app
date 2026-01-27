@@ -179,7 +179,7 @@ async function searchUSDA(query, limit) {
           relevanceScore
         }
       })
-      .filter(item => item.relevanceScore > 10)
+      .filter(item => item.relevanceScore > 5) // Lowered from 10 to 5 for better coverage
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
       .map(item => transformUSDAFood(item.food))
@@ -324,6 +324,11 @@ async function searchOpenFoodFacts(query, limit) {
           relevanceScore += (matchedWords / queryWords.length) * 40
         }
         
+        // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
+        if (nameLower.includes(queryLower)) {
+          relevanceScore += 30
+        }
+        
         // Boost if brand matches query
         if (brand && queryWords.some(word => brand.includes(word))) {
           relevanceScore += 20
@@ -338,7 +343,7 @@ async function searchOpenFoodFacts(query, limit) {
           relevanceScore
         }
       })
-      .filter(item => item !== null && item.relevanceScore > 15) // Filter out low relevance
+      .filter(item => item !== null && item.relevanceScore > 5) // Filter out low relevance (lowered from 15 to 5)
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
       .map(item => transformOpenFoodFactsProduct(item.product))
