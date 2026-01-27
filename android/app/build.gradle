@@ -1,8 +1,13 @@
 apply plugin: 'com.android.application'
-
 android {
     namespace "com.yfitai.app"
     compileSdk rootProject.ext.compileSdkVersion
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
     defaultConfig {
         applicationId "com.yfitai.app"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -16,16 +21,14 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    
     signingConfigs {
         release {
-            storeFile file('../yfit-release-key.keystore')
+            storeFile file('../yfit-release-key.keystore' )
             storePassword 'XnsAudW53SP8'
             keyAlias 'yfit-key'
             keyPassword 'XnsAudW53SP8'
         }
     }
-    
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -34,13 +37,11 @@ android {
         }
     }
 }
-
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
@@ -52,9 +53,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 }
-
 apply from: 'capacitor.build.gradle'
-
 try {
     def servicesJSON = file('google-services.json')
     if (servicesJSON.text) {
@@ -63,4 +62,3 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied")
 }
-
