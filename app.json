@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "YFIT AI",
+    "slug": "yfit-react-app",
+    "version": "1.0.10",
+    "platforms": ["android", "ios"],
+    "android": {
+      "package": "com.yfitai.app",
+      "versionCode": 5
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0440e442-4efa-4ee3-991f-3ddeb350bcc0",
+        "build": {
+          "android": {
+            "node": "20.x.x",
+            "yarn": "1.22.x"
+          }
+        }
+      }
+    }
+  }
+}
