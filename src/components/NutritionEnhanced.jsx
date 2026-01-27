@@ -912,12 +912,13 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   const isLiquid = food.foodType === 'liquid'
   
   const units = isLiquid ? [
-    // Liquid foods: volume units + serving
+    // Liquid foods: volume units + grams + serving
     { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
     { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
     { value: 'cup', label: 'Cups', toGrams: 240 },
     { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
     { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
+    { value: 'g', label: 'Grams (g)', toGrams: 1 },
     { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
   ] : [
     // Solid foods: weight units + serving
