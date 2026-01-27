@@ -179,7 +179,7 @@ async function searchUSDA(query, limit) {
           relevanceScore
         }
       })
-      .filter(item => item.relevanceScore > 10)
+      .filter(item => item.relevanceScore > 5) // Lowered from 10 to 5 for better coverage
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
       .map(item => transformUSDAFood(item.food))
@@ -228,6 +228,23 @@ function transformUSDAFood(usdaFood) {
 
   console.log('🥗 Extracted nutrients:', nutrients)
 
+  // Detect if food is liquid
+  const nameLower = usdaFood.description.toLowerCase()
+  const isLiquid = (
+    nameLower.includes('juice') ||
+    nameLower.includes('drink') ||
+    nameLower.includes('beverage') ||
+    (nameLower.includes('milk') && !nameLower.includes('cheese') && !nameLower.includes('powder')) ||
+    nameLower.includes('water') ||
+    nameLower.includes('soda') ||
+    nameLower.includes('soup') ||
+    nameLower.includes('broth') ||
+    nameLower.includes('honey') ||
+    nameLower.includes('cream') ||
+    nameLower.includes('sauce') ||
+    nameLower.includes('syrup')
+  )
+
   return {
     id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
@@ -241,7 +258,9 @@ function transformUSDAFood(usdaFood) {
     sugar: Math.round(nutrients.sugar || 0),
     sodium: Math.round(nutrients.sodium || 0),
     servingSize: 100,
-    servingUnit: 'g'
+    servingUnit: isLiquid ? 'ml' : 'g',
+    serving_size: isLiquid ? '100ml' : '100g', // For display in search results
+    foodType: isLiquid ? 'liquid' : 'solid'
   }
 }
 
@@ -324,6 +343,11 @@ async function searchOpenFoodFacts(query, limit) {
           relevanceScore += (matchedWords / queryWords.length) * 40
         }
         
+        // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
+        if (nameLower.includes(queryLower)) {
+          relevanceScore += 30
+        }
+        
         // Boost if brand matches query
         if (brand && queryWords.some(word => brand.includes(word))) {
           relevanceScore += 20
@@ -338,7 +362,7 @@ async function searchOpenFoodFacts(query, limit) {
           relevanceScore
         }
       })
-      .filter(item => item !== null && item.relevanceScore > 15) // Filter out low relevance
+      .filter(item => item !== null && item.relevanceScore > 5) // Filter out low relevance (lowered from 15 to 5)
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
       .map(item => transformOpenFoodFactsProduct(item.product))
@@ -372,6 +396,8 @@ function transformOpenFoodFactsProduct(product) {
     (productName.includes('milk') && !productName.includes('cheese')) || 
     productName.includes('water') || 
     productName.includes('soda') || 
+    productName.includes('soup') || 
+    productName.includes('broth') || 
     productName.includes('canneberge') || 
     productName.includes('cranberry') ||
     productName.includes('honey') ||
@@ -419,6 +445,7 @@ function transformOpenFoodFactsProduct(product) {
     servingSize: parseFloat(product.serving_size) || 100,
     servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
     servingGrams: parseFloat(product.serving_size) || 100,
+    serving_size: product.serving_size || '100g', // For display in search results
     foodType: isLiquid ? 'liquid' : 'solid'
   }
 }
