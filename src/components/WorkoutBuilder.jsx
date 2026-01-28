@@ -216,9 +216,30 @@ const WorkoutBuilder = () => {
   };
 
   const filteredExercises = exercises.filter(ex => {
-    // Search filter
-    const matchesSearch = searchQuery === '' || 
-      ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+    // Enhanced search filter - searches name, description, target muscles, and equipment
+    const matchesSearch = searchQuery === '' || (() => {
+      const query = searchQuery.toLowerCase();
+      
+      // Search in exercise name
+      if (ex.name.toLowerCase().includes(query)) return true;
+      
+      // Search in description
+      if (ex.description && ex.description.toLowerCase().includes(query)) return true;
+      
+      // Search in target muscles
+      if (ex.target_muscles) {
+        const muscleArray = Array.isArray(ex.target_muscles) ? ex.target_muscles : [ex.target_muscles];
+        if (muscleArray.some(muscle => muscle.toLowerCase().includes(query))) return true;
+      }
+      
+      // Search in equipment
+      if (ex.equipment) {
+        const equipmentArray = Array.isArray(ex.equipment) ? ex.equipment : [ex.equipment];
+        if (equipmentArray.some(eq => eq.toLowerCase().includes(query))) return true;
+      }
+      
+      return false;
+    })();
     
     // Category filter - map to muscle groups
     let matchesCategory = filterCategory === 'all';
@@ -540,7 +561,7 @@ const WorkoutBuilder = () => {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search exercises by name..."
+                    placeholder="Search by name, muscle, or equipment..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
