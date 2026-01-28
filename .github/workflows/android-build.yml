@@ -28,6 +28,9 @@ jobs:
       - name: Build web app
         run: npm run build
       
+      - name: Remove bundled files (force server URL loading)
+        run: rm -rf dist/*
+      
       - name: Sync Capacitor
         run: npx cap sync android
       
