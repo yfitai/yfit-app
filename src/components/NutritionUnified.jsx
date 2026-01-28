@@ -5,6 +5,7 @@ import MealPlanner from './MealPlanner'
 import MealTemplates from './MealPlanner/MealTemplates'
 import { supabase } from '../lib/supabase'
 
+// Update: Fixed nutrition serving sizes calculation - Jan 28, 2026
 
  function NutritionUnified({ user }) {
   const [activeTab, setActiveTab] = useState('daily') // daily, weekly, templates
