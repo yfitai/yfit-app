@@ -306,6 +306,10 @@ export default function Dashboard({ user }) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* TEST: Verify fresh code is loading */}
+        <div className="mb-4 p-3 bg-yellow-100 border-2 border-yellow-400 rounded-lg text-center">
+          <p className="text-sm font-semibold text-yellow-900">🧪 TEST BUILD - Jan 28, 2026 17:30 UTC</p>
+        </div>
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
