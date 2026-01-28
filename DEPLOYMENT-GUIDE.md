@@ -88,9 +88,11 @@ Code Change → Push to GitHub → Vercel Webhook → Build → Deploy → Updat
 
 **Vercel Build Command:**
 ```bash
-npm run build
-# This automatically runs: node scripts/bump-version.js
+node update-version.js && CI=false npm run build
+# Explicitly runs update-version.js before build to update timestamp
 ```
+
+**Important:** The `prebuild` script in `package.json` does NOT run automatically during Vercel deployments. You must explicitly include the version update script in the build command via `vercel.json`.
 
 **Build Output:** `/dist` folder (Vite build)
 
@@ -185,6 +187,17 @@ Check Vercel dashboard: https://vercel.com/account/tokens
 ## 🐛 Troubleshooting
 
 ### Update Banner Not Showing
+
+**Check 0: Is version.json timestamp updating?**
+```bash
+# Check deployed version.json
+curl https://yfit-deploy.vercel.app/version.json
+# Should show current timestamp, not old date
+```
+
+**If timestamp is stale:**
+- Verify `vercel.json` has: `"buildCommand": "node update-version.js && CI=false npm run build"`
+- The prebuild script in package.json does NOT run on Vercel automatically
 
 **Check 1: Is the app loading from Vercel?**
 ```javascript
