@@ -44,23 +44,21 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     try {
       console.log('startNativeScan called')
       
-      // Dynamically import BarcodeScanner for native platforms
-      let BarcodeScanner
+      // Dynamically import the scanBarcode function from official Capacitor plugin
+      let scanBarcode
       try {
         const module = await import('@capacitor/barcode-scanner')
-        BarcodeScanner = module.BarcodeScanner
+        scanBarcode = module.scanBarcode
+        console.log('scanBarcode function imported:', typeof scanBarcode)
       } catch (importErr) {
-        console.error('Failed to import BarcodeScanner:', importErr)
+        console.error('Failed to import scanBarcode:', importErr)
         throw new Error('Barcode scanner plugin not available')
       }
 
-      if (!BarcodeScanner) {
-        console.error('BarcodeScanner plugin not loaded')
+      if (!scanBarcode || typeof scanBarcode !== 'function') {
+        console.error('scanBarcode is not a function')
         throw new Error('Barcode scanner plugin not available')
       }
-
-      console.log('BarcodeScanner imported:', BarcodeScanner)
-      console.log('Methods:', Object.keys(BarcodeScanner))
 
       // Check and request camera permission first
       console.log('Checking camera permissions...')
@@ -81,8 +79,9 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       console.log('Permissions OK, starting barcode scan...')
 
       // Start scanning with Capacitor Barcode Scanner
-      const result = await BarcodeScanner.scanBarcode({
-        hint: 17, // Try all formats
+      // Using official API: scanBarcode(options)
+      const result = await scanBarcode({
+        hint: 17, // ALL formats
         scanInstructions: 'Point camera at barcode',
         scanButton: false,
         scanText: 'Scanning...',
@@ -92,204 +91,127 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       console.log('Scan result:', result)
 
       if (result && result.ScanResult) {
-        handleScanSuccess(result.ScanResult)
+        const barcode = result.ScanResult
+        console.log('Barcode scanned:', barcode)
+        await lookupFood(barcode)
       } else {
-        setError('No barcode detected. Please try again.')
-        setScanning(false)
+        throw new Error('No barcode detected')
       }
     } catch (err) {
       console.error('Native scan error:', err)
-      console.error('Error details:', {
-        message: err.message,
-        stack: err.stack,
-        name: err.name
-      })
       throw err
     }
   }
 
   const startWebScan = async () => {
     try {
-      const scanner = new Html5Qrcode('barcode-reader')
-      setHtml5Scanner(scanner)
-
-      await scanner.start(
-        { facingMode: 'environment' }, // Use back camera
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
-        },
-        (decodedText) => {
-          // Success callback
-          handleScanSuccess(decodedText)
-        },
-        (errorMessage) => {
-          // Error callback (fires continuously, ignore most errors)
-          // Only log unique errors
-        }
-      )
+      console.log('startWebScan called')
+      
+      // Create scanner instance if not exists
+      if (!html5Scanner) {
+        const scanner = new Html5Qrcode('barcode-scanner-region')
+        setHtml5Scanner(scanner)
+        
+        // Start scanning
+        await scanner.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          async (decodedText) => {
+            console.log('Web barcode scanned:', decodedText)
+            await lookupFood(decodedText)
+            scanner.stop()
+          },
+          (errorMessage) => {
+            // Ignore scan errors (happens frequently during scanning)
+          }
+        )
+      }
     } catch (err) {
       console.error('Web scan error:', err)
       throw err
     }
   }
 
-  const stopScan = async () => {
-    try {
-      if (isNative) {
-        // Native scanner stops automatically after scan
-        // No cleanup needed
-      } else if (html5Scanner) {
-        // Stop web scanner
-        await html5Scanner.stop()
-        await html5Scanner.clear()
-      }
-    } catch (err) {
-      console.error('Error stopping scan:', err)
+  const stopScan = () => {
+    console.log('stopScan called')
+    setScanning(false)
+    
+    if (html5Scanner) {
+      html5Scanner.stop().catch(err => console.error('Error stopping scanner:', err))
     }
   }
 
-  const handleScanSuccess = async (barcode) => {
-    console.log('Barcode detected:', barcode)
-
-    // Stop scanning
-    setScanning(false)
-    setLookingUp(true)
-    await stopScan()
-
+  const lookupFood = async (barcode) => {
     try {
-      // Lookup food by barcode
-      const food = await getFoodByBarcode(barcode)
-
-      if (food) {
-        // Food found!
-        onScanSuccess(food)
+      console.log('Looking up food for barcode:', barcode)
+      setLookingUp(true)
+      
+      const foodData = await getFoodByBarcode(barcode)
+      console.log('Food data:', foodData)
+      
+      if (foodData) {
+        onScanSuccess(foodData)
+        onClose()
       } else {
-        // Food not found
-        setError(`Product not found for barcode: ${barcode}`)
-        setLookingUp(false)
+        throw new Error('Food not found in database')
       }
     } catch (err) {
-      console.error('Error looking up barcode:', err)
-      setError('Error looking up product. Please try again.')
+      console.error('Food lookup error:', err)
+      setError('Could not find food information for this barcode')
+    } finally {
       setLookingUp(false)
     }
   }
 
   const handleScanError = (err) => {
-    console.log('handleScanError called with:', err)
-    if (err.message?.includes('permission')) {
-      setError('Camera permission denied. Please enable camera access in settings.')
-    } else if (err.message?.includes('cancel')) {
-      setError('Scan cancelled.')
-    } else if (err.message?.includes('not available')) {
-      setError(err.message)
-    } else {
-      setError('Unable to access camera. Check permissions and try again.')
-    }
+    console.error('Scan error:', err)
     setScanning(false)
-  }
-
-  const handleClose = async () => {
-    await stopScan()
-    onClose()
-  }
-
-  const handleTryAgain = () => {
-    setError(null)
-    setLookingUp(false)
-    startScan()
+    setError(err.message || 'Failed to scan barcode')
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
-      {/* Web Scanner Container */}
+    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {/* Scanner region for web */}
       {!isNative && (
-        <div
-          id="barcode-reader"
-          className="w-full max-w-md"
-          style={{ display: scanning && !lookingUp ? 'block' : 'none' }}
-        ></div>
+        <div id="barcode-scanner-region" className="flex-1" />
       )}
-
-      {/* Native Scanner Overlay */}
-      {isNative && scanning && !lookingUp && !error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="w-64 h-64 border-4 border-white rounded-lg relative">
-            {/* Scanning animation corners */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-500"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-500"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-500"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-500"></div>
+      
+      {/* Status overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        {scanning && !lookingUp && (
+          <div className="bg-black/50 text-white px-6 py-3 rounded-lg">
+            {isNative ? 'Point camera at barcode' : 'Scanning...'}
           </div>
-          <p className="text-white text-lg font-medium mt-8">
-            Point camera at barcode
-          </p>
-        </div>
-      )}
-
-      {/* Status Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-full max-w-md mx-4 pointer-events-auto">
-          {/* Looking Up State */}
-          {lookingUp && (
-            <div className="bg-white rounded-lg p-8 text-center">
-              <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-4"></div>
-              <p className="text-lg font-medium text-gray-800">Looking up product...</p>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="bg-white rounded-lg p-6">
-              <div className="text-center mb-4">
-                <div className="text-6xl mb-2">⚠️</div>
-                <p className="text-lg font-medium text-gray-800">{error}</p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleClose}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleTryAgain}
-                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
+        
+        {lookingUp && (
+          <div className="bg-black/50 text-white px-6 py-3 rounded-lg">
+            Looking up food information...
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-500 text-white px-6 py-3 rounded-lg max-w-sm text-center">
+            {error}
+          </div>
+        )}
       </div>
-
-      {/* Control Buttons */}
-      {!lookingUp && !error && (
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-          <button
-            onClick={handleClose}
-            className="px-6 py-3 bg-white text-gray-800 rounded-full hover:bg-gray-100 transition-colors font-medium shadow-lg"
-          >
-            Cancel Scan
-          </button>
-        </div>
-      )}
-
-      {/* Instructions */}
-      {!lookingUp && !error && (
-        <div className="absolute top-8 left-0 right-0 flex justify-center">
-          <div className="bg-black bg-opacity-75 text-white px-6 py-3 rounded-full max-w-md mx-4">
-            <p className="text-sm text-center">
-              {isNative
-                ? 'Position barcode within the frame'
-                : 'Allow camera access and point at barcode'}
-            </p>
-          </div>
-        </div>
-      )}
+      
+      {/* Close button */}
+      <button
+        onClick={() => {
+          stopScan()
+          onClose()
+        }}
+        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full p-3 pointer-events-auto"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   )
 }
