@@ -139,23 +139,30 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const lookupFood = async (barcode) => {
     try {
-      console.log('Looking up food for barcode:', barcode)
+      console.log('🔍 Looking up food for barcode:', barcode)
       setLookingUp(true)
+      setScanning(false) // Stop scanning while looking up
       
       const foodData = await getFoodByBarcode(barcode)
-      console.log('Food data:', foodData)
+      console.log('📦 Food data received:', foodData)
       
       if (foodData) {
+        console.log('✅ Food found! Calling onScanSuccess')
         onScanSuccess(foodData)
         onClose()
       } else {
-        throw new Error('Food not found in database')
+        console.warn('❌ Food not found for barcode:', barcode)
+        throw new Error(`Food not found for barcode: ${barcode}. Try scanning again or search manually.`)
       }
     } catch (err) {
-      console.error('Food lookup error:', err)
-      setError('Could not find food information for this barcode')
-    } finally {
+      console.error('❌ Food lookup error:', err)
+      setError(err.message || 'Could not find food information for this barcode')
       setLookingUp(false)
+      // Keep scanner open to show error - user can close manually or try again
+    } finally {
+      if (!error) {
+        setLookingUp(false)
+      }
     }
   }
 
@@ -187,8 +194,17 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
         )}
         
         {error && (
-          <div className="bg-red-500 text-white px-6 py-3 rounded-lg max-w-sm text-center">
-            {error}
+          <div className="bg-red-500 text-white px-6 py-3 rounded-lg max-w-sm text-center pointer-events-auto">
+            <p className="mb-3">{error}</p>
+            <button
+              onClick={() => {
+                setError(null)
+                startScan()
+              }}
+              className="bg-white text-red-500 px-4 py-2 rounded-lg font-medium hover:bg-gray-100"
+            >
+              Try Again
+            </button>
           </div>
         )}
       </div>
