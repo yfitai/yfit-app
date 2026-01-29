@@ -10,18 +10,12 @@ const CURRENT_VERSION_KEY = 'app_version_timestamp';
 export const VersionChecker = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [newVersion, setNewVersion] = useState(null);
-  const [debugInfo, setDebugInfo] = useState({
-    storedTimestamp: null,
-    serverTimestamp: null,
-    lastCheck: null,
-    error: null,
-    isNative: false
-  });
+
 
   useEffect(() => {
     // Only run on mobile (Capacitor)
     const isNative = Capacitor.isNativePlatform();
-    setDebugInfo(prev => ({ ...prev, isNative }));
+
     
     if (!isNative) {
       return;
@@ -60,14 +54,7 @@ export const VersionChecker = () => {
           stored: storedVersion
         });
         
-        // Update debug info
-        setDebugInfo(prev => ({
-          ...prev,
-          storedTimestamp: storedVersion,
-          serverTimestamp: serverVersion.timestamp,
-          lastCheck: new Date().toLocaleTimeString(),
-          error: null
-        }));
+
 
         // If version changed, show update banner instead of auto-reloading
         if (storedVersion && storedVersion !== serverVersion.timestamp) {
@@ -83,11 +70,7 @@ export const VersionChecker = () => {
         }
       } catch (error) {
         console.error('Version check error:', error);
-        setDebugInfo(prev => ({
-          ...prev,
-          error: error.message,
-          lastCheck: new Date().toLocaleTimeString()
-        }));
+
       }
     };
 
@@ -127,35 +110,7 @@ export const VersionChecker = () => {
     }
   };
 
-  // Debug panel (only show on native platform)
-  const DebugPanel = () => {
-    if (!debugInfo.isNative) return null;
-    
-    return (
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'rgba(0,0,0,0.9)',
-        color: '#00ff00',
-        padding: '8px',
-        fontSize: '10px',
-        fontFamily: 'monospace',
-        zIndex: 9999,
-        maxHeight: '120px',
-        overflow: 'auto'
-      }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>🔍 Version Debug Panel</div>
-        <div>Native: {debugInfo.isNative ? 'YES' : 'NO'}</div>
-        <div>Last Check: {debugInfo.lastCheck || 'Not checked yet'}</div>
-        <div>Stored: {debugInfo.storedTimestamp ? debugInfo.storedTimestamp.substring(0, 19) : 'None'}</div>
-        <div>Server: {debugInfo.serverTimestamp ? debugInfo.serverTimestamp.substring(0, 19) : 'None'}</div>
-        <div>Update Available: {updateAvailable ? 'YES ✅' : 'NO'}</div>
-        {debugInfo.error && <div style={{ color: '#ff0000' }}>Error: {debugInfo.error}</div>}
-      </div>
-    );
-  };
+
 
   // Render update banner if update is available
   if (updateAvailable) {
@@ -183,7 +138,7 @@ export const VersionChecker = () => {
     );
   }
 
-  return <DebugPanel />;
+  return null;
 };
 
 export default VersionChecker;

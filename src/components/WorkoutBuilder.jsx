@@ -553,16 +553,44 @@ const WorkoutBuilder = () => {
                 </button>
               </div>
 
-              {/* Search Bar */}
-              <div className="mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              {/* Three Search Fields */}
+              <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Name of Exercise */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name of Exercise</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="e.g., bench press"
+                      className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                </div>
+                
+                {/* Muscle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Muscle</label>
                   <input
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search exercises..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={filterTargetMuscle === 'all' ? '' : filterTargetMuscle}
+                    onChange={(e) => setFilterTargetMuscle(e.target.value || 'all')}
+                    placeholder="e.g., chest, biceps"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+                
+                {/* Equipment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Equipment</label>
+                  <input
+                    type="text"
+                    value={filterEquipment === 'all' ? '' : filterEquipment}
+                    onChange={(e) => setFilterEquipment(e.target.value || 'all')}
+                    placeholder="e.g., dumbbell, barbell"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
               </div>
