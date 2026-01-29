@@ -32,9 +32,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      // Provide empty module for barcode scanner on web builds
-      '@capacitor/barcode-scanner': path.resolve(__dirname, './src/lib/barcode-scanner-stub.js')
+      "@": path.resolve(__dirname, "./src")
     },
   },
 

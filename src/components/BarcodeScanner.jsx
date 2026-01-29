@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Camera } from '@capacitor/camera'
-import { BarcodeScanner } from '@capacitor/barcode-scanner'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
 
@@ -45,9 +44,18 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     try {
       console.log('startNativeScan called')
       
-      // Use modern Capacitor import (not Capacitor.Plugins)
+      // Dynamically import BarcodeScanner for native platforms
+      let BarcodeScanner
+      try {
+        const module = await import('@capacitor/barcode-scanner')
+        BarcodeScanner = module.BarcodeScanner
+      } catch (importErr) {
+        console.error('Failed to import BarcodeScanner:', importErr)
+        throw new Error('Barcode scanner plugin not available')
+      }
+
       if (!BarcodeScanner) {
-        console.error('BarcodeScanner plugin not imported')
+        console.error('BarcodeScanner plugin not loaded')
         throw new Error('Barcode scanner plugin not available')
       }
 
