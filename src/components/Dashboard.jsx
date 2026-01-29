@@ -306,9 +306,9 @@ export default function Dashboard({ user }) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* TEST: Verify fresh code is loading */}
-        <div className="mb-4 p-3 bg-yellow-100 border-2 border-yellow-400 rounded-lg text-center">
-          <p className="text-sm font-semibold text-yellow-900">🧪 TEST BUILD - Jan 28, 2026 17:30 UTC</p>
+        {/* TEST: Auto-update working! */}
+        <div className="mb-4 p-3 bg-green-100 border-2 border-green-500 rounded-lg text-center">
+          <p className="text-sm font-semibold text-green-900">✅ AUTO-UPDATE WORKING! Purple banner test successful! 🎉</p>
         </div>
         {/* Welcome Section */}
         <div className="mb-8">
