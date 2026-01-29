@@ -286,20 +286,20 @@ const WorkoutBuilder = () => {
       }
     }
     
-    // Equipment filter
+    // Equipment filter - partial match
     const matchesEquipment = filterEquipment === 'all' || 
       (ex.equipment && (
         Array.isArray(ex.equipment) 
-          ? ex.equipment.some(eq => eq.toLowerCase() === filterEquipment.toLowerCase())
-          : ex.equipment.toLowerCase() === filterEquipment.toLowerCase()
+          ? ex.equipment.some(eq => eq.toLowerCase().includes(filterEquipment.toLowerCase()))
+          : ex.equipment.toLowerCase().includes(filterEquipment.toLowerCase())
       ));
     
-    // Target muscle filter
+    // Target muscle filter - partial match
     const matchesTargetMuscle = filterTargetMuscle === 'all' || 
       (ex.target_muscles && (
         Array.isArray(ex.target_muscles)
-          ? ex.target_muscles.some(muscle => muscle.toLowerCase() === filterTargetMuscle.toLowerCase())
-          : ex.target_muscles.toLowerCase() === filterTargetMuscle.toLowerCase()
+          ? ex.target_muscles.some(muscle => muscle.toLowerCase().includes(filterTargetMuscle.toLowerCase()))
+          : ex.target_muscles.toLowerCase().includes(filterTargetMuscle.toLowerCase())
       ));
     
     return matchesSearch && matchesCategory && matchesEquipment && matchesTargetMuscle;
