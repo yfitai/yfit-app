@@ -493,6 +493,7 @@ async function searchCustomFoods(query, limit) {
  */
 export async function getFoodByBarcode(barcode) {
   try {
+    console.log('🔍 getFoodByBarcode called for:', barcode)
     // Try Open Food Facts first
     const response = await fetch(
       `${OPEN_FOOD_FACTS_API}/product/${barcode}`,
@@ -503,16 +504,24 @@ export async function getFoodByBarcode(barcode) {
       }
     )
 
+    console.log('📡 API response status:', response.status, response.ok)
+    
     if (!response.ok) {
+      console.log('❌ API response not OK')
       return null
     }
 
     const data = await response.json()
+    console.log('📦 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
     if (data.status === 1 && data.product) {
-      return transformOpenFoodFactsProduct(data.product)
+      const transformed = transformOpenFoodFactsProduct(data.product)
+      console.log('✅ Transformed product:', transformed)
+      alert(`DEBUG: Transformed product:\nName: ${transformed.name}\nCalories: ${transformed.calories}\nProtein: ${transformed.protein}g`)
+      return transformed
     }
 
+    console.log('❌ No product found (status !== 1 or no product)')
     return null
   } catch (error) {
     console.error('Error looking up barcode:', error)
