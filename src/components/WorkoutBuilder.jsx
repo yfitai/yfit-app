@@ -595,70 +595,7 @@ const WorkoutBuilder = () => {
                 </div>
               </div>
 
-              {/* Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {/* Category Filter */}
-                <select
-                  value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="Push">Push</option>
-                  <option value="Pull">Pull</option>
-                  <option value="Legs">Legs</option>
-                  <option value="Core">Core</option>
-                  <option value="Cardio">Cardio</option>
-                  <option value="Duration Exercises">Duration Exercises</option>
-                  <option value="Full Body">Full Body</option>
-                </select>
 
-                {/* Equipment Filter */}
-                <select
-                  value={filterEquipment}
-                  onChange={(e) => setFilterEquipment(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                >
-                  <option value="all">All Equipment</option>
-                  <option value="barbell">Barbell</option>
-                  <option value="dumbbell">Dumbbell</option>
-                  <option value="bodyweight">Body Weight</option>
-                  <option value="cable">Cable</option>
-                  <option value="machine">Machine</option>
-                  <option value="kettlebells">Kettlebell</option>
-                  <option value="resistance_band">Resistance Band</option>
-                  <option value="ez_bar">EZ Bar</option>
-                  <option value="exercise_ball">Exercise Ball</option>
-                  <option value="medicine_ball">Medicine Ball</option>
-                  <option value="foam_roller">Foam Roller</option>
-                </select>
-
-                {/* Target Muscle Filter */}
-                <select
-                  value={filterTargetMuscle}
-                  onChange={(e) => setFilterTargetMuscle(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                >
-                  <option value="all">All Muscles</option>
-                  <option value="chest">Chest</option>
-                  <option value="lats">Lats</option>
-                  <option value="middle back">Middle Back</option>
-                  <option value="lower back">Lower Back</option>
-                  <option value="traps">Traps</option>
-                  <option value="quadriceps">Quads</option>
-                  <option value="hamstrings">Hamstrings</option>
-                  <option value="glutes">Glutes</option>
-                  <option value="calves">Calves</option>
-                  <option value="adductors">Adductors</option>
-                  <option value="abductors">Abductors</option>
-                  <option value="shoulders">Shoulders</option>
-                  <option value="biceps">Biceps</option>
-                  <option value="triceps">Triceps</option>
-                  <option value="forearms">Forearms</option>
-                  <option value="abdominals">Abs</option>
-                  <option value="neck">Neck</option>
-                </select>
-              </div>
             </div>
 
             {/* Exercise List */}
