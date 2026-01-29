@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core'
 import { Camera } from '@capacitor/camera'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
+import { scanBarcode as scanBarcodeNative } from '@capacitor/barcode-scanner'
 
 export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   const [scanning, setScanning] = useState(false)
@@ -44,21 +45,13 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     try {
       console.log('startNativeScan called')
       
-      // Dynamically import the scanBarcode function from official Capacitor plugin
-      let scanBarcode
-      try {
-        const module = await import('@capacitor/barcode-scanner')
-        scanBarcode = module.scanBarcode
-        console.log('scanBarcode function imported:', typeof scanBarcode)
-      } catch (importErr) {
-        console.error('Failed to import scanBarcode:', importErr)
+      // Use the statically imported scanBarcode function
+      if (!scanBarcodeNative || typeof scanBarcodeNative !== 'function') {
+        console.error('scanBarcodeNative is not available')
         throw new Error('Barcode scanner plugin not available')
       }
-
-      if (!scanBarcode || typeof scanBarcode !== 'function') {
-        console.error('scanBarcode is not a function')
-        throw new Error('Barcode scanner plugin not available')
-      }
+      
+      console.log('scanBarcodeNative function available:', typeof scanBarcodeNative)
 
       // Check and request camera permission first
       console.log('Checking camera permissions...')
@@ -80,7 +73,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
       // Start scanning with Capacitor Barcode Scanner
       // Using official API: scanBarcode(options)
-      const result = await scanBarcode({
+      const result = await scanBarcodeNative({
         hint: 17, // ALL formats
         scanInstructions: 'Point camera at barcode',
         scanButton: false,
