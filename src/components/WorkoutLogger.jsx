@@ -852,9 +852,9 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
               {exerciseType === 'time_based' && (
                 <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    ⏱️ Log Time-Based Exercise
-                  </h3>3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  ⏱️ Log Time-Based Exercise
+                </h3>
 
                   {/* Duration Input */}
                   <div className="mb-6">
