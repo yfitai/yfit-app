@@ -595,7 +595,11 @@ const WorkoutBuilder = () => {
                 </div>
               </div>
 
-
+              {/* Search Tip */}
+              <div className="mt-2 flex items-start gap-2 text-xs text-gray-600 bg-blue-50 p-2 rounded-lg border border-blue-100">
+                <span className="text-blue-600 font-semibold">💡 Tip:</span>
+                <span>Use full words for best results (e.g., "biceps" not "bicep", "dumbbell" not "dumbell")</span>
+              </div>
             </div>
 
             {/* Exercise List */}
