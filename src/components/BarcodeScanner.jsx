@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Camera } from '@capacitor/camera'
+import { BarcodeScanner } from '@capacitor/barcode-scanner'
 import { Html5Qrcode } from 'html5-qrcode'
 import { getFoodByBarcode } from '../lib/foodDatabase'
 
@@ -44,17 +45,14 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     try {
       console.log('startNativeScan called')
       
-      // Get BarcodeScanner from Capacitor.Plugins (native plugin registry)
-      const { CapacitorBarcodeScanner } = Capacitor.Plugins
-      
-      if (!CapacitorBarcodeScanner) {
-        console.error('CapacitorBarcodeScanner plugin not found in Capacitor.Plugins')
-        console.error('Available plugins:', Object.keys(Capacitor.Plugins))
+      // Use modern Capacitor import (not Capacitor.Plugins)
+      if (!BarcodeScanner) {
+        console.error('BarcodeScanner plugin not imported')
         throw new Error('Barcode scanner plugin not available')
       }
 
-      console.log('CapacitorBarcodeScanner found:', CapacitorBarcodeScanner)
-      console.log('Methods:', Object.keys(CapacitorBarcodeScanner))
+      console.log('BarcodeScanner imported:', BarcodeScanner)
+      console.log('Methods:', Object.keys(BarcodeScanner))
 
       // Check and request camera permission first
       console.log('Checking camera permissions...')
@@ -75,7 +73,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       console.log('Permissions OK, starting barcode scan...')
 
       // Start scanning with Capacitor Barcode Scanner
-      const result = await CapacitorBarcodeScanner.scanBarcode({
+      const result = await BarcodeScanner.scanBarcode({
         hint: 17, // Try all formats
         scanInstructions: 'Point camera at barcode',
         scanButton: false,
