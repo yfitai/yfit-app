@@ -149,7 +149,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       if (foodData) {
         console.log('✅ Food found! Calling onScanSuccess')
         onScanSuccess(foodData)
-        onClose()
+        // Let parent component handle closing and showing serving selector
       } else {
         console.warn('❌ Food not found for barcode:', barcode)
         throw new Error(`Food not found for barcode: ${barcode}. Try scanning again or search manually.`)
