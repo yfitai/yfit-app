@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase'
-import axios from 'axios'
+import { CapacitorHttp } from '@capacitor/core'
 
 // API Configuration
 const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subdomain for English products
@@ -477,19 +477,20 @@ export async function getFoodByBarcode(barcode) {
     console.log('🌐 Fetching from:', apiUrl)
     alert(`DEBUG: Fetching URL\n${apiUrl}`)
     
-    // Use axios for better WebView compatibility
-    // Axios automatically handles different environments and falls back to XHR when needed
-    alert('DEBUG: Sending axios request...')
+    // Use CapacitorHttp for native HTTP requests that bypass WebView restrictions
+    alert('DEBUG: Sending CapacitorHttp request...')
     
-    const response = await axios.get(apiUrl, {
-      timeout: 30000,
+    const response = await CapacitorHttp.get({
+      url: apiUrl,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-      }
+      },
+      connectTimeout: 30000,
+      readTimeout: 30000
     })
     
-    alert(`DEBUG: Axios response!\nStatus: ${response.status}`)
+    alert(`DEBUG: CapacitorHttp response!\nStatus: ${response.status}`)
     const data = response.data
     alert(`DEBUG: Got data!\nStatus: ${data.status}\nHas Product: ${!!data.product}`)
 

@@ -83,11 +83,11 @@ export default function ProgressPhotos({ userId }) {
 
     setUploading(true);
     try {
-      // Take photo with camera
+      // Take photo with camera using Base64 (works better with Supabase upload)
       const image = await CapacitorCamera.getPhoto({
         quality: 90,
-       allowEditing: false,
-        resultType: CameraResultType.DataUrl,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
         saveToGallery: false,
         correctOrientation: true,
@@ -99,24 +99,28 @@ export default function ProgressPhotos({ userId }) {
         promptLabelPicture: 'Take Photo'
       });
 
-      if (!image.dataUrl) {
+      if (!image.base64String) {
         throw new Error('No image data');
       }
 
-      // Convert data URL to blob (without using fetch to avoid CSP issues)
-        const dataUrlToBlob = (dataUrl) => {
-          const arr = dataUrl.split(',');
-          const mime = arr[0].match(/:(.*?);/)[1];
-          const bstr = atob(arr[1]);
-          let n = bstr.length;
-          const u8arr = new Uint8Array(n);
-          while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
-          }
-          return new Blob([u8arr], { type: mime });
-        };
+      // Convert base64 to blob for Supabase upload
+      const base64ToBlob = (base64, contentType = 'image/jpeg') => {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
         
-        const blob = dataUrlToBlob(image.dataUrl);
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+          const slice = byteCharacters.slice(offset, offset + 512);
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+          byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        
+        return new Blob(byteArrays, { type: contentType });
+      };
+      
+      const blob = base64ToBlob(image.base64String);
         
         // Upload to Supabase Storage
         const fileName = `${userId}/${Date.now()}.jpg`;
