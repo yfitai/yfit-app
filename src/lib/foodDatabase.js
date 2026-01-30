@@ -506,7 +506,7 @@ export async function getFoodByBarcode(barcode) {
     return null
   } catch (error) {
     console.error('❌ EXCEPTION in getFoodByBarcode:', error)
-    alert(`DEBUG: Exception occurred!\nError: ${error.message}\nStack: ${error.stack?.substring(0, 100)}`)
+    alert(`DEBUG: Exception!\n${error.message || error.toString()}`)
     return null
   }
 }
