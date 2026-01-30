@@ -97,20 +97,10 @@ async function searchUSDA(query, limit) {
   try {
     console.log('🥗 Searching USDA API for:', query)
     
-    const response = await fetch(`${USDA_API_BASE}/foods/search?api_key=${USDA_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)'],  // Exclude branded foods from USDA
-        pageSize: limit * 2,
-        pageNumber: 1,
-        sortBy: 'score',
-        sortOrder: 'desc'
-      })
-    })
+    // Use backend proxy to avoid CORS issues with remote loading
+    const response = await fetch(
+      `/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
+    )
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -269,24 +259,9 @@ function transformUSDAFood(usdaFood) {
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // Get more results and filter client-side for better coverage
-    const params = new URLSearchParams({
-      search_terms: query,
-      page_size: limit * 5, // Get even more results to filter
-      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
-      tagtype_0: 'languages',
-      tag_contains_0: 'contains',
-      tag_0: 'en', // Filter for products with English language tag
-      json: 1
-    })
-    
+    // Use backend proxy to avoid CORS issues with remote loading
     const response = await fetch(
-      `${OPEN_FOOD_FACTS_API}/search?${params}`,
-      {
-        headers: {
-          'User-Agent': USER_AGENT
-        }
-      }
+      `/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
     )
 
     if (!response.ok) {
@@ -494,14 +469,9 @@ async function searchCustomFoods(query, limit) {
 export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
-    // Try Open Food Facts first
+    // Use backend proxy to avoid CORS issues with remote loading
     const response = await fetch(
-      `${OPEN_FOOD_FACTS_API}/product/${barcode}`,
-      {
-        headers: {
-          'User-Agent': USER_AGENT
-        }
-      }
+      `/api/food/barcode/${barcode}`
     )
 
     console.log('📡 API response status:', response.status, response.ok)
