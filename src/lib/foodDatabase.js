@@ -476,43 +476,22 @@ export async function getFoodByBarcode(barcode) {
     console.log('🌐 Fetching from:', apiUrl)
     alert(`DEBUG: Fetching URL\n${apiUrl}`)
     
-    // Use XMLHttpRequest instead of fetch() for better WebView compatibility
-    // XMLHttpRequest is more permissive in Android WebViews with remote loading
-    const data = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', apiUrl)
-      xhr.timeout = 30000 // 30 second timeout
-      
-      xhr.onload = () => {
-        alert(`DEBUG: XHR onload\nStatus: ${xhr.status}`)
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const jsonData = JSON.parse(xhr.responseText)
-            alert(`DEBUG: JSON parsed!\nStatus: ${jsonData.status}`)
-            resolve(jsonData)
-          } catch (e) {
-            alert(`DEBUG: JSON parse failed!\n${e.message}`)
-            reject(new Error('JSON parse failed: ' + e.message))
-          }
-        } else {
-          alert(`DEBUG: HTTP error!\nStatus: ${xhr.status}`)
-          reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`))
-        }
+    // Use axios for better WebView compatibility
+    // Axios automatically handles different environments and falls back to XHR when needed
+    const axios = (await import('axios')).default
+    alert('DEBUG: Axios imported, sending request...')
+    
+    const response = await axios.get(apiUrl, {
+      timeout: 30000,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-      
-      xhr.onerror = () => {
-        alert('DEBUG: XHR network error!')
-        reject(new Error('Network error'))
-      }
-      
-      xhr.ontimeout = () => {
-        alert('DEBUG: XHR timeout!')
-        reject(new Error('Request timeout'))
-      }
-      
-      alert('DEBUG: Sending XHR request...')
-      xhr.send()
     })
+    
+    alert(`DEBUG: Axios response!\nStatus: ${response.status}`)
+    const data = response.data
+    alert(`DEBUG: Got data!\nStatus: ${data.status}\nHas Product: ${!!data.product}`)
 
     console.log('📚 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
