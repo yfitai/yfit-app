@@ -470,9 +470,12 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     // Use backend proxy to avoid CORS issues with remote loading
-    const response = await fetch(
-      `/api/food/barcode/${barcode}`
-    )
+    const apiUrl = `/api/food/barcode/${barcode}`
+    const fullUrl = window.location.origin + apiUrl
+    console.log('🌐 Fetching from:', fullUrl)
+    alert(`DEBUG: Fetching URL\n${fullUrl}`)
+    
+    const response = await fetch(apiUrl)
 
     console.log('📡 API response status:', response.status, response.ok)
     alert(`DEBUG: API Response\nStatus: ${response.status}\nOK: ${response.ok}`)
