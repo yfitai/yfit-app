@@ -103,9 +103,20 @@ export default function ProgressPhotos({ userId }) {
         throw new Error('No image data');
       }
 
-      // Convert data URL to blob
-        const response = await fetch(image.dataUrl);
-        const blob = await response.blob();
+      // Convert data URL to blob (without using fetch to avoid CSP issues)
+        const dataUrlToBlob = (dataUrl) => {
+          const arr = dataUrl.split(',');
+          const mime = arr[0].match(/:(.*?);/)[1];
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          return new Blob([u8arr], { type: mime });
+        };
+        
+        const blob = dataUrlToBlob(image.dataUrl);
         
         // Upload to Supabase Storage
         const fileName = `${userId}/${Date.now()}.jpg`;

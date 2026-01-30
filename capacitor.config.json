@@ -4,7 +4,14 @@
   "webDir": "dist",
   "server": {
     "url": "https://yfit-deploy.vercel.app",
-    "cleartext": true
+    "cleartext": true,
+    "allowNavigation": [
+      "https://yfit-deploy.vercel.app",
+      "https://*.supabase.co",
+      "https://*.openfoodfacts.org",
+      "https://api.nal.usda.gov",
+      "*"
+    ]
   },
   "plugins": {
 
