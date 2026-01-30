@@ -505,14 +505,17 @@ export async function getFoodByBarcode(barcode) {
     )
 
     console.log('📡 API response status:', response.status, response.ok)
+    alert(`DEBUG: API Response\nStatus: ${response.status}\nOK: ${response.ok}`)
     
     if (!response.ok) {
       console.log('❌ API response not OK')
+      alert(`DEBUG: API response not OK!\nStatus: ${response.status}`)
       return null
     }
 
     const data = await response.json()
     console.log('📦 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
+    alert(`DEBUG: API Data\nStatus: ${data.status}\nHas Product: ${!!data.product}\nName: ${data.product?.product_name || 'N/A'}`)
     
     if (data.status === 1 && data.product) {
       const transformed = transformOpenFoodFactsProduct(data.product)
@@ -522,9 +525,11 @@ export async function getFoodByBarcode(barcode) {
     }
 
     console.log('❌ No product found (status !== 1 or no product)')
+    alert(`DEBUG: No product found!\nStatus was: ${data.status}\nHad product: ${!!data.product}`)
     return null
   } catch (error) {
-    console.error('Error looking up barcode:', error)
+    console.error('❌ EXCEPTION in getFoodByBarcode:', error)
+    alert(`DEBUG: Exception occurred!\nError: ${error.message}\nStack: ${error.stack?.substring(0, 100)}`)
     return null
   }
 }
