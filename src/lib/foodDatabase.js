@@ -472,35 +472,27 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     // Use backend proxy to avoid CORS issues with remote loading
-    // Use absolute URL because Android WebView doesn't have proper window.location.origin
     const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
     console.log('🌐 Fetching from:', apiUrl)
     alert(`DEBUG: Fetching URL\n${apiUrl}`)
     
-    const response = await fetch(apiUrl)
+    // Use Capacitor's CapacitorHttp for native HTTP requests (bypasses WebView fetch issues)
+    const { CapacitorHttp } = await import('@capacitor/core')
+    const response = await CapacitorHttp.get({ url: apiUrl })
 
-    console.log('📡 API response status:', response.status, response.ok)
-    alert(`DEBUG: API Response\nStatus: ${response.status}\nOK: ${response.ok}`)
+    console.log('📡 API response status:', response.status)
+    alert(`DEBUG: API Response\nStatus: ${response.status}`)
     
-    if (!response.ok) {
+    if (response.status !== 200) {
       console.log('❌ API response not OK')
       alert(`DEBUG: API response not OK!\nStatus: ${response.status}`)
       return null
     }
 
-    console.log('📥 About to parse JSON...')
-    alert('DEBUG: About to parse JSON response')
-    
-    let data
-    try {
-      data = await response.json()
-      alert('DEBUG: JSON parsed successfully!')
-    } catch (jsonError) {
-      alert(`DEBUG: JSON parse failed!\nError: ${jsonError.message}`)
-      throw jsonError
-    }
-    console.log('📦 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
-    alert(`DEBUG: API Data\nStatus: ${data.status}\nHas Product: ${!!data.product}\nName: ${data.product?.product_name || 'N/A'}`)
+    // CapacitorHttp returns data directly, no need to parse JSON
+    const data = response.data
+    alert(`DEBUG: Got data!\nStatus: ${data.status}\nHas Product: ${!!data.product}`)
+    console.log('📚 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
     if (data.status === 1 && data.product) {
       const transformed = transformOpenFoodFactsProduct(data.product)
