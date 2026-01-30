@@ -5,6 +5,7 @@
  */
 
 import { supabase } from './supabase'
+import axios from 'axios'
 
 // API Configuration
 const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subdomain for English products
@@ -478,8 +479,7 @@ export async function getFoodByBarcode(barcode) {
     
     // Use axios for better WebView compatibility
     // Axios automatically handles different environments and falls back to XHR when needed
-    const axios = (await import('axios')).default
-    alert('DEBUG: Axios imported, sending request...')
+    alert('DEBUG: Sending axios request...')
     
     const response = await axios.get(apiUrl, {
       timeout: 30000,
