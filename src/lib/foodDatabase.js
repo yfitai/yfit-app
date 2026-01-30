@@ -483,7 +483,17 @@ export async function getFoodByBarcode(barcode) {
       return null
     }
 
-    const data = await response.json()
+    console.log('📥 About to parse JSON...')
+    alert('DEBUG: About to parse JSON response')
+    
+    let data
+    try {
+      data = await response.json()
+      alert('DEBUG: JSON parsed successfully!')
+    } catch (jsonError) {
+      alert(`DEBUG: JSON parse failed!\nError: ${jsonError.message}`)
+      throw jsonError
+    }
     console.log('📦 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     alert(`DEBUG: API Data\nStatus: ${data.status}\nHas Product: ${!!data.product}\nName: ${data.product?.product_name || 'N/A'}`)
     
