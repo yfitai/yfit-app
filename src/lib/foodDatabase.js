@@ -98,8 +98,9 @@ async function searchUSDA(query, limit) {
     console.log('🥗 Searching USDA API for:', query)
     
     // Use backend proxy to avoid CORS issues with remote loading
+    // Use absolute URL because Android WebView doesn't have proper window.location.origin
     const response = await fetch(
-      `/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
+      `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
     )
 
     if (!response.ok) {
@@ -260,8 +261,9 @@ function transformUSDAFood(usdaFood) {
 async function searchOpenFoodFacts(query, limit) {
   try {
     // Use backend proxy to avoid CORS issues with remote loading
+    // Use absolute URL because Android WebView doesn't have proper window.location.origin
     const response = await fetch(
-      `/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
     )
 
     if (!response.ok) {
@@ -470,10 +472,10 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     // Use backend proxy to avoid CORS issues with remote loading
-    const apiUrl = `/api/food/barcode/${barcode}`
-    const fullUrl = window.location.origin + apiUrl
-    console.log('🌐 Fetching from:', fullUrl)
-    alert(`DEBUG: Fetching URL\n${fullUrl}`)
+    // Use absolute URL because Android WebView doesn't have proper window.location.origin
+    const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
+    console.log('🌐 Fetching from:', apiUrl)
+    alert(`DEBUG: Fetching URL\n${apiUrl}`)
     
     const response = await fetch(apiUrl)
 
