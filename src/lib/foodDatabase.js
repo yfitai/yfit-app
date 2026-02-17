@@ -408,24 +408,25 @@ function transformOpenFoodFactsProduct(product) {
     console.warn('⚠️ Corrupted data detected for', product.product_name, '- applying 10x correction')
   }
 
-  return {
-    id: `off-${product.code}`,
-    name: product.product_name,
-    brand: product.brands || 'Unknown',
-    source: 'openfoodfacts',
-    calories: Math.round((nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0) / correctionFactor),
-    protein: Math.round((nutriments.proteins_100g || 0) / correctionFactor),
-    carbs: Math.round((nutriments.carbohydrates_100g || 0) / correctionFactor),
-    fat: Math.round((nutriments.fat_100g || 0) / correctionFactor),
-    fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
-    sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
-    sodium: Math.round(nutriments.sodium_100g * 1000 / correctionFactor || 0),
-    servingSize: parseFloat(product.serving_size) || 100,
-    servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
-    servingGrams: parseFloat(product.serving_size) || 100,
-    serving_size: product.serving_size || '100g', // For display in search results
-    foodType: isLiquid ? 'liquid' : 'solid'
-  }
+return {
+  id: `off-${product.code}`,
+  name: product.product_name,
+  brand: product.brands || 'Unknown',
+  source: 'openfoodfacts',
+  calories: Math.round((nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0) / correctionFactor),
+  protein: Math.round((nutriments.proteins_100g || 0) / correctionFactor),
+  carbs: Math.round((nutriments.carbohydrates_100g || 0) / correctionFactor),
+  fat: Math.round((nutriments.fat_100g || 0) / correctionFactor),
+  fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
+  sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
+  sodium: Math.round(nutriments.sodium_100g * 1000 / correctionFactor || 0),
+  servingSize: parseFloat(product.serving_size) || 100,
+  servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
+  servingGrams: parseFloat(product.serving_size) || 100,
+  serving_size: product.serving_size || '100g',
+  serving_unit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',  
+  foodType: isLiquid ? 'liquid' : 'solid'
+}
 }
 
 
