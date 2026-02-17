@@ -153,14 +153,19 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     await stopScan()
 
     try {
+      alert('Step 1: Looking up barcode: ' + barcode)
+      
       // Lookup food by barcode
       console.log('🔍 Calling getFoodByBarcode for:', barcode)
       const food = await getFoodByBarcode(barcode)
       console.log('📦 getFoodByBarcode returned:', food)
       
-           if (food) {
+      alert('Step 2: Got food result: ' + (food ? food.name : 'NULL'))
+      
+      if (food) {
         // Food found!
         console.log('✅ Food found! Name:', food.name)
+        alert('Step 3: Calling onScanSuccess')
         onScanSuccess(food)
       } else {
         // Food not found
@@ -170,6 +175,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       }
     } catch (err) {
       console.error('Error looking up barcode:', err)
+      alert('Step ERROR: ' + err.message)
       setError('Error looking up product. Please try again.')
       setLookingUp(false)
     }

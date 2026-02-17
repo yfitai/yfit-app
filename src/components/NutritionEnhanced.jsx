@@ -186,6 +186,8 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
  const handleFoodSelected = (food) => {
+  alert('Step 4: handleFoodSelected called with: ' + (food ? food.name : 'NULL'))
+  
   console.log('🎯 handleFoodSelected called!')
   console.log('🎯 Food data:', food)
   console.log('🎯 Has serving_unit?', food?.serving_unit)
@@ -195,8 +197,11 @@ export default function NutritionEnhanced({ user: propUser }) {
   setServingUnit(food.serving_unit || 'serving')
   setShowFoodSearch(false)
   setShowBarcodeScanner(false)
+  
+  alert('Step 5: About to set showServingSelector to true')
   setShowServingSelector(true)
   
+  alert('Step 6: showServingSelector should now be true')
   console.log('🎯 States set! showServingSelector should be TRUE')
   
   // Force a check after state updates
