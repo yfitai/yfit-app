@@ -158,16 +158,13 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       const food = await getFoodByBarcode(barcode)
       console.log('📦 getFoodByBarcode returned:', food)
       
-      if (food) {
+           if (food) {
         // Food found!
         console.log('✅ Food found! Name:', food.name)
-        alert(`DEBUG: Food found! ${food.name}\nCalling onScanSuccess...`)
         onScanSuccess(food)
-        alert('DEBUG: onScanSuccess called successfully')
       } else {
         // Food not found
         console.log('❌ Food not found')
-        alert(`DEBUG: Food not found for barcode: ${barcode}`)
         setError(`Product not found for barcode: ${barcode}`)
         setLookingUp(false)
       }

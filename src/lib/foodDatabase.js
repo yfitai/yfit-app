@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase'
-import { CapacitorHttp } from '@capacitor/core'
+
 
 // API Configuration
 const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subdomain for English products
@@ -472,43 +472,37 @@ async function searchCustomFoods(query, limit) {
 export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
-    // Use backend proxy to avoid CORS issues with remote loading
+    
+    // Use backend proxy with plain fetch (works with local loading)
     const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
-    console.log('🌐 Fetching from:', apiUrl)
-    alert(`DEBUG: Fetching URL\n${apiUrl}`)
+    console.log('🌐 Fetching from:', apiUrl )
     
-    // Use CapacitorHttp for native HTTP requests that bypass WebView restrictions
-    alert('DEBUG: Sending CapacitorHttp request...')
-    
-    const response = await CapacitorHttp.get({
-      url: apiUrl,
+    const response = await fetch(apiUrl, {
+      method: 'GET',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-      },
-      connectTimeout: 30000,
-      readTimeout: 30000
+      }
     })
     
-    alert(`DEBUG: CapacitorHttp response!\nStatus: ${response.status}`)
-    const data = response.data
-    alert(`DEBUG: Got data!\nStatus: ${data.status}\nHas Product: ${!!data.product}`)
-
+    if (!response.ok) {
+      console.error('❌ API error:', response.status, response.statusText)
+      return null
+    }
+    
+    const data = await response.json()
     console.log('📚 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
     if (data.status === 1 && data.product) {
       const transformed = transformOpenFoodFactsProduct(data.product)
       console.log('✅ Transformed product:', transformed)
-      alert(`DEBUG: Transformed product:\nName: ${transformed.name}\nCalories: ${transformed.calories}\nProtein: ${transformed.protein}g`)
       return transformed
     }
 
     console.log('❌ No product found (status !== 1 or no product)')
-    alert(`DEBUG: No product found!\nStatus was: ${data.status}\nHad product: ${!!data.product}`)
     return null
   } catch (error) {
-    console.error('❌ EXCEPTION in getFoodByBarcode:', error)
-    alert(`DEBUG: Exception!\n${error.message || error.toString()}`)
+    console.error('❌ Exception in getFoodByBarcode:', error)
     return null
   }
 }

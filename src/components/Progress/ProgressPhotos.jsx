@@ -154,7 +154,12 @@ export default function ProgressPhotos({ userId }) {
         alert('Photo captured and uploaded successfully!');
     } catch (error) {
       console.error('Error capturing photo:', error);
-      alert('Error capturing photo. Please try again.');
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      alert(`Error capturing photo: ${error.message}. Please try again.`);
     } finally {
       setUploading(false);
     }
