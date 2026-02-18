@@ -147,10 +147,9 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   const handleScanSuccess = async (barcode) => {
     console.log('Barcode detected:', barcode)
 
-    // Stop scanning
+    // Stop scanning but keep scanner UI open while looking up
     setScanning(false)
     setLookingUp(true)
-    await stopScan()
 
     try {
       // Lookup food by barcode
@@ -159,17 +158,20 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       console.log('📦 getFoodByBarcode returned:', food)
       
       if (food) {
-        // Food found!
+        // Food found! Close scanner and pass to parent
         console.log('✅ Food found! Name:', food.name)
+        await stopScan()
         onScanSuccess(food)
       } else {
-        // Food not found
+        // Food not found - close scanner and show error
         console.log('❌ Food not found')
+        await stopScan()
         setError(`Product not found for barcode: ${barcode}`)
         setLookingUp(false)
       }
     } catch (err) {
       console.error('Error looking up barcode:', err)
+      await stopScan()
       setError('Error looking up product. Please try again.')
       setLookingUp(false)
     }
