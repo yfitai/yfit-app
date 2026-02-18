@@ -186,23 +186,12 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
  const handleFoodSelected = (food) => {
-  console.log('🎯 handleFoodSelected called!')
-  console.log('🎯 Food data:', food)
-  console.log('🎯 Has serving_unit?', food?.serving_unit)
-  
   setSelectedFood(food)
   setServingQuantity(1)
   setServingUnit(food.serving_unit || 'serving')
   setShowFoodSearch(false)
   setShowBarcodeScanner(false)
   setShowServingSelector(true)
-  
-  console.log('🎯 States set! showServingSelector should be TRUE')
-  
-  // Force a check after state updates
-  setTimeout(() => {
-    console.log('🎯 After timeout - selectedFood:', food?.name)
-  }, 100)
 }
 
 

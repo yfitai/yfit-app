@@ -153,20 +153,16 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
     try {
       // Lookup food by barcode
-      console.log('🔍 Calling getFoodByBarcode for:', barcode)
       const food = await getFoodByBarcode(barcode)
-      console.log('📦 getFoodByBarcode returned:', food)
       
       if (food) {
         // Food found! Pass to parent (don't call stopScan for native since it auto-closes)
-        console.log('✅ Food found! Name:', food.name)
         if (!isNative) {
           await stopScan()
         }
         onScanSuccess(food)
       } else {
         // Food not found - show error
-        console.log('❌ Food not found')
         if (!isNative) {
           await stopScan()
         }
