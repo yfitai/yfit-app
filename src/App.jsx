@@ -21,6 +21,7 @@ import { supabase, getCurrentUser } from './lib/supabase'
 import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import VersionChecker from './utils/VersionChecker'
+import { LiveUpdateService } from './services/liveUpdate'
 import './App.css'
 
 function App() {
@@ -28,6 +29,11 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Initialize LiveUpdate service for OTA updates
+    LiveUpdateService.initialize().catch(err => {
+      console.error('Failed to initialize LiveUpdate:', err)
+    })
+
     // Check for existing session
     getCurrentUser().then((currentUser) => {
       setUser(currentUser)
