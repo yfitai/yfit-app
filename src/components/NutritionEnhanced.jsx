@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase, getCurrentUser, getUserProfile } from '../lib/supabase'
-import { updateRecentFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
+import { updateRecentFood, addFavoriteFood, removeFavoriteFood, getFoodByBarcode } from '../lib/foodDatabase'
 import UnitToggle from './UnitToggle'
 import FoodSearch from './FoodSearch'
 import BarcodeScanner from './BarcodeScanner'
@@ -57,6 +57,7 @@ export default function NutritionEnhanced({ user: propUser }) {
   const [showFoodSearch, setShowFoodSearch] = useState(false)
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
   const [showServingSelector, setShowServingSelector] = useState(false)
+  const [lookingUpBarcode, setLookingUpBarcode] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
   const [selectedMealType, setSelectedMealType] = useState('breakfast')
   
@@ -192,6 +193,32 @@ export default function NutritionEnhanced({ user: propUser }) {
   setShowFoodSearch(false)
   setShowBarcodeScanner(false)
   setShowServingSelector(true)
+}
+
+const handleBarcodeScanned = async (barcode) => {
+  // Close scanner immediately
+  setShowBarcodeScanner(false)
+  
+  // Show loading state
+  setLookingUpBarcode(true)
+  
+  try {
+    // Lookup food by barcode
+    const food = await getFoodByBarcode(barcode)
+    
+    if (food) {
+      // Food found! Open serving selector
+      handleFoodSelected(food)
+    } else {
+      // Food not found - show alert
+      alert(`Product not found for barcode: ${barcode}`)
+    }
+  } catch (err) {
+    console.error('Error looking up barcode:', err)
+    alert('Error looking up product. Please try again.')
+  } finally {
+    setLookingUpBarcode(false)
+  }
 }
 
 
@@ -739,9 +766,18 @@ export default function NutritionEnhanced({ user: propUser }) {
 
         {showBarcodeScanner && (
           <BarcodeScanner
-            onScanSuccess={handleFoodSelected}
+            onScanSuccess={handleBarcodeScanned}
             onClose={() => setShowBarcodeScanner(false)}
           />
+        )}
+
+        {lookingUpBarcode && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 text-center">
+              <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-4"></div>
+              <p className="text-lg font-medium text-gray-800">Looking up product...</p>
+            </div>
+          </div>
         )}
 
         {showServingSelector && selectedFood && (
