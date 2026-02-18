@@ -474,8 +474,8 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     
-    // Use backend proxy with plain fetch (works with local loading)
-    const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
+    // Use relative URL for same-origin request (works with Capacitor remote loading)
+    const apiUrl = `/api/food/barcode/${barcode}`
     console.log('🌐 Fetching from:', apiUrl )
     
     const response = await fetch(apiUrl, {
