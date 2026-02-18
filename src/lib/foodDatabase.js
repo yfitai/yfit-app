@@ -5,6 +5,7 @@
  */
 
 import { supabase } from './supabase'
+import { CapacitorHttp } from '@capacitor/core'
 
 
 // API Configuration
@@ -474,24 +475,24 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     
-    // Use relative URL for same-origin request (works with Capacitor remote loading)
-    const apiUrl = `/api/food/barcode/${barcode}`
+    // Use CapacitorHttp for native HTTP requests (bypasses WebView restrictions)
+    const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
     console.log('🌐 Fetching from:', apiUrl )
     
-    const response = await fetch(apiUrl, {
-      method: 'GET',
+    const response = await CapacitorHttp.get({
+      url: apiUrl,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     })
     
-    if (!response.ok) {
-      console.error('❌ API error:', response.status, response.statusText)
+    if (response.status !== 200) {
+      console.error('❌ API error:', response.status)
       return null
     }
     
-    const data = await response.json()
+    const data = response.data
     console.log('📚 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
     if (data.status === 1 && data.product) {
