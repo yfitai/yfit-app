@@ -196,27 +196,36 @@ export default function NutritionEnhanced({ user: propUser }) {
 }
 
 const handleBarcodeScanned = async (barcode) => {
+  console.log('🔍 Barcode scanned:', barcode)
+  
   // Close scanner immediately
   setShowBarcodeScanner(false)
+  console.log('✅ Scanner closed')
   
   // Show loading state
   setLookingUpBarcode(true)
+  console.log('⏳ Looking up barcode...')
   
   try {
     // Lookup food by barcode
+    console.log('📡 Calling getFoodByBarcode...')
     const food = await getFoodByBarcode(barcode)
+    console.log('📦 Food lookup result:', food)
     
     if (food) {
       // Food found! Open serving selector
+      console.log('✅ Food found! Opening serving selector...')
       handleFoodSelected(food)
     } else {
       // Food not found - show alert
+      console.log('❌ Food not found')
       alert(`Product not found for barcode: ${barcode}`)
     }
   } catch (err) {
-    console.error('Error looking up barcode:', err)
+    console.error('❌ Error looking up barcode:', err)
     alert('Error looking up product. Please try again.')
   } finally {
+    console.log('🏁 Lookup complete')
     setLookingUpBarcode(false)
   }
 }

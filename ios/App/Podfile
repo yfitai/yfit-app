@@ -1,4 +1,4 @@
-require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+require_relative '../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '14.0'
 use_frameworks!
@@ -9,17 +9,16 @@ use_frameworks!
 install! 'cocoapods', :disable_input_output_paths => true
 
 def capacitor_pods
-  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
-  pod 'CapacitorBarcodeScanner', :path => '../../node_modules/@capacitor/barcode-scanner'
-  pod 'CapacitorBrowser', :path => '../../node_modules/@capacitor/browser'
-  pod 'CapacitorCamera', :path => '../../node_modules/@capacitor/camera'
-  pod 'CapacitorFilesystem', :path => '../../node_modules/@capacitor/filesystem'
-  pod 'CapacitorHttp', :path => '../../node_modules/@capacitor/http'
-  pod 'CapacitorShare', :path => '../../node_modules/@capacitor/share'
-  pod 'CapawesomeCapacitorLiveUpdate', :path => '../../node_modules/@capawesome/capacitor-live-update'
-  pod 'CapacitorHealth', :path => '../../node_modules/capacitor-health'
+  pod 'Capacitor', :path => '../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios'
+  pod 'CapacitorApp', :path => '../../node_modules/.pnpm/@capacitor+app@7.1.1_@capacitor+core@7.4.4/node_modules/@capacitor/app'
+  pod 'CapacitorBarcodeScanner', :path => '../../node_modules/.pnpm/@capacitor+barcode-scanner@2.2.0_@capacitor+core@7.4.4/node_modules/@capacitor/barcode-scanner'
+  pod 'CapacitorBrowser', :path => '../../node_modules/.pnpm/@capacitor+browser@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/browser'
+  pod 'CapacitorCamera', :path => '../../node_modules/.pnpm/@capacitor+camera@7.0.2_@capacitor+core@7.4.4/node_modules/@capacitor/camera'
+  pod 'CapacitorFilesystem', :path => '../../node_modules/.pnpm/@capacitor+filesystem@7.1.6_@capacitor+core@7.4.4/node_modules/@capacitor/filesystem'
+  pod 'CapacitorShare', :path => '../../node_modules/.pnpm/@capacitor+share@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/share'
+  pod 'CapawesomeCapacitorLiveUpdate', :path => '../../node_modules/.pnpm/@capawesome+capacitor-live-update@7.4.0_@capacitor+core@7.4.4/node_modules/@capawesome/capacitor-live-update'
+  pod 'CapacitorHealth', :path => '../../node_modules/.pnpm/capacitor-health@7.0.0_@capacitor+core@7.4.4/node_modules/capacitor-health'
 end
 
 target 'App' do
