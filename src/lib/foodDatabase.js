@@ -475,17 +475,19 @@ export async function getFoodByBarcode(barcode) {
   try {
     console.log('🔍 getFoodByBarcode called for:', barcode)
     
-    // Use CapacitorHttp for native HTTP requests (bypasses WebView restrictions)
-    const apiUrl = `https://yfit-deploy.vercel.app/api/food/barcode/${barcode}`
-    console.log('🌐 Fetching from:', apiUrl )
+    // Call OpenFoodFacts API directly using CapacitorHttp (bypasses WebView restrictions)
+    const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
+    console.log('🌐 Fetching from OpenFoodFacts:', apiUrl)
     
     const response = await CapacitorHttp.get({
       url: apiUrl,
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'User-Agent': USER_AGENT
       }
     })
+    
+    console.log('📡 Response status:', response.status)
     
     if (response.status !== 200) {
       console.error('❌ API error:', response.status)
