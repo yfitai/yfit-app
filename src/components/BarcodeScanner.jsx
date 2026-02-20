@@ -21,18 +21,21 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
   const startScan = async () => {
     try {
+      console.log('🔍 startScan called, isNative:', isNative)
       setError(null)
       setScanning(true)
 
       if (isNative) {
         // Native mobile scanning
+        console.log('📱 startNativeScan called')
         await startNativeScan()
       } else {
         // Web browser scanning with html5-qrcode
+        console.log('🌐 startWebScan called')
         await startWebScan()
       }
     } catch (err) {
-      console.error('Error starting scan:', err)
+      console.error('❌ Error starting scan:', err)
       handleScanError(err)
     }
   }
@@ -41,13 +44,16 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
     try {
       // Get BarcodeScanner from Capacitor.Plugins (native plugin registry)
       const { CapacitorBarcodeScanner } = Capacitor.Plugins
+      console.log('🔌 CapacitorBarcodeScanner found:', CapacitorBarcodeScanner ? 'YES' : 'NO')
       
       if (!CapacitorBarcodeScanner) {
         throw new Error('Barcode scanner plugin not available')
       }
 
       // Check and request camera permission first
+      console.log('📸 Checking camera permissions...')
       const permission = await Camera.checkPermissions()
+      console.log('📸 Camera permission status:', permission)
 
       if (permission.camera === 'denied') {
         // Request permission
@@ -59,6 +65,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       }
 
       // Start scanning with Capacitor Barcode Scanner
+      console.log('📷 Permissions OK, starting barcode scan...')
       const result = await CapacitorBarcodeScanner.scanBarcode({
         hint: 17, // Try all formats
         scanInstructions: 'Point camera at barcode',
@@ -67,9 +74,12 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
         cameraDirection: 1 // Back camera
       })
 
+      console.log('📊 Scan result:', result)
       if (result && result.ScanResult) {
+        console.log('✅ Barcode detected:', result.ScanResult)
         handleScanSuccess(result.ScanResult)
       } else {
+        console.log('❌ No barcode in result')
         setError('No barcode detected. Please try again.')
         setScanning(false)
       }
@@ -122,6 +132,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
   }
 
   const handleScanSuccess = async (barcode) => {
+    console.log('🎯 handleScanSuccess called with barcode:', barcode)
     // Stop scanning
     setScanning(false)
 
@@ -132,6 +143,7 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
 
     // Pass barcode string to parent immediately
     // Parent will handle the food lookup
+    console.log('📤 Calling onScanSuccess callback with barcode:', barcode)
     onScanSuccess(barcode)
   }
 
