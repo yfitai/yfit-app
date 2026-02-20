@@ -6,6 +6,10 @@ const BUNDLE_ID = 'production';
 
 export class LiveUpdateService {
   static async initialize() {
+    // TEMPORARILY DISABLED to force loading from AAB instead of cached bundle
+    console.log('LiveUpdate: DISABLED - Loading from AAB');
+    return;
+    
     // Only run on native platforms
     if (!Capacitor.isNativePlatform()) {
       console.log('LiveUpdate: Skipping - running in browser');
