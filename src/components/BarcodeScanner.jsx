@@ -75,6 +75,10 @@ export default function BarcodeScannerComponent({ onScanSuccess, onClose }) {
       })
 
       console.log('📊 Scan result:', result)
+      
+      // CRITICAL DEBUG: Show result on screen
+      alert(`SCAN RESULT:\nScanResult: ${result?.ScanResult || 'EMPTY'}\nFormat: ${result?.format || 'NONE'}\nFull: ${JSON.stringify(result)}`)
+      
       if (result && result.ScanResult) {
         console.log('✅ Barcode detected:', result.ScanResult)
         handleScanSuccess(result.ScanResult)
