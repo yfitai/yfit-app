@@ -87,6 +87,35 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
     }
   }
 
+  const handleSaveToFavorites = async (alsoLog) => {
+    if (!food || !user) return
+    
+    try {
+      // Import the favorite foods functions
+      const { addFavoriteFood } = await import('../lib/foodDatabase')
+      
+      // Save to favorite_foods
+      const success = await addFavoriteFood(user.id, food)
+      
+      if (success) {
+        alert('⭐ Saved to My Foods!')
+        
+        if (alsoLog) {
+          // Also log the food
+          handleConfirm()
+        } else {
+          // Just close the scanner
+          onClose()
+        }
+      } else {
+        alert('Error saving to My Foods. Please try again.')
+      }
+    } catch (err) {
+      console.error('Error saving to favorites:', err)
+      alert('Error saving to My Foods. Please try again.')
+    }
+  }
+
   const handleConfirm = () => {
     if (!food) return
     
@@ -250,69 +279,119 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-2">{food.name}</h2>
-            {food.brand && <p className="text-gray-600 mb-4">{food.brand}</p>}
-            
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Serving Size</label>
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800">Confirm Serving Size</h2>
+            <p className="text-sm text-gray-600 mt-1">{food.name}</p>
+            {food.brand && (
+              <p className="text-xs text-gray-500">{food.brand}</p>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="p-4">
+            {/* Quantity and Unit */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quantity & Unit
+              </label>
               <div className="flex gap-2">
                 <input
                   type="number"
                   value={servingQuantity}
-                  onChange={(e) => setServingQuantity(parseFloat(e.target.value) || 1)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || value === '0') {
+                      setServingQuantity('')
+                    } else {
+                      setServingQuantity(parseFloat(value) || 1)
+                    }
+                  }}
+                  onFocus={() => setServingQuantity('')}
                   min="0.1"
                   step="0.1"
+                  className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <select
                   value={servingUnit}
                   onChange={(e) => setServingUnit(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                 >
                   {units.map(unit => (
                     <option key={unit.value} value={unit.value}>{unit.label}</option>
                   ))}
                 </select>
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                ≈ {totalGrams.toFixed(1)}g total
+              </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold mb-2">Nutrition Facts</h3>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span>Calories</span>
-                  <span className="font-medium">{displayCalories} kcal</span>
+            {/* Nutrition Summary */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+              <h3 className="font-semibold text-gray-800 mb-2">Nutrition Facts</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-gray-600">Calories:</span>
+                  <span className="font-semibold text-gray-900 ml-2">{displayCalories} kcal</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Protein</span>
-                  <span className="font-medium">{displayProtein}g</span>
+                <div>
+                  <span className="text-gray-600">Protein:</span>
+                  <span className="font-semibold text-blue-600 ml-2">{displayProtein}g</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Carbs</span>
-                  <span className="font-medium">{displayCarbs}g</span>
+                <div>
+                  <span className="text-gray-600">Carbs:</span>
+                  <span className="font-semibold text-orange-600 ml-2">{displayCarbs}g</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Fat</span>
-                  <span className="font-medium">{displayFat}g</span>
+                <div>
+                  <span className="text-gray-600">Fat:</span>
+                  <span className="font-semibold text-purple-600 ml-2">{displayFat}g</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirm}
-                className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-              >
-                Add to {mealType}
-              </button>
+            {/* Actions */}
+            <div className="space-y-2">
+              {/* Primary Actions Row */}
+              <div className="flex gap-2">
+                <button
+                  onClick={onClose}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
+                >
+                  Log Food
+                </button>
+              </div>
+
+              {/* Save to My Foods Row */}
+              {food.source !== 'custom' && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      // Save to favorites without logging
+                      await handleSaveToFavorites(false)
+                    }}
+                    className="flex-1 px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors font-medium text-sm"
+                  >
+                    ⭐ Save to My Foods
+                  </button>
+                  <button
+                    onClick={async () => {
+                      // Save to favorites AND log
+                      await handleSaveToFavorites(true)
+                    }}
+                    className="flex-1 px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 rounded-lg hover:bg-purple-200 transition-colors font-medium text-sm"
+                  >
+                    ⭐ Log & Save
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
