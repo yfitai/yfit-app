@@ -58,7 +58,19 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
           
           if (foodData) {
             setFood(foodData)
-            setServingUnit(foodData.serving_unit || 'serving')
+            // Map common unit names to our unit values
+            const unitMap = {
+              'grams': 'g',
+              'gram': 'g',
+              'ounces': 'oz',
+              'ounce': 'oz',
+              'pounds': 'lb',
+              'pound': 'lb',
+              'milliliters': 'ml',
+              'milliliter': 'ml'
+            }
+            const mappedUnit = unitMap[foodData.serving_unit?.toLowerCase()] || foodData.serving_unit || 'serving'
+            setServingUnit(mappedUnit)
           } else {
             setError(`Product not found for barcode: ${decodedText}`)
           }
@@ -210,6 +222,31 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
     
     console.log('🍽️ Available units:', units.map(u => u.value))
     console.log('🍽️ Current servingUnit:', servingUnit)
+    
+    // Calculate nutrition based on current serving size
+    const unitsWithGrams = isLiquid ? [
+      { value: 'ml', toGrams: 1 },
+      { value: 'fl_oz', toGrams: 29.57 },
+      { value: 'cup', toGrams: 240 },
+      { value: 'tbsp', toGrams: 15 },
+      { value: 'tsp', toGrams: 5 },
+      { value: 'g', toGrams: 1 },
+      { value: 'serving', toGrams: food.servingGrams || 100 }
+    ] : [
+      { value: 'g', toGrams: 1 },
+      { value: 'oz', toGrams: 28.35 },
+      { value: 'lb', toGrams: 453.59 },
+      { value: 'serving', toGrams: food.servingGrams || 100 }
+    ]
+    
+    const currentUnit = unitsWithGrams.find(u => u.value === servingUnit) || unitsWithGrams[0]
+    const totalGrams = servingQuantity * currentUnit.toGrams
+    const multiplier = totalGrams / 100
+    
+    const displayCalories = Math.round((food.calories || 0) * multiplier)
+    const displayProtein = Math.round((food.protein || 0) * multiplier)
+    const displayCarbs = Math.round((food.carbs || 0) * multiplier)
+    const displayFat = Math.round((food.fat || 0) * multiplier)
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -246,19 +283,19 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span>Calories</span>
-                  <span className="font-medium">{food.calories || 0} kcal</span>
+                  <span className="font-medium">{displayCalories} kcal</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Protein</span>
-                  <span className="font-medium">{food.protein || 0}g</span>
+                  <span className="font-medium">{displayProtein}g</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Carbs</span>
-                  <span className="font-medium">{food.carbs || 0}g</span>
+                  <span className="font-medium">{displayCarbs}g</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Fat</span>
-                  <span className="font-medium">{food.fat || 0}g</span>
+                  <span className="font-medium">{displayFat}g</span>
                 </div>
               </div>
             </div>
