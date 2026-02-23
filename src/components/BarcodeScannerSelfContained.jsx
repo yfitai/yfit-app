@@ -8,6 +8,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
   const [loading, setLoading] = useState(false)
   const [food, setFood] = useState(null)
   const [error, setError] = useState(null)
+  const [html5Scanner, setHtml5Scanner] = useState(null)
   
   // Serving state
   const [servingQuantity, setServingQuantity] = useState(1)
@@ -15,18 +16,19 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
 
   useEffect(() => {
     startScan()
+    return () => {
+      if (html5Scanner) {
+        html5Scanner.stop().catch(() => {})
+      }
+    }
   }, [])
 
   const startScan = async () => {
     try {
-      const { CapacitorBarcodeScanner } = Capacitor.Plugins
+      // FORCE HTML5 scanner to avoid native plugin crash
+      const Html5Qrcode = (await import('html5-qrcode')).Html5Qrcode
       
-      if (!CapacitorBarcodeScanner) {
-        setError('Barcode scanner not available')
-        return
-      }
-
-      // Check camera permission
+      // Check camera permission first
       const permission = await Camera.checkPermissions()
       if (permission.camera === 'denied') {
         const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
@@ -36,33 +38,36 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
         }
       }
 
-      // Scan barcode
-      const result = await CapacitorBarcodeScanner.scanBarcode({
-        hint: 17,
-        scanInstructions: 'Point camera at barcode',
-        scanButton: false,
-        scanText: 'Scanning...',
-        cameraDirection: 1
-      })
+      const scanner = new Html5Qrcode('barcode-reader-mobile')
+      setHtml5Scanner(scanner)
 
-      if (result && result.ScanResult) {
-        // Got barcode! Now lookup food
-        setScanning(false)
-        setLoading(true)
-        
-        const foodData = await getFoodByBarcode(result.ScanResult)
-        
-        if (foodData) {
-          setFood(foodData)
-          setServingUnit(foodData.serving_unit || 'serving')
-        } else {
-          setError(`Product not found for barcode: ${result.ScanResult}`)
+      await scanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
+        async (decodedText) => {
+          // Got barcode! Stop scanner and lookup food
+          await scanner.stop()
+          setScanning(false)
+          setLoading(true)
+          
+          const foodData = await getFoodByBarcode(decodedText)
+          
+          if (foodData) {
+            setFood(foodData)
+            setServingUnit(foodData.serving_unit || 'serving')
+          } else {
+            setError(`Product not found for barcode: ${decodedText}`)
+          }
+          setLoading(false)
+        },
+        (errorMessage) => {
+          // Ignore scanning errors (fires continuously)
         }
-        setLoading(false)
-      } else {
-        setError('No barcode detected')
-        setScanning(false)
-      }
+      )
     } catch (err) {
       console.error('Scan error:', err)
       setError('Scanner error: ' + err.message)
@@ -113,19 +118,21 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
   // Render scanning overlay
   if (scanning) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="w-64 h-64 border-4 border-white rounded-lg relative">
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-500"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-500"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-500"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-500"></div>
-          </div>
-          <p className="text-white text-lg font-medium mt-8">Point camera at barcode</p>
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div id="barcode-reader-mobile" className="w-full max-w-md"></div>
+        <div className="absolute top-8 left-0 right-0 text-center">
+          <p className="text-white text-lg font-medium bg-black bg-opacity-75 px-6 py-3 rounded-full inline-block">
+            Point camera at barcode
+          </p>
         </div>
         <div className="absolute bottom-8">
           <button
-            onClick={onClose}
+            onClick={async () => {
+              if (html5Scanner) {
+                await html5Scanner.stop().catch(() => {})
+              }
+              onClose()
+            }}
             className="px-6 py-3 bg-white text-gray-800 rounded-full hover:bg-gray-100 transition-colors font-medium shadow-lg"
           >
             Cancel
