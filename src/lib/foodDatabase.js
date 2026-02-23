@@ -491,23 +491,43 @@ export async function getFoodByBarcode(barcode) {
 export async function getRecentFoods(userId, limit = 10) {
   try {
     const { data, error } = await supabase
-      .from('food_log')
-      .select('food_data')
+      .from('meals')
+      .select('food_id, food_name, brand, calories, protein_g, carbs_g, fat_g, fiber, sugar, sodium, serving_quantity, serving_unit')
       .eq('user_id', userId)
-      .order('logged_at', { ascending: false })
-      .limit(limit * 2) // Get more to account for duplicates
+      .order('created_at', { ascending: false })
+      .limit(limit * 3) // Get more to account for duplicates
 
     if (error) throw error
 
-    // Extract unique foods
+    // Extract unique foods by food_name + brand
     const seen = new Set()
     const uniqueFoods = []
 
-    for (const entry of data || []) {
-      const food = entry.food_data
-      if (food && !seen.has(food.id)) {
-        seen.add(food.id)
-        uniqueFoods.push(food)
+    for (const meal of data || []) {
+      const key = `${meal.food_name}-${meal.brand || ''}`
+      
+      if (!seen.has(key)) {
+        seen.add(key)
+        
+        // Reconstruct food object from meal data
+        uniqueFoods.push({
+          id: meal.food_id || `meal-${meal.food_name}`,
+          name: meal.food_name,
+          brand: meal.brand || '',
+          source: 'recent',
+          calories: meal.calories || 0,
+          protein: meal.protein_g || 0,
+          carbs: meal.carbs_g || 0,
+          fat: meal.fat_g || 0,
+          fiber: meal.fiber || 0,
+          sugar: meal.sugar || 0,
+          sodium: meal.sodium || 0,
+          servingSize: 100,
+          servingUnit: 'g',
+          serving_size: '100g',
+          foodType: 'solid'
+        })
+        
         if (uniqueFoods.length >= limit) break
       }
     }
