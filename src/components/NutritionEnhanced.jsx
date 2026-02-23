@@ -998,15 +998,6 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   const displayCarbs = Math.round((food.carbs || 0) * multiplier)
   const displayFat = Math.round((food.fat || 0) * multiplier)
 
-  servingQuantity,
-  servingUnit,
-  'selectedUnit.toGrams': selectedUnit.toGrams,
-  totalGrams,
-  multiplier,
-  'food.calories': food.calories,
-  displayCalories
-})
-
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
