@@ -187,12 +187,19 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
  const handleFoodSelected = (food) => {
+  console.log('🎯 handleFoodSelected called with:', food)
   setSelectedFood(food)
+  console.log('✅ setSelectedFood done')
   setServingQuantity(1)
+  console.log('✅ setServingQuantity done')
   setServingUnit(food.serving_unit || 'serving')
+  console.log('✅ setServingUnit done')
   setShowFoodSearch(false)
+  console.log('✅ setShowFoodSearch(false) done')
   setShowBarcodeScanner(false)
+  console.log('✅ setShowBarcodeScanner(false) done')
   setShowServingSelector(true)
+  console.log('✅ setShowServingSelector(true) done - SERVING SELECTOR SHOULD NOW BE VISIBLE')
 }
 
 const handleBarcodeScanned = async (barcode) => {
