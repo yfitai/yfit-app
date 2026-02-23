@@ -108,8 +108,10 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       fiber: Math.round((food.fiber || 0) * multiplier),
       sugar: Math.round((food.sugar || 0) * multiplier),
       sodium: Math.round((food.sodium || 0) * multiplier),
-      serving_size: `${servingQuantity} ${servingUnit}`,
-      brand: food.brand || ''
+      serving_quantity: servingQuantity,
+      serving_unit: servingUnit,
+      brand: food.brand || '',
+      food_id: food.id || null
     }
     
     onFoodConfirmed(mealData)
@@ -189,19 +191,25 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
   // Render serving selector
   if (food) {
     const isLiquid = food.foodType === 'liquid'
+    console.log('🍽️ Serving selector - food.foodType:', food.foodType, 'isLiquid:', isLiquid)
+    
     const units = isLiquid ? [
-      { value: 'ml', label: 'ml' },
-      { value: 'fl_oz', label: 'fl oz' },
-      { value: 'cup', label: 'cup' },
-      { value: 'tbsp', label: 'tbsp' },
-      { value: 'tsp', label: 'tsp' },
-      { value: 'serving', label: 'serving' }
+      { value: 'ml', label: 'Milliliters (ml)' },
+      { value: 'fl_oz', label: 'Fluid Ounces (fl oz)' },
+      { value: 'cup', label: 'Cups' },
+      { value: 'tbsp', label: 'Tablespoons (tbsp)' },
+      { value: 'tsp', label: 'Teaspoons (tsp)' },
+      { value: 'g', label: 'Grams (g)' },
+      { value: 'serving', label: 'Serving' }
     ] : [
-      { value: 'g', label: 'g' },
-      { value: 'oz', label: 'oz' },
-      { value: 'lb', label: 'lb' },
-      { value: 'serving', label: 'serving' }
+      { value: 'g', label: 'Grams (g)' },
+      { value: 'oz', label: 'Ounces (oz)' },
+      { value: 'lb', label: 'Pounds (lb)' },
+      { value: 'serving', label: 'Serving' }
     ]
+    
+    console.log('🍽️ Available units:', units.map(u => u.value))
+    console.log('🍽️ Current servingUnit:', servingUnit)
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
