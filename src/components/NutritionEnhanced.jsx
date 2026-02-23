@@ -182,60 +182,41 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
   const handleOpenBarcodeScanner = (mealType) => {
-    console.log('📦 handleOpenBarcodeScanner called for meal type:', mealType)
     setSelectedMealType(mealType)
-    console.log('✅ setSelectedMealType done')
     setShowBarcodeScanner(true)
-    console.log('✅ setShowBarcodeScanner(true) done - Scanner should now render')
   }
 
  const handleFoodSelected = (food) => {
-  console.log('🎯 handleFoodSelected called with:', food)
   setSelectedFood(food)
-  console.log('✅ setSelectedFood done')
   setServingQuantity(1)
-  console.log('✅ setServingQuantity done')
   setServingUnit(food.serving_unit || 'serving')
-  console.log('✅ setServingUnit done')
   setShowFoodSearch(false)
-  console.log('✅ setShowFoodSearch(false) done')
   setShowBarcodeScanner(false)
-  console.log('✅ setShowBarcodeScanner(false) done')
   setShowServingSelector(true)
-  console.log('✅ setShowServingSelector(true) done - SERVING SELECTOR SHOULD NOW BE VISIBLE')
 }
 
 const handleBarcodeScanned = async (barcode) => {
-  console.log('🔍 Barcode scanned:', barcode)
-  
   // Close scanner immediately
   setShowBarcodeScanner(false)
-  console.log('✅ Scanner closed')
   
   // Show loading state
   setLookingUpBarcode(true)
-  console.log('⏳ Looking up barcode...')
   
   try {
     // Lookup food by barcode
-    console.log('📡 Calling getFoodByBarcode...')
     const food = await getFoodByBarcode(barcode)
-    console.log('📦 Food lookup result:', food)
     
     if (food) {
       // Food found! Open serving selector
-      console.log('✅ Food found! Opening serving selector...')
       handleFoodSelected(food)
     } else {
       // Food not found - show alert
-      console.log('❌ Food not found')
       alert(`Product not found for barcode: ${barcode}`)
     }
   } catch (err) {
-    console.error('❌ Error looking up barcode:', err)
+    console.error('Error looking up barcode:', err)
     alert('Error looking up product. Please try again.')
   } finally {
-    console.log('🏁 Lookup complete')
     setLookingUpBarcode(false)
   }
 }

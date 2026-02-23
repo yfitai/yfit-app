@@ -232,7 +232,6 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
   // Render serving selector
   if (food) {
     const isLiquid = food.foodType === 'liquid'
-    console.log('🍽️ Serving selector - food.foodType:', food.foodType, 'isLiquid:', isLiquid)
     
     const units = isLiquid ? [
       { value: 'ml', label: 'Milliliters (ml)' },
@@ -248,9 +247,6 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       { value: 'lb', label: 'Pounds (lb)' },
       { value: 'serving', label: 'Serving' }
     ]
-    
-    console.log('🍽️ Available units:', units.map(u => u.value))
-    console.log('🍽️ Current servingUnit:', servingUnit)
     
     // Calculate nutrition based on current serving size
     const unitsWithGrams = isLiquid ? [
