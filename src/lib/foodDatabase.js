@@ -383,15 +383,6 @@ function transformOpenFoodFactsProduct(product) {
     (product.serving_size && (product.serving_size.includes('ml') || product.serving_size.includes('mL') || product.serving_size.includes('fl oz')))
   ) || false
 
-    console.log('Food:', product.product_name, 'Categories:', categories, 'ProductName:', productName, 'isLiquid:', isLiquid, 'serving_size:', product.serving_size)
-    product_name: product.product_name,
-    'energy-kcal_100g': nutriments['energy-kcal_100g'],
-    'energy_100g': nutriments.energy_100g,
-    'proteins_100g': nutriments.proteins_100g,
-    'carbohydrates_100g': nutriments.carbohydrates_100g,
-    'fat_100g': nutriments.fat_100g
-  })
-
    // Validate data - check if values are suspiciously high (likely data entry error)
   const totalMacros = (nutriments.proteins_100g || 0) + (nutriments.carbohydrates_100g || 0) + (nutriments.fat_100g || 0)
   const dataIsCorrupted = totalMacros > 110 // Macros can't exceed 100g per 100g (allow 10% margin)
