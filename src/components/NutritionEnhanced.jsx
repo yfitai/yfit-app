@@ -182,8 +182,11 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
   const handleOpenBarcodeScanner = (mealType) => {
+    console.log('📦 handleOpenBarcodeScanner called for meal type:', mealType)
     setSelectedMealType(mealType)
+    console.log('✅ setSelectedMealType done')
     setShowBarcodeScanner(true)
+    console.log('✅ setShowBarcodeScanner(true) done - Scanner should now render')
   }
 
  const handleFoodSelected = (food) => {
