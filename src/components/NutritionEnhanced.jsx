@@ -3,7 +3,7 @@ import { supabase, getCurrentUser, getUserProfile } from '../lib/supabase'
 import { updateRecentFood, addFavoriteFood, removeFavoriteFood, getFoodByBarcode } from '../lib/foodDatabase'
 import UnitToggle from './UnitToggle'
 import FoodSearch from './FoodSearch'
-import BarcodeScanner from './BarcodeScanner'
+import BarcodeScannerSelfContained from './BarcodeScannerSelfContained'
 import MacroSettings from './MacroSettings'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
@@ -784,8 +784,31 @@ const handleBarcodeScanned = async (barcode) => {
         )}
 
         {showBarcodeScanner && (
-          <BarcodeScanner
-            onScanSuccess={handleBarcodeScanned}
+          <BarcodeScannerSelfContained
+            mealType={selectedMealType}
+            user={user}
+            onFoodConfirmed={async (mealData) => {
+              // Add user_id and meal_date to the meal data
+              const completeMealData = {
+                ...mealData,
+                user_id: user.id,
+                meal_date: selectedDate,
+                created_at: new Date().toISOString()
+              }
+              
+              // Save to database
+              const { error } = await supabase.from('meals').insert(completeMealData)
+              
+              if (error) {
+                console.error('Error logging food:', error)
+                alert('Error logging food. Please try again.')
+                return
+              }
+              
+              // Reload meals and close scanner
+              await loadTodaysMeals(user.id, selectedDate)
+              setShowBarcodeScanner(false)
+            }}
             onClose={() => setShowBarcodeScanner(false)}
           />
         )}
