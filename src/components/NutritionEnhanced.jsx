@@ -967,8 +967,6 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 
 // Serving Size Selector Component
 function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel, user, onSaveToMyFoods }) {
-  console.log('🍽️ ServingSizeSelector RENDERING with food:', food)
-  console.log('🍽️ ServingSizeSelector props:', { servingQuantity, servingUnit })
 
   // Available units - show different options based on food type
   const isLiquid = food.foodType === 'liquid'
@@ -1000,7 +998,6 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   const displayCarbs = Math.round((food.carbs || 0) * multiplier)
   const displayFat = Math.round((food.fat || 0) * multiplier)
 
-console.log('🥜 DEBUG:', {
   servingQuantity,
   servingUnit,
   'selectedUnit.toGrams': selectedUnit.toGrams,

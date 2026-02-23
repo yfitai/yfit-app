@@ -28,16 +28,13 @@ const USER_AGENT = 'YFIT/1.0 (contact@yfit.app)'
 export async function searchFoods(query, options = {}) {
   const { limit = 20, source = 'all' } = options
 
-  console.log('🔍 searchFoods called:', { query, source, limit })
 
   try {
     const results = []
 
     // Search Open Food Facts (branded foods)
     if (source === 'all') {
-      console.log('📦 Searching Open Food Facts...')
       const offResults = await searchOpenFoodFacts(query, limit)
-      console.log('📦 Open Food Facts found:', offResults.length, 'results')
       results.push(...offResults)
     }
 
@@ -55,10 +52,8 @@ export async function searchFoods(query, options = {}) {
 
     // Search Custom Foods (user-created)
     if (source === 'custom') {
-      console.log('✏️ Searching Custom Foods...')
       try {
         const customResults = await searchCustomFoods(query, limit)
-        console.log('✏️ Custom Foods found:', customResults.length, 'results')
         results.push(...customResults)
       } catch (error) {
         console.warn('Custom foods search failed:', error.message)
@@ -82,7 +77,6 @@ export async function searchFoods(query, options = {}) {
       if (custom[i]) interleaved.push(custom[i])
     }
 
-        console.log('✅ Final results:', interleaved.length, '(Branded:', branded.length, 'USDA:', usda.length, 'Custom:', custom.length, ')')
 
     return interleaved.slice(0, limit)
   } catch (error) {
@@ -346,7 +340,6 @@ async function searchOpenFoodFacts(query, limit) {
       .slice(0, limit)
       .map(item => transformOpenFoodFactsProduct(item.product))
     
-    console.log(`📦 Open Food Facts: ${data.products.length} results → ${scoredProducts.length} after filtering`)
     return scoredProducts
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
@@ -391,7 +384,6 @@ function transformOpenFoodFactsProduct(product) {
   ) || false
 
     console.log('Food:', product.product_name, 'Categories:', categories, 'ProductName:', productName, 'isLiquid:', isLiquid, 'serving_size:', product.serving_size)
-  console.log('🥜 API DATA:', {
     product_name: product.product_name,
     'energy-kcal_100g': nutriments['energy-kcal_100g'],
     'energy_100g': nutriments.energy_100g,
@@ -473,11 +465,8 @@ async function searchCustomFoods(query, limit) {
  */
 export async function getFoodByBarcode(barcode) {
   try {
-    console.log('🔍 getFoodByBarcode called for:', barcode)
-    
     // Call OpenFoodFacts API directly using CapacitorHttp (bypasses WebView restrictions)
     const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
-    console.log('🌐 Fetching from OpenFoodFacts:', apiUrl)
     
     const response = await CapacitorHttp.get({
       url: apiUrl,
@@ -487,29 +476,20 @@ export async function getFoodByBarcode(barcode) {
       }
     })
     
-    console.log('📡 Response status:', response.status)
-    
     if (response.status !== 200) {
-      console.error('❌ API error:', response.status)
       return null
     }
     
     const data = response.data
-    console.log('📚 API data:', { status: data.status, hasProduct: !!data.product, productName: data.product?.product_name })
     
     if (data.status === 1 && data.product) {
       const transformed = transformOpenFoodFactsProduct(data.product)
-      console.log('✅ Transformed product:', transformed)
       return transformed
     }
 
-    console.log('❌ No product found (status !== 1 or no product)')
     return null
   } catch (error) {
-    console.error('❌ Exception in getFoodByBarcode:', error)
-    console.error('❌ Error name:', error.name)
-    console.error('❌ Error message:', error.message)
-    console.error('❌ Error stack:', error.stack)
+    console.error('Error in getFoodByBarcode:', error)
     return null
   }
 }
