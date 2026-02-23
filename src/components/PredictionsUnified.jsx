@@ -99,10 +99,10 @@ export default function PredictionsUnified({ user }) {
   const fetchNutritionData = async () => {
     try {
       const { data, error } = await supabase
-        .from('nutrition_logs')
+        .from('meals')
         .select('*')
         .eq('user_id', user.id)
-        .order('log_date', { ascending: false })
+        .order('meal_date', { ascending: false })
         .limit(30);
       
       if (error) throw error;
@@ -140,7 +140,7 @@ export default function PredictionsUnified({ user }) {
         .from('daily_logs')
         .select('*')
         .eq('user_id', user.id)
-        .order('log_date', { ascending: false })
+        .order('logged_at', { ascending: false })
         .limit(30);
       
       if (error) throw error;
