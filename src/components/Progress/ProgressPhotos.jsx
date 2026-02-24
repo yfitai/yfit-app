@@ -300,7 +300,10 @@ export default function ProgressPhotos({ userId }) {
             <div key={viewType} className="space-y-2">
               {/* Camera Button */}
               <button
-                onClick={() => handleCameraCapture(viewType)}
+                onClick={() => {
+                  console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
+                  handleCameraCapture(viewType);
+                }}
                 disabled={uploading}
                 className="w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
