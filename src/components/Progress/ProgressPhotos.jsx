@@ -90,7 +90,9 @@ export default function ProgressPhotos({ userId }) {
     try {
       console.log('🎬 Calling CapacitorCamera.getPhoto...');
       // Take photo with camera using Base64 (works better with Supabase upload)
-      const image = await CapacitorCamera.getPhoto({
+      let image;
+      try {
+        image = await CapacitorCamera.getPhoto({
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.Base64,
@@ -104,6 +106,12 @@ export default function ProgressPhotos({ userId }) {
         promptLabelPhoto: 'From Gallery',
         promptLabelPicture: 'Take Photo'
       });
+        console.log('🎬 Camera.getPhoto SUCCESS!');
+      } catch (cameraError) {
+        console.error('🎬 Camera.getPhoto FAILED:', cameraError);
+        console.error('🎬 Camera error details:', JSON.stringify(cameraError));
+        throw cameraError;
+      }
 
       console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
       console.log('🎬 Has base64String:', !!image.base64String);
