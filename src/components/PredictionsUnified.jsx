@@ -61,10 +61,10 @@ export default function PredictionsUnified({ user }) {
   const fetchWeightData = async () => {
     try {
       const { data, error } = await supabase
-        .from('body_measurements')
+        .from('daily_trackers')
         .select('*')
         .eq('user_id', user.id)
-        .order('measurement_date', { ascending: false })
+        .order('tracker_date', { ascending: false })
         .limit(30);
       
       if (error) throw error;
