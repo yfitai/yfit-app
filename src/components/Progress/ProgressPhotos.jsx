@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Camera, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-
+import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { Capacitor } from '@capacitor/core'
+import { App } from '@capacitor/app'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -15,7 +17,45 @@ export default function ProgressPhotos({ userId }) {
     loadPhotos()
   }, [userId])
 
-
+  // Handle app restored result (when Android kills app during camera use)
+  useEffect(() => {
+    const handleAppRestored = async () => {
+      console.log('🔄 Setting up appRestoredResult listener');
+      
+      const listener = await App.addListener('appRestoredResult', async (data) => {
+        console.log('🔄 appRestoredResult triggered:', data);
+        
+        if (data.pluginId === 'Camera' && data.methodName === 'getPhoto') {
+          console.log('🔄 Camera data restored after app restart');
+          
+          // Get the view type from localStorage (saved before camera opened)
+          const viewType = localStorage.getItem('pendingPhotoViewType');
+          console.log('🔄 Restored viewType from localStorage:', viewType);
+          
+          if (data.data && data.data.dataUrl) {
+            console.log('🔄 Processing restored camera data...');
+            await processAndUploadPhoto(data.data, viewType || 'front');
+            localStorage.removeItem('pendingPhotoViewType');
+          } else {
+            console.error('🔄 No dataUrl in restored data');
+          }
+        }
+      });
+      
+      return listener;
+    };
+    
+    let listenerHandle;
+    handleAppRestored().then(handle => {
+      listenerHandle = handle;
+    });
+    
+    return () => {
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
+    };
+  }, [userId, photos])
 
   const loadPhotos = async () => {
     // Load from Supabase
@@ -75,7 +115,125 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
+  // Extract photo processing and upload logic
+  const processAndUploadPhoto = async (imageData, viewType) => {
+    console.log('💾 processAndUploadPhoto called with viewType:', viewType);
+    
+    try {
+      if (!imageData.dataUrl) {
+        throw new Error('No image data');
+      }
 
+      // Convert data URL to blob (this is the working approach from January)
+      const response = await fetch(imageData.dataUrl);
+      const blob = await response.blob();
+        
+      // Upload to Supabase Storage
+      const fileName = `${userId}/${Date.now()}.jpg`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('progress-photos')
+        .upload(fileName, blob);
+
+      if (uploadError) {
+        console.error('❌ Storage upload error:', uploadError);
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      console.log('✅ Storage upload successful:', uploadData);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('progress-photos')
+        .getPublicUrl(fileName);
+
+      console.log('✅ Got public URL:', publicUrl);
+
+      // Save to database
+      const { data: photoData, error: dbError } = await supabase
+        .from('progress_photos')
+        .insert({
+          user_id: userId,
+          image_url: publicUrl,
+          view_type: viewType,
+          taken_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('❌ Database insert error:', dbError);
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
+
+      console.log('✅ Database insert successful:', photoData);
+
+      setPhotos([photoData, ...photos]);
+      alert('Photo captured and uploaded successfully!');
+      setUploading(false);
+    } catch (error) {
+      console.error('❌ Error processing photo:', error);
+      alert(`Error: ${error.message}. Please try again.`);
+      setUploading(false);
+    }
+  };
+
+  const handleCameraCapture = async (viewType) => {
+    console.log('🎬 handleCameraCapture called with viewType:', viewType);
+    console.log('🎬 Is native platform:', Capacitor.isNativePlatform());
+    
+    // Check if running on native platform
+    if (!Capacitor.isNativePlatform()) {
+      alert('Camera is only available on mobile devices. Please use the upload button instead.');
+      return;
+    }
+
+    // Save viewType to localStorage so we can restore it if app is killed
+    localStorage.setItem('pendingPhotoViewType', viewType);
+    console.log('🎬 Saved viewType to localStorage:', viewType);
+
+    setUploading(true);
+    console.log('🎬 setUploading(true) - starting camera capture');
+    
+    try {
+      console.log('🎬 Calling CapacitorCamera.getPhoto...');
+      // Take photo with camera using Base64 (works better with Supabase upload)
+      let image;
+      try {
+        image = await CapacitorCamera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        saveToGallery: false,
+        correctOrientation: true,
+        width: 1080,
+        height: 1920,
+        promptLabelHeader: 'Take Progress Photo',
+        promptLabelCancel: 'Cancel',
+        promptLabelPhoto: 'From Gallery',
+        promptLabelPicture: 'Take Photo'
+      });
+        console.log('🎬 Camera.getPhoto SUCCESS!');
+      } catch (cameraError) {
+        console.error('🎬 Camera.getPhoto FAILED:', cameraError);
+        console.error('🎬 Camera error details:', JSON.stringify(cameraError));
+        throw cameraError;
+      }
+
+      console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
+      console.log('🎬 Has dataUrl:', !!image.dataUrl);
+
+      // If we got here, the app wasn't killed - process normally
+      localStorage.removeItem('pendingPhotoViewType');
+      await processAndUploadPhoto(image, viewType);
+    } catch (error) {
+      console.error('❌ Error capturing photo:', error);
+      alert(`Error: ${error.message}. Please try again.`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleDeletePhoto = async (photoId) => {
     if (!confirm('Are you sure you want to delete this photo?')) return
@@ -200,21 +358,18 @@ export default function ProgressPhotos({ userId }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {['front', 'side', 'back'].map(viewType => (
             <div key={viewType} className="space-y-2">
-              {/* Camera Button - HTML5 file input with capture */}
-              <label className={`w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer ${
-                uploading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}>
+              {/* Camera Button */}
+              <button
+                onClick={() => {
+                  console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
+                  handleCameraCapture(viewType);
+                }}
+                disabled={uploading}
+                className="w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Camera className="w-8 h-8 text-blue-600 mb-2" />
                 <span className="text-sm font-medium text-blue-700 capitalize">Take {viewType}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => handlePhotoUpload(e, viewType)}
-                  disabled={uploading}
-                  className="hidden"
-                />
-              </label>
+              </button>
               
               {/* Upload Button */}
               <label className="w-full flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
