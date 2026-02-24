@@ -202,14 +202,14 @@ export default function PredictionsUnified({ user }) {
 
     try {
       const sortedWeights = [...data].sort((a, b) => 
-        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
+        new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
       );
 
       // Calculate weekly weight change rate
       const firstWeight = parseFloat(sortedWeights[0].weight_kg);
       const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg);
-      const firstDate = new Date(sortedWeights[0].measurement_date).getTime();
-      const lastDate = new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime();
+      const firstDate = new Date(sortedWeights[0].tracker_date).getTime();
+      const lastDate = new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime();
       
       const daysBetween = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
       const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
@@ -226,9 +226,9 @@ export default function PredictionsUnified({ user }) {
       const goalDate = new Date(Date.now() + adjustedWeeks * 7 * 24 * 60 * 60 * 1000);
 
       return {
-        currentWeight: Math.round(lastWeight * 10) / 10,
-        goalWeight: Math.round(goalWeight * 10) / 10,
-        weeklyChange: Math.round(weeklyChange * 10) / 10,
+        currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
+        goalWeight: Math.round(goalWeight * 2.2 * 10) / 10,
+        weeklyChange: Math.round(weeklyChange * 2.2 * 10) / 10,
         weeksToGoal: Math.round(adjustedWeeks),
         goalDate: goalDate.toLocaleDateString(),
         trend: weeklyChange < 0 ? 'losing' : weeklyChange > 0 ? 'gaining' : 'stable',
@@ -251,16 +251,16 @@ export default function PredictionsUnified({ user }) {
 
       // Calculate weight change over period
       const sortedWeights = [...wData].sort((a, b) => 
-        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
+        new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
       );
       
       const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
                           parseFloat(sortedWeights[0].weight_kg);
-      const days = (new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime() - 
-                   new Date(sortedWeights[0].measurement_date).getTime()) / (1000 * 60 * 60 * 24);
+      const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
+                   new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
 
-      // 1 lb = 3500 calories
-      const caloriesDelta = (weightChange * 3500) / days;
+      // 1 kg = 2.2 lbs, 1 lb = 3500 calories
+      const caloriesDelta = (weightChange * 2.2 * 3500) / days;
       const tdee = Math.round(avgCalories - caloriesDelta);
 
       // Activity level classification
@@ -706,14 +706,14 @@ export default function PredictionsUnified({ user }) {
     try {
       // Calculate current trends
       const sortedWeights = [...wData].sort((a, b) => 
-        new Date(a.measurement_date).getTime() - new Date(b.measurement_date).getTime()
+        new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
       );
 
       const firstWeight = parseFloat(sortedWeights[0].weight_kg);
       const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg);
       const weightChange = lastWeight - firstWeight;
-      const days = (new Date(sortedWeights[sortedWeights.length - 1].measurement_date).getTime() - 
-                   new Date(sortedWeights[0].measurement_date).getTime()) / (1000 * 60 * 60 * 24);
+      const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
+                   new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
       const weeklyWeightChange = (weightChange / days) * 7;
 
       // Calculate training volume trend
@@ -749,12 +749,12 @@ export default function PredictionsUnified({ user }) {
       }
 
       return {
-        currentWeight: Math.round(lastWeight * 10) / 10,
-        projectedWeight: Math.round(projectedWeight * 10) / 10,
-        weeklyWeightChange: Math.round(weeklyWeightChange * 100) / 100,
+        currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
+        projectedWeight: Math.round(projectedWeight * 2.2 * 10) / 10,
+        weeklyWeightChange: Math.round(weeklyWeightChange * 2.2 * 100) / 100,
         isRecomping,
-        estimatedMuscleGain: Math.round(estimatedMuscleGain * 10) / 10,
-        estimatedFatLoss: Math.round(estimatedFatLoss * 10) / 10,
+        estimatedMuscleGain: Math.round(estimatedMuscleGain * 2.2 * 10) / 10,
+        estimatedFatLoss: Math.round(estimatedFatLoss * 2.2 * 10) / 10,
         volumeTrend: volumeIncrease > 5 ? 'increasing' : volumeIncrease < -5 ? 'decreasing' : 'stable',
         recommendation: isRecomping 
           ? 'Great! You\'re building muscle while losing fat'
