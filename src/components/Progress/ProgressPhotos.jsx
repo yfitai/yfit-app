@@ -75,6 +75,9 @@ export default function ProgressPhotos({ userId }) {
   }
 
   const handleCameraCapture = async (viewType) => {
+    console.log('🎬 handleCameraCapture called with viewType:', viewType);
+    console.log('🎬 Is native platform:', Capacitor.isNativePlatform());
+    
     // Check if running on native platform
     if (!Capacitor.isNativePlatform()) {
       alert('Camera is only available on mobile devices. Please use the upload button instead.');
@@ -82,7 +85,10 @@ export default function ProgressPhotos({ userId }) {
     }
 
     setUploading(true);
+    console.log('🎬 setUploading(true) - starting camera capture');
+    
     try {
+      console.log('🎬 Calling CapacitorCamera.getPhoto...');
       // Take photo with camera using Base64 (works better with Supabase upload)
       const image = await CapacitorCamera.getPhoto({
         quality: 90,
@@ -98,6 +104,9 @@ export default function ProgressPhotos({ userId }) {
         promptLabelPhoto: 'From Gallery',
         promptLabelPicture: 'Take Photo'
       });
+
+      console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
+      console.log('🎬 Has base64String:', !!image.base64String);
 
       if (!image.base64String) {
         throw new Error('No image data');
