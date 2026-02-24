@@ -15,15 +15,6 @@ export class LiveUpdateService {
     try {
       console.log('LiveUpdate: Initializing...');
       
-      // TEMPORARY: Reset to built-in bundle for testing
-      // Remove this after camera fixes are deployed to Vercel
-      try {
-        await LiveUpdate.reset();
-        console.log('LiveUpdate: Reset to built-in bundle (testing mode)');
-      } catch (resetError) {
-        console.log('LiveUpdate: Reset not needed or failed:', resetError.message);
-      }
-      
       // Check for updates on app start
       await this.checkForUpdates();
       
