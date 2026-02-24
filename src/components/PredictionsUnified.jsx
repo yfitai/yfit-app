@@ -402,7 +402,7 @@ export default function PredictionsUnified({ user }) {
       // Analyze by day of week
       const byDayOfWeek = {};
       data.forEach(log => {
-        const day = new Date(log.entry_date).toLocaleDateString('en-US', { weekday: 'long' });
+        const day = new Date(log.meal_date).toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
         byDayOfWeek[day].calories += parseFloat(log.calories) || 0;
         byDayOfWeek[day].count++;

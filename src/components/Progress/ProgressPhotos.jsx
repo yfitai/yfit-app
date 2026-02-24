@@ -103,24 +103,18 @@ export default function ProgressPhotos({ userId }) {
         throw new Error('No image data');
       }
 
-      // Convert base64 to blob for Supabase upload
-      const base64ToBlob = (base64, contentType = 'image/jpeg') => {
-        const byteCharacters = atob(base64);
-        const byteArrays = [];
-        
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-          const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-          byteArrays.push(new Uint8Array(byteNumbers));
+      // Convert base64 to ArrayBuffer for Supabase upload (more reliable in Capacitor)
+      const base64ToArrayBuffer = (base64) => {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
-        
-        return new Blob(byteArrays, { type: contentType });
+        return bytes.buffer;
       };
       
-      const blob = base64ToBlob(image.base64String);
+      const arrayBuffer = base64ToArrayBuffer(image.base64String);
+      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
         
         // Upload to Supabase Storage
         const fileName = `${userId}/${Date.now()}.jpg`;
@@ -129,12 +123,19 @@ export default function ProgressPhotos({ userId }) {
           .from('progress-photos')
           .upload(fileName, blob);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('❌ Storage upload error:', uploadError);
+          throw new Error(`Storage upload failed: ${uploadError.message}`);
+        }
+
+        console.log('✅ Storage upload successful:', uploadData);
 
         // Get public URL
         const { data: { publicUrl } } = supabase.storage
           .from('progress-photos')
           .getPublicUrl(fileName);
+
+        console.log('✅ Got public URL:', publicUrl);
 
         // Save to database
         const { data: photoData, error: dbError } = await supabase
@@ -148,18 +149,18 @@ export default function ProgressPhotos({ userId }) {
           .select()
           .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error('❌ Database insert error:', dbError);
+          throw new Error(`Database insert failed: ${dbError.message}`);
+        }
+
+        console.log('✅ Database insert successful:', photoData);
 
         setPhotos([photoData, ...photos]);
         alert('Photo captured and uploaded successfully!');
     } catch (error) {
-      console.error('Error capturing photo:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      alert(`Error capturing photo: ${error.message}. Please try again.`);
+      console.error('❌ Error capturing photo:', error);
+      alert(`Error: ${error.message}. Please try again.`);
     } finally {
       setUploading(false);
     }
