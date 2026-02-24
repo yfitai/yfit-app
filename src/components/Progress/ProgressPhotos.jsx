@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Camera, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { CameraPreview } from '@capgo/camera-preview'
 import { Capacitor } from '@capacitor/core'
-import { App } from '@capacitor/app'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -12,50 +11,21 @@ export default function ProgressPhotos({ userId }) {
   const [compareMode, setCompareMode] = useState(false)
   const [comparePhotos, setComparePhotos] = useState({ before: null, after: null })
   const [viewMode, setViewMode] = useState('grid') // grid, timeline, compare
+  const [cameraActive, setCameraActive] = useState(false)
+  const [currentViewType, setCurrentViewType] = useState(null)
 
   useEffect(() => {
     loadPhotos()
   }, [userId])
 
-  // Handle app restored result (when Android kills app during camera use)
+  // Cleanup camera preview on unmount
   useEffect(() => {
-    const handleAppRestored = async () => {
-      console.log('🔄 Setting up appRestoredResult listener');
-      
-      const listener = await App.addListener('appRestoredResult', async (data) => {
-        console.log('🔄 appRestoredResult triggered:', data);
-        
-        if (data.pluginId === 'Camera' && data.methodName === 'getPhoto') {
-          console.log('🔄 Camera data restored after app restart');
-          
-          // Get the view type from localStorage (saved before camera opened)
-          const viewType = localStorage.getItem('pendingPhotoViewType');
-          console.log('🔄 Restored viewType from localStorage:', viewType);
-          
-          if (data.data && data.data.dataUrl) {
-            console.log('🔄 Processing restored camera data...');
-            await processAndUploadPhoto(data.data, viewType || 'front');
-            localStorage.removeItem('pendingPhotoViewType');
-          } else {
-            console.error('🔄 No dataUrl in restored data');
-          }
-        }
-      });
-      
-      return listener;
-    };
-    
-    let listenerHandle;
-    handleAppRestored().then(handle => {
-      listenerHandle = handle;
-    });
-    
     return () => {
-      if (listenerHandle) {
-        listenerHandle.remove();
+      if (cameraActive) {
+        CameraPreview.stop().catch(console.error);
       }
     };
-  }, [userId, photos])
+  }, [cameraActive])
 
   const loadPhotos = async () => {
     // Load from Supabase
@@ -115,17 +85,17 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
-  // Extract photo processing and upload logic
-  const processAndUploadPhoto = async (imageData, viewType) => {
+  // Process and upload photo from base64 string
+  const processAndUploadPhoto = async (base64String, viewType) => {
     console.log('💾 processAndUploadPhoto called with viewType:', viewType);
     
     try {
-      if (!imageData.dataUrl) {
+      if (!base64String) {
         throw new Error('No image data');
       }
 
-      // Convert data URL to blob (this is the working approach from January)
-      const response = await fetch(imageData.dataUrl);
+      // Convert base64 to blob
+      const response = await fetch(`data:image/jpeg;base64,${base64String}`);
       const blob = await response.blob();
         
       // Upload to Supabase Storage
@@ -178,9 +148,8 @@ export default function ProgressPhotos({ userId }) {
     }
   };
 
-  const handleCameraCapture = async (viewType) => {
-    console.log('🎬 handleCameraCapture called with viewType:', viewType);
-    console.log('🎬 Is native platform:', Capacitor.isNativePlatform());
+  const startCamera = async (viewType) => {
+    console.log('📸 Starting camera preview for viewType:', viewType);
     
     // Check if running on native platform
     if (!Capacitor.isNativePlatform()) {
@@ -188,50 +157,61 @@ export default function ProgressPhotos({ userId }) {
       return;
     }
 
-    // Save viewType to localStorage so we can restore it if app is killed
-    localStorage.setItem('pendingPhotoViewType', viewType);
-    console.log('🎬 Saved viewType to localStorage:', viewType);
+    try {
+      setCurrentViewType(viewType);
+      setCameraActive(true);
+      
+      // Start camera preview
+      await CameraPreview.start({
+        position: viewType === 'front' ? 'front' : 'rear',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        x: 0,
+        y: 0,
+        toBack: false,
+        paddingBottom: 0,
+        rotateWhenOrientationChanged: true,
+        storeToFile: false,
+        disableAudio: true
+      });
+      
+      console.log('✅ Camera preview started');
+    } catch (error) {
+      console.error('❌ Error starting camera:', error);
+      alert(`Error starting camera: ${error.message}`);
+      setCameraActive(false);
+    }
+  };
 
+  const capturePhoto = async () => {
+    console.log('📸 Capturing photo...');
     setUploading(true);
-    console.log('🎬 setUploading(true) - starting camera capture');
     
     try {
-      console.log('🎬 Calling CapacitorCamera.getPhoto...');
-      // Take photo with camera using Base64 (works better with Supabase upload)
-      let image;
-      try {
-        image = await CapacitorCamera.getPhoto({
-        quality: 90,
-        allowEditing: true,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
-        saveToGallery: false,
-        correctOrientation: true,
-        width: 1080,
-        height: 1920,
-        promptLabelHeader: 'Take Progress Photo',
-        promptLabelCancel: 'Cancel',
-        promptLabelPhoto: 'From Gallery',
-        promptLabelPicture: 'Take Photo'
-      });
-        console.log('🎬 Camera.getPhoto SUCCESS!');
-      } catch (cameraError) {
-        console.error('🎬 Camera.getPhoto FAILED:', cameraError);
-        console.error('🎬 Camera error details:', JSON.stringify(cameraError));
-        throw cameraError;
-      }
-
-      console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
-      console.log('🎬 Has dataUrl:', !!image.dataUrl);
-
-      // If we got here, the app wasn't killed - process normally
-      localStorage.removeItem('pendingPhotoViewType');
-      await processAndUploadPhoto(image, viewType);
+      // Capture photo as base64
+      const result = await CameraPreview.capture({ quality: 90 });
+      console.log('✅ Photo captured:', result);
+      
+      // Stop camera preview
+      await CameraPreview.stop();
+      setCameraActive(false);
+      
+      // Upload the photo
+      await processAndUploadPhoto(result.value, currentViewType);
     } catch (error) {
       console.error('❌ Error capturing photo:', error);
       alert(`Error: ${error.message}. Please try again.`);
-    } finally {
       setUploading(false);
+    }
+  };
+
+  const cancelCamera = async () => {
+    console.log('🚫 Canceling camera');
+    try {
+      await CameraPreview.stop();
+      setCameraActive(false);
+    } catch (error) {
+      console.error('❌ Error stopping camera:', error);
     }
   };
 
@@ -362,7 +342,7 @@ export default function ProgressPhotos({ userId }) {
               <button
                 onClick={() => {
                   console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
-                  handleCameraCapture(viewType);
+                  startCamera(viewType);
                 }}
                 disabled={uploading}
                 className="w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -580,6 +560,45 @@ export default function ProgressPhotos({ userId }) {
           <p className="text-sm text-gray-500">
             Tip: Take photos in the same location, lighting, and pose for best comparison results.
           </p>
+        </div>
+      )}
+
+      {/* Camera Preview Overlay */}
+      {cameraActive && (
+        <div className="fixed inset-0 z-50 bg-black">
+          {/* Camera preview will be rendered here by the plugin */}
+          
+          {/* Camera Controls Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="flex items-center justify-center gap-6">
+              {/* Cancel Button */}
+              <button
+                onClick={cancelCamera}
+                disabled={uploading}
+                className="px-6 py-3 bg-gray-600 text-white rounded-full font-medium hover:bg-gray-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              
+              {/* Capture Button */}
+              <button
+                onClick={capturePhoto}
+                disabled={uploading}
+                className="w-20 h-20 bg-white rounded-full border-4 border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 flex items-center justify-center"
+              >
+                {uploading ? (
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <div className="w-16 h-16 bg-blue-500 rounded-full" />
+                )}
+              </button>
+              
+              {/* View Type Label */}
+              <div className="px-6 py-3 bg-blue-600 text-white rounded-full font-medium capitalize">
+                {currentViewType}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
