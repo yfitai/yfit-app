@@ -29,10 +29,10 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Initialize LiveUpdate service for OTA updates
-    LiveUpdateService.initialize().catch(err => {
-      console.error('Failed to initialize LiveUpdate:', err)
-    })
+    // TEMPORARILY DISABLED: LiveUpdate service for camera testing
+    // LiveUpdateService.initialize().catch(err => {
+    //   console.error('Failed to initialize LiveUpdate:', err)
+    // })
 
     // Check for existing session
     getCurrentUser().then((currentUser) => {
