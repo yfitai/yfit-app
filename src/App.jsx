@@ -114,3 +114,4 @@ function App() {
 }
 
 export default App
+// Force rebuild for camera fix Tue Feb 24 14:38:13 EST 2026
