@@ -3,6 +3,7 @@ import { Camera, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye
 import { supabase } from '../../lib/supabase'
 import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { Capacitor } from '@capacitor/core'
+import { App } from '@capacitor/app'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -15,6 +16,46 @@ export default function ProgressPhotos({ userId }) {
   useEffect(() => {
     loadPhotos()
   }, [userId])
+
+  // Handle app restored result (when Android kills app during camera use)
+  useEffect(() => {
+    const handleAppRestored = async () => {
+      console.log('🔄 Setting up appRestoredResult listener');
+      
+      const listener = await App.addListener('appRestoredResult', async (data) => {
+        console.log('🔄 appRestoredResult triggered:', data);
+        
+        if (data.pluginId === 'Camera' && data.methodName === 'getPhoto') {
+          console.log('🔄 Camera data restored after app restart');
+          
+          // Get the view type from localStorage (saved before camera opened)
+          const viewType = localStorage.getItem('pendingPhotoViewType');
+          console.log('🔄 Restored viewType from localStorage:', viewType);
+          
+          if (data.data && data.data.base64String) {
+            console.log('🔄 Processing restored camera data...');
+            await processAndUploadPhoto(data.data, viewType || 'front');
+            localStorage.removeItem('pendingPhotoViewType');
+          } else {
+            console.error('🔄 No base64String in restored data');
+          }
+        }
+      });
+      
+      return listener;
+    };
+    
+    let listenerHandle;
+    handleAppRestored().then(handle => {
+      listenerHandle = handle;
+    });
+    
+    return () => {
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
+    };
+  }, [userId, photos])
 
   const loadPhotos = async () => {
     // Load from Supabase
@@ -74,6 +115,78 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
+  // Extract photo processing and upload logic (used by both normal flow and appRestoredResult)
+  const processAndUploadPhoto = async (imageData, viewType) => {
+    console.log('💾 processAndUploadPhoto called with viewType:', viewType);
+    
+    try {
+      if (!imageData.base64String) {
+        throw new Error('No image data');
+      }
+
+      // Convert base64 to ArrayBuffer for Supabase upload (more reliable in Capacitor)
+      const base64ToArrayBuffer = (base64) => {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+      };
+      
+      const arrayBuffer = base64ToArrayBuffer(imageData.base64String);
+      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+        
+      // Upload to Supabase Storage
+      const fileName = `${userId}/${Date.now()}.jpg`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('progress-photos')
+        .upload(fileName, blob);
+
+      if (uploadError) {
+        console.error('❌ Storage upload error:', uploadError);
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      console.log('✅ Storage upload successful:', uploadData);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('progress-photos')
+        .getPublicUrl(fileName);
+
+      console.log('✅ Got public URL:', publicUrl);
+
+      // Save to database
+      const { data: photoData, error: dbError } = await supabase
+        .from('progress_photos')
+        .insert({
+          user_id: userId,
+          image_url: publicUrl,
+          view_type: viewType,
+          taken_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('❌ Database insert error:', dbError);
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
+
+      console.log('✅ Database insert successful:', photoData);
+
+      setPhotos([photoData, ...photos]);
+      alert('Photo captured and uploaded successfully!');
+      setUploading(false);
+    } catch (error) {
+      console.error('❌ Error processing photo:', error);
+      alert(`Error: ${error.message}. Please try again.`);
+      setUploading(false);
+    }
+  };
+
   const handleCameraCapture = async (viewType) => {
     console.log('🎬 handleCameraCapture called with viewType:', viewType);
     console.log('🎬 Is native platform:', Capacitor.isNativePlatform());
@@ -83,6 +196,10 @@ export default function ProgressPhotos({ userId }) {
       alert('Camera is only available on mobile devices. Please use the upload button instead.');
       return;
     }
+
+    // Save viewType to localStorage so we can restore it if app is killed
+    localStorage.setItem('pendingPhotoViewType', viewType);
+    console.log('🎬 Saved viewType to localStorage:', viewType);
 
     setUploading(true);
     console.log('🎬 setUploading(true) - starting camera capture');
@@ -116,65 +233,9 @@ export default function ProgressPhotos({ userId }) {
       console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
       console.log('🎬 Has base64String:', !!image.base64String);
 
-      if (!image.base64String) {
-        throw new Error('No image data');
-      }
-
-      // Convert base64 to ArrayBuffer for Supabase upload (more reliable in Capacitor)
-      const base64ToArrayBuffer = (base64) => {
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        return bytes.buffer;
-      };
-      
-      const arrayBuffer = base64ToArrayBuffer(image.base64String);
-      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
-        
-        // Upload to Supabase Storage
-        const fileName = `${userId}/${Date.now()}.jpg`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('progress-photos')
-          .upload(fileName, blob);
-
-        if (uploadError) {
-          console.error('❌ Storage upload error:', uploadError);
-          throw new Error(`Storage upload failed: ${uploadError.message}`);
-        }
-
-        console.log('✅ Storage upload successful:', uploadData);
-
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('progress-photos')
-          .getPublicUrl(fileName);
-
-        console.log('✅ Got public URL:', publicUrl);
-
-        // Save to database
-        const { data: photoData, error: dbError } = await supabase
-          .from('progress_photos')
-          .insert({
-            user_id: userId,
-            image_url: publicUrl,
-            view_type: viewType,
-            taken_at: new Date().toISOString()
-          })
-          .select()
-          .single();
-
-        if (dbError) {
-          console.error('❌ Database insert error:', dbError);
-          throw new Error(`Database insert failed: ${dbError.message}`);
-        }
-
-        console.log('✅ Database insert successful:', photoData);
-
-        setPhotos([photoData, ...photos]);
-        alert('Photo captured and uploaded successfully!');
+      // If we got here, the app wasn't killed - process normally
+      localStorage.removeItem('pendingPhotoViewType');
+      await processAndUploadPhoto(image, viewType);
     } catch (error) {
       console.error('❌ Error capturing photo:', error);
       alert(`Error: ${error.message}. Please try again.`);
