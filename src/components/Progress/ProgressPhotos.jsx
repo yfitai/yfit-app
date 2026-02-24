@@ -32,12 +32,12 @@ export default function ProgressPhotos({ userId }) {
           const viewType = localStorage.getItem('pendingPhotoViewType');
           console.log('🔄 Restored viewType from localStorage:', viewType);
           
-          if (data.data && data.data.base64String) {
+          if (data.data && data.data.dataUrl) {
             console.log('🔄 Processing restored camera data...');
             await processAndUploadPhoto(data.data, viewType || 'front');
             localStorage.removeItem('pendingPhotoViewType');
           } else {
-            console.error('🔄 No base64String in restored data');
+            console.error('🔄 No dataUrl in restored data');
           }
         }
       });
@@ -115,27 +115,18 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
-  // Extract photo processing and upload logic (used by both normal flow and appRestoredResult)
+  // Extract photo processing and upload logic
   const processAndUploadPhoto = async (imageData, viewType) => {
     console.log('💾 processAndUploadPhoto called with viewType:', viewType);
     
     try {
-      if (!imageData.base64String) {
+      if (!imageData.dataUrl) {
         throw new Error('No image data');
       }
 
-      // Convert base64 to ArrayBuffer for Supabase upload (more reliable in Capacitor)
-      const base64ToArrayBuffer = (base64) => {
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        return bytes.buffer;
-      };
-      
-      const arrayBuffer = base64ToArrayBuffer(imageData.base64String);
-      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+      // Convert data URL to blob (this is the working approach from January)
+      const response = await fetch(imageData.dataUrl);
+      const blob = await response.blob();
         
       // Upload to Supabase Storage
       const fileName = `${userId}/${Date.now()}.jpg`;
@@ -211,8 +202,8 @@ export default function ProgressPhotos({ userId }) {
       try {
         image = await CapacitorCamera.getPhoto({
         quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Base64,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera,
         saveToGallery: false,
         correctOrientation: true,
@@ -231,7 +222,7 @@ export default function ProgressPhotos({ userId }) {
       }
 
       console.log('🎬 Camera.getPhoto returned:', image ? 'Image received' : 'No image');
-      console.log('🎬 Has base64String:', !!image.base64String);
+      console.log('🎬 Has dataUrl:', !!image.dataUrl);
 
       // If we got here, the app wasn't killed - process normally
       localStorage.removeItem('pendingPhotoViewType');
