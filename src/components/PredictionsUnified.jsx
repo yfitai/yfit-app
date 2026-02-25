@@ -242,29 +242,42 @@ export default function PredictionsUnified({ user }) {
 
   // 2. TDEE Calculation
   const calculateTDEE = (wData = weightData, woData = workoutData, nData = nutritionData) => {
-    if (wData.length < 7 || nData.length < 7) return null;
+    // Reduced requirement: need at least 3 weight entries OR 3 nutrition entries
+    if (wData.length < 3 && nData.length < 3) return null;
 
     try {
-      // Calculate average daily calorie intake
-      const avgCalories = nData.reduce((sum, log) => 
-        sum + (parseFloat(log.calories) || 0), 0) / nData.length;
+      // Calculate average daily calorie intake (filter out very low entries that are likely incomplete)
+      const validNutritionData = nData.filter(log => parseFloat(log.calories) > 50);
+      const avgCalories = validNutritionData.length > 0
+        ? validNutritionData.reduce((sum, log) => sum + (parseFloat(log.calories) || 0), 0) / validNutritionData.length
+        : 1875; // Default fallback if no valid nutrition data
 
-      // Calculate weight change over period
-      const sortedWeights = [...wData].sort((a, b) => 
-        new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
-      );
+      // Calculate weight change over period (if we have weight data)
+      let tdee = avgCalories; // Default to average intake
       
-      const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
-                          parseFloat(sortedWeights[0].weight_kg);
-      const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
-                   new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
+      if (wData.length >= 3) {
+        const sortedWeights = [...wData].sort((a, b) => 
+          new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
+        );
+        
+        const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
+                            parseFloat(sortedWeights[0].weight_kg);
+        const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
+                     new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
 
-      // 1 kg = 2.2 lbs, 1 lb = 3500 calories
-      const caloriesDelta = (weightChange * 2.2 * 3500) / days;
-      const tdee = Math.round(avgCalories - caloriesDelta);
+        // 1 kg = 2.2 lbs, 1 lb = 3500 calories
+        // Only calculate if we have meaningful time period (at least 3 days)
+        if (days >= 3) {
+          const caloriesDelta = (weightChange * 2.2 * 3500) / days;
+          tdee = Math.round(avgCalories - caloriesDelta);
+        }
+      }
 
       // Activity level classification
-      const workoutsPerWeek = (woData.length / days) * 7;
+      const days = wData.length >= 3 
+        ? (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24)
+        : 7; // Default to 1 week if no weight data
+      const workoutsPerWeek = woData.length > 0 ? (woData.length / Math.max(days, 1)) * 7 : 0;
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';
@@ -370,7 +383,10 @@ export default function PredictionsUnified({ user }) {
 
   // 4. Nutrition Pattern Analysis
   const analyzeNutritionPatterns = (data = nutritionData) => {
-    if (data.length < 7) return null;
+    // Filter out invalid entries (less than 50 calories - likely incomplete)
+    const validData = data.filter(log => parseFloat(log.calories) > 50);
+    
+    if (validData.length < 3) return null; // Reduced from 7 to 3
 
     try {
       const avgMacros = {
@@ -380,7 +396,7 @@ export default function PredictionsUnified({ user }) {
         calories: 0
       };
 
-      data.forEach(log => {
+      validData.forEach(log => {
         avgMacros.protein += parseFloat(log.protein_g) || 0;
         avgMacros.carbs += parseFloat(log.carbs_g) || 0;
         avgMacros.fat += parseFloat(log.fat_g) || 0;
@@ -388,7 +404,7 @@ export default function PredictionsUnified({ user }) {
       });
 
       Object.keys(avgMacros).forEach(key => {
-        avgMacros[key] = Math.round(avgMacros[key] / data.length);
+        avgMacros[key] = Math.round(avgMacros[key] / validData.length);
       });
 
       // Calculate macro ratios
@@ -401,7 +417,7 @@ export default function PredictionsUnified({ user }) {
 
       // Analyze by day of week
       const byDayOfWeek = {};
-      data.forEach(log => {
+      validData.forEach(log => {
         const day = new Date(log.meal_date).toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
         byDayOfWeek[day].calories += parseFloat(log.calories) || 0;
@@ -467,14 +483,16 @@ export default function PredictionsUnified({ user }) {
     
     console.log('Filtered to strength workouts only:', strengthWorkouts.length, 'of', data.length);
     
-    if (strengthWorkouts.length < 7) {
-      console.log('❌ Not enough strength workouts for injury risk (need 7, have ' + strengthWorkouts.length + ')');
+    // Reduced requirement from 7 to 5 workouts
+    if (strengthWorkouts.length < 5) {
+      console.log('❌ Not enough strength workouts for injury risk (need 5, have ' + strengthWorkouts.length + ')');
       return null;
     }
 
     try {
-      const recentWorkouts = strengthWorkouts.slice(0, 7);
-      const olderWorkouts = strengthWorkouts.slice(7, 14);
+      // Use 5 most recent workouts for analysis
+      const recentWorkouts = strengthWorkouts.slice(0, 5);
+      const olderWorkouts = strengthWorkouts.slice(5, 10);
 
       const recentAvgVolume = recentWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / recentWorkouts.length;
       const olderAvgVolume = olderWorkouts.length > 0 
@@ -731,20 +749,25 @@ export default function PredictionsUnified({ user }) {
       const projectedWeightChange = weeklyWeightChange * 12;
       const projectedWeight = lastWeight + projectedWeightChange;
 
-      // Estimate muscle/fat split (simplified)
+      // Estimate muscle/fat split (realistic estimates)
       let estimatedMuscleGain = 0;
       let estimatedFatLoss = 0;
 
       if (isRecomping) {
-        estimatedMuscleGain = Math.abs(volumeIncrease) * 0.1; // Rough estimate
+        // Recomping: slow muscle gain, moderate fat loss
+        estimatedMuscleGain = Math.min(6, Math.abs(volumeIncrease) * 0.05); // Max 6 lbs muscle in 12 weeks
         estimatedFatLoss = Math.abs(projectedWeightChange) + estimatedMuscleGain;
       } else if (weeklyWeightChange < 0) {
-        // Losing weight
-        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.75;
-        estimatedMuscleGain = volumeIncrease > 0 ? Math.abs(projectedWeightChange) * 0.25 : 0;
+        // Losing weight: preserve muscle, lose fat
+        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.75; // 75% fat
+        estimatedMuscleGain = volumeIncrease > 10 ? Math.min(3, Math.abs(projectedWeightChange) * 0.1) : 0; // Small muscle gain if training hard
+      } else if (weeklyWeightChange > 0) {
+        // Gaining weight: muscle and some fat
+        estimatedMuscleGain = Math.min(12, projectedWeightChange * 0.6); // Max 12 lbs muscle in 12 weeks
+        estimatedFatLoss = 0;
       } else {
-        // Gaining weight
-        estimatedMuscleGain = projectedWeightChange * 0.5;
+        // Maintaining weight
+        estimatedMuscleGain = volumeIncrease > 10 ? 2 : 0; // Minimal muscle gain
         estimatedFatLoss = 0;
       }
 
