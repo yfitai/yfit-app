@@ -41,9 +41,6 @@ importers:
       '@capawesome/capacitor-live-update':
         specifier: ^7.4.0
         version: 7.4.0(@capacitor/core@7.5.0)
-      '@capgo/camera-preview':
-        specifier: ^8.1.1
-        version: 8.1.1(@capacitor/core@7.5.0)
       '@hookform/resolvers':
         specifier: ^5.0.1
         version: 5.2.2(react-hook-form@7.71.2(react@18.3.1))
@@ -400,11 +397,6 @@ packages:
     resolution: {integrity: sha512-ZNfD/r3XvnBpeG6xNYMjyQKbZJMZ0IMk8TTzO8Uz1mZIsYeolveNFM4vuta+Fxf2OAp4Etuq7rXJR4KbmWvSDQ==}
     peerDependencies:
       '@capacitor/core': '>=7.0.0'
-
-  '@capgo/camera-preview@8.1.1':
-    resolution: {integrity: sha512-4Xzl5M9Z3YasyKWzj3Rm1EooyLWY8D0Q2BpukiRCYmlE9fAKDRPY/od7uoC2fYJ1nPrAZrKDLRMGfE4fNwKaSQ==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -3149,10 +3141,6 @@ snapshots:
   '@capacitor/synapse@1.0.4': {}
 
   '@capawesome/capacitor-live-update@7.4.0(@capacitor/core@7.5.0)':
-    dependencies:
-      '@capacitor/core': 7.5.0
-
-  '@capgo/camera-preview@8.1.1(@capacitor/core@7.5.0)':
     dependencies:
       '@capacitor/core': 7.5.0
 
