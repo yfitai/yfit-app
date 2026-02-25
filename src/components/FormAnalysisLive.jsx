@@ -654,13 +654,13 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Lowered position - ready for next rep
-    if (armAngle < 30 && repStateRef.current === 'up' && timeSinceLastRep > 500) {
+    // Lowered position - ready for next rep (arms at sides)
+    if (armAngle < 50 && repStateRef.current === 'up' && timeSinceLastRep > 500) {
       repStateRef.current = 'down';
       console.log('✅ Lateral Raise - Arms lowered, ready for next rep');
     }
-    // Raised position - COUNT REP
-    else if (armAngle > 70 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    // Raised position - COUNT REP (arms raised to shoulder level)
+    else if (armAngle > 75 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
       console.log('🎯 LATERAL RAISE REP COUNTED!');
@@ -950,9 +950,11 @@ const analyzeBicepCurl = (landmarks) => {
     selectedExerciseRef.current = selectedExercise;
     setFormFeedback([]);
     setRepCount(0);
-    repStateRef.current = 'up';
+    // Set initial state based on exercise type
+    // For lateral raises, start in 'down' state (arms at sides, ready to count first raise)
+    repStateRef.current = selectedExercise.id === 'lateralraise' ? 'down' : 'up';
     lastRepTimeRef.current = 0;
-    console.log('Started analysis for:', selectedExercise.name);
+    console.log('Started analysis for:', selectedExercise.name, '| Initial state:', repStateRef.current);
 
     // Start camera
     if (webcamRef.current && webcamRef.current.video && poseRef.current) {
