@@ -982,8 +982,8 @@ const analyzeBicepCurl = (landmarks) => {
     isAnalyzingRef.current = false;
     selectedExerciseRef.current = null;
     setFormFeedback([]);
-    setRepCount(0); // Reset rep count
-    console.log('Stopped analysis');
+    // DON'T reset rep count - keep it visible after stopping
+    console.log('Stopped analysis | Final rep count:', repCount);
     
     // Clear the canvas
     if (canvasRef.current) {
@@ -1074,6 +1074,16 @@ return (
                     >
                       Refresh Page
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Rep Count Overlay - Visible during analysis */}
+              {isAnalyzing && (
+                <div className="absolute top-4 right-4 bg-black bg-opacity-75 rounded-lg px-6 py-3 border-2 border-blue-500">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold text-blue-400">{repCount}</div>
+                    <div className="text-xs text-gray-300 mt-1">REPS</div>
                   </div>
                 </div>
               )}
