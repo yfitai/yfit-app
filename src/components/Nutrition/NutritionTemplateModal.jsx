@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Utensils } from 'lucide-react'
+import { X, Utensils, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 
 export default function NutritionTemplateModal({ mealType, onSelectTemplate, onClose, user }) {
@@ -54,6 +54,37 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
       console.error('[NutritionTemplate] Error loading templates:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleDeleteTemplate(e, template) {
+    e.stopPropagation() // Prevent template selection when clicking delete
+    
+    if (!confirm(`Delete template "${template.name}"?`)) {
+      return
+    }
+
+    try {
+      console.log('[NutritionTemplate] Deleting template:', template.id)
+      
+      const { error } = await supabase
+        .from('meal_templates')
+        .delete()
+        .eq('id', template.id)
+        .eq('user_id', user.id)
+      
+      if (error) {
+        console.error('[NutritionTemplate] Error deleting template:', error)
+        alert('Failed to delete template. Please try again.')
+        return
+      }
+      
+      console.log('[NutritionTemplate] Template deleted successfully')
+      // Reload templates
+      await loadTemplates()
+    } catch (error) {
+      console.error('[NutritionTemplate] Error deleting template:', error)
+      alert('Failed to delete template. Please try again.')
     }
   }
 
@@ -131,10 +162,21 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
                         {template.meals?.length || 0} items
                       </p>
                     </div>
-                    <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                    <div className="flex items-center gap-2">
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => handleDeleteTemplate(e, template)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete template"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                      {/* Select Arrow */}
+                      <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </button>
