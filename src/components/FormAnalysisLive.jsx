@@ -958,7 +958,7 @@ const analyzeBicepCurl = (landmarks) => {
     repStateRef.current = exercisesStartingDown.includes(selectedExercise.id) ? 'down' : 'up';
     
     lastRepTimeRef.current = 0;
-    console.log('Started analysis for:', selectedExercise.name, '| Initial state:', repStateRef.current);
+    console.log('🔥 FORM ANALYSIS v2.1 - Started analysis for:', selectedExercise.name, '| Initial state:', repStateRef.current);
 
     // Start camera
     if (webcamRef.current && webcamRef.current.video && poseRef.current) {
