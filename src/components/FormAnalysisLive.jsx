@@ -1022,12 +1022,13 @@ const analyzeBicepCurl = (landmarks) => {
         const endTime = new Date();
         const durationSeconds = Math.floor((endTime - sessionStartTime) / 1000);
         
+        // Note: exercise_id in table is UUID, but we're storing text ID
+        // Store exercise name in the new exercise_name column
         const { data, error } = await supabase
           .from('form_analysis_sessions')
           .insert({
             user_id: user.id,
             exercise_name: exercise.name,
-            exercise_id: exercise.id,
             start_time: sessionStartTime.toISOString(),
             end_time: endTime.toISOString(),
             duration_seconds: durationSeconds,
@@ -1036,7 +1037,8 @@ const analyzeBicepCurl = (landmarks) => {
             max_form_score: formScore,
             min_form_score: formScore,
             feedback_summary: feedbackHistory,
-            analysis_status: 'completed'
+            analysis_status: 'completed',
+            notes: `Exercise ID: ${exercise.id}`
           });
         
         if (error) {
