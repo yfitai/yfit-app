@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Camera, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
+import { Camera as CameraIcon, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { CameraPreview } from '@capgo/camera-preview'
+import { Camera } from '@capacitor/camera'
 import { Capacitor } from '@capacitor/core'
+import { CameraResultType, CameraSource } from '@capacitor/camera'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -11,21 +12,10 @@ export default function ProgressPhotos({ userId }) {
   const [compareMode, setCompareMode] = useState(false)
   const [comparePhotos, setComparePhotos] = useState({ before: null, after: null })
   const [viewMode, setViewMode] = useState('grid') // grid, timeline, compare
-  const [cameraActive, setCameraActive] = useState(false)
-  const [currentViewType, setCurrentViewType] = useState(null)
 
   useEffect(() => {
     loadPhotos()
   }, [userId])
-
-  // Cleanup camera preview on unmount
-  useEffect(() => {
-    return () => {
-      if (cameraActive) {
-        CameraPreview.stop().catch(console.error);
-      }
-    };
-  }, [cameraActive])
 
   const loadPhotos = async () => {
     // Load from Supabase
@@ -85,17 +75,40 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
-  // Process and upload photo from base64 string
-  const processAndUploadPhoto = async (base64String, viewType) => {
-    console.log('💾 processAndUploadPhoto called with viewType:', viewType);
+  const handleCameraCapture = async (viewType) => {
+    console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
     
+    // Check if running on native platform
+    if (!Capacitor.isNativePlatform()) {
+      alert('Camera is only available on mobile devices. Please use the upload button instead.');
+      return;
+    }
+
+    setUploading(true);
+    
+    // Show user-friendly message
+    const userMessage = 'Opening camera... Note: The app may restart after taking the photo. Your photo will be saved automatically.';
+    console.log('📸', userMessage);
+
     try {
-      if (!base64String) {
-        throw new Error('No image data');
+      // Use standard Capacitor Camera
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        saveToGallery: false,
+        correctOrientation: true
+      });
+
+      console.log('✅ Photo captured successfully');
+
+      if (!image.dataUrl) {
+        throw new Error('No image data received');
       }
 
-      // Convert base64 to blob
-      const response = await fetch(`data:image/jpeg;base64,${base64String}`);
+      // Convert dataUrl to blob
+      const response = await fetch(image.dataUrl);
       const blob = await response.blob();
         
       // Upload to Supabase Storage
@@ -107,17 +120,15 @@ export default function ProgressPhotos({ userId }) {
 
       if (uploadError) {
         console.error('❌ Storage upload error:', uploadError);
-        throw new Error(`Storage upload failed: ${uploadError.message}`);
+        throw uploadError;
       }
 
-      console.log('✅ Storage upload successful:', uploadData);
+      console.log('✅ Storage upload successful');
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('progress-photos')
         .getPublicUrl(fileName);
-
-      console.log('✅ Got public URL:', publicUrl);
 
       // Save to database
       const { data: photoData, error: dbError } = await supabase
@@ -133,85 +144,21 @@ export default function ProgressPhotos({ userId }) {
 
       if (dbError) {
         console.error('❌ Database insert error:', dbError);
-        throw new Error(`Database insert failed: ${dbError.message}`);
+        throw dbError;
       }
 
-      console.log('✅ Database insert successful:', photoData);
+      console.log('✅ Photo saved successfully');
 
       setPhotos([photoData, ...photos]);
       alert('Photo captured and uploaded successfully!');
+      
+    } catch (error) {
+      console.error('❌ Error with camera:', error);
+      if (error.message !== 'User cancelled photos app') {
+        alert(`Error: ${error.message}. Please try again.`);
+      }
+    } finally {
       setUploading(false);
-    } catch (error) {
-      console.error('❌ Error processing photo:', error);
-      alert(`Error: ${error.message}. Please try again.`);
-      setUploading(false);
-    }
-  };
-
-  const startCamera = async (viewType) => {
-    console.log('📸 Starting camera preview for viewType:', viewType);
-    
-    // Check if running on native platform
-    if (!Capacitor.isNativePlatform()) {
-      alert('Camera is only available on mobile devices. Please use the upload button instead.');
-      return;
-    }
-
-    try {
-      setCurrentViewType(viewType);
-      setCameraActive(true);
-      
-      // Start camera preview
-      await CameraPreview.start({
-        position: viewType === 'front' ? 'front' : 'rear',
-        width: window.innerWidth,
-        height: window.innerHeight,
-        x: 0,
-        y: 0,
-        toBack: false,
-        paddingBottom: 0,
-        rotateWhenOrientationChanged: true,
-        storeToFile: false,
-        disableAudio: true
-      });
-      
-      console.log('✅ Camera preview started');
-    } catch (error) {
-      console.error('❌ Error starting camera:', error);
-      alert(`Error starting camera: ${error.message}`);
-      setCameraActive(false);
-    }
-  };
-
-  const capturePhoto = async () => {
-    console.log('📸 Capturing photo...');
-    setUploading(true);
-    
-    try {
-      // Capture photo as base64
-      const result = await CameraPreview.capture({ quality: 90 });
-      console.log('✅ Photo captured:', result);
-      
-      // Stop camera preview
-      await CameraPreview.stop();
-      setCameraActive(false);
-      
-      // Upload the photo
-      await processAndUploadPhoto(result.value, currentViewType);
-    } catch (error) {
-      console.error('❌ Error capturing photo:', error);
-      alert(`Error: ${error.message}. Please try again.`);
-      setUploading(false);
-    }
-  };
-
-  const cancelCamera = async () => {
-    console.log('🚫 Canceling camera');
-    try {
-      await CameraPreview.stop();
-      setCameraActive(false);
-    } catch (error) {
-      console.error('❌ Error stopping camera:', error);
     }
   };
 
@@ -257,7 +204,7 @@ export default function ProgressPhotos({ userId }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Camera className="w-6 h-6 text-blue-600" />
+          <CameraIcon className="w-6 h-6 text-blue-600" />
           <h2 className="text-2xl font-bold text-gray-900">Progress Photos</h2>
         </div>
         
@@ -314,16 +261,15 @@ export default function ProgressPhotos({ userId }) {
             </div>
           </div>
           
-          {/* AI Insights */}
           <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
-              <h3 className="font-semibold text-gray-900">AI-Detected Progress</h3>
+              <h3 className="font-semibold text-gray-900">Progress Insights</h3>
             </div>
             <ul className="space-y-1">
-              {analytics.insights.map((insight, index) => (
-                <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
+              {analytics.insights.map((insight, idx) => (
+                <li key={idx} className="text-sm text-gray-700 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
                   {insight}
                 </li>
               ))}
@@ -332,66 +278,67 @@ export default function ProgressPhotos({ userId }) {
         </div>
       )}
 
-      {/* Upload Section */}
-      <div className="mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">Add New Photo</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {['front', 'side', 'back'].map(viewType => (
-            <div key={viewType} className="space-y-2">
-              {/* Camera Button */}
-              <button
-                onClick={() => {
-                  console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
-                  startCamera(viewType);
-                }}
+      {/* Capture Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {['front', 'side', 'back'].map((viewType) => (
+          <div key={viewType} className="space-y-2">
+            <button
+              onClick={() => handleCameraCapture(viewType)}
+              disabled={uploading}
+              className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <CameraIcon className="w-5 h-5" />
+              Take {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
+            </button>
+            
+            <label className="block">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handlePhotoUpload(e, viewType)}
                 disabled={uploading}
-                className="w-full flex flex-col items-center justify-center p-4 border-2 border-blue-500 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Camera className="w-8 h-8 text-blue-600 mb-2" />
-                <span className="text-sm font-medium text-blue-700 capitalize">Take {viewType}</span>
-              </button>
-              
-              {/* Upload Button */}
-              <label className="w-full flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
-                <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                <span className="text-xs text-gray-600 capitalize">or Upload</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handlePhotoUpload(e, viewType)}
-                  disabled={uploading}
-                />
-              </label>
-            </div>
-          ))}
-        </div>
+                className="hidden"
+              />
+              <div className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer text-center flex items-center justify-center gap-2">
+                <Upload className="w-4 h-4" />
+                Upload {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
+              </div>
+            </label>
+          </div>
+        ))}
       </div>
+
+      {uploading && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-blue-700 text-center font-medium">
+            Processing photo... Please wait.
+          </p>
+        </div>
+      )}
 
       {/* Photos Display */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {photos.map(photo => (
+          {photos.map((photo) => (
             <div key={photo.id} className="relative group">
-              <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={photo.image_url}
-                  alt={`Progress photo from ${new Date(photo.taken_at).toLocaleDateString()}`}
-                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedPhoto(photo)}
-                />
+              <img
+                src={photo.image_url}
+                alt={`Progress ${photo.view_type}`}
+                className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setSelectedPhoto(photo)}
+              />
+              <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded capitalize">
+                {photo.view_type}
               </div>
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => handleDeletePhoto(photo.id)}
-                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="absolute top-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                {new Date(photo.taken_at).toLocaleDateString()}
               </div>
-              <div className="mt-2 text-sm text-gray-600 text-center">
-                {new Date(photo.taken_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </div>
+              <button
+                onClick={() => handleDeletePhoto(photo.id)}
+                className="absolute bottom-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
@@ -399,36 +346,45 @@ export default function ProgressPhotos({ userId }) {
 
       {viewMode === 'timeline' && (
         <div className="space-y-6">
-          {photos.map((photo, index) => (
+          {photos.map((photo, idx) => (
             <div key={photo.id} className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={photo.image_url}
-                  alt={`Progress photo`}
-                  className="w-full h-full object-cover cursor-pointer"
-                  onClick={() => setSelectedPhoto(photo)}
-                />
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {photos.length - idx}
+                </div>
+                {idx < photos.length - 1 && (
+                  <div className="w-0.5 h-24 bg-gray-300 mx-auto mt-2"></div>
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="font-semibold text-gray-900">
-                    {new Date(photo.taken_at).toLocaleDateString('en-US', { 
-                      month: 'long', 
-                      day: 'numeric', 
-                      year: 'numeric' 
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">
+                    {new Date(photo.taken_at).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
                     })}
                   </span>
-                  <span className="text-sm text-gray-500 capitalize">({photo.view_type} view)</span>
                 </div>
-                {photo.notes && (
-                  <p className="text-gray-700">{photo.notes}</p>
-                )}
-                {index < photos.length - 1 && (
-                  <div className="mt-2 text-sm text-green-600 font-medium">
-                    {Math.floor((new Date(photo.taken_at) - new Date(photos[index + 1].taken_at)) / (1000 * 60 * 60 * 24))} days since last photo
-                  </div>
-                )}
+                <img
+                  src={photo.image_url}
+                  alt={`Progress ${photo.view_type}`}
+                  className="w-full max-w-md h-64 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setSelectedPhoto(photo)}
+                />
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full capitalize">
+                    {photo.view_type} View
+                  </span>
+                  <button
+                    onClick={() => handleDeletePhoto(photo.id)}
+                    className="px-3 py-1 bg-red-100 text-red-700 text-sm rounded-full hover:bg-red-200 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -436,169 +392,130 @@ export default function ProgressPhotos({ userId }) {
       )}
 
       {viewMode === 'compare' && (
-        <div>
-          <div className="mb-4 text-center text-gray-600">
-            Select two photos to compare side-by-side
-          </div>
-          <div className="grid grid-cols-2 gap-8 mb-6">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3 text-center">Before</h3>
+              <h3 className="text-lg font-semibold mb-3">Before</h3>
               {comparePhotos.before ? (
                 <div className="relative">
                   <img
                     src={comparePhotos.before.image_url}
                     alt="Before"
-                    className="w-full rounded-lg"
+                    className="w-full h-96 object-cover rounded-lg"
                   />
-                  <div className="text-center mt-2 text-sm text-gray-600">
-                    {new Date(comparePhotos.before.taken_at).toLocaleDateString()}
-                  </div>
                   <button
                     onClick={() => setComparePhotos({ ...comparePhotos, before: null })}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full"
+                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <div className="aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400">Select a photo</span>
+                <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">Select a "before" photo from below</p>
                 </div>
               )}
             </div>
+            
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3 text-center">After</h3>
+              <h3 className="text-lg font-semibold mb-3">After</h3>
               {comparePhotos.after ? (
                 <div className="relative">
                   <img
                     src={comparePhotos.after.image_url}
                     alt="After"
-                    className="w-full rounded-lg"
+                    className="w-full h-96 object-cover rounded-lg"
                   />
-                  <div className="text-center mt-2 text-sm text-gray-600">
-                    {new Date(comparePhotos.after.taken_at).toLocaleDateString()}
-                  </div>
                   <button
                     onClick={() => setComparePhotos({ ...comparePhotos, after: null })}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full"
+                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <div className="aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400">Select a photo</span>
+                <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">Select an "after" photo from below</p>
                 </div>
               )}
             </div>
           </div>
-          
-          {/* Photo Selection Grid */}
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-            {photos.map(photo => (
-              <div
-                key={photo.id}
-                className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500"
-                onClick={() => {
-                  if (!comparePhotos.before) {
-                    setComparePhotos({ ...comparePhotos, before: photo })
-                  } else if (!comparePhotos.after) {
-                    setComparePhotos({ ...comparePhotos, after: photo })
-                  }
-                }}
-              >
+
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold mb-3">Select Photos to Compare</h3>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+              {photos.map((photo) => (
                 <img
+                  key={photo.id}
                   src={photo.image_url}
-                  alt="Progress photo"
-                  className="w-full h-full object-cover"
+                  alt={`Progress ${photo.view_type}`}
+                  className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                  onClick={() => {
+                    if (!comparePhotos.before) {
+                      setComparePhotos({ ...comparePhotos, before: photo })
+                    } else if (!comparePhotos.after) {
+                      setComparePhotos({ ...comparePhotos, after: photo })
+                    }
+                  }}
                 />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Photo Modal */}
       {selectedPhoto && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setSelectedPhoto(null)}>
           <div className="relative max-w-4xl w-full">
             <button
               onClick={() => setSelectedPhoto(null)}
-              className="absolute top-4 right-4 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100"
+              className="absolute -top-12 right-0 p-2 bg-white rounded-full hover:bg-gray-100"
             >
               <X className="w-6 h-6" />
             </button>
             <img
               src={selectedPhoto.image_url}
-              alt="Progress photo"
-              className="w-full rounded-lg"
+              alt={`Progress ${selectedPhoto.view_type}`}
+              className="w-full h-auto rounded-lg"
+              onClick={(e) => e.stopPropagation()}
             />
-            <div className="bg-white rounded-b-lg p-4">
-              <div className="text-lg font-semibold text-gray-900">
-                {new Date(selectedPhoto.taken_at).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
+            <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold capitalize">{selectedPhoto.view_type} View</p>
+                  <p className="text-sm text-gray-300">
+                    {new Date(selectedPhoto.taken_at).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeletePhoto(selectedPhoto.id)
+                    setSelectedPhoto(null)
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Delete
+                </button>
               </div>
-              {selectedPhoto.notes && (
-                <p className="text-gray-700 mt-2">{selectedPhoto.notes}</p>
-              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Empty State */}
       {photos.length === 0 && (
         <div className="text-center py-12">
-          <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Progress Photos Yet</h3>
-          <p className="text-gray-600 mb-4">
-            Start tracking your visual progress by uploading your first photo!
+          <CameraIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 text-lg mb-2">No progress photos yet</p>
+          <p className="text-gray-500 text-sm">
+            Start tracking your journey by taking your first progress photo!
           </p>
-          <p className="text-sm text-gray-500">
-            Tip: Take photos in the same location, lighting, and pose for best comparison results.
-          </p>
-        </div>
-      )}
-
-      {/* Camera Preview Overlay */}
-      {cameraActive && (
-        <div className="fixed inset-0 z-[9999] bg-black">
-          {/* Camera preview will be rendered here by the plugin */}
-          
-          {/* Camera Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-[10000]" style={{zIndex: 2147483647}}>
-            <div className="flex items-center justify-center gap-6">
-              {/* Cancel Button */}
-              <button
-                onClick={cancelCamera}
-                disabled={uploading}
-                className="px-6 py-3 bg-gray-600 text-white rounded-full font-medium hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              
-              {/* Capture Button */}
-              <button
-                onClick={capturePhoto}
-                disabled={uploading}
-                className="w-20 h-20 bg-white rounded-full border-4 border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 flex items-center justify-center"
-              >
-                {uploading ? (
-                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <div className="w-16 h-16 bg-blue-500 rounded-full" />
-                )}
-              </button>
-              
-              {/* View Type Label */}
-              <div className="px-6 py-3 bg-blue-600 text-white rounded-full font-medium capitalize">
-                {currentViewType}
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

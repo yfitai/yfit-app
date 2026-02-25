@@ -22,7 +22,6 @@
     "@capacitor/ios": "^7.4.4",
     "@capacitor/share": "^7.0.3",
     "@capawesome/capacitor-live-update": "^7.4.0",
-    "@capgo/camera-preview": "^8.1.1",
     "@hookform/resolvers": "^5.0.1",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/drawing_utils": "^0.3.1675466124",
