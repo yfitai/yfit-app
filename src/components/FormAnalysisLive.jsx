@@ -1080,9 +1080,9 @@ return (
 
               {/* Rep Count Overlay - Visible during analysis */}
               {isAnalyzing && (
-                <div className="absolute top-4 right-4 bg-black bg-opacity-75 rounded-lg px-6 py-3 border-2 border-blue-500">
+                <div className="absolute top-4 right-4 bg-black bg-opacity-75 rounded-lg px-6 py-3 border-2 border-green-500">
                   <div className="text-center">
-                    <div className="text-5xl font-bold text-blue-400">{repCount}</div>
+                    <div className="text-5xl font-bold text-green-400">{repCount}</div>
                     <div className="text-xs text-gray-300 mt-1">REPS</div>
                   </div>
                 </div>
@@ -1150,9 +1150,9 @@ return (
               <div className={`text-6xl font-bold ${isAnalyzing ? 'text-blue-600' : 'text-gray-300'}`}>
                 {repCount}
               </div>
-              <div className="text-gray-600 mt-2">
-                {isAnalyzing ? 'Reps Completed' : 'Start analysis to begin'}
-              </div>
+              {repCount > 0 && (
+                <div className="text-gray-600 mt-2">Reps Completed</div>
+              )}
             </div>
           </div>
 
