@@ -565,11 +565,11 @@ export default function ProgressPhotos({ userId }) {
 
       {/* Camera Preview Overlay */}
       {cameraActive && (
-        <div className="fixed inset-0 z-50 bg-black">
+        <div className="fixed inset-0 z-[9999] bg-black">
           {/* Camera preview will be rendered here by the plugin */}
           
           {/* Camera Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-[10000]" style={{zIndex: 2147483647}}>
             <div className="flex items-center justify-center gap-6">
               {/* Cancel Button */}
               <button
