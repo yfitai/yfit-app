@@ -100,10 +100,20 @@ export default function ProgressPhotos({ userId }) {
       }
 
       console.log('✅ Photo captured from webcam');
+      console.log('Connecting to', `'${imageSrc.substring(0, 100)}...'`);
 
-      // Convert base64 to blob
-      const response = await fetch(imageSrc);
-      const blob = await response.blob();
+      // Convert base64 to blob (without fetch to avoid CSP violation)
+      const base64Data = imageSrc.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      
+      console.log('✅ Blob created successfully');
+      console.log('Blob size:', blob.size, 'bytes');
         
       // Upload to Supabase Storage
       const fileName = `${userId}/${Date.now()}.jpg`;
