@@ -624,6 +624,8 @@ const analyzeSquat = (landmarks) => {
     const rightArmAngle = calculateAngle(landmarks[24], rightShoulder, rightElbow);
     const armAngle = Math.max(leftArmAngle, rightArmAngle);
     
+    console.log('Lateral Raise - Arm angle:', armAngle.toFixed(1), '| State:', repStateRef.current);
+    
     // Track WORST form issue during raised position
     if (repStateRef.current === 'down' && armAngle > 60) {
       let currentIssue = null;
@@ -655,14 +657,17 @@ const analyzeSquat = (landmarks) => {
     // Lowered position - ready for next rep
     if (armAngle < 30 && repStateRef.current === 'up' && timeSinceLastRep > 500) {
       repStateRef.current = 'down';
+      console.log('✅ Lateral Raise - Arms lowered, ready for next rep');
     }
     // Raised position - COUNT REP
     else if (armAngle > 70 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
+      console.log('🎯 LATERAL RAISE REP COUNTED!');
       
       setRepCount(prev => {
         const newRepCount = prev + 1;
+        console.log('✅ Lateral raise rep counted! Total:', newRepCount);
         const worstIssue = currentRepIssuesRef.current[0];
         const feedbackMessage = worstIssue ? worstIssue.message : 'Good raise!';
         const feedbackType = worstIssue ? worstIssue.type : 'success';
