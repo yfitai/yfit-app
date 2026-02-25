@@ -1,16 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { Pose } from '@mediapipe/pose';
 import { Camera } from '@mediapipe/camera_utils';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS } from '@mediapipe/pose';
 import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle } from 'lucide-react';
+import { supabase, getCurrentUser } from '../lib/supabase';
 
 const FormAnalysisLive = ({ preSelectedExerciseName }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
+
+  // Load current user
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    };
+    loadUser();
+  }, []);
 
   // Auto-select exercise if preSelectedExerciseName is provided
   useEffect(() => {
@@ -38,6 +48,8 @@ const FormAnalysisLive = ({ preSelectedExerciseName }) => {
   const currentRepIssuesRef = useRef([]); // Track form issues during current rep
   const [feedbackHistory, setFeedbackHistory] = useState([]); // Persistent feedback list
   const feedbackEndRef = useRef(null); // For auto-scroll
+  const [sessionStartTime, setSessionStartTime] = useState(null); // Track session start time
+  const [user, setUser] = useState(null); // Current user
 
 
 // Exercise options (10 total exercises)
@@ -955,10 +967,12 @@ const analyzeBicepCurl = (landmarks) => {
     // 'down' = resting/lowered position (ready to count when you perform the movement)
     // 'up' = extended/raised position (need to lower first before counting)
     const exercisesStartingDown = ['lateralraise', 'bicepcurl', 'preachercurl', 'bentoverrow'];
-    repStateRef.current = exercisesStartingDown.includes(selectedExercise.id) ? 'down' : 'up';
-    
+    const initialState = exercisesStartingDown.includes(selectedExercise.id) ? 'down' : 'up';
+    repStateRef.current = initialState;
     lastRepTimeRef.current = 0;
-    console.log('🔥 FORM ANALYSIS v2.1 - Started analysis for:', selectedExercise.name, '| Initial state:', repStateRef.current);
+    
+    console.log('🔥 FORM ANALYSIS v2.1 - Started analysis for:', selectedExercise.name, '| Initial state:', initialState);
+    setSessionStartTime(new Date());
 
     // Start camera
     if (webcamRef.current && webcamRef.current.video && poseRef.current) {
@@ -977,13 +991,64 @@ const analyzeBicepCurl = (landmarks) => {
     }
   };
 
-  const stopAnalysis = () => {
+  const stopAnalysis = async () => {
     setIsAnalyzing(false);
     isAnalyzingRef.current = false;
+    const exercise = selectedExerciseRef.current;
     selectedExerciseRef.current = null;
     setFormFeedback([]);
-    // DON'T reset rep count - keep it visible after stopping
+    
     console.log('Stopped analysis | Final rep count:', repCount);
+    
+    // Calculate form score from feedback history
+    const calculateFormScore = () => {
+      if (feedbackHistory.length === 0) return 100; // Perfect if no feedback
+      
+      let score = 100;
+      feedbackHistory.forEach(feedback => {
+        if (feedback.type === 'error') score -= 15; // Critical errors
+        else if (feedback.type === 'warning') score -= 10; // Warnings
+        else if (feedback.type === 'success') score += 5; // Good form bonus
+      });
+      
+      return Math.max(0, Math.min(100, score)); // Clamp between 0-100
+    };
+    
+    const formScore = calculateFormScore();
+    
+    // Save session to Supabase
+    if (user && exercise && sessionStartTime) {
+      try {
+        const endTime = new Date();
+        const durationSeconds = Math.floor((endTime - sessionStartTime) / 1000);
+        
+        const { data, error } = await supabase
+          .from('form_analysis_sessions')
+          .insert({
+            user_id: user.id,
+            exercise_name: exercise.name,
+            exercise_id: exercise.id,
+            start_time: sessionStartTime.toISOString(),
+            end_time: endTime.toISOString(),
+            duration_seconds: durationSeconds,
+            total_reps: repCount,
+            average_form_score: formScore,
+            max_form_score: formScore,
+            min_form_score: formScore,
+            feedback_summary: feedbackHistory,
+            analysis_status: 'completed'
+          });
+        
+        if (error) {
+          console.error('Error saving form analysis session:', error);
+        } else {
+          console.log('✅ Form analysis session saved:', data);
+          console.log('📊 Form score:', formScore, '| Reps:', repCount, '| Duration:', durationSeconds, 's');
+        }
+      } catch (err) {
+        console.error('Error saving session:', err);
+      }
+    }
     
     // Clear the canvas
     if (canvasRef.current) {
@@ -1147,7 +1212,7 @@ return (
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Rep Count</h2>
             <div className="text-center">
-              <div className={`text-6xl font-bold ${isAnalyzing ? 'text-blue-600' : 'text-gray-300'}`}>
+              <div className={`text-6xl font-bold ${repCount > 0 ? 'text-green-600' : 'text-gray-300'}`}>
                 {repCount}
               </div>
               {repCount > 0 && (
