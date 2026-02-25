@@ -32,13 +32,14 @@ export default function PredictionsUnified({ user }) {
   }, [user]);  const fetchAllData = async () => {
     setLoading(true);
     try {
-      // Fetch data and get results directly
-      const [weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults] = await Promise.all([
+      // Fetch data and get results directly (including user's TDEE from Goals page)
+      const [weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE] = await Promise.all([
         fetchWeightData(),
         fetchWorkoutData(),
         fetchNutritionData(),
         fetchMedicationData(),
-        fetchDailyLogs()
+        fetchDailyLogs(),
+        fetchUserTDEE()
       ]);
       
       console.log('📊 Data fetched:', {
@@ -46,11 +47,12 @@ export default function PredictionsUnified({ user }) {
         workouts: workoutResults.length,
         nutrition: nutritionResults.length,
         medication: medicationResults.length,
-        dailyLogs: dailyLogsResults.length
+        dailyLogs: dailyLogsResults.length,
+        userTDEE: userTDEE
       });
       
       // Calculate predictions with fetched data (not state)
-      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults);
+      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -153,8 +155,32 @@ export default function PredictionsUnified({ user }) {
     }
   };
 
-  const calculatePredictionsDirectly = (wData, woData, nData, mData, dlData) => {
-    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length, dlData: dlData.length });
+  const fetchUserTDEE = async () => {
+    try {
+      // Fetch the most recent calculated TDEE from Goals page
+      const { data, error } = await supabase
+        .from('calculated_metrics')
+        .select('tdee')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.log('No user TDEE found in calculated_metrics');
+        return null;
+      }
+      
+      console.log('📊 User TDEE from Goals page:', data?.tdee);
+      return data?.tdee || null;
+    } catch (error) {
+      console.error('Error fetching user TDEE:', error);
+      return null;
+    }
+  };
+
+  const calculatePredictionsDirectly = (wData, woData, nData, mData, dlData, userTDEE = null) => {
+    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length, dlData: dlData.length, userTDEE });
     
     // Check for compressed data (workouts within short timeframe)
     let isCompressedData = false;
@@ -169,7 +195,7 @@ export default function PredictionsUnified({ user }) {
     setPredictions({
       // Phase 1
       weightLoss: calculateWeightLossPrediction(wData),
-      tdee: calculateTDEE(wData, woData, nData),
+      tdee: calculateTDEE(wData, woData, nData, userTDEE),
       medicationAdherence: predictMedicationAdherence(mData),
       nutritionPatterns: analyzeNutritionPatterns(nData),
       injuryRisk: assessInjuryRisk(woData),
@@ -241,7 +267,7 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 2. TDEE Calculation
-  const calculateTDEE = (wData = weightData, woData = workoutData, nData = nutritionData) => {
+  const calculateTDEE = (wData = weightData, woData = workoutData, nData = nutritionData, userTDEE = null) => {
     // Reduced requirement: need at least 3 weight entries OR 3 nutrition entries
     if (wData.length < 3 && nData.length < 3) return null;
 
@@ -255,12 +281,19 @@ export default function PredictionsUnified({ user }) {
       // Check if nutrition data looks incomplete (avg < 800 cal/day is unrealistic)
       const hasIncompleteNutritionData = avgCalories < 800;
       
-      // Use baseline TDEE if nutrition data is incomplete
-      // Baseline calculation: weight in kg * 22 (sedentary) to 33 (very active)
+      // HYBRID APPROACH: Use user's entered TDEE from Goals page if available
+      // Otherwise use conservative baseline calculation
       let baselineTDEE = 1875; // Default fallback
-      if (wData.length > 0) {
+      
+      if (userTDEE && userTDEE > 0) {
+        // User has entered their TDEE in Goals page - use that!
+        baselineTDEE = Math.round(userTDEE);
+        console.log('✅ Using user-entered TDEE from Goals page:', baselineTDEE);
+      } else if (wData.length > 0) {
+        // Conservative baseline: weight_kg × 24 (better for weight loss users)
         const latestWeight = parseFloat(wData[0].weight_kg);
-        baselineTDEE = Math.round(latestWeight * 28); // Moderate activity multiplier
+        baselineTDEE = Math.round(latestWeight * 24);
+        console.log('📊 Using conservative formula (weight × 24):', baselineTDEE);
       }
 
       // Calculate weight change over period (if we have weight data)
