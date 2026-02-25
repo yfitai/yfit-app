@@ -950,9 +950,13 @@ const analyzeBicepCurl = (landmarks) => {
     selectedExerciseRef.current = selectedExercise;
     setFormFeedback([]);
     setRepCount(0);
+    
     // Set initial state based on exercise type
-    // For lateral raises, start in 'down' state (arms at sides, ready to count first raise)
-    repStateRef.current = selectedExercise.id === 'lateralraise' ? 'down' : 'up';
+    // 'down' = resting/lowered position (ready to count when you perform the movement)
+    // 'up' = extended/raised position (need to lower first before counting)
+    const exercisesStartingDown = ['lateralraise', 'bicepcurl', 'preachercurl', 'bentoverrow'];
+    repStateRef.current = exercisesStartingDown.includes(selectedExercise.id) ? 'down' : 'up';
+    
     lastRepTimeRef.current = 0;
     console.log('Started analysis for:', selectedExercise.name, '| Initial state:', repStateRef.current);
 
