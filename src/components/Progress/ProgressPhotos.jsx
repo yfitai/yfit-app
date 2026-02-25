@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Camera as CameraIcon, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { Camera } from '@capacitor/camera'
-import { Capacitor } from '@capacitor/core'
-import { CameraResultType, CameraSource } from '@capacitor/camera'
+import Webcam from 'react-webcam'
 
 export default function ProgressPhotos({ userId }) {
   const [photos, setPhotos] = useState([])
@@ -12,6 +10,9 @@ export default function ProgressPhotos({ userId }) {
   const [compareMode, setCompareMode] = useState(false)
   const [comparePhotos, setComparePhotos] = useState({ before: null, after: null })
   const [viewMode, setViewMode] = useState('grid') // grid, timeline, compare
+  const [showCamera, setShowCamera] = useState(false)
+  const [currentViewType, setCurrentViewType] = useState(null)
+  const webcamRef = useRef(null)
 
   useEffect(() => {
     loadPhotos()
@@ -75,40 +76,33 @@ export default function ProgressPhotos({ userId }) {
     }
   }
 
-  const handleCameraCapture = async (viewType) => {
+  const handleCameraCapture = (viewType) => {
     console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
-    
-    // Check if running on native platform
-    if (!Capacitor.isNativePlatform()) {
-      alert('Camera is only available on mobile devices. Please use the upload button instead.');
+    setCurrentViewType(viewType);
+    setShowCamera(true);
+  };
+
+  const capturePhoto = async () => {
+    if (!webcamRef.current) {
+      alert('Camera not ready. Please try again.');
       return;
     }
 
     setUploading(true);
-    
-    // Show user-friendly message
-    const userMessage = 'Opening camera... Note: The app may restart after taking the photo. Your photo will be saved automatically.';
-    console.log('📸', userMessage);
+    console.log('📸 Capturing photo from webcam...');
 
     try {
-      // Use standard Capacitor Camera
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: true,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
-        saveToGallery: false,
-        correctOrientation: true
-      });
-
-      console.log('✅ Photo captured successfully');
-
-      if (!image.dataUrl) {
-        throw new Error('No image data received');
+      // Capture image from webcam
+      const imageSrc = webcamRef.current.getScreenshot();
+      
+      if (!imageSrc) {
+        throw new Error('Failed to capture image');
       }
 
-      // Convert dataUrl to blob
-      const response = await fetch(image.dataUrl);
+      console.log('✅ Photo captured from webcam');
+
+      // Convert base64 to blob
+      const response = await fetch(imageSrc);
       const blob = await response.blob();
         
       // Upload to Supabase Storage
@@ -136,7 +130,7 @@ export default function ProgressPhotos({ userId }) {
         .insert({
           user_id: userId,
           image_url: publicUrl,
-          view_type: viewType,
+          view_type: currentViewType,
           taken_at: new Date().toISOString()
         })
         .select()
@@ -151,15 +145,19 @@ export default function ProgressPhotos({ userId }) {
 
       setPhotos([photoData, ...photos]);
       alert('Photo captured and uploaded successfully!');
+      setShowCamera(false);
       
     } catch (error) {
-      console.error('❌ Error with camera:', error);
-      if (error.message !== 'User cancelled photos app') {
-        alert(`Error: ${error.message}. Please try again.`);
-      }
+      console.error('❌ Error capturing photo:', error);
+      alert(`Error: ${error.message}. Please try again.`);
     } finally {
       setUploading(false);
     }
+  };
+
+  const closeCamera = () => {
+    setShowCamera(false);
+    setCurrentViewType(null);
   };
 
   const handleDeletePhoto = async (photoId) => {
@@ -516,6 +514,61 @@ export default function ProgressPhotos({ userId }) {
           <p className="text-gray-500 text-sm">
             Start tracking your journey by taking your first progress photo!
           </p>
+        </div>
+      )}
+
+      {/* Camera Overlay */}
+      {showCamera && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          {/* Camera Preview */}
+          <div className="flex-1 relative">
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              screenshotFormat="image/jpeg"
+              videoConstraints={{
+                facingMode: 'user', // Front camera for progress photos
+                width: 1080,
+                height: 1920
+              }}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* View Type Label */}
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
+              {currentViewType === 'front' && 'Front View'}
+              {currentViewType === 'side' && 'Side View'}
+              {currentViewType === 'back' && 'Back View'}
+            </div>
+          </div>
+
+          {/* Camera Controls */}
+          <div className="bg-black p-6 flex items-center justify-between">
+            {/* Cancel Button */}
+            <button
+              onClick={closeCamera}
+              disabled={uploading}
+              className="text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+
+            {/* Capture Button */}
+            <button
+              onClick={capturePhoto}
+              disabled={uploading}
+              className="w-20 h-20 rounded-full bg-white border-4 border-gray-300 hover:bg-gray-100 transition-all disabled:opacity-50 flex items-center justify-center"
+            >
+              {uploading ? (
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-white" />
+              )}
+            </button>
+
+            {/* Placeholder for symmetry */}
+            <div className="w-20" />
+          </div>
         </div>
       )}
     </div>
