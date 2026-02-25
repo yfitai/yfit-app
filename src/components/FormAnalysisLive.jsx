@@ -6,11 +6,25 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS } from '@mediapipe/pose';
 import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle } from 'lucide-react';
 
-const FormAnalysisLive = () => {
+const FormAnalysisLive = ({ preSelectedExerciseName }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
+
+  // Auto-select exercise if preSelectedExerciseName is provided
+  useEffect(() => {
+    if (preSelectedExerciseName && !selectedExercise) {
+      const matchedExercise = exercises.find(ex => 
+        ex.name.toLowerCase().includes(preSelectedExerciseName.toLowerCase()) ||
+        preSelectedExerciseName.toLowerCase().includes(ex.name.toLowerCase())
+      );
+      if (matchedExercise) {
+        setSelectedExercise(matchedExercise);
+        console.log('Auto-selected exercise:', matchedExercise.name);
+      }
+    }
+  }, [preSelectedExerciseName]);
   const [formFeedback, setFormFeedback] = useState([]);
   const [repCount, setRepCount] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);

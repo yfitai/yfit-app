@@ -291,7 +291,7 @@ export default function FormAnalysis() {
         <p className="text-gray-600 mb-6">
           Start the camera to get real-time AI-powered form feedback with automatic rep counting.
         </p>
-        <FormAnalysisLive />
+        <FormAnalysisLive preSelectedExerciseName={exercise.name} />
       </div>
 
       {/* Action Buttons */}
