@@ -537,7 +537,7 @@ export default function ProgressPhotos({ userId }) {
               audio={false}
               screenshotFormat="image/jpeg"
               videoConstraints={{
-                facingMode: 'user', // Front camera for progress photos
+                facingMode: 'environment', // Rear camera for progress photos
                 width: 1080,
                 height: 1920
               }}
