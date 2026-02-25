@@ -71,7 +71,7 @@ const VideoFormAnalysis = ({ exerciseId, exerciseName, onAnalysisComplete }) => 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' }, 
+        video: { facingMode: 'environment' }, // Rear camera for form analysis
         audio: false 
       });
       
