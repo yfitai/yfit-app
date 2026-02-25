@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { ArrowLeft, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
-import VideoFormAnalysis from '../components/VideoFormAnalysis';
+import FormAnalysisLive from '../components/FormAnalysisLive';
 
 export default function FormAnalysis() {
   const { slug } = useParams();
@@ -285,16 +285,13 @@ export default function FormAnalysis() {
         </Card>
       </div>
 
-      {/* Video Form Analysis Section */}
+      {/* Live Form Analysis Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">AI Form Analysis</h2>
         <p className="text-gray-600 mb-6">
-          Upload or record a video of yourself performing this exercise to get personalized AI-powered form feedback.
+          Start the camera to get real-time AI-powered form feedback with automatic rep counting.
         </p>
-        <VideoFormAnalysis 
-          exerciseId={exercise.id} 
-          exerciseName={exercise.name}
-        />
+        <FormAnalysisLive />
       </div>
 
       {/* Action Buttons */}
