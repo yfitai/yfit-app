@@ -252,8 +252,19 @@ export default function PredictionsUnified({ user }) {
         ? validNutritionData.reduce((sum, log) => sum + (parseFloat(log.calories) || 0), 0) / validNutritionData.length
         : 1875; // Default fallback if no valid nutrition data
 
+      // Check if nutrition data looks incomplete (avg < 800 cal/day is unrealistic)
+      const hasIncompleteNutritionData = avgCalories < 800;
+      
+      // Use baseline TDEE if nutrition data is incomplete
+      // Baseline calculation: weight in kg * 22 (sedentary) to 33 (very active)
+      let baselineTDEE = 1875; // Default fallback
+      if (wData.length > 0) {
+        const latestWeight = parseFloat(wData[0].weight_kg);
+        baselineTDEE = Math.round(latestWeight * 28); // Moderate activity multiplier
+      }
+
       // Calculate weight change over period (if we have weight data)
-      let tdee = avgCalories; // Default to average intake
+      let tdee = hasIncompleteNutritionData ? baselineTDEE : avgCalories; // Use baseline if data is incomplete
       
       if (wData.length >= 3) {
         const sortedWeights = [...wData].sort((a, b) => 
@@ -266,18 +277,22 @@ export default function PredictionsUnified({ user }) {
                      new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
 
         // 1 kg = 2.2 lbs, 1 lb = 3500 calories
-        // Only calculate if we have meaningful time period (at least 3 days)
-        if (days >= 3) {
+        // Only calculate if we have meaningful time period (at least 3 days) AND complete nutrition data
+        if (days >= 3 && !hasIncompleteNutritionData) {
           const caloriesDelta = (weightChange * 2.2 * 3500) / days;
-          tdee = Math.round(avgCalories - caloriesDelta);
+          const calculatedTDEE = Math.round(avgCalories - caloriesDelta);
+          // Sanity check: TDEE should be between 1200-4000 cal/day
+          if (calculatedTDEE >= 1200 && calculatedTDEE <= 4000) {
+            tdee = calculatedTDEE;
+          }
         }
       }
 
       // Activity level classification
       const days = wData.length >= 3 
-        ? (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24)
+        ? Math.max(1, (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24))
         : 7; // Default to 1 week if no weight data
-      const workoutsPerWeek = woData.length > 0 ? (woData.length / Math.max(days, 1)) * 7 : 0;
+      const workoutsPerWeek = woData.length > 0 ? Math.min(14, (woData.length / days) * 7) : 0; // Cap at 14x/week (2x per day max)
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';
@@ -750,24 +765,32 @@ export default function PredictionsUnified({ user }) {
       const projectedWeight = lastWeight + projectedWeightChange;
 
       // Estimate muscle/fat split (realistic estimates)
+      // Realistic muscle gain: 1-2 lbs per month for beginners, 0.5-1 lb for intermediate
+      // 12 weeks = 3 months, so max 3-6 lbs for beginners, 1.5-3 lbs for intermediate
       let estimatedMuscleGain = 0;
       let estimatedFatLoss = 0;
 
+      // Determine training level based on volume increase
+      const isBeginner = volumeIncrease > 50; // Rapid gains = beginner/returning
+      const maxMuscleGain = isBeginner ? 4 : 2.5; // 4 lbs for beginners, 2.5 lbs for intermediate in 12 weeks
+
       if (isRecomping) {
         // Recomping: slow muscle gain, moderate fat loss
-        estimatedMuscleGain = Math.min(6, Math.abs(volumeIncrease) * 0.05); // Max 6 lbs muscle in 12 weeks
+        estimatedMuscleGain = Math.min(maxMuscleGain, 3); // Conservative: 3 lbs max
         estimatedFatLoss = Math.abs(projectedWeightChange) + estimatedMuscleGain;
       } else if (weeklyWeightChange < 0) {
         // Losing weight: preserve muscle, lose fat
-        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.75; // 75% fat
-        estimatedMuscleGain = volumeIncrease > 10 ? Math.min(3, Math.abs(projectedWeightChange) * 0.1) : 0; // Small muscle gain if training hard
+        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.80; // 80% fat loss
+        // Muscle gain while cutting is minimal, even with high volume
+        estimatedMuscleGain = volumeIncrease > 30 ? Math.min(maxMuscleGain * 0.5, 2) : 0; // Max 2 lbs if training very hard
       } else if (weeklyWeightChange > 0) {
         // Gaining weight: muscle and some fat
-        estimatedMuscleGain = Math.min(12, projectedWeightChange * 0.6); // Max 12 lbs muscle in 12 weeks
+        const muscleRatio = volumeIncrease > 30 ? 0.6 : 0.4; // Higher ratio if training hard
+        estimatedMuscleGain = Math.min(maxMuscleGain, projectedWeightChange * muscleRatio);
         estimatedFatLoss = 0;
       } else {
         // Maintaining weight
-        estimatedMuscleGain = volumeIncrease > 10 ? 2 : 0; // Minimal muscle gain
+        estimatedMuscleGain = volumeIncrease > 20 ? Math.min(maxMuscleGain * 0.5, 1.5) : 0; // Max 1.5 lbs
         estimatedFatLoss = 0;
       }
 
