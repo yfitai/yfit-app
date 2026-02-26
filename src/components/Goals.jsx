@@ -353,27 +353,27 @@ export default function Goals({ user: propUser }) {
           very_active: 1.9
         }
         metrics.tdee = Math.round(metrics.bmr * (multipliers[activityLevel] || 1.2))
-        // Recalculate adjusted calories
-        const adjustments = {
-          lose_weight: -500,
-          maintain: 0,
-          gain_weight: 300,
-          build_strength: 200
+        // Recalculate adjusted calories using weightChangeRate
+        if (goalType === 'lose_weight') {
+          metrics.adjustedCalories = Math.round(metrics.tdee - calorieAdjustment)
+        } else if (goalType === 'gain_weight' || goalType === 'build_strength') {
+          metrics.adjustedCalories = Math.round(metrics.tdee + calorieAdjustment)
+        } else {
+          metrics.adjustedCalories = metrics.tdee
         }
-        metrics.adjustedCalories = Math.round(metrics.tdee + (adjustments[goalType] || 0))
       }
       
       if (useManualTDEE && manualTDEE) {
         const tdeeValue = parseInt(manualTDEE)
         metrics.tdee = tdeeValue
-        // Recalculate adjusted calories with manual TDEE
-        const adjustments = {
-          lose_weight: -500,
-          maintain: 0,
-          gain_weight: 300,
-          build_strength: 200
+        // Recalculate adjusted calories with manual TDEE using weightChangeRate
+        if (goalType === 'lose_weight') {
+          metrics.adjustedCalories = Math.round(tdeeValue - calorieAdjustment)
+        } else if (goalType === 'gain_weight' || goalType === 'build_strength') {
+          metrics.adjustedCalories = Math.round(tdeeValue + calorieAdjustment)
+        } else {
+          metrics.adjustedCalories = tdeeValue
         }
-        metrics.adjustedCalories = Math.round(tdeeValue + (adjustments[goalType] || 0))
       }
       
       setCalculatedMetrics(metrics)
