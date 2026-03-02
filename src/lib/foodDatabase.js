@@ -270,136 +270,128 @@ function transformUSDAFood(usdaFood) {
 }
 
 /**
+ * Score and transform Open Food Facts products by relevance
+ * Used by both native (direct) and web (proxy) paths
+ */
+function scoreAndTransformOFF(products, query, limit) {
+  const queryLower = query.toLowerCase()
+  const queryWords = queryLower.split(' ').filter(w => w.length > 2)
+
+  const FOREIGN_WORDS = [
+    'fromage', 'lait', 'blanc', 'frais', 'beurre', 'crème', 'farine', 'sucre', 'sel',
+    'poulet', 'boeuf', 'porc', 'poisson', 'légumes', 'fruits', 'jus', 'eau',
+    'leche', 'queso', 'mantequilla', 'harina', 'azúcar', 'pollo', 'carne', 'cerdo',
+    'milch', 'käse', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
+    'formaggio', 'burro', 'farina', 'zucchero',
+    'leite', 'queijo', 'manteiga', 'farinha', 'açúcar', 'frango',
+  ]
+  const NON_ENGLISH_BRANDS = [
+    'sidi ali', 'sidi-ali', 'jaouda', 'oulmès', 'centrale danone', 'perly',
+    'vittel', 'evian', 'perrier', 'volvic', 'buldak', 'samyang',
+    'milky food professional', 'la brea'
+  ]
+
+  return products
+    .map(product => {
+      if (!product.product_name || !product.nutriments) return null
+      const name = product.product_name || ''
+      const nameLower = name.toLowerCase()
+      const brand = (product.brands || '').toLowerCase()
+      const nutriments = product.nutriments
+
+      if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return null
+      if (/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)) return null
+
+      const langCodes = product.languages_codes || {}
+      const langKeys = Object.keys(langCodes)
+      if (langKeys.length > 0 && !langKeys.some(c => c.startsWith('en'))) return null
+
+      if (FOREIGN_WORDS.some(w => new RegExp(`\\b${w}\\b`, 'i').test(nameLower))) return null
+      if (NON_ENGLISH_BRANDS.some(b => brand.includes(b) || nameLower.includes(b))) return null
+
+      const hasNutrition = nutriments.proteins_100g !== undefined ||
+        nutriments.carbohydrates_100g !== undefined ||
+        nutriments.fat_100g !== undefined ||
+        nutriments['energy-kcal_100g'] !== undefined ||
+        nutriments.energy_100g !== undefined
+      if (!hasNutrition) return null
+
+      let relevanceScore = 0
+      if (nameLower === queryLower) relevanceScore += 100
+      if (nameLower.startsWith(queryLower)) relevanceScore += 50
+      if (nameLower.includes(queryLower)) relevanceScore += 30
+      const matchedWords = queryWords.filter(w => nameLower.includes(w)).length
+      if (queryWords.length > 0) relevanceScore += (matchedWords / queryWords.length) * 40
+      if (brand && queryWords.some(w => brand.includes(w))) relevanceScore += 20
+      if (nameLower.split(' ').length > 8) relevanceScore -= 10
+
+      return { product, relevanceScore }
+    })
+    .filter(item => item !== null && item.relevanceScore > 5)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, limit)
+    .map(item => transformOpenFoodFactsProduct(item.product))
+}
+
+/**
  * Search Open Food Facts API
+ * Uses CapacitorHttp for direct device-side calls (bypasses CORS on Android/iOS)
+ * Falls back to fetch for web browser
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // Use backend proxy to avoid CORS issues with remote loading
-    // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
-    )
+    // Fetch size: request more than needed since we'll filter some out
+    const fetchSize = Math.min(limit * 2, 60)
+    
+    // Build the Open Food Facts URL - use world subdomain for global branded coverage
+    // Pre-filter for English at API level with tag_0=en
+    const params = new URLSearchParams({
+      search_terms: query,
+      page_size: fetchSize,
+      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
+      tagtype_0: 'languages',
+      tag_contains_0: 'contains',
+      tag_0: 'en',
+      json: 1
+    })
+    const offUrl = `https://world.openfoodfacts.org/cgi/search.pl?${params}`
 
-    if (!response.ok) {
-      throw new Error(`Open Food Facts API error: ${response.status}`)
+    let rawData
+    try {
+      // Use CapacitorHttp on native (Android/iOS) to bypass CORS restrictions
+      // On web browser, fall back to regular fetch
+      const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.()
+      if (isNative) {
+        const result = await CapacitorHttp.get({
+          url: offUrl,
+          headers: { 'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)' },
+          readTimeout: 8000,
+          connectTimeout: 5000
+        })
+        rawData = typeof result.data === 'string' ? JSON.parse(result.data) : result.data
+      } else {
+        // Web browser - use Vercel proxy to avoid CORS
+        const proxyResponse = await fetch(
+          `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${fetchSize}`,
+          { signal: AbortSignal.timeout(8000) }
+        )
+        if (!proxyResponse.ok) throw new Error(`Proxy error: ${proxyResponse.status}`)
+        const proxyData = await proxyResponse.json()
+        // Proxy already filters, so wrap in expected format
+        return proxyData.products ? scoreAndTransformOFF(proxyData.products, query, limit) : []
+      }
+    } catch (fetchErr) {
+      console.warn('Open Food Facts direct call failed:', fetchErr.message)
+      return []
     }
 
-    const data = await response.json()
-    
+    const data = rawData
     if (!data.products || data.products.length === 0) {
       return []
     }
 
-    // Filter and score products by relevance to search query
-    const queryLower = query.toLowerCase()
-    const queryWords = queryLower.split(' ').filter(w => w.length > 2)
-    
-    const scoredProducts = data.products
-      .map(product => {
-        if (!product.product_name || !product.nutriments) return null
-        
-        const name = product.product_name || ''
-        const nameLower = name.toLowerCase()
-        const brand = (product.brands || '').toLowerCase()
-        const nutriments = product.nutriments
-        
-        // Filter out products with non-Latin characters (Chinese, Japanese, Korean, Arabic, Cyrillic)
-        const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
-        if (hasNonLatinChars) return null
-
-        // Filter out products with accented/special characters (non-English European)
-        const hasAccentedChars = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)
-        if (hasAccentedChars) return null
-
-        // Language code validation - prefer English, but allow products with no language code
-        // (many US products don't have language codes set in Open Food Facts)
-        const langCodes = product.languages_codes || {}
-        const langKeys = Object.keys(langCodes)
-        if (langKeys.length > 0) {
-          // If language codes are set, must include English
-          const hasEnglish = langKeys.some(code => code.startsWith('en'))
-          if (!hasEnglish) return null
-        }
-        // If no language codes set, allow through (will be caught by other filters)
-
-        // Foreign word detection - block clearly non-English product names
-        const foreignWords = [
-          // French
-          'fromage', 'lait', 'blanc', 'frais', 'beurre', 'crème', 'farine', 'sucre', 'sel',
-          'poulet', 'boeuf', 'porc', 'poisson', 'légumes', 'fruits', 'jus', 'eau',
-          // Spanish  
-          'leche', 'queso', 'mantequilla', 'harina', 'azúcar', 'pollo', 'carne', 'cerdo',
-          // German (removed 'butter' - it's also an English word)
-          'milch', 'käse', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
-          // Italian (removed 'latte' - it's also an English word used in coffee)
-          'formaggio', 'burro', 'farina', 'zucchero',
-          // Portuguese
-          'leite', 'queijo', 'manteiga', 'farinha', 'açúcar', 'frango',
-        ]
-        const nameLowerForForeign = name.toLowerCase()
-        const hasForeignWord = foreignWords.some(word => {
-          // Only match as standalone word to avoid false positives
-          const regex = new RegExp(`\\b${word}\\b`, 'i')
-          return regex.test(nameLowerForForeign)
-        })
-        if (hasForeignWord) return null
-
-        // Block known non-English brand names
-        const nonEnglishBrands = [
-          'sidi ali', 'sidi-ali', 'jaouda', 'oulmès', 'centrale danone', 'perly',
-          'vittel', 'evian', 'perrier', 'volvic', 'buldak', 'samyang',
-          'milky food professional', 'la brea'
-        ]
-        if (nonEnglishBrands.some(b => brand.includes(b) || nameLower.includes(b))) return null
-        
-        // Filter out products without nutrition data
-        const hasNutrition = (nutriments.proteins_100g !== undefined) ||
-                            (nutriments.carbohydrates_100g !== undefined) ||
-                            (nutriments.fat_100g !== undefined) ||
-                            (nutriments['energy-kcal_100g'] !== undefined) ||
-                            (nutriments.energy_100g !== undefined)
-        if (!hasNutrition) return null
-        
-        // Calculate relevance score
-        let relevanceScore = 0
-        
-        // Exact match gets highest score
-        if (nameLower === queryLower) relevanceScore += 100
-        
-        // Starts with query gets high score
-        if (nameLower.startsWith(queryLower)) relevanceScore += 50
-        
-        // Contains all query words
-        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
-        if (queryWords.length > 0) {
-          relevanceScore += (matchedWords / queryWords.length) * 40
-        }
-        
-        // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
-        if (nameLower.includes(queryLower)) {
-          relevanceScore += 30
-        }
-        
-        // Boost if brand matches query
-        if (brand && queryWords.some(word => brand.includes(word))) {
-          relevanceScore += 20
-        }
-        
-        // Penalize very long product names (likely not what user wants)
-        const wordCount = nameLower.split(' ').length
-        if (wordCount > 8) relevanceScore -= 10
-        
-        return {
-          product,
-          relevanceScore
-        }
-      })
-      .filter(item => item !== null && item.relevanceScore > 5) // Filter out low relevance (lowered from 15 to 5)
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, limit)
-      .map(item => transformOpenFoodFactsProduct(item.product))
-    
-    return scoredProducts
+    // Use shared scoring/filtering helper
+    return scoreAndTransformOFF(data.products, query, limit)
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
     return []
