@@ -12,6 +12,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   const [showQuickAdd, setShowQuickAdd] = useState(true)
   const [showCustomFoodModal, setShowCustomFoodModal] = useState(false)
   const searchTimeout = useRef(null)
+  const searchIdRef = useRef(0) // Track search ID to ignore stale results
 
   // Load recent and favorite foods on mount
   useEffect(() => {
@@ -55,22 +56,30 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   }
 
  const performSearch = async (searchQuery, searchFilter) => {
+  // Increment search ID - any previous search with a lower ID is stale
+  const currentSearchId = ++searchIdRef.current
   setLoading(true)
+  setResults([]) // Clear results immediately to avoid showing stale data
   try {
     const searchResults = await searchFoods(searchQuery, {
       limit: 40,
       source: searchFilter || filter  // Use passed filter or current filter
     })
-
-
+    // Only update results if this is still the latest search
+    if (currentSearchId === searchIdRef.current) {
       setResults(searchResults)
-    } catch (error) {
-      console.error('Search error:', error)
+    }
+  } catch (error) {
+    console.error('Search error:', error)
+    if (currentSearchId === searchIdRef.current) {
       setResults([])
-    } finally {
+    }
+  } finally {
+    if (currentSearchId === searchIdRef.current) {
       setLoading(false)
     }
   }
+}
 
   const handleSelectFood = (food) => {
     onSelectFood(food)

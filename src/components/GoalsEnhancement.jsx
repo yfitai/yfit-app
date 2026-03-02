@@ -67,9 +67,13 @@ export default function GoalsEnhancement({
         setTargetDate(initialData.target_date)
       }
       if (initialData.weekly_goal_kg) {
-        // Convert kg to display units (lbs or kg)
+        // Convert kg to display units (lbs or kg) and snap to nearest valid dropdown option
         const weeklyInDisplay = isMetric ? initialData.weekly_goal_kg : initialData.weekly_goal_kg * 2.20462
-        setWeeklyGoal(weeklyInDisplay.toFixed(1))
+        const validOptions = ['0.5', '1', '1.5', '2']
+        const closest = validOptions.reduce((prev, curr) =>
+          Math.abs(parseFloat(curr) - weeklyInDisplay) < Math.abs(parseFloat(prev) - weeklyInDisplay) ? curr : prev
+        )
+        setWeeklyGoal(closest)
       }
       if (initialData.fiber_goal_g) setFiberGoal(initialData.fiber_goal_g.toString())
       if (initialData.sugar_goal_g) setSugarGoal(initialData.sugar_goal_g.toString())
@@ -95,12 +99,13 @@ export default function GoalsEnhancement({
     }
   }, [currentWeight, currentBodyFat, manuallyEditedWeight])
   
-  // Auto-sync weekly goal with Basic Info weight change rate (unless manually edited)
+  // Auto-sync weekly goal with Basic Info weight change rate
+  // Only sync if weeklyGoal is empty (no loaded data from DB) and user hasn't manually changed it
   useEffect(() => {
-    if (weightChangeRate && !manuallyEditedGoal) {
+    if (weightChangeRate && !manuallyEditedGoal && !weeklyGoal) {
       setWeeklyGoal(weightChangeRate)
     }
-  }, [weightChangeRate, manuallyEditedGoal])
+  }, [weightChangeRate, weeklyGoal])
   
   // Convert water goal when unit system changes
   useEffect(() => {
