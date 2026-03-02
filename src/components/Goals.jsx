@@ -144,6 +144,11 @@ export default function Goals({ user: propUser }) {
       setActivityLevel(goalsData.activity_level)
       setGoalType(goalsData.goal_type)
       
+      // Load weight change rate (lbs/week)
+      if (goalsData.weight_change_rate) {
+        setWeightChangeRate(goalsData.weight_change_rate.toString())
+      }
+      
       // Load enhanced goals
       setEnhancedGoals({
         starting_weight_kg: goalsData.starting_weight_kg,
@@ -391,6 +396,7 @@ export default function Goals({ user: propUser }) {
             gender,
             activity_level: activityLevel,
             goal_type: goalType,
+            weight_change_rate: parseFloat(weightChangeRate),
             // Enhanced Goals fields
             starting_weight_kg: enhancedGoals.starting_weight_kg,
             target_weight_kg: enhancedGoals.target_weight_kg,

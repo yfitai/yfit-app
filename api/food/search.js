@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
     // USDA FoodData Central API
     // Note: Using demo key for now - should be replaced with actual API key in production
-    const usdaApiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+    const usdaApiKey = process.env.USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m';
     const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}`;
     
     const response = await fetch(usdaUrl, {
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)'],  // Exclude branded foods from USDA
+        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],  // Include all food types
         pageSize: parseInt(pageSize),
         pageNumber: 1,
         sortBy: 'score',

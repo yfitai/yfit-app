@@ -34,19 +34,16 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching Open Food Facts for: ${query}`);
 
-    // Build query parameters
+    // Build query parameters - use world.openfoodfacts.org for better coverage
     const params = new URLSearchParams({
       search_terms: query,
       page_size: pageSize,
-      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
-      tagtype_0: 'languages',
-      tag_contains_0: 'contains',
-      tag_0: 'en', // Filter for products with English language tag
+      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
       json: 1
     });
 
-    // Fetch from Open Food Facts API
-    const openFoodFactsUrl = `https://us.openfoodfacts.org/api/v2/search?${params}`;
+    // Fetch from Open Food Facts API - use world subdomain for maximum coverage
+    const openFoodFactsUrl = `https://world.openfoodfacts.org/cgi/search.pl?${params}`;
     
     const response = await fetch(openFoodFactsUrl, {
       headers: {
@@ -64,10 +61,12 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    console.log(`[API] Open Food Facts search success, found ${data.products?.length || 0} results`);
+    // cgi/search.pl returns { products: [...] } same as v2/search
+    const products = data.products || [];
+    console.log(`[API] Open Food Facts search success, found ${products.length} results`);
 
-    // Return the data
-    return res.status(200).json(data);
+    // Return in consistent format
+    return res.status(200).json({ products });
 
   } catch (error) {
     console.error('[API] Error in Open Food Facts search:', error);

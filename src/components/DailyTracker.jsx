@@ -85,13 +85,20 @@ export default function DailyTracker({ user }) {
 
   const fetchTodayLog = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      // Use local date to avoid timezone issues
+      const now = new Date();
+      const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      // Build a wide UTC window that covers the full local day regardless of timezone
+      const startUTC = new Date(`${localDate}T00:00:00`);
+      startUTC.setHours(startUTC.getHours() - 14); // earliest UTC offset
+      const endUTC = new Date(`${localDate}T23:59:59`);
+      endUTC.setHours(endUTC.getHours() + 14); // latest UTC offset
       const { data, error } = await supabase
         .from('daily_logs')
         .select('*')
         .eq('user_id', user.id)
-        .gte('logged_at', `${today}T00:00:00`)
-        .lte('logged_at', `${today}T23:59:59`)
+        .gte('logged_at', startUTC.toISOString())
+        .lte('logged_at', endUTC.toISOString())
         .order('logged_at', { ascending: false })
         .limit(1);
 
@@ -235,9 +242,9 @@ export default function DailyTracker({ user }) {
     setLoading(true);
 
     try {
+      const today = new Date().toISOString().split('T')[0];
+
       const logData = {
-        user_id: user.id,
-        logged_at: new Date().toISOString(),
         sleep_hours: formData.sleep_hours ? parseFloat(formData.sleep_hours) : null,
         sleep_quality: formData.sleep_quality,
         water_ml: formData.water_ml ? parseInt(formData.water_ml) : null,
@@ -252,16 +259,20 @@ export default function DailyTracker({ user }) {
 
       let result;
       if (todayLog) {
-        // Update existing log
+        // Update existing log - preserve original logged_at timestamp
         result = await supabase
           .from('daily_logs')
           .update(logData)
           .eq('id', todayLog.id);
       } else {
-        // Insert new log
+        // Insert new log for today - set logged_at to start of today so it's always found
         result = await supabase
           .from('daily_logs')
-          .insert([logData]);
+          .insert([{ 
+            ...logData,
+            user_id: user.id,
+            logged_at: `${today}T12:00:00.000Z`
+          }]);
       }
 
       if (result.error) throw result.error;

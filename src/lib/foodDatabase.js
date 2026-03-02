@@ -13,7 +13,7 @@ const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subd
 const USDA_API_BASE = 'https://api.nal.usda.gov/fdc/v1'
 
 // Get USDA API key from environment variable
-const USDA_API_KEY = import.meta.env.VITE_USDA_API_KEY || 'DEMO_KEY'
+const USDA_API_KEY = import.meta.env.VITE_USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m'
 console.log('🔑 USDA API Key loaded:', USDA_API_KEY ? (USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom key (length: ' + USDA_API_KEY.length + ' )') : 'NOT SET')
 
 // User-Agent for Open Food Facts (required)
@@ -140,9 +140,8 @@ async function searchUSDA(query, limit) {
         const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
         relevanceScore += (matchedWords / queryWords.length) * 30
         
-        // Penalize overly processed or irrelevant items
+        // Penalize only truly irrelevant items (not common foods)
         const irrelevantKeywords = [
-          'spread', 'dip', 'sauce', 'dressing', 'mix', 'prepared',
           'frozen meal', 'tv dinner', 'baby food', 'infant formula',
           'dietary supplement', 'protein powder', 'shake mix'
         ]
@@ -151,7 +150,7 @@ async function searchUSDA(query, limit) {
           nameLower.includes(keyword) && !queryLower.includes(keyword)
         )
         
-        if (hasIrrelevantKeyword) relevanceScore -= 60 // Increased penalty from 40 to 60
+        if (hasIrrelevantKeyword) relevanceScore -= 30
         
         // Boost simple, whole foods
         const isSimpleFood = nameLower.split(',').length === 1 && nameLower.split(' ').length <= 3
@@ -159,14 +158,14 @@ async function searchUSDA(query, limit) {
         
         // Penalize foods with too many descriptors (likely not what user wants)
         const wordCount = nameLower.split(' ').length
-        if (wordCount > 6) relevanceScore -= 15
+        if (wordCount > 8) relevanceScore -= 10
         
         return {
           food,
           relevanceScore
         }
       })
-      .filter(item => item.relevanceScore > 5) // Lowered from 10 to 5 for better coverage
+      .filter(item => item.relevanceScore > 0) // Accept anything with any relevance
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, limit)
       .map(item => transformUSDAFood(item.food))
