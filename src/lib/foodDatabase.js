@@ -302,9 +302,9 @@ function scoreAndTransformOFF(products, query, limit) {
       if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return null
       if (/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)) return null
 
-      const langCodes = product.languages_codes || {}
-      const langKeys = Object.keys(langCodes)
-      if (langKeys.length > 0 && !langKeys.some(c => c.startsWith('en'))) return null
+      // NOTE: Do NOT check languages_codes - many valid US/Canadian branded products
+      // have French language codes (bilingual packaging) but English product names.
+      // Rely on accented chars + foreign words filters instead.
 
       if (FOREIGN_WORDS.some(w => new RegExp(`\\b${w}\\b`, 'i').test(nameLower))) return null
       if (NON_ENGLISH_BRANDS.some(b => brand.includes(b) || nameLower.includes(b))) return null
