@@ -32,22 +32,22 @@ export async function searchFoods(query, options = {}) {
   try {
     const results = []
 
-    // Search Open Food Facts (branded foods)
+    // Search both APIs in PARALLEL for faster results
     if (source === 'all') {
-      const offResults = await searchOpenFoodFacts(query, limit)
+      console.log('🔍 Searching USDA + Open Food Facts in parallel...')
+      const [offResults, usdaResults] = await Promise.all([
+        searchOpenFoodFacts(query, limit).catch(err => {
+          console.warn('Open Food Facts search failed:', err.message)
+          return []
+        }),
+        searchUSDA(query, limit).catch(err => {
+          console.warn('USDA search failed:', err.message)
+          return []
+        })
+      ])
+      console.log(`🔍 Results: ${offResults.length} branded + ${usdaResults.length} USDA`)
       results.push(...offResults)
-    }
-
-    // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all') {
-      console.log('🥗 Searching USDA...')
-      try {
-        const usdaResults = await searchUSDA(query, limit)
-        console.log('🥗 USDA found:', usdaResults.length, 'results')
-        results.push(...usdaResults)
-      } catch (error) {
-        console.warn('USDA search failed:', error.message)
-      }
+      results.push(...usdaResults)
     }
 
     // Search Custom Foods (user-created)
@@ -304,10 +304,10 @@ async function searchOpenFoodFacts(query, limit) {
           'poulet', 'boeuf', 'porc', 'poisson', 'légumes', 'fruits', 'jus', 'eau',
           // Spanish  
           'leche', 'queso', 'mantequilla', 'harina', 'azúcar', 'pollo', 'carne', 'cerdo',
-          // German
-          'milch', 'käse', 'butter', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
-          // Italian
-          'latte', 'formaggio', 'burro', 'farina', 'zucchero', 'pollo',
+          // German (removed 'butter' - it's also an English word)
+          'milch', 'käse', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
+          // Italian (removed 'latte' - it's also an English word used in coffee)
+          'formaggio', 'burro', 'farina', 'zucchero',
           // Portuguese
           'leite', 'queijo', 'manteiga', 'farinha', 'açúcar', 'frango',
         ]

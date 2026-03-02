@@ -24,9 +24,9 @@ const FOREIGN_WORDS = [
   'porc', 'poisson', 'legumes', 'jus',
   // Spanish
   'leche', 'queso', 'mantequilla', 'harina', 'azucar', 'pollo', 'cerdo',
-  // German
+  // German (removed 'butter' - it's also an English word)
   'milch', 'kase', 'mehl', 'zucker', 'huhnchen', 'fleisch', 'nudeln',
-  // Italian
+  // Italian (removed 'latte' - it's also an English word used in coffee)
   'formaggio', 'burro', 'zucchero',
   // Portuguese
   'leite', 'queijo', 'manteiga', 'farinha', 'frango',

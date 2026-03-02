@@ -86,13 +86,22 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   }
 
 const handleFilterChange = (newFilter) => {
-  setFilter(newFilter)
-  setResults([])
-  setLoading(true)
-  if (query.length >= 2) {
-    performSearch(query, newFilter)  // Pass the new filter directly
+  // 'custom' (My Foods) tab doesn't need a search - it shows saved foods
+  // 'all' tab should only re-search if filter was previously 'custom'
+  if (newFilter === 'custom') {
+    setFilter(newFilter)
+    // Don't clear results or search - My Foods section handles its own display
+    return
+  }
+  // Switching back to 'all' - only re-search if we were on 'custom' tab
+  if (filter === 'custom') {
+    setFilter(newFilter)
+    if (query.length >= 2) {
+      performSearch(query, newFilter)
+    }
   } else {
-    setLoading(false)
+    // Same source filter - just update filter state, keep existing results
+    setFilter(newFilter)
   }
 }
 
