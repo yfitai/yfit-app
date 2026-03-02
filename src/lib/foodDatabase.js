@@ -246,9 +246,9 @@ function transformUSDAFood(usdaFood) {
     nameLower.includes('syrup')
   )
 
-  // Use actual brand name for branded foods, 'USDA' for whole/foundation foods
+  // Use actual brand name for branded foods, 'Whole Food' for generic USDA items
   const brandName = usdaFood.brandOwner || usdaFood.brandName || 
-    (usdaFood.dataType === 'Branded' ? 'Branded' : 'USDA')
+    (usdaFood.dataType === 'Branded' ? 'Branded' : 'Whole Food')
 
   return {
     id: `usda-${usdaFood.fdcId}`,
