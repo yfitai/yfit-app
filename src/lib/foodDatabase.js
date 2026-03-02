@@ -340,18 +340,31 @@ function scoreAndTransformOFF(products, query, limit) {
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // Request limit*5 items from proxy - Open Food Facts has many non-English products
-    // so we need to fetch more to get enough English results after filtering
-    // The proxy applies server-side English filtering and returns only English products
-    const fetchSize = limit * 5  // e.g. limit=20 → fetch 100, filter down to ~20 English
+    // IMPORTANT: Call Open Food Facts DIRECTLY from the device (not through Vercel proxy)
+    // Vercel's server IPs are blocked by Open Food Facts, but device IPs work fine.
+    // The proxy was only needed for the barcode scanner (different endpoint).
+    const fetchSize = limit * 5  // Fetch more to account for filtering
     
+    const params = new URLSearchParams({
+      search_terms: query,
+      page_size: fetchSize,
+      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
+      tagtype_0: 'languages',
+      tag_contains_0: 'contains',
+      tag_0: 'en',
+      json: 1
+    })
+
     const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${fetchSize}`,
-      { signal: AbortSignal.timeout(12000) }  // 12 second timeout
+      `https://us.openfoodfacts.org/api/v2/search?${params}`,
+      {
+        headers: { 'User-Agent': 'YFIT/1.0 (contact@yfit.app)' },
+        signal: AbortSignal.timeout(12000)
+      }
     )
 
     if (!response.ok) {
-      throw new Error(`Open Food Facts proxy error: ${response.status}`)
+      throw new Error(`Open Food Facts API error: ${response.status}`)
     }
 
     const data = await response.json()
@@ -360,10 +373,9 @@ async function searchOpenFoodFacts(query, limit) {
       return []
     }
 
-    // Proxy already applies English filtering - just score and transform
     return scoreAndTransformOFF(data.products, query, limit)
   } catch (error) {
-    console.error('Error searching Open Food Facts:', error)
+    console.warn('Open Food Facts search failed (will use USDA only):', error.message)
     return []
   }
 }
