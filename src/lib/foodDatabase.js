@@ -95,9 +95,24 @@ async function searchUSDA(query, limit) {
     
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
-    )
+    // 10 second timeout to avoid hanging
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    let response
+    try {
+      response = await fetch(
+        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${Math.min(limit, 25)}`,
+        { signal: controller.signal }
+      )
+    } catch (fetchErr) {
+      clearTimeout(timeoutId)
+      if (fetchErr.name === 'AbortError') {
+        console.warn('⏱️ USDA timed out after 10s')
+        return []
+      }
+      throw fetchErr
+    }
+    clearTimeout(timeoutId)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -258,7 +273,7 @@ async function searchOpenFoodFacts(query, limit) {
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
     const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
     )
 
     if (!response.ok) {
@@ -292,10 +307,16 @@ async function searchOpenFoodFacts(query, limit) {
         const hasAccentedChars = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)
         if (hasAccentedChars) return null
 
-        // Language code validation - must contain 'en'
+        // Language code validation - prefer English, but allow products with no language code
+        // (many US products don't have language codes set in Open Food Facts)
         const langCodes = product.languages_codes || {}
-        const hasEnglish = Object.keys(langCodes).some(code => code.startsWith('en'))
-        if (!hasEnglish) return null
+        const langKeys = Object.keys(langCodes)
+        if (langKeys.length > 0) {
+          // If language codes are set, must include English
+          const hasEnglish = langKeys.some(code => code.startsWith('en'))
+          if (!hasEnglish) return null
+        }
+        // If no language codes set, allow through (will be caught by other filters)
 
         // Foreign word detection - block clearly non-English product names
         const foreignWords = [

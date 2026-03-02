@@ -1,13 +1,13 @@
 /**
  * Vercel Serverless Function - Open Food Facts Search Proxy
  * 
- * This endpoint proxies requests to Open Food Facts API to avoid CORS issues
- * when the app is loaded remotely from Vercel.
- * Applies server-side English-only filtering before returning results.
+ * Optimized for speed:
+ * - Fetches only 50 items (not 200) to reduce API response time
+ * - 8 second timeout to avoid hanging
+ * - Server-side English-only filtering
  * 
- * Endpoint: /api/food/search-openfoodfacts?query=chicken&pageSize=50
+ * Endpoint: /api/food/search-openfoodfacts?query=chicken&pageSize=20
  * Method: GET
- * Returns: English-only food search results from Open Food Facts
  */
 
 // Known non-English brand names to block
@@ -18,37 +18,42 @@ const BLOCKED_BRANDS = [
 ];
 
 // Foreign words that indicate non-English products
+// Only include words that are NEVER used in English product names
 const FOREIGN_WORDS = [
-  // French
+  // French (specific food words not used in English)
   'fromage', 'lait', 'beurre', 'farine', 'sucre', 'poulet', 'boeuf',
   'porc', 'poisson', 'legumes', 'jus',
   // Spanish
   'leche', 'queso', 'mantequilla', 'harina', 'azucar', 'pollo', 'cerdo',
-  // German (removed 'butter' - it's also an English word)
+  // German (NOT 'butter' - same in English)
   'milch', 'kase', 'mehl', 'zucker', 'huhnchen', 'fleisch', 'nudeln',
-  // Italian (removed 'latte' - it's also an English word used in coffee)
+  // Italian (NOT 'latte' - used in English for coffee drinks)
   'formaggio', 'burro', 'zucchero',
   // Portuguese
   'leite', 'queijo', 'manteiga', 'farinha', 'frango',
 ];
 
 function isEnglishProduct(product) {
-  const name = (product.product_name || '').toLowerCase();
+  const name = (product.product_name || '').toLowerCase().trim();
   const brand = (product.brands || '').toLowerCase();
 
   // Must have a product name
-  if (!name || name.trim().length === 0) return false;
+  if (!name) return false;
 
-  // Block non-Latin characters (Chinese, Japanese, Korean, Arabic, Cyrillic)
+  // Block non-Latin characters
   if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return false;
 
   // Block accented/special characters
   if (/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)) return false;
 
-  // Language code validation - must have English
+  // Language code validation - prefer English, but allow products with no language code
+  // (many US products on Open Food Facts don't have language codes set)
   const langCodes = product.languages_codes || {};
-  const hasEnglish = Object.keys(langCodes).some(code => code.startsWith('en'));
-  if (!hasEnglish) return false;
+  const langKeys = Object.keys(langCodes);
+  if (langKeys.length > 0) {
+    const hasEnglish = langKeys.some(code => code.startsWith('en'));
+    if (!hasEnglish) return false;
+  }
 
   // Block known non-English brands
   if (BLOCKED_BRANDS.some(b => brand.includes(b) || name.includes(b))) return false;
@@ -64,38 +69,28 @@ function isEnglishProduct(product) {
 }
 
 export default async function handler(req, res) {
-  // Enable CORS for the frontend
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight OPTIONS request
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Only allow GET requests
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { query, pageSize = 50 } = req.query;
+    const { query, pageSize = 20 } = req.query;
 
-    if (!query) {
-      return res.status(400).json({ error: 'Query parameter is required' });
-    }
+    if (!query) return res.status(400).json({ error: 'Query parameter is required' });
 
-    console.log(`[API] Searching Open Food Facts for: ${query}`);
+    console.log(`[OFF] Searching for: ${query}`);
 
-    // Request more results than needed since we'll filter many out
-    const fetchSize = Math.min(parseInt(pageSize) * 4, 200);
+    // Fetch only 50 items (was 200) - much faster response
+    // The English filter is pre-applied at API level with tag_0: 'en'
+    const fetchSize = Math.min(parseInt(pageSize) * 3, 60);
 
-    // Build query parameters - use us.openfoodfacts.org for US-focused results
     const params = new URLSearchParams({
       search_terms: query,
       page_size: fetchSize,
-      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
+      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
       tagtype_0: 'languages',
       tag_contains_0: 'contains',
       tag_0: 'en',  // Pre-filter for English at API level
@@ -105,18 +100,31 @@ export default async function handler(req, res) {
     // Use US subdomain for English-focused results
     const openFoodFactsUrl = `https://us.openfoodfacts.org/cgi/search.pl?${params}`;
     
-    const response = await fetch(openFoodFactsUrl, {
-      headers: {
-        'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)',
-      },
-    });
+    // 8 second timeout - don't let slow OFF responses block the user
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    let response;
+    try {
+      response = await fetch(openFoodFactsUrl, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)',
+        },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.warn('[OFF] Request timed out after 8s - returning empty results');
+        return res.status(200).json({ products: [], timedOut: true });
+      }
+      throw fetchError;
+    }
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.error(`[API] Open Food Facts API error: ${response.status}`);
-      return res.status(response.status).json({ 
-        error: 'Failed to fetch from Open Food Facts',
-        status: response.status 
-      });
+      console.error(`[OFF] API error: ${response.status}`);
+      return res.status(200).json({ products: [] }); // Return empty instead of error
     }
 
     const data = await response.json();
@@ -125,16 +133,12 @@ export default async function handler(req, res) {
     // Apply server-side English-only filtering
     const englishProducts = rawProducts.filter(isEnglishProduct);
     
-    console.log(`[API] Open Food Facts: ${rawProducts.length} raw → ${englishProducts.length} English-only results`);
+    console.log(`[OFF] ${rawProducts.length} raw → ${englishProducts.length} English results`);
 
-    // Return filtered results
     return res.status(200).json({ products: englishProducts });
 
   } catch (error) {
-    console.error('[API] Error in Open Food Facts search:', error);
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      message: error.message 
-    });
+    console.error('[OFF] Error:', error);
+    return res.status(200).json({ products: [] }); // Return empty instead of 500
   }
 }
