@@ -101,7 +101,7 @@ async function searchUSDA(query, limit) {
     let response
     try {
       response = await fetch(
-        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${Math.min(limit, 25)}`,
+        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${Math.min(limit, 40)}`,
         { signal: controller.signal }
       )
     } catch (fetchErr) {
@@ -246,10 +246,14 @@ function transformUSDAFood(usdaFood) {
     nameLower.includes('syrup')
   )
 
+  // Use actual brand name for branded foods, 'USDA' for whole/foundation foods
+  const brandName = usdaFood.brandOwner || usdaFood.brandName || 
+    (usdaFood.dataType === 'Branded' ? 'Branded' : 'USDA')
+
   return {
     id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
-    brand: 'USDA',
+    brand: brandName,
     source: 'usda',
     calories: Math.round(nutrients.calories || 0),
     protein: Math.round(nutrients.protein || 0),
