@@ -284,13 +284,48 @@ async function searchOpenFoodFacts(query, limit) {
         const brand = (product.brands || '').toLowerCase()
         const nutriments = product.nutriments
         
-        // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
+        // Filter out products with non-Latin characters (Chinese, Japanese, Korean, Arabic, Cyrillic)
         const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
         if (hasNonLatinChars) return null
-        
-        // Filter out specific non-English brands
-        const nonEnglishBrands = ['sidi ali', 'sidi-ali']
-        if (nonEnglishBrands.some(b => brand.includes(b))) return null
+
+        // Filter out products with accented/special characters (non-English European)
+        const hasAccentedChars = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)
+        if (hasAccentedChars) return null
+
+        // Language code validation - must contain 'en'
+        const langCodes = product.languages_codes || {}
+        const hasEnglish = Object.keys(langCodes).some(code => code.startsWith('en'))
+        if (!hasEnglish) return null
+
+        // Foreign word detection - block clearly non-English product names
+        const foreignWords = [
+          // French
+          'fromage', 'lait', 'blanc', 'frais', 'beurre', 'crème', 'farine', 'sucre', 'sel',
+          'poulet', 'boeuf', 'porc', 'poisson', 'légumes', 'fruits', 'jus', 'eau',
+          // Spanish  
+          'leche', 'queso', 'mantequilla', 'harina', 'azúcar', 'pollo', 'carne', 'cerdo',
+          // German
+          'milch', 'käse', 'butter', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
+          // Italian
+          'latte', 'formaggio', 'burro', 'farina', 'zucchero', 'pollo',
+          // Portuguese
+          'leite', 'queijo', 'manteiga', 'farinha', 'açúcar', 'frango',
+        ]
+        const nameLowerForForeign = name.toLowerCase()
+        const hasForeignWord = foreignWords.some(word => {
+          // Only match as standalone word to avoid false positives
+          const regex = new RegExp(`\\b${word}\\b`, 'i')
+          return regex.test(nameLowerForForeign)
+        })
+        if (hasForeignWord) return null
+
+        // Block known non-English brand names
+        const nonEnglishBrands = [
+          'sidi ali', 'sidi-ali', 'jaouda', 'oulmès', 'centrale danone', 'perly',
+          'vittel', 'evian', 'perrier', 'volvic', 'buldak', 'samyang',
+          'milky food professional', 'la brea'
+        ]
+        if (nonEnglishBrands.some(b => brand.includes(b) || nameLower.includes(b))) return null
         
         // Filter out products without nutrition data
         const hasNutrition = (nutriments.proteins_100g !== undefined) ||
