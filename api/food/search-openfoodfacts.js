@@ -83,9 +83,9 @@ export default async function handler(req, res) {
 
     console.log(`[OFF] Searching for: ${query}`);
 
-    // Fetch only 50 items (was 200) - much faster response
-    // The English filter is pre-applied at API level with tag_0: 'en'
-    const fetchSize = Math.min(parseInt(pageSize) * 3, 60);
+    // Fetch pageSize items - caller already multiplied by 5 to account for filtering
+    // Cap at 200 to avoid very slow responses
+    const fetchSize = Math.min(parseInt(pageSize), 200);
 
     const params = new URLSearchParams({
       search_terms: query,

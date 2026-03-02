@@ -340,57 +340,27 @@ function scoreAndTransformOFF(products, query, limit) {
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // Fetch size: request more than needed since we'll filter some out
-    const fetchSize = Math.min(limit * 2, 60)
+    // Request limit*5 items from proxy - Open Food Facts has many non-English products
+    // so we need to fetch more to get enough English results after filtering
+    // The proxy applies server-side English filtering and returns only English products
+    const fetchSize = limit * 5  // e.g. limit=20 → fetch 100, filter down to ~20 English
     
-    // Build the Open Food Facts URL - use world subdomain for global branded coverage
-    // Pre-filter for English at API level with tag_0=en
-    const params = new URLSearchParams({
-      search_terms: query,
-      page_size: fetchSize,
-      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes',
-      tagtype_0: 'languages',
-      tag_contains_0: 'contains',
-      tag_0: 'en',
-      json: 1
-    })
-    const offUrl = `https://world.openfoodfacts.org/cgi/search.pl?${params}`
+    const response = await fetch(
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${fetchSize}`,
+      { signal: AbortSignal.timeout(12000) }  // 12 second timeout
+    )
 
-    let rawData
-    try {
-      // Use CapacitorHttp on native (Android/iOS) to bypass CORS restrictions
-      // On web browser, fall back to regular fetch
-      const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.()
-      if (isNative) {
-        const result = await CapacitorHttp.get({
-          url: offUrl,
-          headers: { 'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)' },
-          readTimeout: 8000,
-          connectTimeout: 5000
-        })
-        rawData = typeof result.data === 'string' ? JSON.parse(result.data) : result.data
-      } else {
-        // Web browser - use Vercel proxy to avoid CORS
-        const proxyResponse = await fetch(
-          `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${fetchSize}`,
-          { signal: AbortSignal.timeout(8000) }
-        )
-        if (!proxyResponse.ok) throw new Error(`Proxy error: ${proxyResponse.status}`)
-        const proxyData = await proxyResponse.json()
-        // Proxy already filters, so wrap in expected format
-        return proxyData.products ? scoreAndTransformOFF(proxyData.products, query, limit) : []
-      }
-    } catch (fetchErr) {
-      console.warn('Open Food Facts direct call failed:', fetchErr.message)
-      return []
+    if (!response.ok) {
+      throw new Error(`Open Food Facts proxy error: ${response.status}`)
     }
 
-    const data = rawData
+    const data = await response.json()
+    
     if (!data.products || data.products.length === 0) {
       return []
     }
 
-    // Use shared scoring/filtering helper
+    // Proxy already applies English filtering - just score and transform
     return scoreAndTransformOFF(data.products, query, limit)
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
