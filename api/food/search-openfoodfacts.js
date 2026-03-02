@@ -3,11 +3,65 @@
  * 
  * This endpoint proxies requests to Open Food Facts API to avoid CORS issues
  * when the app is loaded remotely from Vercel.
+ * Applies server-side English-only filtering before returning results.
  * 
  * Endpoint: /api/food/search-openfoodfacts?query=chicken&pageSize=50
  * Method: GET
- * Returns: Food search results from Open Food Facts
+ * Returns: English-only food search results from Open Food Facts
  */
+
+// Known non-English brand names to block
+const BLOCKED_BRANDS = [
+  'sidi ali', 'sidi-ali', 'jaouda', 'oulmes', 'centrale danone', 'perly',
+  'vittel', 'evian', 'perrier', 'volvic', 'buldak', 'samyang',
+  'milky food professional', 'la brea'
+];
+
+// Foreign words that indicate non-English products
+const FOREIGN_WORDS = [
+  // French
+  'fromage', 'lait', 'beurre', 'farine', 'sucre', 'poulet', 'boeuf',
+  'porc', 'poisson', 'legumes', 'jus',
+  // Spanish
+  'leche', 'queso', 'mantequilla', 'harina', 'azucar', 'pollo', 'cerdo',
+  // German
+  'milch', 'kase', 'mehl', 'zucker', 'huhnchen', 'fleisch', 'nudeln',
+  // Italian
+  'formaggio', 'burro', 'zucchero',
+  // Portuguese
+  'leite', 'queijo', 'manteiga', 'farinha', 'frango',
+];
+
+function isEnglishProduct(product) {
+  const name = (product.product_name || '').toLowerCase();
+  const brand = (product.brands || '').toLowerCase();
+
+  // Must have a product name
+  if (!name || name.trim().length === 0) return false;
+
+  // Block non-Latin characters (Chinese, Japanese, Korean, Arabic, Cyrillic)
+  if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return false;
+
+  // Block accented/special characters
+  if (/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)) return false;
+
+  // Language code validation - must have English
+  const langCodes = product.languages_codes || {};
+  const hasEnglish = Object.keys(langCodes).some(code => code.startsWith('en'));
+  if (!hasEnglish) return false;
+
+  // Block known non-English brands
+  if (BLOCKED_BRANDS.some(b => brand.includes(b) || name.includes(b))) return false;
+
+  // Block foreign words in product name
+  const hasForeignWord = FOREIGN_WORDS.some(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    return regex.test(name);
+  });
+  if (hasForeignWord) return false;
+
+  return true;
+}
 
 export default async function handler(req, res) {
   // Enable CORS for the frontend
@@ -34,16 +88,22 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching Open Food Facts for: ${query}`);
 
-    // Build query parameters - use world.openfoodfacts.org for better coverage
+    // Request more results than needed since we'll filter many out
+    const fetchSize = Math.min(parseInt(pageSize) * 4, 200);
+
+    // Build query parameters - use us.openfoodfacts.org for US-focused results
     const params = new URLSearchParams({
       search_terms: query,
-      page_size: pageSize,
+      page_size: fetchSize,
       fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
+      tagtype_0: 'languages',
+      tag_contains_0: 'contains',
+      tag_0: 'en',  // Pre-filter for English at API level
       json: 1
     });
 
-    // Fetch from Open Food Facts API - use world subdomain for maximum coverage
-    const openFoodFactsUrl = `https://world.openfoodfacts.org/cgi/search.pl?${params}`;
+    // Use US subdomain for English-focused results
+    const openFoodFactsUrl = `https://us.openfoodfacts.org/cgi/search.pl?${params}`;
     
     const response = await fetch(openFoodFactsUrl, {
       headers: {
@@ -60,13 +120,15 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
+    const rawProducts = data.products || [];
+    
+    // Apply server-side English-only filtering
+    const englishProducts = rawProducts.filter(isEnglishProduct);
+    
+    console.log(`[API] Open Food Facts: ${rawProducts.length} raw → ${englishProducts.length} English-only results`);
 
-    // cgi/search.pl returns { products: [...] } same as v2/search
-    const products = data.products || [];
-    console.log(`[API] Open Food Facts search success, found ${products.length} results`);
-
-    // Return in consistent format
-    return res.status(200).json({ products });
+    // Return filtered results
+    return res.status(200).json({ products: englishProducts });
 
   } catch (error) {
     console.error('[API] Error in Open Food Facts search:', error);

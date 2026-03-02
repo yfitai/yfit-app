@@ -145,8 +145,24 @@ export default function Goals({ user: propUser }) {
       setGoalType(goalsData.goal_type)
       
       // Load weight change rate (lbs/week)
+      // If weight_change_rate is set, use it directly
+      // If NULL (old records), derive from weekly_goal_kg (stored in kg, convert to lbs)
       if (goalsData.weight_change_rate) {
-        setWeightChangeRate(goalsData.weight_change_rate.toString())
+        // Round to nearest valid option: 0.5, 1, 1.5, 2
+        const rate = parseFloat(goalsData.weight_change_rate)
+        const validRates = [0.5, 1, 1.5, 2]
+        const closest = validRates.reduce((prev, curr) => 
+          Math.abs(curr - rate) < Math.abs(prev - rate) ? curr : prev
+        )
+        setWeightChangeRate(closest.toString())
+      } else if (goalsData.weekly_goal_kg) {
+        // Derive from weekly_goal_kg: convert kg to lbs and round to nearest valid option
+        const lbsPerWeek = goalsData.weekly_goal_kg * 2.20462
+        const validRates = [0.5, 1, 1.5, 2]
+        const closest = validRates.reduce((prev, curr) => 
+          Math.abs(curr - lbsPerWeek) < Math.abs(prev - lbsPerWeek) ? curr : prev
+        )
+        setWeightChangeRate(closest.toString())
       }
       
       // Load enhanced goals
