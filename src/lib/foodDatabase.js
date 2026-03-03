@@ -358,13 +358,20 @@ async function searchOpenFoodFacts(query, limit) {
     const apiUrl = `https://us.openfoodfacts.org/api/v2/search?${params}`
     console.log('🍎 Calling Open Food Facts via CapacitorHttp:', apiUrl.substring(0, 80) + '...')
 
-    const response = await CapacitorHttp.get({
-      url: apiUrl,
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': USER_AGENT
-      }
-    })
+    // CapacitorHttp doesn't support AbortSignal, so use Promise.race() for timeout
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Open Food Facts timeout after 8s')), 8000)
+    )
+    const response = await Promise.race([
+      CapacitorHttp.get({
+        url: apiUrl,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': USER_AGENT
+        }
+      }),
+      timeoutPromise
+    ])
 
     if (response.status !== 200) {
       throw new Error(`Open Food Facts API error: ${response.status}`)
