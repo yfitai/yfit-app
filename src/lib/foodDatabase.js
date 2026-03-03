@@ -32,22 +32,20 @@ export async function searchFoods(query, options = {}) {
   try {
     const results = []
 
-    // Search Open Food Facts (branded foods)
+    // Search USDA + Open Food Facts in PARALLEL for faster results
     if (source === 'all') {
-      const offResults = await searchOpenFoodFacts(query, limit)
+      const [offResults, usdaResults] = await Promise.all([
+        searchOpenFoodFacts(query, limit).catch(err => {
+          console.warn('Open Food Facts search failed:', err.message)
+          return []
+        }),
+        searchUSDA(query, limit).catch(err => {
+          console.warn('USDA search failed:', err.message)
+          return []
+        })
+      ])
       results.push(...offResults)
-    }
-
-    // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all') {
-      console.log('🥗 Searching USDA...')
-      try {
-        const usdaResults = await searchUSDA(query, limit)
-        console.log('🥗 USDA found:', usdaResults.length, 'results')
-        results.push(...usdaResults)
-      } catch (error) {
-        console.warn('USDA search failed:', error.message)
-      }
+      results.push(...usdaResults)
     }
 
     // Search Custom Foods (user-created)
