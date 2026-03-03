@@ -277,18 +277,14 @@ function scoreAndTransformOFF(products, query, limit) {
   const queryLower = query.toLowerCase()
   const queryWords = queryLower.split(' ').filter(w => w.length > 2)
 
-  const FOREIGN_WORDS = [
-    'fromage', 'lait', 'blanc', 'frais', 'beurre', 'crème', 'farine', 'sucre', 'sel',
-    'poulet', 'boeuf', 'porc', 'poisson', 'légumes', 'fruits', 'jus', 'eau',
-    'leche', 'queso', 'mantequilla', 'harina', 'azúcar', 'pollo', 'carne', 'cerdo',
-    'milch', 'käse', 'mehl', 'zucker', 'hühnchen', 'fleisch', 'nudeln',
-    'formaggio', 'burro', 'farina', 'zucchero',
-    'leite', 'queijo', 'manteiga', 'farinha', 'açúcar', 'frango',
-  ]
+  // Only block products where the NAME IS ENTIRELY non-English (not just has one accented char).
+  // Canadian products often have bilingual names like "Chicken Breast / Poitrine de poulet" -
+  // blocking on any accented char removes all Canadian branded products.
+  // Instead: block if the name contains CJK/Arabic/Cyrillic scripts (truly non-English),
+  // OR if the name has MORE accented chars than regular Latin chars (mostly foreign).
   const NON_ENGLISH_BRANDS = [
-    'sidi ali', 'sidi-ali', 'jaouda', 'oulmès', 'centrale danone', 'perly',
-    'vittel', 'evian', 'perrier', 'volvic', 'buldak', 'samyang',
-    'milky food professional', 'la brea'
+    'sidi ali', 'sidi-ali', 'jaouda', 'centrale danone',
+    'buldak', 'samyang'
   ]
 
   return products
@@ -299,14 +295,15 @@ function scoreAndTransformOFF(products, query, limit) {
       const brand = (product.brands || '').toLowerCase()
       const nutriments = product.nutriments
 
+      // Block CJK, Arabic, Cyrillic scripts
       if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return null
-      if (/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/i.test(name)) return null
 
-      // NOTE: Do NOT check languages_codes - many valid US/Canadian branded products
-      // have French language codes (bilingual packaging) but English product names.
-      // Rely on accented chars + foreign words filters instead.
+      // Only block if the product name has MORE accented chars than regular ASCII letters
+      // (i.e. the name is predominantly non-English, not just bilingual)
+      const accentedCount = (name.match(/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/gi) || []).length
+      const asciiLetterCount = (name.match(/[a-zA-Z]/g) || []).length
+      if (accentedCount > 0 && accentedCount >= asciiLetterCount * 0.4) return null
 
-      if (FOREIGN_WORDS.some(w => new RegExp(`\\b${w}\\b`, 'i').test(nameLower))) return null
       if (NON_ENGLISH_BRANDS.some(b => brand.includes(b) || nameLower.includes(b))) return null
 
       const hasNutrition = nutriments.proteins_100g !== undefined ||
@@ -322,12 +319,14 @@ function scoreAndTransformOFF(products, query, limit) {
       if (nameLower.includes(queryLower)) relevanceScore += 30
       const matchedWords = queryWords.filter(w => nameLower.includes(w)).length
       if (queryWords.length > 0) relevanceScore += (matchedWords / queryWords.length) * 40
-      if (brand && queryWords.some(w => brand.includes(w))) relevanceScore += 20
-      if (nameLower.split(' ').length > 8) relevanceScore -= 10
+      // Single-word queries: give score if brand contains the word
+      if (queryWords.length === 0 && nameLower.includes(queryLower)) relevanceScore += 40
+      if (brand && (brand.includes(queryLower) || queryWords.some(w => brand.includes(w)))) relevanceScore += 20
+      if (nameLower.split(' ').length > 10) relevanceScore -= 10
 
       return { product, relevanceScore }
     })
-    .filter(item => item !== null && item.relevanceScore > 5)
+    .filter(item => item !== null && item.relevanceScore > 0)
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .slice(0, limit)
     .map(item => transformOpenFoodFactsProduct(item.product))
@@ -344,7 +343,7 @@ async function searchOpenFoodFacts(query, limit) {
     // fetch() is blocked by WebView for cross-origin requests to openfoodfacts.org.
     // CapacitorHttp routes through the native HTTP layer, bypassing CORS entirely.
     // This is the same approach used by getFoodByBarcode() which works correctly.
-    const fetchSize = limit * 5  // Fetch more to account for filtering
+    const fetchSize = Math.min(limit * 2, 40)  // Keep small for speed - CapacitorHttp is fast
     
     const params = new URLSearchParams({
       search_terms: query,
