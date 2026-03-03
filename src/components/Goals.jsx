@@ -553,6 +553,24 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
+        // 9. Delete daily_logs (tracker entries - sleep, steps, water, BP, glucose)
+        const { error: dailyLogsError } = await supabase
+          .from('daily_logs')
+          .delete()
+          .eq('user_id', user.id)
+
+        // 10. Delete daily_trackers (used by Predictions page)
+        const { error: dailyTrackersError } = await supabase
+          .from('daily_trackers')
+          .delete()
+          .eq('user_id', user.id)
+
+        // 11. Delete form analysis sessions (Form Analysis history)
+        const { error: formAnalysisError } = await supabase
+          .from('form_analysis_sessions')
+          .delete()
+          .eq('user_id', user.id)
+
         // Check for any errors (ignore 404/406 errors for tables that don't exist)
         const allErrors = [
           { name: 'sessionsError', error: sessionsError },
@@ -565,7 +583,10 @@ export default function Goals({ user: propUser }) {
           { name: 'bodyCompError', error: bodyCompError },
           { name: 'bodyMeasLogsError', error: bodyMeasLogsError },
           { name: 'healthMetricsError', error: healthMetricsError },
-          { name: 'mealLogsError', error: mealLogsError }
+          { name: 'mealLogsError', error: mealLogsError },
+          { name: 'dailyLogsError', error: dailyLogsError },
+          { name: 'dailyTrackersError', error: dailyTrackersError },
+          { name: 'formAnalysisError', error: formAnalysisError }
         ];
         
         // Log all errors for debugging

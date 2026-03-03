@@ -122,17 +122,29 @@ export default function Dashboard({ user }) {
       setWorkoutsThisWeek(workoutsData.length)
     }
     
-    // Get goals for steps and calories targets
-    const { data: goalsData } = await supabase
-      .from('user_profiles')
+    // Get goals for steps target from user_goals
+    const { data: userGoalsData } = await supabase
+      .from('user_goals')
       .select('steps_goal, adjusted_calories')
       .eq('user_id', user.id)
-      .single()
-    
-    if (goalsData) {
-      if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
-      if (goalsData.adjusted_calories) setCaloriesGoal(Math.round(goalsData.adjusted_calories))
+      .maybeSingle()
+
+    // Get most recent adjusted_calories from calculated_metrics
+    const { data: metricsData } = await supabase
+      .from('calculated_metrics')
+      .select('adjusted_calories')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const goalsData = {
+      steps_goal: userGoalsData?.steps_goal || null,
+      adjusted_calories: metricsData?.adjusted_calories || userGoalsData?.adjusted_calories || null
     }
+
+    if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
+    if (goalsData.adjusted_calories) setCaloriesGoal(Math.round(goalsData.adjusted_calories))
     
     // Calculate health score (0-100)
     calculateHealthScore(trackerData, mealsData, workoutsData, goalsData)
@@ -164,19 +176,8 @@ export default function Dashboard({ user }) {
     }
     maxScore += 25
     
-    // Profile completion (25 points)
-    if (goalsData) {
-      let profileScore = 0
-      if (goalsData.steps_goal) profileScore += 12.5
-      if (goalsData.adjusted_calories) profileScore += 12.5
-      score += profileScore
-    }
-    maxScore += 25
-    
-    // Only show score if user has some data
-    if (maxScore > 0) {
-      setHealthScore(Math.round((score / maxScore) * 100))
-    }
+    // Score is based purely on activity - starts at 0 and increases with steps, calories, workouts
+    setHealthScore(Math.round((score / maxScore) * 100))
   }
 
   const setGreetingAndQuote = () => {

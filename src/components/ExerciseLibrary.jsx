@@ -393,22 +393,7 @@ const ExerciseLibrary = () => {
                     {exercise.equipment?.[0] || 'N/A'}
                   </span>
                 </div>
-                {hasFormAnalysis(exercise.name) ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewFormAnalysis(exercise);
-                    }}
-                    className="w-full px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    View Form Analysis
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <div className="w-full px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-center text-sm">
-                    Form Analysis Coming Soon
-                  </div>
-                )}
+
               </div>
             </div>
           ))}
