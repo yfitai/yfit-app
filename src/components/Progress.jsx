@@ -26,6 +26,7 @@ export default function Progress({ user: propUser }) {
   // Current vs Goal
   const [currentMetrics, setCurrentMetrics] = useState(null)
   const [goalMetrics, setGoalMetrics] = useState(null)
+  const [startingMetrics, setStartingMetrics] = useState(null)
   
   // Predictive analytics
   const [predictions, setPredictions] = useState(null)
@@ -174,76 +175,73 @@ export default function Progress({ user: propUser }) {
 
   // loadFitnessProgress removed - WorkoutAnalyticsDashboard handles workout analytics now
 
-const loadGoals = async (userId) => {
-  console.log('📊 Loading goals and latest measurements for user:', userId)
-  const { data: goalsData } = await supabase
-    .from('user_goals')
-    .select('*')
-    .eq('user_id', userId)
-    .single()
-
-  if (goalsData) {
-    // Get latest weight and body fat from daily_logs
-    const { data: measurementData, error: measurementError } = await supabase
-      .from('daily_logs')
-      .select('weight_kg, body_fat_percent, logged_at')
+  const loadGoals = async (userId) => {
+    console.log('📊 Loading goals and latest measurements for user:', userId)
+    const { data: goalsData } = await supabase
+      .from('user_goals')
+      .select('*')
       .eq('user_id', userId)
-      .not('weight_kg', 'is', null)
-      .order('logged_at', { ascending: false })
+      .order('updated_at', { ascending: false })
       .limit(1)
-    
-    const latestMeasurement = measurementData && measurementData.length > 0 ? {
-      weight_kg: measurementData[0].weight_kg,
-      body_fat_percentage: measurementData[0].body_fat_percent,
-      measurement_date: measurementData[0].logged_at
-    } : null
-    
-    console.log('Latest measurement query result:', { latestMeasurement, measurementError })
-    console.log('Goals data:', { weight: goalsData.weight_kg, bf: goalsData.starting_body_fat_percentage })
-    
-    // Use latest measurement if available, otherwise fall back to starting values
-    const currentWeight = latestMeasurement?.weight_kg || goalsData.weight_kg
-    const currentBodyFat = latestMeasurement?.body_fat_percentage || goalsData.starting_body_fat_percentage
-    
-    console.log('Final current values:', { currentWeight, currentBodyFat })
-    
-    // Calculate current BMI from height and current weight
-    const currentBMI = goalsData.height_cm && currentWeight
-      ? (currentWeight / Math.pow(goalsData.height_cm / 100, 2))
-      : null
-    
-    // Calculate goal BMI from height and target weight
-    const goalBMI = goalsData.height_cm && goalsData.target_weight_kg
-      ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
-      : null
+      .maybeSingle()
 
-    setCurrentMetrics({
-      weight: currentWeight ? currentWeight * 2.20462 : null,
-      bodyFat: currentBodyFat || null,
-      bmi: currentBMI
-    })
+    if (goalsData) {
+      // Get latest weight and body fat from daily_logs
+      const { data: measurementData } = await supabase
+        .from('daily_logs')
+        .select('weight_kg, body_fat_percent, logged_at')
+        .eq('user_id', userId)
+        .not('weight_kg', 'is', null)
+        .order('logged_at', { ascending: false })
+        .limit(1)
+
+      const latestMeasurement = measurementData && measurementData.length > 0 ? {
+        weight_kg: measurementData[0].weight_kg,
+        body_fat_percentage: measurementData[0].body_fat_percent,
+      } : null
+
+      // Starting values = what user entered when they set goals
+      const startingWeight = goalsData.starting_weight_kg || goalsData.weight_kg
+      const startingBodyFat = goalsData.starting_body_fat_percentage
+      const startingBMI = goalsData.height_cm && startingWeight
+        ? (startingWeight / Math.pow(goalsData.height_cm / 100, 2))
+        : null
+
+      // Current values = latest logged measurement, or starting if none logged yet
+      const currentWeight = latestMeasurement?.weight_kg || startingWeight
+      const currentBodyFat = latestMeasurement?.body_fat_percentage || startingBodyFat
+      const currentBMI = goalsData.height_cm && currentWeight
+        ? (currentWeight / Math.pow(goalsData.height_cm / 100, 2))
+        : null
+
+      // Goal values
+      const goalBMI = goalsData.height_cm && goalsData.target_weight_kg
+        ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+        : null
+
+      setStartingMetrics({
+        weight: startingWeight ? startingWeight * 2.20462 : null,
+        bodyFat: startingBodyFat || null,
+        bmi: startingBMI
+      })
+      setCurrentMetrics({
+        weight: currentWeight ? currentWeight * 2.20462 : null,
+        bodyFat: currentBodyFat || null,
+        bmi: currentBMI
+      })
       setGoalMetrics({
-      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
-      bodyFat: goalsData.target_body_fat_percentage || null,
-      bmi: goalBMI
-    })
-    
-    console.log('Current metrics set:', {
-      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
-      bodyFat: goalsData.starting_body_fat_percentage || null,
-      bmi: currentBMI
-    })
-    console.log('Goal metrics set:', {
-      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
-      bodyFat: goalsData.target_body_fat_percentage || null,
-      bmi: goalBMI
-    })
-    console.log('Goals data from database:', goalsData)
+        weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
+        bodyFat: goalsData.target_body_fat_percentage || null,
+        bmi: goalBMI
+      })
+
+      console.log('Starting:', { weight: startingWeight, bmi: startingBMI })
+      console.log('Current:', { weight: currentWeight, bmi: currentBMI })
+      console.log('Goal:', { weight: goalsData.target_weight_kg, bmi: goalBMI })
+    }
   }
-}
 
-const calculatePredictions = () => {
-
+  const calculatePredictions = () => {
     if (weightData.length < 2) return
 
     // Calculate trend
@@ -313,6 +311,7 @@ const calculatePredictions = () => {
             title="Weight"
             current={currentMetrics.weight}
             goal={goalMetrics.weight}
+            starting={startingMetrics?.weight}
             unit="lbs"
             icon={<TrendingDown className="w-6 h-6" />}
             color="blue"
@@ -321,6 +320,7 @@ const calculatePredictions = () => {
             title="Body Fat"
             current={currentMetrics.bodyFat}
             goal={goalMetrics.bodyFat}
+            starting={startingMetrics?.bodyFat}
             unit="%"
             icon={<Target className="w-6 h-6" />}
             color="green"
@@ -329,6 +329,7 @@ const calculatePredictions = () => {
             title="BMI"
             current={currentMetrics.bmi}
             goal={goalMetrics.bmi}
+            starting={startingMetrics?.bmi}
             unit=""
             icon={<Activity className="w-6 h-6" />}
             color="purple"
@@ -542,10 +543,13 @@ const calculatePredictions = () => {
 }
 
 // Overview Card Component
-function OverviewCard({ title, current, goal, unit, icon, color }) {
-  const progress = ((current - goal) / current) * 100
-  const remaining = Math.abs(current - goal)
-  const isImproving = current > goal // Assuming lower is better (weight, BF, BMI)
+function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
+  // Journey progress: 0% at start, 100% when goal is reached
+  const journeyTotal = starting != null && goal != null ? Math.abs(starting - goal) : null
+  const journeyMade  = starting != null && current != null ? Math.abs(starting - current) : null
+  const progress = journeyTotal && journeyTotal > 0 ? Math.min((journeyMade / journeyTotal) * 100, 100) : 0
+  const remaining = current != null && goal != null ? Math.abs(current - goal) : null
+  const isImproving = current != null && goal != null && current > goal // lower is better
 
   const colorClasses = {
     blue: 'bg-blue-50 text-blue-600 border-blue-200',
@@ -580,7 +584,7 @@ function OverviewCard({ title, current, goal, unit, icon, color }) {
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className={`h-2 rounded-full ${color === 'blue' ? 'bg-blue-500' : color === 'green' ? 'bg-green-500' : 'bg-purple-500'}`}
-            style={{ width: `${progress != null ? Math.min(Math.abs(progress), 100) : 0}%` }}
+            style={{ width: `${progress}%` }}
           ></div>
         </div>
         
