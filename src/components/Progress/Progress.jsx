@@ -190,67 +190,58 @@ export default function Progress({ user: propUser }) {
     }
   }
 
-const loadGoals = async (userId) => {
-  console.log('Loading goals for user:', userId)
-  const { data: goalsData } = await supabase
-    .from('user_goals')
-    .select('*')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const loadGoals = async (userId) => {
+    console.log('Loading goals for user:', userId)
+    const { data: goalsData } = await supabase
+      .from('user_goals')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-  if (goalsData) {
-    // Calculate current BMI from height and starting weight
-    const currentBMI = goalsData.height_cm && goalsData.weight_kg 
-      ? (goalsData.weight_kg / Math.pow(goalsData.height_cm / 100, 2))
-      : null
-    
-    // Calculate goal BMI from height and target weight
-    const goalBMI = goalsData.height_cm && goalsData.target_weight_kg
-      ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
-      : null
+    if (goalsData) {
+      // Calculate current BMI from height and starting weight
+      const currentBMI = goalsData.height_cm && goalsData.weight_kg
+        ? (goalsData.weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+        : null
 
-    // starting_weight_kg is the weight the user entered when they set goals
-    const startingWeightLbs = (goalsData.starting_weight_kg || goalsData.weight_kg)
-      ? (goalsData.starting_weight_kg || goalsData.weight_kg) * 2.20462
-      : null
-    const startingBMI = goalsData.height_cm && (goalsData.starting_weight_kg || goalsData.weight_kg)
-      ? ((goalsData.starting_weight_kg || goalsData.weight_kg) / Math.pow(goalsData.height_cm / 100, 2))
-      : null
+      // Calculate goal BMI from height and target weight
+      const goalBMI = goalsData.height_cm && goalsData.target_weight_kg
+        ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+        : null
 
-    setStartingMetrics({
-      weight: startingWeightLbs,
-      bodyFat: goalsData.starting_body_fat_percentage || null,
-      bmi: startingBMI
-    })
-    setCurrentMetrics({
-      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
-      bodyFat: goalsData.starting_body_fat_percentage || null,
-      bmi: currentBMI
-    })
-    setGoalMetrics({
-      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
-      bodyFat: goalsData.target_body_fat_percentage || null,
-      bmi: goalBMI
-    })
-    
-    console.log('Current metrics set:', {
-      weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
-      bodyFat: goalsData.starting_body_fat_percentage || null,
-      bmi: currentBMI
-    })
-    console.log('Goal metrics set:', {
-      weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
-      bodyFat: goalsData.target_body_fat_percentage || null,
-      bmi: goalBMI
-    })
-    console.log('Goals data from database:', goalsData)
+      // starting_weight_kg is the weight the user entered when they set goals
+      const startingWeightLbs = (goalsData.starting_weight_kg || goalsData.weight_kg)
+        ? (goalsData.starting_weight_kg || goalsData.weight_kg) * 2.20462
+        : null
+      const startingBMI = goalsData.height_cm && (goalsData.starting_weight_kg || goalsData.weight_kg)
+        ? ((goalsData.starting_weight_kg || goalsData.weight_kg) / Math.pow(goalsData.height_cm / 100, 2))
+        : null
+
+      setStartingMetrics({
+        weight: startingWeightLbs,
+        bodyFat: goalsData.starting_body_fat_percentage || null,
+        bmi: startingBMI
+      })
+      setCurrentMetrics({
+        weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
+        bodyFat: goalsData.starting_body_fat_percentage || null,
+        bmi: currentBMI
+      })
+      setGoalMetrics({
+        weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
+        bodyFat: goalsData.target_body_fat_percentage || null,
+        bmi: goalBMI
+      })
+
+      console.log('Starting metrics:', { weight: startingWeightLbs, bmi: startingBMI })
+      console.log('Current metrics:', { weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null, bmi: currentBMI })
+      console.log('Goal metrics:', { weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null, bmi: goalBMI })
+    }
   }
-}
 
-const calculatePredictions = () => {
-
+  const calculatePredictions = () => {
     if (weightData.length < 2) return
 
     // Calculate trend
