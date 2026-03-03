@@ -289,10 +289,26 @@ export default function PredictionsUnified({ user }) {
     if (wData.length < 3 && nData.length < 3) return null;
 
     try {
-      // Calculate average daily calorie intake (filter out very low entries that are likely incomplete)
+      // Group meals by day first, then average daily totals (not individual food item rows)
       const validNutritionData = nData.filter(log => parseFloat(log.calories) > 50);
-      const avgCalories = validNutritionData.length > 0
-        ? validNutritionData.reduce((sum, log) => sum + (parseFloat(log.calories) || 0), 0) / validNutritionData.length
+      const dailyCalorieMap = {};
+      const dailyMacroMap = {};
+      const todayStr = new Date().toISOString().split('T')[0];
+      validNutritionData.forEach(log => {
+        const day = log.meal_date ? log.meal_date.split('T')[0] : todayStr;
+        if (!dailyCalorieMap[day]) {
+          dailyCalorieMap[day] = 0;
+          dailyMacroMap[day] = { protein: 0, carbs: 0, fat: 0 };
+        }
+        dailyCalorieMap[day] += parseFloat(log.calories) || 0;
+        dailyMacroMap[day].protein += parseFloat(log.protein_g) || 0;
+        dailyMacroMap[day].carbs += parseFloat(log.carbs_g) || 0;
+        dailyMacroMap[day].fat += parseFloat(log.fat_g) || 0;
+      });
+      const dailyTotals = Object.values(dailyCalorieMap);
+      const todayCalories = dailyCalorieMap[todayStr] || 0;
+      const avgCalories = dailyTotals.length > 0
+        ? Math.round(dailyTotals.reduce((sum, c) => sum + c, 0) / dailyTotals.length)
         : 1875; // Default fallback if no valid nutrition data
 
       // Check if nutrition data looks incomplete (avg < 800 cal/day is unrealistic)
@@ -351,6 +367,7 @@ export default function PredictionsUnified({ user }) {
       return {
         tdee,
         avgCalories: Math.round(avgCalories),
+        todayCalories: Math.round(todayCalories),
         activityLevel,
         workoutsPerWeek: Math.round(workoutsPerWeek * 10) / 10,
         maintenanceRange: {
@@ -454,23 +471,26 @@ export default function PredictionsUnified({ user }) {
     if (validData.length < 3) return null; // Reduced from 7 to 3
 
     try {
-      const avgMacros = {
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-        calories: 0
-      };
-
+      // Group by date first so we get daily totals, not per-item averages
+      const todayStr = new Date().toISOString().split('T')[0];
+      const byDate = {};
       validData.forEach(log => {
-        avgMacros.protein += parseFloat(log.protein_g) || 0;
-        avgMacros.carbs += parseFloat(log.carbs_g) || 0;
-        avgMacros.fat += parseFloat(log.fat_g) || 0;
-        avgMacros.calories += parseFloat(log.calories) || 0;
+        const day = log.meal_date ? log.meal_date.split('T')[0] : todayStr;
+        if (!byDate[day]) byDate[day] = { protein: 0, carbs: 0, fat: 0, calories: 0 };
+        byDate[day].protein += parseFloat(log.protein_g) || 0;
+        byDate[day].carbs += parseFloat(log.carbs_g) || 0;
+        byDate[day].fat += parseFloat(log.fat_g) || 0;
+        byDate[day].calories += parseFloat(log.calories) || 0;
       });
+      const dayEntries = Object.entries(byDate); // [[dateStr, {protein,carbs,fat,calories}], ...]
+      const numDays = dayEntries.length;
 
-      Object.keys(avgMacros).forEach(key => {
-        avgMacros[key] = Math.round(avgMacros[key] / validData.length);
-      });
+      const avgMacros = {
+        protein: Math.round(dayEntries.reduce((s, [, d]) => s + d.protein, 0) / numDays),
+        carbs: Math.round(dayEntries.reduce((s, [, d]) => s + d.carbs, 0) / numDays),
+        fat: Math.round(dayEntries.reduce((s, [, d]) => s + d.fat, 0) / numDays),
+        calories: Math.round(dayEntries.reduce((s, [, d]) => s + d.calories, 0) / numDays),
+      };
 
       // Calculate macro ratios
       const totalMacroCalories = (avgMacros.protein * 4) + (avgMacros.carbs * 4) + (avgMacros.fat * 9);
@@ -480,12 +500,12 @@ export default function PredictionsUnified({ user }) {
         fat: Math.round((avgMacros.fat * 9 / totalMacroCalories) * 100)
       };
 
-      // Analyze by day of week
+      // Analyze by day of week (using daily totals, not per-item)
       const byDayOfWeek = {};
-      validData.forEach(log => {
-        const day = new Date(log.meal_date).toLocaleDateString('en-US', { weekday: 'long' });
+      dayEntries.forEach(([dateStr, totals]) => {
+        const day = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
-        byDayOfWeek[day].calories += parseFloat(log.calories) || 0;
+        byDayOfWeek[day].calories += totals.calories;
         byDayOfWeek[day].count++;
       });
 
@@ -1170,9 +1190,9 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-sm opacity-75">calories/day</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Intake</div>
-                <div className="text-4xl font-bold">{predictions.tdee.avgCalories}</div>
-                <div className="text-sm opacity-75">calories/day</div>
+                <div className="text-sm opacity-90 mb-1">Today's Intake</div>
+                <div className="text-4xl font-bold">{predictions.tdee.todayCalories > 0 ? predictions.tdee.todayCalories : predictions.tdee.avgCalories}</div>
+                <div className="text-sm opacity-75">{predictions.tdee.todayCalories > 0 ? `${predictions.tdee.avgCalories} cal/day avg` : 'calories/day avg'}</div>
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">Activity Level</div>
