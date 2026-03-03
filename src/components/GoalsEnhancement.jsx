@@ -42,6 +42,9 @@ export default function GoalsEnhancement({
   const [waterGoal, setWaterGoal] = useState('')
   const [stepsGoal, setStepsGoal] = useState('10000')
   const [sleepGoal, setSleepGoal] = useState('8')
+  const [bpSystolicGoal, setBpSystolicGoal] = useState('120')
+  const [bpDiastolicGoal, setBpDiastolicGoal] = useState('80')
+  const [glucoseGoal, setGlucoseGoal] = useState('100')
   const [dataLoaded, setDataLoaded] = useState(false)
   const [manuallyEditedWeight, setManuallyEditedWeight] = useState(false)
   const [manuallyEditedGoal, setManuallyEditedGoal] = useState(false)
@@ -85,6 +88,9 @@ export default function GoalsEnhancement({
       }
       if (initialData.steps_goal) setStepsGoal(initialData.steps_goal.toString())
       if (initialData.sleep_hours_goal) setSleepGoal(initialData.sleep_hours_goal.toString())
+      if (initialData.bp_systolic_goal) setBpSystolicGoal(initialData.bp_systolic_goal.toString())
+      if (initialData.bp_diastolic_goal) setBpDiastolicGoal(initialData.bp_diastolic_goal.toString())
+      if (initialData.glucose_goal) setGlucoseGoal(initialData.glucose_goal.toString())
       setDataLoaded(true)
     }
   }, [initialData])
@@ -187,7 +193,10 @@ export default function GoalsEnhancement({
       sodium_goal_mg: sodiumGoal ? parseFloat(sodiumGoal) : 2300,
       water_goal_ml: waterGoal ? (isMetric ? parseInt(waterGoal) : ozToMl(parseInt(waterGoal))) : 2000,
       steps_goal: stepsGoal ? parseInt(stepsGoal) : 10000,
-      sleep_hours_goal: sleepGoal ? parseFloat(sleepGoal) : 8
+      sleep_hours_goal: sleepGoal ? parseFloat(sleepGoal) : 8,
+      bp_systolic_goal: bpSystolicGoal ? parseInt(bpSystolicGoal) : 120,
+      bp_diastolic_goal: bpDiastolicGoal ? parseInt(bpDiastolicGoal) : 80,
+      glucose_goal: glucoseGoal ? parseInt(glucoseGoal) : 100
     }
     
     if (onGoalsChange) {
@@ -196,7 +205,7 @@ export default function GoalsEnhancement({
   }, [
     startingWeight, targetWeight, startingBodyFat, targetBodyFat,
     targetDate, weeklyGoal, fiberGoal, sugarGoal, sodiumGoal,
-    waterGoal, stepsGoal, sleepGoal, unitSystem
+    waterGoal, stepsGoal, sleepGoal, bpSystolicGoal, bpDiastolicGoal, glucoseGoal, unitSystem
   ])
   
   const estimatedDate = calculateEstimatedDate()
@@ -451,6 +460,48 @@ export default function GoalsEnhancement({
               placeholder="8 hours recommended"
             />
             <p className="text-xs text-gray-500 mt-1">7-9 hours recommended</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Blood Pressure Goal (systolic mmHg)
+            </label>
+            <input
+              type="number"
+              value={bpSystolicGoal}
+              onChange={(e) => setBpSystolicGoal(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="120"
+            />
+            <p className="text-xs text-gray-500 mt-1">Normal: &lt;120 mmHg systolic</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Blood Pressure Goal (diastolic mmHg)
+            </label>
+            <input
+              type="number"
+              value={bpDiastolicGoal}
+              onChange={(e) => setBpDiastolicGoal(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="80"
+            />
+            <p className="text-xs text-gray-500 mt-1">Normal: &lt;80 mmHg diastolic</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fasting Glucose Goal (mg/dL)
+            </label>
+            <input
+              type="number"
+              value={glucoseGoal}
+              onChange={(e) => setGlucoseGoal(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="100"
+            />
+            <p className="text-xs text-gray-500 mt-1">Normal fasting: &lt;100 mg/dL</p>
           </div>
         </div>
       </div>

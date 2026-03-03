@@ -33,13 +33,14 @@ export default function PredictionsUnified({ user }) {
     setLoading(true);
     try {
       // Fetch data and get results directly (including user's TDEE from Goals page)
-      const [weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE] = await Promise.all([
+      const [weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE, userGoalWeightKg] = await Promise.all([
         fetchWeightData(),
         fetchWorkoutData(),
         fetchNutritionData(),
         fetchMedicationData(),
         fetchDailyLogs(),
-        fetchUserTDEE()
+        fetchUserTDEE(),
+        fetchUserGoalWeight()
       ]);
       
       console.log('📊 Data fetched:', {
@@ -48,11 +49,12 @@ export default function PredictionsUnified({ user }) {
         nutrition: nutritionResults.length,
         medication: medicationResults.length,
         dailyLogs: dailyLogsResults.length,
-        userTDEE: userTDEE
+        userTDEE: userTDEE,
+        userGoalWeightKg: userGoalWeightKg
       });
       
       // Calculate predictions with fetched data (not state)
-      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE);
+      calculatePredictionsDirectly(weightResults, workoutResults, nutritionResults, medicationResults, dailyLogsResults, userTDEE, userGoalWeightKg);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -162,13 +164,12 @@ export default function PredictionsUnified({ user }) {
         .from('calculated_metrics')
         .select('tdee')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('calculated_at', { ascending: false })
         .limit(1)
         .single();
       
       if (error) {
         console.log('No user TDEE found in calculated_metrics');
-        return null;
       }
       
       console.log('📊 User TDEE from Goals page:', data?.tdee);
@@ -179,8 +180,24 @@ export default function PredictionsUnified({ user }) {
     }
   };
 
-  const calculatePredictionsDirectly = (wData, woData, nData, mData, dlData, userTDEE = null) => {
-    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length, dlData: dlData.length, userTDEE });
+  const fetchUserGoalWeight = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_goals')
+        .select('target_weight_kg')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) return null;
+      return data?.target_weight_kg || null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const calculatePredictionsDirectly = (wData, woData, nData, mData, dlData, userTDEE = null, userGoalWeightKg = null) => {
+    console.log('🧮 Calculating predictions with:', { wData: wData.length, woData: woData.length, nData: nData.length, mData: mData.length, dlData: dlData.length, userTDEE, userGoalWeightKg });
     
     // Check for compressed data (workouts within short timeframe)
     let isCompressedData = false;
@@ -194,7 +211,7 @@ export default function PredictionsUnified({ user }) {
     }
     setPredictions({
       // Phase 1
-      weightLoss: calculateWeightLossPrediction(wData),
+      weightLoss: calculateWeightLossPrediction(wData, userGoalWeightKg),
       tdee: calculateTDEE(wData, woData, nData, userTDEE),
       medicationAdherence: predictMedicationAdherence(mData),
       nutritionPatterns: analyzeNutritionPatterns(nData),
@@ -223,7 +240,7 @@ export default function PredictionsUnified({ user }) {
   };
 
   // 1. Weight Loss Prediction
-  const calculateWeightLossPrediction = (data = weightData) => {
+  const calculateWeightLossPrediction = (data = weightData, userGoalWeight = null) => {
     if (data.length < 3) return null;
 
     try {
@@ -240,8 +257,8 @@ export default function PredictionsUnified({ user }) {
       const daysBetween = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
       const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
 
-      // Assume goal is 10% weight loss
-      const goalWeight = firstWeight * 0.9;
+      // Use actual target weight from user_goals if available, otherwise default to 10% loss
+      const goalWeight = (userGoalWeight && userGoalWeight > 20) ? userGoalWeight : firstWeight * 0.9;
       const remainingWeight = lastWeight - goalWeight;
       const weeksToGoal = Math.abs(remainingWeight / weeklyChange);
 

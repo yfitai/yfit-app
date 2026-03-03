@@ -426,6 +426,9 @@ export default function Goals({ user: propUser }) {
             water_goal_ml: enhancedGoals.water_goal_ml,
             steps_goal: enhancedGoals.steps_goal,
             sleep_hours_goal: enhancedGoals.sleep_hours_goal,
+            bp_systolic_goal: enhancedGoals.bp_systolic_goal,
+            bp_diastolic_goal: enhancedGoals.bp_diastolic_goal,
+            glucose_goal: enhancedGoals.glucose_goal,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'user_id'
