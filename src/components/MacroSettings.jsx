@@ -6,20 +6,109 @@ import {
   getRecommendedFatPercentage
 } from '../lib/macroCalculations'
 
+/**
+ * MacroSettings
+ *
+ * Sliders work in grams with step=1.
+ * When one macro slider is moved, the remaining calorie budget is
+ * redistributed proportionally across the other two macros so the
+ * total always stays equal to the user's calorie goal (adjustedCalories).
+ */
 export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories, goalType, onMacrosUpdated }) {
   const [useCustomMacros, setUseCustomMacros] = useState(false)
-  // Gram-based state for sliders (1g precision)
   const [proteinGrams, setProteinGrams] = useState(150)
-  const [carbGrams, setCarbGrams] = useState(200)
-  const [fatGrams, setFatGrams] = useState(60)
-  const [macros, setMacros] = useState(null)
-  const [error, setError] = useState(null)
-  // Prevent reload from overwriting user's custom settings after a save
-  const userIsEditingRef = useRef(false)
+  const [carbGrams, setCarbGrams]       = useState(200)
+  const [fatGrams, setFatGrams]         = useState(60)
+  const [macros, setMacros]             = useState(null)
+
+  // Prevent DB reload from overwriting user's in-progress edits
+  const userIsEditingRef     = useRef(false)
   const lastAdjustedCalories = useRef(null)
 
+  // ─── helpers ────────────────────────────────────────────────────────────────
+
+  const totalKcal = (p, c, f) => p * 4 + c * 4 + f * 9
+
+  const buildMacros = (p, c, f) => {
+    const total = Math.max(totalKcal(p, c, f), 1)
+    return {
+      protein: { grams: p, percentage: Math.round((p * 4 / total) * 100), calories: p * 4 },
+      carbs:   { grams: c, percentage: Math.round((c * 4 / total) * 100), calories: c * 4 },
+      fat:     { grams: f, percentage: Math.round((f * 9 / total) * 100), calories: f * 9 },
+      totalCalories: total
+    }
+  }
+
+  const applyMacros = (p, c, f) => {
+    const m = buildMacros(p, c, f)
+    setProteinGrams(p)
+    setCarbGrams(c)
+    setFatGrams(f)
+    setMacros(m)
+    if (onMacrosUpdated) onMacrosUpdated(m)
+    return m
+  }
+
+  const gramsToPercents = (p, c, f) => {
+    const total = Math.max(totalKcal(p, c, f), 1)
+    return {
+      p: Math.round((p * 4 / total) * 100),
+      c: Math.round((c * 4 / total) * 100),
+      f: Math.round((f * 9 / total) * 100)
+    }
+  }
+
+  /**
+   * Given a changed macro (type, newGrams), redistribute the remaining
+   * calorie budget proportionally across the other two macros so the
+   * total stays at adjustedCalories.
+   */
+  const redistributeToGoal = (changedType, newGrams, curProtein, curCarbs, curFat) => {
+    const goal = Math.round(adjustedCalories)
+    const calPerG = changedType === 'fat' ? 9 : 4
+    const usedKcal = newGrams * calPerG
+    const remaining = Math.max(goal - usedKcal, 0)
+
+    let newP = curProtein
+    let newC = curCarbs
+    let newF = curFat
+
+    if (changedType === 'protein') {
+      newP = newGrams
+      const oldCKcal = curCarbs * 4
+      const oldFKcal = curFat   * 9
+      const oldOther = Math.max(oldCKcal + oldFKcal, 1)
+      const cKcal = Math.round((oldCKcal / oldOther) * remaining)
+      const fKcal = remaining - cKcal
+      newC = Math.max(Math.round(cKcal / 4), 20)
+      newF = Math.max(Math.round(fKcal / 9), 20)
+    } else if (changedType === 'carbs') {
+      newC = newGrams
+      const oldPKcal = curProtein * 4
+      const oldFKcal = curFat     * 9
+      const oldOther = Math.max(oldPKcal + oldFKcal, 1)
+      const pKcal = Math.round((oldPKcal / oldOther) * remaining)
+      const fKcal = remaining - pKcal
+      newP = Math.max(Math.round(pKcal / 4), 50)
+      newF = Math.max(Math.round(fKcal / 9), 20)
+    } else {
+      // fat changed
+      newF = newGrams
+      const oldPKcal = curProtein * 4
+      const oldCKcal = curCarbs   * 4
+      const oldOther = Math.max(oldPKcal + oldCKcal, 1)
+      const pKcal = Math.round((oldPKcal / oldOther) * remaining)
+      const cKcal = remaining - pKcal
+      newP = Math.max(Math.round(pKcal / 4), 50)
+      newC = Math.max(Math.round(cKcal / 4), 20)
+    }
+
+    return { p: newP, c: newC, f: newF }
+  }
+
+  // ─── load from DB ───────────────────────────────────────────────────────────
+
   useEffect(() => {
-    // Only reload if calories actually changed AND user isn't actively editing custom macros
     if (adjustedCalories !== lastAdjustedCalories.current) {
       lastAdjustedCalories.current = adjustedCalories
       if (!userIsEditingRef.current) {
@@ -31,151 +120,95 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   const loadMacroSettings = async () => {
     if (!user || !adjustedCalories) return
 
-    // Load from database
     const { data } = await supabase
-        .from('user_preferences')
-        .select('use_custom_macros, protein_percent, carb_percent, fat_percent')
-        .eq('user_id', user.id)
-        .single()
+      .from('user_preferences')
+      .select('use_custom_macros, protein_percent, carb_percent, fat_percent')
+      .eq('user_id', user.id)
+      .single()
 
-      if (data && data.use_custom_macros) {
-        setUseCustomMacros(true)
-        // Convert saved percentages back to grams using current calories
-        const p = data.protein_percent
-        const c = data.carb_percent
-        const f = data.fat_percent
-        const pGrams = Math.round((adjustedCalories * p / 100) / 4)
-        const cGrams = Math.round((adjustedCalories * c / 100) / 4)
-        const fGrams = Math.round((adjustedCalories * f / 100) / 9)
-        setProteinGrams(pGrams)
-        setCarbGrams(cGrams)
-        setFatGrams(fGrams)
-        calculateAndSetMacrosFromGrams(pGrams, cGrams, fGrams)
-      } else {
-        setUseCustomMacros(false)
-        calculateAndSetMacrosLBM()
-      }
-  }
-
-  const calculateAndSetMacrosLBM = () => {
-    let calculatedMacros
-    if (leanBodyMassLbs) {
-      const recommendedFatPercent = getRecommendedFatPercentage(goalType)
-      calculatedMacros = calculateMacrosFromLBM(leanBodyMassLbs, adjustedCalories, recommendedFatPercent)
+    if (data && data.use_custom_macros) {
+      setUseCustomMacros(true)
+      const pGrams = Math.round((adjustedCalories * data.protein_percent / 100) / 4)
+      const cGrams = Math.round((adjustedCalories * data.carb_percent    / 100) / 4)
+      const fGrams = Math.round((adjustedCalories * data.fat_percent     / 100) / 9)
+      applyMacros(pGrams, cGrams, fGrams)
     } else {
-      calculatedMacros = calculateMacrosFromPercentages(adjustedCalories, 30, 40, 30)
+      setUseCustomMacros(false)
+      applyLBMMacros()
     }
-    // Sync gram sliders to LBM values
-    setProteinGrams(calculatedMacros.protein.grams)
-    setCarbGrams(calculatedMacros.carbs.grams)
-    setFatGrams(calculatedMacros.fat.grams)
-    setMacros(calculatedMacros)
-    if (onMacrosUpdated) onMacrosUpdated(calculatedMacros)
   }
 
-  const calculateAndSetMacrosFromGrams = (p, c, f) => {
-    if (!adjustedCalories) return
-    const totalCals = (p * 4) + (c * 4) + (f * 9)
-    const calculatedMacros = {
-      protein: { grams: p, percentage: Math.round((p * 4 / totalCals) * 100), calories: p * 4 },
-      carbs:   { grams: c, percentage: Math.round((c * 4 / totalCals) * 100), calories: c * 4 },
-      fat:     { grams: f, percentage: Math.round((f * 9 / totalCals) * 100), calories: f * 9 },
-      totalCalories: totalCals
+  const applyLBMMacros = () => {
+    let m
+    if (leanBodyMassLbs) {
+      const fatPct = getRecommendedFatPercentage(goalType)
+      m = calculateMacrosFromLBM(leanBodyMassLbs, adjustedCalories, fatPct)
+    } else {
+      m = calculateMacrosFromPercentages(adjustedCalories, 30, 40, 30)
     }
-    setMacros(calculatedMacros)
-    if (onMacrosUpdated) onMacrosUpdated(calculatedMacros)
-    return calculatedMacros
+    applyMacros(m.protein.grams, m.carbs.grams, m.fat.grams)
   }
+
+  // ─── event handlers ─────────────────────────────────────────────────────────
 
   const handleToggleCustomMacros = async (enabled) => {
     setUseCustomMacros(enabled)
     userIsEditingRef.current = enabled
 
     if (!enabled) {
-      // Switch back to LBM-based
-      calculateAndSetMacrosLBM()
+      applyLBMMacros()
       await saveMacroSettings(false, 30, 40, 30)
     } else {
-      // Start custom mode with current gram values
-      calculateAndSetMacrosFromGrams(proteinGrams, carbGrams, fatGrams)
+      applyMacros(proteinGrams, carbGrams, fatGrams)
       const { p, c, f } = gramsToPercents(proteinGrams, carbGrams, fatGrams)
       await saveMacroSettings(true, p, c, f)
     }
   }
 
-  const gramsToPercents = (p, c, f) => {
-    const totalCals = (p * 4) + (c * 4) + (f * 9)
-    return {
-      p: Math.round((p * 4 / totalCals) * 100),
-      c: Math.round((c * 4 / totalCals) * 100),
-      f: Math.round((f * 9 / totalCals) * 100)
-    }
-  }
-
-  const handleGramChange = (type, value) => {
+  const handleGramChange = async (type, rawValue) => {
     userIsEditingRef.current = true
-    const newValue = Math.max(0, parseInt(value) || 0)
+    const newGrams = Math.max(0, parseInt(rawValue) || 0)
 
-    let newProtein = proteinGrams
-    let newCarbs = carbGrams
-    let newFat = fatGrams
+    // Redistribute remaining calories to the other two macros
+    const { p, c, f } = redistributeToGoal(type, newGrams, proteinGrams, carbGrams, fatGrams)
+    applyMacros(p, c, f)
 
-    if (type === 'protein') newProtein = newValue
-    else if (type === 'carbs') newCarbs = newValue
-    else if (type === 'fat') newFat = newValue
-
-    setProteinGrams(newProtein)
-    setCarbGrams(newCarbs)
-    setFatGrams(newFat)
-
-    const totalCals = (newProtein * 4) + (newCarbs * 4) + (newFat * 9)
-    if (totalCals <= 0) {
-      setError('Total calories must be greater than 0')
-      return
-    }
-
-    setError(null)
-    calculateAndSetMacrosFromGrams(newProtein, newCarbs, newFat)
-
-    // Save as percentages to DB
-    const { p, c, f } = gramsToPercents(newProtein, newCarbs, newFat)
-    saveMacroSettings(true, p, c, f)
+    const percents = gramsToPercents(p, c, f)
+    await saveMacroSettings(true, percents.p, percents.c, percents.f)
   }
+
+  // ─── persistence ────────────────────────────────────────────────────────────
 
   const saveMacroSettings = async (useCustom, p, c, f) => {
     await supabase
       .from('user_preferences')
-      .upsert({
-        user_id: user.id,
-        use_custom_macros: useCustom,
-        protein_percent: p,
-        carb_percent: c,
-        fat_percent: f
-      }, {
-        onConflict: 'user_id'
-      })
+      .upsert(
+        { user_id: user.id, use_custom_macros: useCustom, protein_percent: p, carb_percent: c, fat_percent: f },
+        { onConflict: 'user_id' }
+      )
   }
+
+  // ─── render ─────────────────────────────────────────────────────────────────
 
   if (!macros) {
     return <div className="text-center py-4">Calculating macros...</div>
   }
 
-  const totalCals = (proteinGrams * 4) + (carbGrams * 4) + (fatGrams * 9)
-  const maxGrams = adjustedCalories ? Math.round(adjustedCalories / 4) : 400
+  const goal    = Math.round(adjustedCalories || 0)
+  const current = totalKcal(proteinGrams, carbGrams, fatGrams)
+  const maxGrams = goal ? Math.round(goal / 4) : 400
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        🎯 Macro Targets
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Macro Targets</h3>
 
-      {/* Toggle Custom Macros */}
+      {/* Toggle */}
       <div className="flex items-center justify-between mb-4 p-4 bg-gray-50 rounded-lg">
         <div>
           <p className="font-medium text-gray-800">Custom Macro Targets</p>
           <p className="text-sm text-gray-600">
             {useCustomMacros
-              ? 'Using custom gram targets'
+              ? 'Moving one slider auto-adjusts the others to stay at your calorie goal'
               : 'Using LBM-based calculation (1g protein per lb lean mass)'}
           </p>
         </div>
@@ -190,7 +223,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
         </label>
       </div>
 
-      {/* Macro Summary */}
+      {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="text-center p-4 bg-blue-50 rounded-lg">
           <p className="text-xl font-bold text-blue-600">{macros.protein.grams}g</p>
@@ -209,14 +242,18 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
         </div>
       </div>
 
-      {/* Custom Gram Sliders */}
+      {/* Sliders (custom mode only) */}
       {useCustomMacros && (
         <div className="space-y-5 mb-4">
-          {/* Protein slider */}
+
+          {/* Protein */}
           <div>
             <div className="flex justify-between mb-1">
               <label className="text-sm font-medium text-gray-700">Protein</label>
-              <span className="text-sm text-blue-600 font-medium">{proteinGrams}g &nbsp;<span className="text-gray-400">({Math.round((proteinGrams * 4 / Math.max(totalCals,1)) * 100)}%)</span></span>
+              <span className="text-sm text-blue-600 font-medium">
+                {proteinGrams}g &nbsp;
+                <span className="text-gray-400">({macros.protein.percentage}%)</span>
+              </span>
             </div>
             <input
               type="range"
@@ -232,11 +269,14 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
             </div>
           </div>
 
-          {/* Carbs slider */}
+          {/* Carbs */}
           <div>
             <div className="flex justify-between mb-1">
               <label className="text-sm font-medium text-gray-700">Carbs</label>
-              <span className="text-sm text-orange-600 font-medium">{carbGrams}g &nbsp;<span className="text-gray-400">({Math.round((carbGrams * 4 / Math.max(totalCals,1)) * 100)}%)</span></span>
+              <span className="text-sm text-orange-600 font-medium">
+                {carbGrams}g &nbsp;
+                <span className="text-gray-400">({macros.carbs.percentage}%)</span>
+              </span>
             </div>
             <input
               type="range"
@@ -252,11 +292,14 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
             </div>
           </div>
 
-          {/* Fat slider */}
+          {/* Fat */}
           <div>
             <div className="flex justify-between mb-1">
               <label className="text-sm font-medium text-gray-700">Fat</label>
-              <span className="text-sm text-purple-600 font-medium">{fatGrams}g &nbsp;<span className="text-gray-400">({Math.round((fatGrams * 9 / Math.max(totalCals,1)) * 100)}%)</span></span>
+              <span className="text-sm text-purple-600 font-medium">
+                {fatGrams}g &nbsp;
+                <span className="text-gray-400">({macros.fat.percentage}%)</span>
+              </span>
             </div>
             <input
               type="range"
@@ -272,32 +315,30 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
             </div>
           </div>
 
-          {/* Total calories display */}
+          {/* Calorie total */}
           <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
             <p className="text-sm font-medium text-gray-700">
-              Total: <span className="font-bold text-gray-900">{totalCals} kcal</span>
-              {adjustedCalories && (
-                <span className={`ml-2 text-xs ${Math.abs(totalCals - adjustedCalories) <= 50 ? 'text-green-600' : 'text-amber-600'}`}>
-                  (goal: {Math.round(adjustedCalories)} kcal{Math.abs(totalCals - adjustedCalories) <= 50 ? ' ✓' : ` — ${totalCals > adjustedCalories ? '+' : ''}${totalCals - Math.round(adjustedCalories)}`})
+              Total:{' '}
+              <span className="font-bold text-gray-900">{current} kcal</span>
+              {goal > 0 && (
+                <span className={`ml-2 text-xs ${Math.abs(current - goal) <= 20 ? 'text-green-600' : 'text-amber-600'}`}>
+                  (goal: {goal} kcal
+                  {Math.abs(current - goal) <= 20
+                    ? ' ✓'
+                    : ` — ${current > goal ? '+' : ''}${current - goal}`})
                 </span>
               )}
             </p>
           </div>
-
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
-          )}
         </div>
       )}
 
-      {/* Explanation */}
+      {/* LBM explanation */}
       {!useCustomMacros && (
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-700">
             <strong>LBM-Based Calculation:</strong><br />
-            • Protein: 1g per lb of lean body mass ({Math.round(leanBodyMassLbs)} lbs = {macros.protein.grams}g)<br />
+            • Protein: 1g per lb of lean body mass ({Math.round(leanBodyMassLbs || 0)} lbs = {macros.protein.grams}g)<br />
             • Fat: {macros.fat.percentage}% for hormone health<br />
             • Carbs: Remaining calories for energy
           </p>
