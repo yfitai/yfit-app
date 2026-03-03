@@ -335,44 +335,50 @@ function scoreAndTransformOFF(products, query, limit) {
 
 /**
  * Search Open Food Facts API
- * Uses CapacitorHttp for direct device-side calls (bypasses CORS on Android/iOS)
+ * Uses CapacitorHttp for direct device-side calls (bypasses WebView CORS on Android/iOS)
  * Falls back to fetch for web browser
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // IMPORTANT: Call Open Food Facts DIRECTLY from the device (not through Vercel proxy)
-    // Vercel's server IPs are blocked by Open Food Facts, but device IPs work fine.
-    // The proxy was only needed for the barcode scanner (different endpoint).
+    // IMPORTANT: Must use CapacitorHttp (not fetch) to bypass Android WebView CORS restrictions.
+    // fetch() is blocked by WebView for cross-origin requests to openfoodfacts.org.
+    // CapacitorHttp routes through the native HTTP layer, bypassing CORS entirely.
+    // This is the same approach used by getFoodByBarcode() which works correctly.
     const fetchSize = limit * 5  // Fetch more to account for filtering
     
     const params = new URLSearchParams({
       search_terms: query,
-      page_size: fetchSize,
+      page_size: String(fetchSize),
       fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
       tagtype_0: 'languages',
       tag_contains_0: 'contains',
       tag_0: 'en',
-      json: 1
+      json: '1'
     })
 
-    const response = await fetch(
-      `https://us.openfoodfacts.org/api/v2/search?${params}`,
-      {
-        headers: { 'User-Agent': 'YFIT/1.0 (contact@yfit.app)' },
-        signal: AbortSignal.timeout(12000)
-      }
-    )
+    const apiUrl = `https://us.openfoodfacts.org/api/v2/search?${params}`
+    console.log('🍎 Calling Open Food Facts via CapacitorHttp:', apiUrl.substring(0, 80) + '...')
 
-    if (!response.ok) {
+    const response = await CapacitorHttp.get({
+      url: apiUrl,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': USER_AGENT
+      }
+    })
+
+    if (response.status !== 200) {
       throw new Error(`Open Food Facts API error: ${response.status}`)
     }
 
-    const data = await response.json()
+    const data = response.data
     
     if (!data.products || data.products.length === 0) {
+      console.log('🍎 Open Food Facts returned 0 products')
       return []
     }
 
+    console.log(`🍎 Open Food Facts returned ${data.products.length} raw products`)
     return scoreAndTransformOFF(data.products, query, limit)
   } catch (error) {
     console.warn('Open Food Facts search failed (will use USDA only):', error.message)
