@@ -32,22 +32,22 @@ export async function searchFoods(query, options = {}) {
   try {
     const results = []
 
-    // Search both APIs in PARALLEL for faster results
+    // Search Open Food Facts (branded foods)
     if (source === 'all') {
-      console.log('🔍 Searching USDA + Open Food Facts in parallel...')
-      const [offResults, usdaResults] = await Promise.all([
-        searchOpenFoodFacts(query, limit).catch(err => {
-          console.warn('Open Food Facts search failed:', err.message)
-          return []
-        }),
-        searchUSDA(query, limit).catch(err => {
-          console.warn('USDA search failed:', err.message)
-          return []
-        })
-      ])
-      console.log(`🔍 Results: ${offResults.length} branded + ${usdaResults.length} USDA`)
+      const offResults = await searchOpenFoodFacts(query, limit)
       results.push(...offResults)
-      results.push(...usdaResults)
+    }
+
+    // Search USDA (whole foods) - NOW ENABLED
+    if (source === 'all') {
+      console.log('🥗 Searching USDA...')
+      try {
+        const usdaResults = await searchUSDA(query, limit)
+        console.log('🥗 USDA found:', usdaResults.length, 'results')
+        results.push(...usdaResults)
+      } catch (error) {
+        console.warn('USDA search failed:', error.message)
+      }
     }
 
     // Search Custom Foods (user-created)
@@ -95,24 +95,9 @@ async function searchUSDA(query, limit) {
     
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    // 10 second timeout to avoid hanging
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000)
-    let response
-    try {
-      response = await fetch(
-        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${Math.min(limit, 40)}`,
-        { signal: controller.signal }
-      )
-    } catch (fetchErr) {
-      clearTimeout(timeoutId)
-      if (fetchErr.name === 'AbortError') {
-        console.warn('⏱️ USDA timed out after 10s')
-        return []
-      }
-      throw fetchErr
-    }
-    clearTimeout(timeoutId)
+    const response = await fetch(
+      `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
+    )
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -246,14 +231,10 @@ function transformUSDAFood(usdaFood) {
     nameLower.includes('syrup')
   )
 
-  // Use actual brand name for branded foods, 'Whole Food' for generic USDA items
-  const brandName = usdaFood.brandOwner || usdaFood.brandName || 
-    (usdaFood.dataType === 'Branded' ? 'Branded' : 'Whole Food')
-
   return {
     id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
-    brand: brandName,
+    brand: 'USDA',
     source: 'usda',
     calories: Math.round(nutrients.calories || 0),
     protein: Math.round(nutrients.protein || 0),
@@ -270,124 +251,97 @@ function transformUSDAFood(usdaFood) {
 }
 
 /**
- * Score and transform Open Food Facts products by relevance
- * Used by both native (direct) and web (proxy) paths
- */
-function scoreAndTransformOFF(products, query, limit) {
-  const queryLower = query.toLowerCase()
-  const queryWords = queryLower.split(' ').filter(w => w.length > 2)
-
-  // Only block products where the NAME IS ENTIRELY non-English (not just has one accented char).
-  // Canadian products often have bilingual names like "Chicken Breast / Poitrine de poulet" -
-  // blocking on any accented char removes all Canadian branded products.
-  // Instead: block if the name contains CJK/Arabic/Cyrillic scripts (truly non-English),
-  // OR if the name has MORE accented chars than regular Latin chars (mostly foreign).
-  const NON_ENGLISH_BRANDS = [
-    'sidi ali', 'sidi-ali', 'jaouda', 'centrale danone',
-    'buldak', 'samyang'
-  ]
-
-  return products
-    .map(product => {
-      if (!product.product_name || !product.nutriments) return null
-      const name = product.product_name || ''
-      const nameLower = name.toLowerCase()
-      const brand = (product.brands || '').toLowerCase()
-      const nutriments = product.nutriments
-
-      // Block CJK, Arabic, Cyrillic scripts
-      if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)) return null
-
-      // Only block if the product name has MORE accented chars than regular ASCII letters
-      // (i.e. the name is predominantly non-English, not just bilingual)
-      const accentedCount = (name.match(/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿœ]/gi) || []).length
-      const asciiLetterCount = (name.match(/[a-zA-Z]/g) || []).length
-      if (accentedCount > 0 && accentedCount >= asciiLetterCount * 0.4) return null
-
-      if (NON_ENGLISH_BRANDS.some(b => brand.includes(b) || nameLower.includes(b))) return null
-
-      const hasNutrition = nutriments.proteins_100g !== undefined ||
-        nutriments.carbohydrates_100g !== undefined ||
-        nutriments.fat_100g !== undefined ||
-        nutriments['energy-kcal_100g'] !== undefined ||
-        nutriments.energy_100g !== undefined
-      if (!hasNutrition) return null
-
-      let relevanceScore = 0
-      if (nameLower === queryLower) relevanceScore += 100
-      if (nameLower.startsWith(queryLower)) relevanceScore += 50
-      if (nameLower.includes(queryLower)) relevanceScore += 30
-      const matchedWords = queryWords.filter(w => nameLower.includes(w)).length
-      if (queryWords.length > 0) relevanceScore += (matchedWords / queryWords.length) * 40
-      // Single-word queries: give score if brand contains the word
-      if (queryWords.length === 0 && nameLower.includes(queryLower)) relevanceScore += 40
-      if (brand && (brand.includes(queryLower) || queryWords.some(w => brand.includes(w)))) relevanceScore += 20
-      if (nameLower.split(' ').length > 10) relevanceScore -= 10
-
-      return { product, relevanceScore }
-    })
-    .filter(item => item !== null && item.relevanceScore > 0)
-    .sort((a, b) => b.relevanceScore - a.relevanceScore)
-    .slice(0, limit)
-    .map(item => transformOpenFoodFactsProduct(item.product))
-}
-
-/**
  * Search Open Food Facts API
- * Uses CapacitorHttp for direct device-side calls (bypasses WebView CORS on Android/iOS)
- * Falls back to fetch for web browser
  */
 async function searchOpenFoodFacts(query, limit) {
   try {
-    // IMPORTANT: Must use CapacitorHttp (not fetch) to bypass Android WebView CORS restrictions.
-    // fetch() is blocked by WebView for cross-origin requests to openfoodfacts.org.
-    // CapacitorHttp routes through the native HTTP layer, bypassing CORS entirely.
-    // This is the same approach used by getFoodByBarcode() which works correctly.
-    const fetchSize = Math.min(limit * 2, 40)  // Keep small for speed - CapacitorHttp is fast
-    
-    const params = new URLSearchParams({
-      search_terms: query,
-      page_size: String(fetchSize),
-      fields: 'product_name,brands,nutriments,serving_size,code,languages_codes,categories_tags',
-      tagtype_0: 'languages',
-      tag_contains_0: 'contains',
-      tag_0: 'en',
-      json: '1'
-    })
-
-    const apiUrl = `https://us.openfoodfacts.org/api/v2/search?${params}`
-    console.log('🍎 Calling Open Food Facts via CapacitorHttp:', apiUrl.substring(0, 80) + '...')
-
-    // CapacitorHttp doesn't support AbortSignal, so use Promise.race() for timeout
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Open Food Facts timeout after 8s')), 8000)
+    // Use backend proxy to avoid CORS issues with remote loading
+    // Use absolute URL because Android WebView doesn't have proper window.location.origin
+    const response = await fetch(
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
     )
-    const response = await Promise.race([
-      CapacitorHttp.get({
-        url: apiUrl,
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': USER_AGENT
-        }
-      }),
-      timeoutPromise
-    ])
 
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new Error(`Open Food Facts API error: ${response.status}`)
     }
 
-    const data = response.data
+    const data = await response.json()
     
     if (!data.products || data.products.length === 0) {
-      console.log('🍎 Open Food Facts returned 0 products')
       return []
     }
 
-    console.log(`🍎 Open Food Facts returned ${data.products.length} raw products`)
-    return scoreAndTransformOFF(data.products, query, limit)
+    // Filter and score products by relevance to search query
+    const queryLower = query.toLowerCase()
+    const queryWords = queryLower.split(' ').filter(w => w.length > 2)
+    
+    const scoredProducts = data.products
+      .map(product => {
+        if (!product.product_name || !product.nutriments) return null
+        
+        const name = product.product_name || ''
+        const nameLower = name.toLowerCase()
+        const brand = (product.brands || '').toLowerCase()
+        const nutriments = product.nutriments
+        
+        // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
+        const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
+        if (hasNonLatinChars) return null
+        
+        // Filter out specific non-English brands
+        const nonEnglishBrands = ['sidi ali', 'sidi-ali']
+        if (nonEnglishBrands.some(b => brand.includes(b))) return null
+        
+        // Filter out products without nutrition data
+        const hasNutrition = (nutriments.proteins_100g !== undefined) ||
+                            (nutriments.carbohydrates_100g !== undefined) ||
+                            (nutriments.fat_100g !== undefined) ||
+                            (nutriments['energy-kcal_100g'] !== undefined) ||
+                            (nutriments.energy_100g !== undefined)
+        if (!hasNutrition) return null
+        
+        // Calculate relevance score
+        let relevanceScore = 0
+        
+        // Exact match gets highest score
+        if (nameLower === queryLower) relevanceScore += 100
+        
+        // Starts with query gets high score
+        if (nameLower.startsWith(queryLower)) relevanceScore += 50
+        
+        // Contains all query words
+        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
+        if (queryWords.length > 0) {
+          relevanceScore += (matchedWords / queryWords.length) * 40
+        }
+        
+        // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
+        if (nameLower.includes(queryLower)) {
+          relevanceScore += 30
+        }
+        
+        // Boost if brand matches query
+        if (brand && queryWords.some(word => brand.includes(word))) {
+          relevanceScore += 20
+        }
+        
+        // Penalize very long product names (likely not what user wants)
+        const wordCount = nameLower.split(' ').length
+        if (wordCount > 8) relevanceScore -= 10
+        
+        return {
+          product,
+          relevanceScore
+        }
+      })
+      .filter(item => item !== null && item.relevanceScore > 5) // Filter out low relevance (lowered from 15 to 5)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, limit)
+      .map(item => transformOpenFoodFactsProduct(item.product))
+    
+    return scoredProducts
   } catch (error) {
-    console.warn('Open Food Facts search failed (will use USDA only):', error.message)
+    console.error('Error searching Open Food Facts:', error)
     return []
   }
 }
