@@ -59,51 +59,56 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   }
 
   /**
-   * Given a changed macro (type, newGrams), redistribute the remaining
-   * calorie budget proportionally across the other two macros so the
-   * total stays at adjustedCalories.
+   * Protein is always the anchor — it never changes when carbs or fat move.
+   * When carbs slider moves → fat adjusts to fill the remaining budget.
+   * When fat slider moves  → carbs adjust to fill the remaining budget.
+   * When protein slider moves → protein changes, carbs & fat keep their
+   *   existing ratio and split whatever budget remains.
    */
   const redistributeToGoal = (changedType, newGrams, curProtein, curCarbs, curFat) => {
     const goal = Math.round(adjustedCalories)
-    const calPerG = changedType === 'fat' ? 9 : 4
-    const usedKcal = newGrams * calPerG
-    const remaining = Math.max(goal - usedKcal, 0)
-
-    let newP = curProtein
-    let newC = curCarbs
-    let newF = curFat
 
     if (changedType === 'protein') {
-      newP = newGrams
+      // Protein moved: keep carbs & fat ratio, fill remaining budget
+      const newP = newGrams
+      const proteinKcal = newP * 4
+      const remaining = Math.max(goal - proteinKcal, 0)
       const oldCKcal = curCarbs * 4
       const oldFKcal = curFat   * 9
       const oldOther = Math.max(oldCKcal + oldFKcal, 1)
       const cKcal = Math.round((oldCKcal / oldOther) * remaining)
       const fKcal = remaining - cKcal
-      newC = Math.max(Math.round(cKcal / 4), 20)
-      newF = Math.max(Math.round(fKcal / 9), 20)
-    } else if (changedType === 'carbs') {
-      newC = newGrams
-      const oldPKcal = curProtein * 4
-      const oldFKcal = curFat     * 9
-      const oldOther = Math.max(oldPKcal + oldFKcal, 1)
-      const pKcal = Math.round((oldPKcal / oldOther) * remaining)
-      const fKcal = remaining - pKcal
-      newP = Math.max(Math.round(pKcal / 4), 50)
-      newF = Math.max(Math.round(fKcal / 9), 20)
-    } else {
-      // fat changed
-      newF = newGrams
-      const oldPKcal = curProtein * 4
-      const oldCKcal = curCarbs   * 4
-      const oldOther = Math.max(oldPKcal + oldCKcal, 1)
-      const pKcal = Math.round((oldPKcal / oldOther) * remaining)
-      const cKcal = remaining - pKcal
-      newP = Math.max(Math.round(pKcal / 4), 50)
-      newC = Math.max(Math.round(cKcal / 4), 20)
+      return {
+        p: newP,
+        c: Math.max(Math.round(cKcal / 4), 20),
+        f: Math.max(Math.round(fKcal / 9), 20)
+      }
     }
 
-    return { p: newP, c: newC, f: newF }
+    // Protein is FIXED for carbs/fat changes
+    const proteinKcal = curProtein * 4
+    const budgetForCF = Math.max(goal - proteinKcal, 0)
+
+    if (changedType === 'carbs') {
+      const newC = newGrams
+      const carbKcal = newC * 4
+      const fatKcal  = Math.max(budgetForCF - carbKcal, 20 * 9) // min 20g fat
+      return {
+        p: curProtein,
+        c: newC,
+        f: Math.max(Math.round(fatKcal / 9), 20)
+      }
+    }
+
+    // fat changed
+    const newF = newGrams
+    const fatKcal  = newF * 9
+    const carbKcal = Math.max(budgetForCF - fatKcal, 20 * 4) // min 20g carbs
+    return {
+      p: curProtein,
+      c: Math.max(Math.round(carbKcal / 4), 20),
+      f: newF
+    }
   }
 
   // ─── load from DB ───────────────────────────────────────────────────────────
