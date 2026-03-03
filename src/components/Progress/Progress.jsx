@@ -24,6 +24,7 @@ export default function Progress({ user: propUser }) {
   // Current vs Goal
   const [currentMetrics, setCurrentMetrics] = useState(null)
   const [goalMetrics, setGoalMetrics] = useState(null)
+  const [startingMetrics, setStartingMetrics] = useState(null)
   
   // Predictive analytics
   const [predictions, setPredictions] = useState(null)
@@ -208,12 +209,25 @@ const loadGoals = async (userId) => {
       ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
       : null
 
+    // starting_weight_kg is the weight the user entered when they set goals
+    const startingWeightLbs = (goalsData.starting_weight_kg || goalsData.weight_kg)
+      ? (goalsData.starting_weight_kg || goalsData.weight_kg) * 2.20462
+      : null
+    const startingBMI = goalsData.height_cm && (goalsData.starting_weight_kg || goalsData.weight_kg)
+      ? ((goalsData.starting_weight_kg || goalsData.weight_kg) / Math.pow(goalsData.height_cm / 100, 2))
+      : null
+
+    setStartingMetrics({
+      weight: startingWeightLbs,
+      bodyFat: goalsData.starting_body_fat_percentage || null,
+      bmi: startingBMI
+    })
     setCurrentMetrics({
       weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
       bodyFat: goalsData.starting_body_fat_percentage || null,
       bmi: currentBMI
     })
-      setGoalMetrics({
+    setGoalMetrics({
       weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null,
       bodyFat: goalsData.target_body_fat_percentage || null,
       bmi: goalBMI
@@ -301,6 +315,7 @@ const calculatePredictions = () => {
             title="Weight"
             current={currentMetrics.weight}
             goal={goalMetrics.weight}
+            starting={startingMetrics?.weight}
             unit="lbs"
             icon={<TrendingDown className="w-6 h-6" />}
             color="blue"
@@ -309,6 +324,7 @@ const calculatePredictions = () => {
             title="Body Fat"
             current={currentMetrics.bodyFat}
             goal={goalMetrics.bodyFat}
+            starting={startingMetrics?.bodyFat}
             unit="%"
             icon={<Target className="w-6 h-6" />}
             color="green"
@@ -317,6 +333,7 @@ const calculatePredictions = () => {
             title="BMI"
             current={currentMetrics.bmi}
             goal={goalMetrics.bmi}
+            starting={startingMetrics?.bmi}
             unit=""
             icon={<Activity className="w-6 h-6" />}
             color="purple"
@@ -540,10 +557,14 @@ const calculatePredictions = () => {
 }
 
 // Overview Card Component
-function OverviewCard({ title, current, goal, unit, icon, color }) {
-  const progress = ((current - goal) / current) * 100
-  const remaining = Math.abs(current - goal)
-  const isImproving = current > goal // Assuming lower is better (weight, BF, BMI)
+function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
+  // Journey progress: how far from starting toward goal (0% at start, 100% at goal)
+  // For weight-loss metrics, lower is better: starting > current > goal
+  const journeyTotal = starting != null && goal != null ? Math.abs(starting - goal) : null
+  const journeyMade  = starting != null && current != null ? Math.abs(starting - current) : null
+  const progress = journeyTotal && journeyTotal > 0 ? Math.min((journeyMade / journeyTotal) * 100, 100) : 0
+  const remaining = current != null && goal != null ? Math.abs(current - goal) : null
+  const isImproving = current != null && goal != null && current > goal // lower is better
 
   const colorClasses = {
     blue: 'bg-blue-50 text-blue-600 border-blue-200',
@@ -578,12 +599,12 @@ function OverviewCard({ title, current, goal, unit, icon, color }) {
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className={`h-2 rounded-full ${color === 'blue' ? 'bg-blue-500' : color === 'green' ? 'bg-green-500' : 'bg-purple-500'}`}
-            style={{ width: `${progress != null ? Math.min(Math.abs(progress), 100) : 0}%` }}
+            style={{ width: `${progress}%` }}
           ></div>
         </div>
         
         <div className="text-sm font-medium text-gray-700">
-          {remaining != null ? remaining.toFixed(1) : '--'}{unit} to go
+          {remaining != null ? remaining.toFixed(1) : '--'}{unit} to go{starting != null && progress > 0 ? ` (${Math.round(progress)}% complete)` : ''}
         </div>
       </div>
     </div>

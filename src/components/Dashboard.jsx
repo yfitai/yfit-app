@@ -122,11 +122,13 @@ export default function Dashboard({ user }) {
       setWorkoutsThisWeek(workoutsData.length)
     }
     
-    // Get goals for steps target from user_goals
+    // Get goals for steps target from user_goals (most recent row)
     const { data: userGoalsData } = await supabase
       .from('user_goals')
       .select('steps_goal, adjusted_calories')
       .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle()
 
     // Get most recent adjusted_calories from calculated_metrics
