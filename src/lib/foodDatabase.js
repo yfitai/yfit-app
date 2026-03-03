@@ -231,10 +231,14 @@ function transformUSDAFood(usdaFood) {
     nameLower.includes('syrup')
   )
 
+  // Use real brand name from USDA data; fall back to 'Whole Food' for unbranded items
+  const brandName = usdaFood.brandName || usdaFood.brandOwner || null
+  const displayBrand = brandName ? brandName.charAt(0).toUpperCase() + brandName.slice(1).toLowerCase() : 'Whole Food'
+
   return {
     id: `usda-${usdaFood.fdcId}`,
     name: usdaFood.description,
-    brand: 'USDA',
+    brand: displayBrand,
     source: 'usda',
     calories: Math.round(nutrients.calories || 0),
     protein: Math.round(nutrients.protein || 0),
