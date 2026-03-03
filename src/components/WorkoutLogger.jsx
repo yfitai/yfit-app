@@ -128,7 +128,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       if (error) throw error;
 
       // Create session exercises
-      if (workout?.workout_exercises) {
+      if (workout?.workout_exercises && workout.workout_exercises.length > 0) {
         const sessionExercises = workout.workout_exercises.map(we => ({
           session_id: session.id,
           exercise_id: we.exercise_id,
@@ -137,7 +137,20 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           completed_sets: 0
         }));
 
-        await supabase.from('session_exercises').insert(sessionExercises);
+        console.log('📋 Inserting session_exercises:', sessionExercises);
+        const { data: seData, error: seError } = await supabase
+          .from('session_exercises')
+          .insert(sessionExercises)
+          .select();
+
+        if (seError) {
+          console.error('❌ Failed to create session exercises:', seError);
+          alert('Failed to set up workout session: ' + seError.message + '\n\nPlease check Supabase RLS policies for session_exercises table.');
+          // Clean up the orphaned session
+          await supabase.from('workout_sessions').delete().eq('id', session.id);
+          return;
+        }
+        console.log('✅ Created session_exercises:', seData?.length, 'rows');
       }
 
       setActiveSession(session);
