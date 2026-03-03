@@ -196,7 +196,9 @@ const loadGoals = async (userId) => {
     .from('user_goals')
     .select('*')
     .eq('user_id', userId)
-    .single()
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (goalsData) {
     // Calculate current BMI from height and starting weight

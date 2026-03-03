@@ -122,27 +122,28 @@ export default function Dashboard({ user }) {
       setWorkoutsThisWeek(workoutsData.length)
     }
     
-    // Get goals for steps target from user_goals (most recent row)
+    // Get steps goal from user_goals (most recent row)
     const { data: userGoalsData } = await supabase
       .from('user_goals')
-      .select('steps_goal, adjusted_calories')
+      .select('steps_goal')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
       .limit(1)
       .maybeSingle()
 
     // Get most recent adjusted_calories from calculated_metrics
+    // Note: calculated_metrics uses 'calculated_at' as its timestamp column
     const { data: metricsData } = await supabase
       .from('calculated_metrics')
       .select('adjusted_calories')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      .order('calculated_at', { ascending: false })
       .limit(1)
       .maybeSingle()
 
     const goalsData = {
       steps_goal: userGoalsData?.steps_goal || null,
-      adjusted_calories: metricsData?.adjusted_calories || userGoalsData?.adjusted_calories || null
+      adjusted_calories: metricsData?.adjusted_calories || null
     }
 
     if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
