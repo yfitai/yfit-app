@@ -65,3 +65,24 @@ ALTER TABLE user_goals
 - Set up beta tester accounts and onboarding flow
 - Collect feedback and triage bugs from beta testers
 - Weight Loss Prediction: consider adding a "not enough data yet" message for users with fewer than 3 entries
+
+---
+
+## Session 2 Fixes — March 3, 2026
+
+### Fitness Page — Workout Logging (Complete Set)
+- **Root cause:** Missing RLS policies on `session_exercises` and `exercise_sets` tables blocked all inserts
+- **Fix:** Added INSERT/SELECT/UPDATE policies for both tables in Supabase (user can only access rows belonging to their own sessions)
+- **SQL applied:** Two RLS policy blocks with `auth.uid()::text` cast
+
+### Predictions Page — Calorie Calculations
+- **Root cause:** `calculateTDEE` and `analyzeNutritionPatterns` were averaging per food-item row instead of per day (3 items logged = 872 cal ÷ 3 rows = 291 shown)
+- **Fix:** Both functions now group `meals` rows by `meal_date` first, sum per day, then average across days
+- **Today's Intake field** now shows actual today's total; daily average shown as subtitle
+
+### Predictions Page — Activity Level
+- Shows "Very Active" with sparse data (1 session ÷ 1 day × 7 = 7x/week) — this is expected behavior, normalizes with more data
+
+### Known: Predictions cards need minimum data thresholds
+- Injury Risk, Nutrition Patterns, and Weight Loss cards show edge-case results with < 7 days of data
+- Future improvement: add "Not enough data yet" placeholder cards until minimum thresholds are met
