@@ -170,12 +170,41 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
     try {
       // Get session exercise
-      const { data: sessionExercises } = await supabase
+      let { data: sessionExercises, error: seError } = await supabase
         .from('session_exercises')
         .select('*')
         .eq('session_id', activeSession.id)
         .eq('exercise_id', currentExercise.exercise_id)
-        .single();
+        .maybeSingle();
+
+      if (seError) {
+        console.error('Error fetching session exercise:', seError);
+        alert('Error logging set. Please try again.');
+        return;
+      }
+
+      if (!sessionExercises) {
+        console.error('No session exercise found for exercise_id:', currentExercise.exercise_id, 'session_id:', activeSession.id);
+        // Attempt to create the missing session exercise on the fly
+        const { data: newSE, error: insertError } = await supabase
+          .from('session_exercises')
+          .insert({
+            session_id: activeSession.id,
+            exercise_id: currentExercise.exercise_id,
+            exercise_order: currentExercise.exercise_order || currentExerciseIndex + 1,
+            target_sets: currentExercise.target_sets,
+            completed_sets: 0
+          })
+          .select()
+          .single();
+        if (insertError || !newSE) {
+          console.error('Failed to create session exercise:', insertError);
+          alert('Error logging set. Please try again.');
+          return;
+        }
+        // Use the newly created session exercise
+        sessionExercises = newSE;
+      }
 
       // Insert set based on exercise type
       if (type === 'strength') {
@@ -263,11 +292,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       } else if (type === 'time_based') {
         setTimeBasedData({ duration: '' });
       }
-    } catch (error) {
+     } catch (error) {
       console.error('Error logging set:', error);
+      alert('Error logging set: ' + (error?.message || 'Please try again.'));
     }
   };
-
   const skipRest = () => {
     setIsResting(false);
     setRestTimer(0);
