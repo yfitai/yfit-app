@@ -36,8 +36,9 @@ export default async function handler(req, res) {
 
     console.log(`[OFF] Searching for: ${query}, pageSize: ${pageSize}`);
 
-    // Use us.openfoodfacts.org for US/English branded products (Tate's, Trader Joe's, etc.)
-    // world.openfoodfacts.org returns French/European products first which is wrong for US users
+    // Use world.openfoodfacts.org - DO NOT change to us.openfoodfacts.org (causes timeouts)
+    // NO language tag filter - it's too restrictive and returns almost nothing
+    // Client-side filtering handles English-only results
     const params = new URLSearchParams({
       search_terms: query,
       page_size: pageSize,
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
       json: 1
     });
 
-    const openFoodFactsUrl = `https://us.openfoodfacts.org/cgi/search.pl?${params}`;
+    const openFoodFactsUrl = `https://world.openfoodfacts.org/cgi/search.pl?${params}`;
 
     const response = await fetch(openFoodFactsUrl, {
       headers: {

@@ -271,19 +271,10 @@ async function searchOpenFoodFacts(query, limit) {
   try {
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    // 10-second timeout prevents Android WebView from hanging indefinitely
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000)
-
-    let response
-    try {
-      response = await fetch(
-        `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`,
-        { signal: controller.signal }
-      )
-    } finally {
-      clearTimeout(timeoutId)
-    }
+    // DO NOT add a timeout here - OFF API takes 12-27s and a timeout kills all branded results
+    const response = await fetch(
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
+    )
 
     if (!response.ok) {
       throw new Error(`Open Food Facts API error: ${response.status}`)
