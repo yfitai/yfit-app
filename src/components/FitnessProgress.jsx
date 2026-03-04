@@ -9,6 +9,26 @@ import {
   ChevronRight, Filter, Download, X, Edit2, Trash2
 } from 'lucide-react';
 
+/**
+ * Returns true if a workout session is a weighted/resistance training session.
+ * Cardio (walking, treadmill, running) and stretching/flexibility sessions are excluded
+ * from workout counts, frequency calculations, and analytics charts.
+ * Personal records are tracked for ALL session types regardless of this flag.
+ */
+const isWeightedSession = (session) => {
+  const name = (session.session_name || '').toLowerCase();
+  return !name.includes('walking') &&
+         !name.includes('treadmill') &&
+         !name.includes('duration') &&
+         !name.includes('stretching') &&
+         !name.includes('flexibility') &&
+         !name.includes('cardio') &&
+         !name.includes('yoga') &&
+         !name.includes('foam roll') &&
+         !name.includes('running') &&
+         !name.includes('cycling');
+};
+
 const FitnessProgress = () => {
   const [user, setUser] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -283,8 +303,9 @@ const FitnessProgress = () => {
         setPersonalRecords([]);
       }
 
-      // Calculate overall stats
-      const totalWorkouts = sessionsData?.length || 0;
+      // Calculate overall stats — only count weighted/resistance sessions as "workouts"
+      const weightedSessions = (sessionsData || []).filter(isWeightedSession);
+      const totalWorkouts = weightedSessions.length;
       const totalVolume = sessionsData?.reduce((sum, s) => sum + (s.total_volume || 0), 0) || 0;
       const totalReps = sessionsData?.reduce((sum, s) => sum + (s.total_reps || 0), 0) || 0;
       
@@ -819,11 +840,12 @@ const FitnessProgress = () => {
   };
 
   const recommendRestDay = () => {
-    if (recentSessions.length < 5) return null;
+    // Filter to weighted sessions first — cardio/stretching inflate frequency
+    const weightedForRest = recentSessions.filter(isWeightedSession);
+    if (weightedForRest.length < 5) return null;
 
     try {
-      // Use all available sessions for better accuracy
-      const sessions = recentSessions;
+      const sessions = weightedForRest;
       
       // Calculate workout frequency (sessions per week)
       const dates = sessions.map(s => new Date(s.start_time));
@@ -838,7 +860,7 @@ const FitnessProgress = () => {
       if (daysBetween < 7) {
         // For short time spans (< 1 week), use 30-day rolling average
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        const last30Days = recentSessions.filter(s => new Date(s.start_time).getTime() > thirtyDaysAgo);
+        const last30Days = sessions.filter(s => new Date(s.start_time).getTime() > thirtyDaysAgo);
         frequency = (last30Days.length / 30) * 7;
       } else {
         // For longer spans, use actual data

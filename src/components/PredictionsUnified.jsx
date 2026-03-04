@@ -354,11 +354,20 @@ export default function PredictionsUnified({ user }) {
         }
       }
 
-      // Activity level classification
+      // Activity level classification — only count weighted/resistance sessions,
+      // not cardio (walking, treadmill) or stretching which inflate the frequency
+      const weightedWoData = woData.filter(w => {
+        const name = (w.session_name || '').toLowerCase();
+        return !name.includes('walking') && !name.includes('treadmill') &&
+               !name.includes('duration') && !name.includes('stretching') &&
+               !name.includes('flexibility') && !name.includes('cardio') &&
+               !name.includes('yoga') && !name.includes('foam roll') &&
+               !name.includes('running') && !name.includes('cycling');
+      });
       const days = wData.length >= 3 
         ? Math.max(1, (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24))
         : 7; // Default to 1 week if no weight data
-      const workoutsPerWeek = woData.length > 0 ? Math.min(14, (woData.length / days) * 7) : 0; // Cap at 14x/week (2x per day max)
+      const workoutsPerWeek = weightedWoData.length > 0 ? Math.min(14, (weightedWoData.length / days) * 7) : 0; // Cap at 14x/week (2x per day max)
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';

@@ -75,10 +75,22 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         return;
       }
 
+      // Filter to weighted/resistance sessions only for duration and workout count.
+      // Cardio (walking, treadmill) and stretching inflate frequency and duration metrics.
+      // Volume chart is unaffected (cardio/stretching already contribute 0 volume).
+      const weightedSessions = sessions.filter(session => {
+        const name = (session.session_name || '').toLowerCase();
+        return !name.includes('walking') && !name.includes('treadmill') &&
+               !name.includes('duration') && !name.includes('stretching') &&
+               !name.includes('flexibility') && !name.includes('cardio') &&
+               !name.includes('yoga') && !name.includes('foam roll') &&
+               !name.includes('running') && !name.includes('cycling');
+      });
+
       // Group sessions by day or week depending on time range
       const groupByDay = daysToLoad <= 30; // Daily for 7 and 30 days, weekly for 90+ days
       const weeklyData = {};
-      sessions.forEach(session => {
+      weightedSessions.forEach(session => {
         const sessionDate = new Date(session.start_time);
         
         let weekKey;
