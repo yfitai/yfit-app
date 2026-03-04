@@ -13,6 +13,9 @@ import {
  * When one macro slider is moved, the remaining calorie budget is
  * redistributed proportionally across the other two macros so the
  * total always stays equal to the user's calorie goal (adjustedCalories).
+ *
+ * On Android, sliders are LOCKED by default to prevent accidental
+ * adjustment while scrolling. Tap the Edit button to unlock, tap Done to save and re-lock.
  */
 export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories, goalType, onMacrosUpdated }) {
   const [useCustomMacros, setUseCustomMacros] = useState(false)
@@ -20,6 +23,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   const [carbGrams, setCarbGrams]       = useState(200)
   const [fatGrams, setFatGrams]         = useState(60)
   const [macros, setMacros]             = useState(null)
+  const [slidersLocked, setSlidersLocked] = useState(true)  // locked by default
 
   // Prevent DB reload from overwriting user's in-progress edits
   const userIsEditingRef     = useRef(false)
@@ -69,7 +73,6 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
     const goal = Math.round(adjustedCalories)
 
     if (changedType === 'protein') {
-      // Protein moved: keep carbs & fat ratio, fill remaining budget
       const newP = newGrams
       const proteinKcal = newP * 4
       const remaining = Math.max(goal - proteinKcal, 0)
@@ -85,14 +88,13 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       }
     }
 
-    // Protein is FIXED for carbs/fat changes
     const proteinKcal = curProtein * 4
     const budgetForCF = Math.max(goal - proteinKcal, 0)
 
     if (changedType === 'carbs') {
       const newC = newGrams
       const carbKcal = newC * 4
-      const fatKcal  = Math.max(budgetForCF - carbKcal, 20 * 9) // min 20g fat
+      const fatKcal  = Math.max(budgetForCF - carbKcal, 20 * 9)
       return {
         p: curProtein,
         c: newC,
@@ -100,10 +102,9 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       }
     }
 
-    // fat changed
     const newF = newGrams
     const fatKcal  = newF * 9
-    const carbKcal = Math.max(budgetForCF - fatKcal, 20 * 4) // min 20g carbs
+    const carbKcal = Math.max(budgetForCF - fatKcal, 20 * 4)
     return {
       p: curProtein,
       c: Math.max(Math.round(carbKcal / 4), 20),
@@ -133,7 +134,6 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
 
     if (data && data.use_custom_macros) {
       setUseCustomMacros(true)
-      // Prefer saved gram values (exact); fall back to percent calculation for legacy rows
       const pGrams = data.protein_grams != null
         ? data.protein_grams
         : Math.round((adjustedCalories * (data.protein_percent || 30) / 100) / 4)
@@ -166,6 +166,8 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   const handleToggleCustomMacros = async (enabled) => {
     setUseCustomMacros(enabled)
     userIsEditingRef.current = enabled
+    // When enabling custom mode, start locked so user must tap Edit to adjust
+    setSlidersLocked(true)
 
     if (!enabled) {
       applyLBMMacros()
@@ -180,13 +182,16 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   const handleGramChange = async (type, rawValue) => {
     userIsEditingRef.current = true
     const newGrams = Math.max(0, parseInt(rawValue) || 0)
-
-    // Redistribute remaining calories to the other two macros
     const { p, c, f } = redistributeToGoal(type, newGrams, proteinGrams, carbGrams, fatGrams)
     applyMacros(p, c, f)
+    // Don't save on every slider tick — save only when Done is tapped
+  }
 
-    const percents = gramsToPercents(p, c, f)
-    await saveMacroSettings(true, percents.p, percents.c, percents.f, p, c, f)
+  const handleDone = async () => {
+    setSlidersLocked(true)
+    userIsEditingRef.current = false
+    const percents = gramsToPercents(proteinGrams, carbGrams, fatGrams)
+    await saveMacroSettings(true, percents.p, percents.c, percents.f, proteinGrams, carbGrams, fatGrams)
   }
 
   // ─── persistence ────────────────────────────────────────────────────────────
@@ -207,6 +212,29 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
         },
         { onConflict: 'user_id' }
       )
+  }
+
+  // ─── sub-components ─────────────────────────────────────────────────────────
+
+  /**
+   * A read-only visual bar that looks like a slider but cannot be touched.
+   * Used when slidersLocked = true to prevent accidental scroll-adjustments on Android.
+   */
+  const LockedBar = ({ value, min, max, color }) => {
+    const pct = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
+    return (
+      <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="absolute left-0 top-0 h-full rounded-full transition-all"
+          style={{ width: `${pct}%`, backgroundColor: color }}
+        />
+        {/* Thumb indicator */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white shadow"
+          style={{ left: `calc(${pct}% - 8px)`, backgroundColor: color }}
+        />
+      </div>
+    )
   }
 
   // ─── render ─────────────────────────────────────────────────────────────────
@@ -267,6 +295,30 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       {useCustomMacros && (
         <div className="space-y-5 mb-4">
 
+          {/* Edit / Done header */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              {slidersLocked
+                ? '🔒 Tap Edit to adjust macros'
+                : '✏️ Drag sliders, then tap Done to save'}
+            </p>
+            {slidersLocked ? (
+              <button
+                onClick={() => setSlidersLocked(false)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                ✏️ Edit
+              </button>
+            ) : (
+              <button
+                onClick={handleDone}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+              >
+                ✓ Done
+              </button>
+            )}
+          </div>
+
           {/* Protein */}
           <div>
             <div className="flex justify-between mb-1">
@@ -276,15 +328,19 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
                 <span className="text-gray-400">({macros.protein.percentage}%)</span>
               </span>
             </div>
-            <input
-              type="range"
-              min="50"
-              max={maxGrams}
-              step="1"
-              value={proteinGrams}
-              onChange={(e) => handleGramChange('protein', e.target.value)}
-              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-            />
+            {slidersLocked ? (
+              <LockedBar value={proteinGrams} min={50} max={maxGrams} color="#2563eb" />
+            ) : (
+              <input
+                type="range"
+                min="50"
+                max={maxGrams}
+                step="1"
+                value={proteinGrams}
+                onChange={(e) => handleGramChange('protein', e.target.value)}
+                className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+            )}
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>50g</span><span>{maxGrams}g</span>
             </div>
@@ -299,15 +355,19 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
                 <span className="text-gray-400">({macros.carbs.percentage}%)</span>
               </span>
             </div>
-            <input
-              type="range"
-              min="20"
-              max={maxGrams}
-              step="1"
-              value={carbGrams}
-              onChange={(e) => handleGramChange('carbs', e.target.value)}
-              className="w-full h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
-            />
+            {slidersLocked ? (
+              <LockedBar value={carbGrams} min={20} max={maxGrams} color="#ea580c" />
+            ) : (
+              <input
+                type="range"
+                min="20"
+                max={maxGrams}
+                step="1"
+                value={carbGrams}
+                onChange={(e) => handleGramChange('carbs', e.target.value)}
+                className="w-full h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
+              />
+            )}
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>20g</span><span>{maxGrams}g</span>
             </div>
@@ -322,15 +382,19 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
                 <span className="text-gray-400">({macros.fat.percentage}%)</span>
               </span>
             </div>
-            <input
-              type="range"
-              min="20"
-              max="200"
-              step="1"
-              value={fatGrams}
-              onChange={(e) => handleGramChange('fat', e.target.value)}
-              className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
-            />
+            {slidersLocked ? (
+              <LockedBar value={fatGrams} min={20} max={200} color="#9333ea" />
+            ) : (
+              <input
+                type="range"
+                min="20"
+                max="200"
+                step="1"
+                value={fatGrams}
+                onChange={(e) => handleGramChange('fat', e.target.value)}
+                className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+              />
+            )}
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>20g</span><span>200g</span>
             </div>
