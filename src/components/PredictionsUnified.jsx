@@ -360,9 +360,11 @@ export default function PredictionsUnified({ user }) {
         const name = (w.session_name || '').toLowerCase();
         return !name.includes('walking') && !name.includes('treadmill') &&
                !name.includes('duration') && !name.includes('stretching') &&
+               !name.includes('strechting') && // typo variant used in session name
                !name.includes('flexibility') && !name.includes('cardio') &&
                !name.includes('yoga') && !name.includes('foam roll') &&
-               !name.includes('running') && !name.includes('cycling');
+               !name.includes('running') && !name.includes('cycling') &&
+               !name.includes('wall sit');
       });
       const days = wData.length >= 3 
         ? Math.max(1, (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24))
@@ -572,7 +574,13 @@ export default function PredictionsUnified({ user }) {
     // Filter out duration exercises and stretching - only count strength workouts
     const strengthWorkouts = data.filter(w => {
       const name = (w.session_name || '').toLowerCase();
-      return !name.includes('walking') && !name.includes('duration') && !name.includes('stretching');
+      return !name.includes('walking') && !name.includes('treadmill') &&
+             !name.includes('duration') && !name.includes('stretching') &&
+             !name.includes('strechting') && // typo variant used in session name
+             !name.includes('flexibility') && !name.includes('cardio') &&
+             !name.includes('yoga') && !name.includes('foam roll') &&
+             !name.includes('running') && !name.includes('cycling') &&
+             !name.includes('wall sit');
     });
     
     console.log('Filtered to strength workouts only:', strengthWorkouts.length, 'of', data.length);

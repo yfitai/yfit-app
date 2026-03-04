@@ -21,12 +21,14 @@ const isWeightedSession = (session) => {
          !name.includes('treadmill') &&
          !name.includes('duration') &&
          !name.includes('stretching') &&
+         !name.includes('strechting') && // typo variant used in session name
          !name.includes('flexibility') &&
          !name.includes('cardio') &&
          !name.includes('yoga') &&
          !name.includes('foam roll') &&
          !name.includes('running') &&
-         !name.includes('cycling');
+         !name.includes('cycling') &&
+         !name.includes('wall sit');
 };
 
 const FitnessProgress = () => {

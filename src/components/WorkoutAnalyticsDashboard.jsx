@@ -82,9 +82,11 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         const name = (session.session_name || '').toLowerCase();
         return !name.includes('walking') && !name.includes('treadmill') &&
                !name.includes('duration') && !name.includes('stretching') &&
+               !name.includes('strechting') && // typo variant used in session name
                !name.includes('flexibility') && !name.includes('cardio') &&
                !name.includes('yoga') && !name.includes('foam roll') &&
-               !name.includes('running') && !name.includes('cycling');
+               !name.includes('running') && !name.includes('cycling') &&
+               !name.includes('wall sit');
       });
 
       // Group sessions by day or week depending on time range
