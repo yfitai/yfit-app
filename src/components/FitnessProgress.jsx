@@ -308,7 +308,9 @@ const FitnessProgress = () => {
       }
 
       // Calculate overall stats — only count weighted/resistance sessions as "workouts"
+      console.log('[DEBUG FitnessProgress] All sessions:', (sessionsData || []).map(s => ({ name: s.workout?.name || s.session_name || 'NO_NAME', completed: s.is_completed, volume: s.total_volume })));
       const weightedSessions = (sessionsData || []).filter(isWeightedSession);
+      console.log('[DEBUG FitnessProgress] Weighted sessions (' + weightedSessions.length + '):', weightedSessions.map(s => s.workout?.name || s.session_name || 'NO_NAME'));
       const totalWorkouts = weightedSessions.length;
       const totalVolume = sessionsData?.reduce((sum, s) => sum + (s.total_volume || 0), 0) || 0;
       const totalReps = sessionsData?.reduce((sum, s) => sum + (s.total_reps || 0), 0) || 0;
