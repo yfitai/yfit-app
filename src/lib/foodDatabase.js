@@ -95,9 +95,19 @@ async function searchUSDA(query, limit) {
     
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
-    )
+    // 10-second timeout prevents Android WebView from hanging indefinitely
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+    let response
+    try {
+      response = await fetch(
+        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`,
+        { signal: controller.signal }
+      )
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -261,9 +271,19 @@ async function searchOpenFoodFacts(query, limit) {
   try {
     // Use backend proxy to avoid CORS issues with remote loading
     // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
-    )
+    // 10-second timeout prevents Android WebView from hanging indefinitely
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+    let response
+    try {
+      response = await fetch(
+        `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`,
+        { signal: controller.signal }
+      )
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (!response.ok) {
       throw new Error(`Open Food Facts API error: ${response.status}`)

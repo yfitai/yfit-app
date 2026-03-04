@@ -127,15 +127,22 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
 
     const { data } = await supabase
       .from('user_preferences')
-      .select('use_custom_macros, protein_percent, carb_percent, fat_percent')
+      .select('use_custom_macros, protein_percent, carb_percent, fat_percent, protein_grams, carb_grams, fat_grams')
       .eq('user_id', user.id)
       .single()
 
     if (data && data.use_custom_macros) {
       setUseCustomMacros(true)
-      const pGrams = Math.round((adjustedCalories * data.protein_percent / 100) / 4)
-      const cGrams = Math.round((adjustedCalories * data.carb_percent    / 100) / 4)
-      const fGrams = Math.round((adjustedCalories * data.fat_percent     / 100) / 9)
+      // Prefer saved gram values (exact); fall back to percent calculation for legacy rows
+      const pGrams = data.protein_grams != null
+        ? data.protein_grams
+        : Math.round((adjustedCalories * (data.protein_percent || 30) / 100) / 4)
+      const cGrams = data.carb_grams != null
+        ? data.carb_grams
+        : Math.round((adjustedCalories * (data.carb_percent    || 40) / 100) / 4)
+      const fGrams = data.fat_grams != null
+        ? data.fat_grams
+        : Math.round((adjustedCalories * (data.fat_percent     || 30) / 100) / 9)
       applyMacros(pGrams, cGrams, fGrams)
     } else {
       setUseCustomMacros(false)
@@ -166,7 +173,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
     } else {
       applyMacros(proteinGrams, carbGrams, fatGrams)
       const { p, c, f } = gramsToPercents(proteinGrams, carbGrams, fatGrams)
-      await saveMacroSettings(true, p, c, f)
+      await saveMacroSettings(true, p, c, f, proteinGrams, carbGrams, fatGrams)
     }
   }
 
@@ -179,16 +186,25 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
     applyMacros(p, c, f)
 
     const percents = gramsToPercents(p, c, f)
-    await saveMacroSettings(true, percents.p, percents.c, percents.f)
+    await saveMacroSettings(true, percents.p, percents.c, percents.f, p, c, f)
   }
 
   // ─── persistence ────────────────────────────────────────────────────────────
 
-  const saveMacroSettings = async (useCustom, p, c, f) => {
+  const saveMacroSettings = async (useCustom, p, c, f, pGrams, cGrams, fGrams) => {
     await supabase
       .from('user_preferences')
       .upsert(
-        { user_id: user.id, use_custom_macros: useCustom, protein_percent: p, carb_percent: c, fat_percent: f },
+        {
+          user_id: user.id,
+          use_custom_macros: useCustom,
+          protein_percent: p,
+          carb_percent: c,
+          fat_percent: f,
+          protein_grams: pGrams ?? null,
+          carb_grams: cGrams ?? null,
+          fat_grams: fGrams ?? null
+        },
         { onConflict: 'user_id' }
       )
   }

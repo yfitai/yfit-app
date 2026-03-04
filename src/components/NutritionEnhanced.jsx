@@ -188,8 +188,9 @@ export default function NutritionEnhanced({ user: propUser }) {
 
  const handleFoodSelected = (food) => {
   setSelectedFood(food)
-  setServingQuantity(1)
-  setServingUnit(food.serving_unit || 'serving')
+  // Use preferred serving if saved (My Foods), otherwise default to 1
+  setServingQuantity(food.preferred_serving_quantity ?? 1)
+  setServingUnit(food.preferred_serving_unit || food.serving_unit || 'serving')
   setShowFoodSearch(false)
   setShowBarcodeScanner(false)
   setShowServingSelector(true)
@@ -323,8 +324,18 @@ const handleBarcodeScanned = async (barcode) => {
   const handleSaveToMyFoods = async (alsoLog) => {
     if (!selectedFood || !user) return
 
+    // Attach the user's current serving choice so My Foods remembers it
+    const foodWithServing = {
+      ...selectedFood,
+      preferred_serving_quantity: servingQuantity,
+      preferred_serving_unit: servingUnit,
+      // Also update the canonical serving fields so legacy code picks them up
+      serving_quantity: servingQuantity,
+      serving_unit: servingUnit
+    }
+
     // Save to favorite_foods
-    const success = await addFavoriteFood(user.id, selectedFood)
+    const success = await addFavoriteFood(user.id, foodWithServing)
     
     if (success) {
       alert('⭐ Saved to My Foods!')
