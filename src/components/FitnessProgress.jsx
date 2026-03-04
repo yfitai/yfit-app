@@ -16,7 +16,9 @@ import {
  * Personal records are tracked for ALL session types regardless of this flag.
  */
 const isWeightedSession = (session) => {
-  const name = (session.session_name || '').toLowerCase();
+  // Session name is stored in the joined workout template: session.workout.name
+  // session_name field is not populated on workout_sessions rows
+  const name = (session.workout?.name || session.session_name || '').toLowerCase();
   return !name.includes('walking') &&
          !name.includes('treadmill') &&
          !name.includes('duration') &&

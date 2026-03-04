@@ -85,7 +85,7 @@ export default function PredictionsUnified({ user }) {
     try {
       const { data, error } = await supabase
         .from('workout_sessions')
-        .select('*')
+        .select('*, workout:workouts(name)')
         .eq('user_id', user.id)
         .order('start_time', { ascending: false })
         .limit(30);
@@ -357,7 +357,7 @@ export default function PredictionsUnified({ user }) {
       // Activity level classification — only count weighted/resistance sessions,
       // not cardio (walking, treadmill) or stretching which inflate the frequency
       const weightedWoData = woData.filter(w => {
-        const name = (w.session_name || '').toLowerCase();
+        const name = (w.workout?.name || w.session_name || '').toLowerCase();
         return !name.includes('walking') && !name.includes('treadmill') &&
                !name.includes('duration') && !name.includes('stretching') &&
                !name.includes('strechting') && // typo variant used in session name
@@ -573,7 +573,7 @@ export default function PredictionsUnified({ user }) {
     
     // Filter out duration exercises and stretching - only count strength workouts
     const strengthWorkouts = data.filter(w => {
-      const name = (w.session_name || '').toLowerCase();
+      const name = (w.workout?.name || w.session_name || '').toLowerCase();
       return !name.includes('walking') && !name.includes('treadmill') &&
              !name.includes('duration') && !name.includes('stretching') &&
              !name.includes('strechting') && // typo variant used in session name

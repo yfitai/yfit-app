@@ -58,7 +58,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
       // Load all workout sessions in the time range
       const { data: sessions, error } = await supabase
         .from('workout_sessions')
-        .select('*')
+        .select('*, workout:workouts(name)')
         .eq('user_id', userId)
         .eq('is_completed', true)
         .gte('start_time', effectiveStartDate.toISOString())
@@ -79,7 +79,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
       // Cardio (walking, treadmill) and stretching inflate frequency and duration metrics.
       // Volume chart is unaffected (cardio/stretching already contribute 0 volume).
       const weightedSessions = sessions.filter(session => {
-        const name = (session.session_name || '').toLowerCase();
+        const name = (session.workout?.name || session.session_name || '').toLowerCase();
         return !name.includes('walking') && !name.includes('treadmill') &&
                !name.includes('duration') && !name.includes('stretching') &&
                !name.includes('strechting') && // typo variant used in session name
