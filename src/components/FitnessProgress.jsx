@@ -308,9 +308,7 @@ const FitnessProgress = () => {
       }
 
       // Calculate overall stats — only count weighted/resistance sessions as "workouts"
-      console.log('[DEBUG FitnessProgress] All sessions:', (sessionsData || []).map(s => ({ id: s.id, name: s.workout?.name || s.session_name || 'NO_NAME', start_time: s.start_time, volume: s.total_volume })));
       const weightedSessions = (sessionsData || []).filter(isWeightedSession);
-      console.log('[DEBUG FitnessProgress] Weighted sessions (' + weightedSessions.length + '):', weightedSessions.map(s => ({ id: s.id, name: s.workout?.name || s.session_name || 'NO_NAME', start_time: s.start_time })));
       const totalWorkouts = weightedSessions.length;
       const totalVolume = sessionsData?.reduce((sum, s) => sum + (s.total_volume || 0), 0) || 0;
       const totalReps = sessionsData?.reduce((sum, s) => sum + (s.total_reps || 0), 0) || 0;
@@ -1583,7 +1581,7 @@ const FitnessProgress = () => {
                         e.stopPropagation();
                         deleteWorkoutSession(session.id, session.workout?.name || 'Quick Workout');
                       }}
-                      className="p-2 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-2 hover:bg-red-100 rounded-lg transition-colors sm:opacity-0 sm:group-hover:opacity-100"
                     >
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
