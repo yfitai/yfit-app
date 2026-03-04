@@ -128,18 +128,24 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadHealthMetrics = async (userId) => {
+    // Health metrics (BP, glucose, sleep) are stored in daily_logs by the Daily Tracker
     const { data } = await supabase
-      .from('health_metrics_logs')
-      .select('*')
+      .from('daily_logs')
+      .select('logged_at, bp_systolic, bp_diastolic, glucose_mg_dl, sleep_hours')
       .eq('user_id', userId)
       .gte('logged_at', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
       .order('logged_at', { ascending: true })
 
     if (data) {
-      setHealthMetricsData(data.map(d => ({
+      // Only include entries that have at least one health metric logged
+      const filtered = data.filter(d =>
+        d.bp_systolic != null || d.bp_diastolic != null ||
+        d.glucose_mg_dl != null || d.sleep_hours != null
+      )
+      setHealthMetricsData(filtered.map(d => ({
         date: new Date(d.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        systolic: d.blood_pressure_systolic,
-        diastolic: d.blood_pressure_diastolic,
+        systolic: d.bp_systolic,
+        diastolic: d.bp_diastolic,
         glucose: d.glucose_mg_dl,
         sleep: d.sleep_hours,
         timestamp: d.logged_at
