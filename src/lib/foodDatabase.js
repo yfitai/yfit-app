@@ -298,6 +298,15 @@ async function searchOpenFoodFacts(query, limit) {
     // Filter and score products by relevance to search query
     const queryLower = query.toLowerCase()
     const queryWords = queryLower.split(' ').filter(w => w.length > 2)
+    // Build stem variants for each query word (simple s/es/ies plural/singular)
+    const stemVariants = queryWords.flatMap(word => {
+      const variants = [word]
+      if (word.endsWith('ies')) variants.push(word.slice(0, -3) + 'y')  // cookies->cookie? No, cookies->cookie
+      if (word.endsWith('es') && word.length > 4) variants.push(word.slice(0, -2)) // cookies->cooki (not ideal)
+      if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) variants.push(word.slice(0, -1)) // cookies->cookie
+      if (!word.endsWith('s')) variants.push(word + 's') // cookie->cookies
+      return variants
+    })
     
     const scoredProducts = data.products
       .map(product => {
@@ -333,10 +342,16 @@ async function searchOpenFoodFacts(query, limit) {
         // Starts with query gets high score
         if (nameLower.startsWith(queryLower)) relevanceScore += 50
         
-        // Contains all query words
+        // Contains all query words (exact)
         const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
         if (queryWords.length > 0) {
           relevanceScore += (matchedWords / queryWords.length) * 40
+        }
+        
+        // Stem/plural match: 'cookies' query matches products with 'cookie' in name
+        const stemMatchedWords = stemVariants.filter(stem => nameLower.includes(stem)).length
+        if (stemMatchedWords > 0) {
+          relevanceScore += 25
         }
         
         // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
