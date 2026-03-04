@@ -366,10 +366,15 @@ export default function PredictionsUnified({ user }) {
                !name.includes('running') && !name.includes('cycling') &&
                !name.includes('wall sit');
       });
-      const days = wData.length >= 3 
-        ? Math.max(1, (new Date(wData[wData.length - 1].tracker_date).getTime() - new Date(wData[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24))
-        : 7; // Default to 1 week if no weight data
-      const workoutsPerWeek = weightedWoData.length > 0 ? Math.min(14, (weightedWoData.length / days) * 7) : 0; // Cap at 14x/week (2x per day max)
+      // Use the span of the weighted workouts themselves for frequency calculation.
+      // Minimum of 7 days prevents division-by-near-zero when all sessions are on the same day.
+      let activityDays = 7;
+      if (weightedWoData.length >= 2) {
+        const woTimes = weightedWoData.map(w => new Date(w.start_time).getTime());
+        const woSpanDays = (Math.max(...woTimes) - Math.min(...woTimes)) / (1000 * 60 * 60 * 24);
+        activityDays = Math.max(7, woSpanDays);
+      }
+      const workoutsPerWeek = weightedWoData.length > 0 ? Math.min(14, (weightedWoData.length / activityDays) * 7) : 0; // Cap at 14x/week (2x per day max)
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';
@@ -585,9 +590,8 @@ export default function PredictionsUnified({ user }) {
     
     console.log('Filtered to strength workouts only:', strengthWorkouts.length, 'of', data.length);
     
-    // Reduced requirement from 7 to 5 workouts
-    if (strengthWorkouts.length < 5) {
-      console.log('❌ Not enough strength workouts for injury risk (need 5, have ' + strengthWorkouts.length + ')');
+    // Need at least 3 strength workouts to assess injury risk
+    if (strengthWorkouts.length < 3) {
       return null;
     }
 
@@ -605,8 +609,10 @@ export default function PredictionsUnified({ user }) {
       const volumeIncrease = Math.max(-200, Math.min(200, rawVolumeIncrease)); // Cap at ±200%
 
       // Calculate workout frequency (using filtered strength workouts only)
+      // Use minimum of 7 days to prevent division-by-near-zero when sessions cluster on same day
       const dates = strengthWorkouts.map(w => new Date(w.start_time));
-      const daysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
+      const rawDaysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
+      const daysBetween = Math.max(7, rawDaysBetween);
       const rawFrequency = (strengthWorkouts.length / daysBetween) * 7;
       const frequency = Math.min(7, rawFrequency); // Cap at 7x/week
 
@@ -1294,7 +1300,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
             <AlertTriangle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Injury Risk Assessment</h3>
-            <p className="text-gray-600">Log 7+ workouts to assess injury risk</p>
+            <p className="text-gray-600">Log 3+ strength workouts to assess injury risk</p>
           </div>
         )}
 

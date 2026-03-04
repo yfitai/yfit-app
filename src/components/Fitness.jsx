@@ -17,7 +17,7 @@ const Fitness = () => {
     { id: 'builder', name: 'Create Workout', icon: Plus },
     { id: 'logger', name: 'Log Workout', icon: Play },
     { id: 'form-live', name: 'Form Analysis', icon: Camera },
-    { id: 'progress', name: 'Progress', icon: TrendingUp }
+    { id: 'progress', name: 'Strength Stats', icon: TrendingUp }
   ];
 
   const renderContent = () => {
