@@ -311,7 +311,19 @@ async function searchOpenFoodFacts(query, limit) {
         // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
         const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
         if (hasNonLatinChars) return null
-        
+
+        // Filter 4: require 'en' in language codes (removes products with no English labelling)
+        const langCodes = Object.keys(product.languages_codes || {})
+        if (!langCodes.includes('en')) return null
+
+        // Filter 4: block accented characters in product name (removes French/Spanish/German names)
+        const ACCENTED = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ]/
+        if (ACCENTED.test(name)) return null
+
+        // Filter 4: block accented characters in brand name (removes Gerblé, Cuétara, Schär etc.)
+        const brandRaw = product.brands || ''
+        if (ACCENTED.test(brandRaw)) return null
+
         // Filter out specific non-English brands
         const nonEnglishBrands = ['sidi ali', 'sidi-ali']
         if (nonEnglishBrands.some(b => brand.includes(b))) return null
