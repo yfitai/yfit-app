@@ -366,6 +366,8 @@ export default function PredictionsUnified({ user }) {
                !name.includes('running') && !name.includes('cycling') &&
                !name.includes('wall sit');
       });
+      console.log('[DEBUG TDEE] All woData:', woData.length, woData.map(w => ({ name: w.workout?.name || w.session_name, start: w.start_time })));
+      console.log('[DEBUG TDEE] Weighted woData:', weightedWoData.length, weightedWoData.map(w => ({ name: w.workout?.name || w.session_name, start: w.start_time })));
       // Use the span of the weighted workouts themselves for frequency calculation.
       // Minimum of 7 days prevents division-by-near-zero when all sessions are on the same day.
       let activityDays = 7;
