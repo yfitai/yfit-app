@@ -60,6 +60,42 @@ const FitnessProgress = () => {
     performanceTrends: null,
     exerciseCorrelations: []
   });
+  const [cleaningUp, setCleaningUp] = useState(false);
+  const [cleanupDone, setCleanupDone] = useState(false);
+
+  // One-time cleanup: delete known test/duplicate sessions by ID
+  // These IDs were identified via debug logging on 2026-03-04
+  const DUPLICATE_SESSION_IDS = [
+    'e4a31492-992c-49f4-84aa-a09cce92875f', // Duration Strechting duplicate (Mar 4, 16:36)
+    '29a83530-8d5f-4dbe-8f2c-cd68779a87ce', // Duration Strechting duplicate (Mar 4, 15:02)
+    '69780f80-ae0a-4cf2-8dbd-5eb29bd88829', // Walking Treadmill duplicate (Mar 4, 16:21)
+    '9aa3b0e4-6dca-4a22-a133-b52eb0048c46', // Pull Tuesday Saturday duplicate (Mar 3, 20:13)
+    'dfed48db-842b-43da-a27a-b76a7999c4e3', // Pull Tuesday Saturday duplicate (Mar 3, 20:12)
+    '85060c5e-4693-4cd1-a8d8-4ab06fe626de', // Pull Tuesday Saturday duplicate (Mar 3, 20:04)
+    'adfe174e-c817-4c1d-81d7-acc3a20e91b5', // Walking Treadmill duplicate (Mar 3, 19:07)
+  ];
+
+  const cleanupDuplicateSessions = async () => {
+    if (!user || cleaningUp || cleanupDone) return;
+    setCleaningUp(true);
+    try {
+      const { error } = await supabase
+        .from('workout_sessions')
+        .delete()
+        .in('id', DUPLICATE_SESSION_IDS)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      setCleanupDone(true);
+      // Refresh data
+      await fetchData();
+      alert('✅ Cleaned up 7 test sessions successfully! Predictions will now show correct activity level.');
+    } catch (err) {
+      console.error('Cleanup error:', err);
+      alert('Error during cleanup: ' + err.message);
+    } finally {
+      setCleaningUp(false);
+    }
+  };
 
   useEffect(() => {
     initializeUser();
@@ -1526,7 +1562,19 @@ const FitnessProgress = () => {
 
         {/* Recent Sessions */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Workouts</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Recent Workouts</h2>
+            {!cleanupDone && (
+              <button
+                onClick={cleanupDuplicateSessions}
+                disabled={cleaningUp}
+                className="text-xs px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+                title="Remove 7 known test/duplicate sessions from database"
+              >
+                {cleaningUp ? 'Cleaning...' : '🧹 Clean Up Test Sessions'}
+              </button>
+            )}
+          </div>
           {recentSessions.length === 0 ? (
             <p className="text-gray-600 text-center py-8">No workout sessions yet</p>
           ) : (
