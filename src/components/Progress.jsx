@@ -14,6 +14,8 @@ export default function Progress({ user: propUser }) {
   const [user, setUser] = useState(propUser || null)
   const [timeRange, setTimeRange] = useState('30') // 7, 30, 90, 365 days
   const [measurementCategory, setMeasurementCategory] = useState('torso') // torso, arms, core, lower
+  // Read glucose unit preference from localStorage (set by Daily Tracker)
+  const [glucoseUnit] = useState(() => localStorage.getItem('yfit_glucose_unit') || 'mg/dl')
   
   // Progress data
   const [weightData, setWeightData] = useState([])
@@ -128,10 +130,11 @@ export default function Progress({ user: propUser }) {
   }
 
   const loadHealthMetrics = async (userId) => {
-    // Health metrics (BP, glucose, sleep) are stored in daily_logs by the Daily Tracker
+    // Health metrics (BP, glucose, sleep, water) are stored in daily_logs by the Daily Tracker
+    const unit = localStorage.getItem('yfit_glucose_unit') || 'mg/dl'
     const { data } = await supabase
       .from('daily_logs')
-      .select('logged_at, bp_systolic, bp_diastolic, glucose_mg_dl, sleep_hours')
+      .select('logged_at, bp_systolic, bp_diastolic, glucose_mg_dl, sleep_hours, water_ml')
       .eq('user_id', userId)
       .gte('logged_at', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
       .order('logged_at', { ascending: true })
@@ -140,16 +143,24 @@ export default function Progress({ user: propUser }) {
       // Only include entries that have at least one health metric logged
       const filtered = data.filter(d =>
         d.bp_systolic != null || d.bp_diastolic != null ||
-        d.glucose_mg_dl != null || d.sleep_hours != null
+        d.glucose_mg_dl != null || d.sleep_hours != null || d.water_ml != null
       )
-      setHealthMetricsData(filtered.map(d => ({
-        date: new Date(d.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        systolic: d.bp_systolic,
-        diastolic: d.bp_diastolic,
-        glucose: d.glucose_mg_dl,
-        sleep: d.sleep_hours,
-        timestamp: d.logged_at
-      })))
+      setHealthMetricsData(filtered.map(d => {
+        // Convert glucose from mg/dL (stored) to user's preferred unit for display
+        let glucoseDisplay = d.glucose_mg_dl
+        if (d.glucose_mg_dl != null && unit === 'mmol/l') {
+          glucoseDisplay = Math.round(d.glucose_mg_dl / 18.0182 * 10) / 10
+        }
+        return {
+          date: new Date(d.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          systolic: d.bp_systolic,
+          diastolic: d.bp_diastolic,
+          glucose: glucoseDisplay,
+          sleep: d.sleep_hours,
+          water: d.water_ml != null ? Math.round(d.water_ml / 10) / 100 : null, // convert ml to L
+          timestamp: d.logged_at
+        }
+      }))
     }
   }
 
@@ -478,30 +489,50 @@ export default function Progress({ user: propUser }) {
           {/* Glucose */}
           <ChartCard title="Blood Glucose" icon={<Droplet className="w-5 h-5 text-blue-500" />}>
             <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={healthMetricsData}>
+              <LineChart data={healthMetricsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Area type="monotone" dataKey="glucose" stroke="#3b82f6" fill="#93c5fd" name="Glucose (mg/dL)" />
-              </AreaChart>
+                <Line type="monotone" dataKey="glucose" stroke="#3b82f6" strokeWidth={2}
+                  name={`Glucose (${glucoseUnit === 'mmol/l' ? 'mmol/L' : 'mg/dL'})`}
+                  dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              </LineChart>
             </ResponsiveContainer>
           </ChartCard>
 
           {/* Sleep */}
-          <ChartCard title="Sleep Quality" icon={<Moon className="w-5 h-5 text-indigo-500" />}>
+          <ChartCard title="Sleep" icon={<Moon className="w-5 h-5 text-indigo-500" />}>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={healthMetricsData}>
+              <LineChart data={healthMetricsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="sleep" fill="#6366f1" name="Hours of Sleep" />
-              </BarChart>
+                <Line type="monotone" dataKey="sleep" stroke="#6366f1" strokeWidth={2}
+                  name="Hours of Sleep" dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              </LineChart>
             </ResponsiveContainer>
           </ChartCard>
+
+          {/* Water Intake */}
+          {healthMetricsData.some(d => d.water != null) && (
+            <ChartCard title="Water Intake" icon={<Droplet className="w-5 h-5 text-cyan-500" />}>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={healthMetricsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="water" stroke="#06b6d4" strokeWidth={2}
+                    name="Water (L)" dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          )}
 
           {/* Nutrition Compliance */}
           {nutritionComplianceData.length > 0 && (
