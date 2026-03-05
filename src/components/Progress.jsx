@@ -16,6 +16,8 @@ export default function Progress({ user: propUser }) {
   const [measurementCategory, setMeasurementCategory] = useState('torso') // torso, arms, core, lower
   // Read glucose unit preference from localStorage (set by Daily Tracker)
   const [glucoseUnit] = useState(() => localStorage.getItem('yfit_glucose_unit') || 'mg/dl')
+  // Read water unit preference from localStorage (set by Daily Tracker)
+  const [waterUnit] = useState(() => localStorage.getItem('yfit_water_unit') || 'ml')
   
   // Progress data
   const [weightData, setWeightData] = useState([])
@@ -151,13 +153,21 @@ export default function Progress({ user: propUser }) {
         if (d.glucose_mg_dl != null && unit === 'mmol/l') {
           glucoseDisplay = Math.round(d.glucose_mg_dl / 18.0182 * 10) / 10
         }
+        // Convert water from ml (stored) to user's preferred unit
+        let waterDisplay = null
+        if (d.water_ml != null) {
+          const wUnit = localStorage.getItem('yfit_water_unit') || 'ml'
+          if (wUnit === 'oz') waterDisplay = Math.round(d.water_ml / 29.5735)
+          else if (wUnit === 'cups') waterDisplay = Math.round(d.water_ml / 236.588 * 10) / 10
+          else waterDisplay = Math.round(d.water_ml / 100) / 10 // ml → L with 1 decimal
+        }
         return {
           date: new Date(d.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           systolic: d.bp_systolic,
           diastolic: d.bp_diastolic,
           glucose: glucoseDisplay,
           sleep: d.sleep_hours,
-          water: d.water_ml != null ? Math.round(d.water_ml / 10) / 100 : null, // convert ml to L
+          water: waterDisplay,
           timestamp: d.logged_at
         }
       }))
@@ -528,7 +538,8 @@ export default function Progress({ user: propUser }) {
                   <Tooltip />
                   <Legend />
                   <Line type="monotone" dataKey="water" stroke="#06b6d4" strokeWidth={2}
-                    name="Water (L)" dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                    name={`Water (${waterUnit === 'oz' ? 'oz' : waterUnit === 'cups' ? 'cups' : 'L'})`}
+                    dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
