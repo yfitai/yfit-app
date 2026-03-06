@@ -241,7 +241,8 @@ export default function PredictionsUnified({ user }) {
 
   // 1. Weight Loss Prediction
   const calculateWeightLossPrediction = (data = weightData, userGoalWeight = null) => {
-    if (data.length < 3) return null;
+    // Need at least 2 entries on different days to calculate a rate of change
+    if (data.length < 2) return null;
 
     try {
       const sortedWeights = [...data].sort((a, b) => 
@@ -255,7 +256,24 @@ export default function PredictionsUnified({ user }) {
       const lastDate = new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime();
       
       const daysBetween = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
+
+      // Need at least 1 full day of separation to calculate a meaningful rate
+      if (daysBetween < 1) return null;
+
       const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
+
+      // If weight is perfectly stable, we can't project a timeline
+      if (weeklyChange === 0) {
+        return {
+          currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
+          goalWeight: Math.round(((userGoalWeight && userGoalWeight > 20) ? userGoalWeight : firstWeight * 0.9) * 2.2 * 10) / 10,
+          weeklyChange: 0,
+          weeksToGoal: null,
+          goalDate: null,
+          trend: 'stable',
+          confidence: Math.min(95, 50 + (data.length * 3))
+        };
+      }
 
       // Use actual target weight from user_goals if available, otherwise default to 10% loss
       const goalWeight = (userGoalWeight && userGoalWeight > 20) ? userGoalWeight : firstWeight * 0.9;
@@ -329,29 +347,36 @@ export default function PredictionsUnified({ user }) {
         console.log('📊 Using conservative formula (weight × 24):', baselineTDEE);
       }
 
-      // Calculate weight change over period (if we have weight data)
-      let tdee = hasIncompleteNutritionData ? baselineTDEE : avgCalories; // Use baseline if data is incomplete
-      
-      if (wData.length >= 3) {
-        const sortedWeights = [...wData].sort((a, b) => 
-          new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
-        );
-        
-        const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
-                            parseFloat(sortedWeights[0].weight_kg);
-        const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
-                     new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
+      // If the user has entered a known TDEE in Goals, use it as the authoritative value.
+      // Do NOT override it with back-calculations from intake + weight change — the user
+      // is likely eating in a deficit, which would produce a falsely low TDEE estimate.
+      let tdee = baselineTDEE;
 
-        // 1 kg = 2.2 lbs, 1 lb = 3500 calories
-        // Only calculate if we have meaningful time period (at least 3 days) AND complete nutrition data
-        if (days >= 3 && !hasIncompleteNutritionData) {
-          const caloriesDelta = (weightChange * 2.2 * 3500) / days;
-          const calculatedTDEE = Math.round(avgCalories - caloriesDelta);
-          // Sanity check: TDEE should be between 1200-4000 cal/day
-          if (calculatedTDEE >= 1200 && calculatedTDEE <= 4000) {
-            tdee = calculatedTDEE;
+      if (!userTDEE || userTDEE <= 0) {
+        // No user-entered TDEE: try to back-calculate from intake + weight change
+        let startingTDEE = hasIncompleteNutritionData ? baselineTDEE : avgCalories;
+        if (wData.length >= 3) {
+          const sortedWeights = [...wData].sort((a, b) => 
+            new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
+          );
+          const weightChange = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg) - 
+                              parseFloat(sortedWeights[0].weight_kg);
+          const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
+                       new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
+          // Only calculate if we have meaningful time period (at least 3 days) AND complete nutrition data
+          if (days >= 3 && !hasIncompleteNutritionData) {
+            const caloriesDelta = (weightChange * 2.2 * 3500) / days;
+            const calculatedTDEE = Math.round(avgCalories - caloriesDelta);
+            // Sanity check: TDEE should be between 1200-4000 cal/day
+            if (calculatedTDEE >= 1200 && calculatedTDEE <= 4000) {
+              startingTDEE = calculatedTDEE;
+            }
           }
         }
+        tdee = startingTDEE;
+        console.log('📊 Back-calculated TDEE (no Goals entry):', tdee);
+      } else {
+        console.log('✅ Using authoritative Goals TDEE — skipping back-calculation:', tdee);
       }
 
       // Activity level classification — only count weighted/resistance sessions,
@@ -1195,7 +1220,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
             <Scale className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Weight Loss Prediction</h3>
-            <p className="text-gray-600">Log at least 3 weight entries to see predictions</p>
+            <p className="text-gray-600">Log weight on 2+ different days to see predictions</p>
           </div>
         )}
 
