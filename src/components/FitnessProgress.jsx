@@ -1335,15 +1335,16 @@ const FitnessProgress = () => {
                       {selectedExercise.name} - Training Volume
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={progressData}>
+                      <LineChart data={progressData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" />
-                        <YAxis />
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="volume" fill="#8B5CF6" name="Total Volume (lbs)" />
-                        <Bar dataKey="reps" fill="#F59E0B" name="Total Reps" />
-                      </BarChart>
+                        <Line yAxisId="left" type="monotone" dataKey="volume" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Total Volume (lbs)" />
+                        <Line yAxisId="right" type="monotone" dataKey="reps" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Total Reps" />
+                      </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </>
@@ -1463,17 +1464,31 @@ const FitnessProgress = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <div className="text-sm opacity-90 mb-2">Predicted Next 1RM</div>
-                    <div className="text-4xl font-bold">{predictNext1RM() || 'N/A'} lbs</div>
-                    <div className="text-sm opacity-75 mt-2">
-                      Based on your progression trend
-                    </div>
+                    {predictNext1RM() ? (
+                      <>
+                        <div className="text-4xl font-bold">{predictNext1RM()} lbs</div>
+                        <div className="text-sm opacity-75 mt-2">Based on your progression trend</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold opacity-60">Not enough data</div>
+                        <div className="text-sm opacity-75 mt-2">Complete this exercise in 2+ sessions to unlock predictions</div>
+                      </>
+                    )}
                   </div>
                   <div>
                     <div className="text-sm opacity-90 mb-2">Recommended Working Weight</div>
-                    <div className="text-4xl font-bold">{calculateRecommendedWeight() || 'N/A'} lbs</div>
-                    <div className="text-sm opacity-75 mt-2">
-                      80% of predicted 1RM for optimal gains
-                    </div>
+                    {calculateRecommendedWeight() ? (
+                      <>
+                        <div className="text-4xl font-bold">{calculateRecommendedWeight()} lbs</div>
+                        <div className="text-sm opacity-75 mt-2">80% of predicted 1RM for optimal gains</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold opacity-60">Not enough data</div>
+                        <div className="text-sm opacity-75 mt-2">Complete this exercise in 2+ sessions to unlock</div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
