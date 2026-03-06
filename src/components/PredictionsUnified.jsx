@@ -64,16 +64,24 @@ export default function PredictionsUnified({ user }) {
 
   const fetchWeightData = async () => {
     try {
+      // Weight is stored in daily_logs.weight_kg (logged by DailyTracker component)
+      // Use logged_at as the date field; filter to only rows that have a weight entry
       const { data, error } = await supabase
-        .from('daily_trackers')
-        .select('*')
+        .from('daily_logs')
+        .select('id, user_id, weight_kg, logged_at')
         .eq('user_id', user.id)
-        .order('tracker_date', { ascending: false })
-        .limit(30);
+        .not('weight_kg', 'is', null)
+        .order('logged_at', { ascending: false })
+        .limit(90);
       
       if (error) throw error;
-      setWeightData(data || []);
-      return data || [];
+      // Normalize to tracker_date field so downstream calculations work unchanged
+      const normalized = (data || []).map(row => ({
+        ...row,
+        tracker_date: row.logged_at
+      }));
+      setWeightData(normalized);
+      return normalized;
     } catch (error) {
       console.error('Error fetching weight data:', error);
       setWeightData([]);
