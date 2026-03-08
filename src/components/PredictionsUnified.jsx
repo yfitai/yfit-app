@@ -1260,9 +1260,17 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-sm opacity-75">calories/day</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Today's Intake</div>
-                <div className="text-4xl font-bold">{predictions.tdee.todayCalories > 0 ? predictions.tdee.todayCalories : predictions.tdee.avgCalories}</div>
-                <div className="text-sm opacity-75">{predictions.tdee.todayCalories > 0 ? `${predictions.tdee.avgCalories} cal/day avg` : 'calories/day avg'}</div>
+                <div className="text-sm opacity-90 mb-1">
+                  {predictions.tdee.todayCalories > 0 ? "Today's Intake" : "Avg Daily Intake"}
+                </div>
+                <div className="text-4xl font-bold">
+                  {predictions.tdee.todayCalories > 0 ? predictions.tdee.todayCalories : predictions.tdee.avgCalories}
+                </div>
+                <div className="text-sm opacity-75">
+                  {predictions.tdee.todayCalories > 0
+                    ? `${predictions.tdee.avgCalories} cal/day avg`
+                    : 'rolling avg — no log yet today'}
+                </div>
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">Activity Level</div>
