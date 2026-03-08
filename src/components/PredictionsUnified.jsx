@@ -319,7 +319,9 @@ export default function PredictionsUnified({ user }) {
       const validNutritionData = nData.filter(log => parseFloat(log.calories) > 50);
       const dailyCalorieMap = {};
       const dailyMacroMap = {};
-      const todayStr = new Date().toISOString().split('T')[0];
+      // Use LOCAL date string (not UTC) so today's meals always match today's date
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       validNutritionData.forEach(log => {
         const day = log.meal_date ? log.meal_date.split('T')[0] : todayStr;
         if (!dailyCalorieMap[day]) {
@@ -331,11 +333,16 @@ export default function PredictionsUnified({ user }) {
         dailyMacroMap[day].carbs += parseFloat(log.carbs_g) || 0;
         dailyMacroMap[day].fat += parseFloat(log.fat_g) || 0;
       });
-      const dailyTotals = Object.values(dailyCalorieMap);
+      // For the rolling average, exclude days with < 500 cal (incomplete logging days)
+      // These skew the average down and don't represent real eating patterns
+      const completeDailyTotals = Object.values(dailyCalorieMap).filter(c => c >= 500);
+      const allDailyTotals = Object.values(dailyCalorieMap);
       const todayCalories = dailyCalorieMap[todayStr] || 0;
-      const avgCalories = dailyTotals.length > 0
-        ? Math.round(dailyTotals.reduce((sum, c) => sum + c, 0) / dailyTotals.length)
-        : 1875; // Default fallback if no valid nutrition data
+      const avgCalories = completeDailyTotals.length > 0
+        ? Math.round(completeDailyTotals.reduce((sum, c) => sum + c, 0) / completeDailyTotals.length)
+        : allDailyTotals.length > 0
+          ? Math.round(allDailyTotals.reduce((sum, c) => sum + c, 0) / allDailyTotals.length)
+          : 1875; // Default fallback if no valid nutrition data
 
       // Check if nutrition data looks incomplete (avg < 800 cal/day is unrealistic)
       const hasIncompleteNutritionData = avgCalories < 800;
@@ -521,7 +528,9 @@ export default function PredictionsUnified({ user }) {
 
     try {
       // Group by date first so we get daily totals, not per-item averages
-      const todayStr = new Date().toISOString().split('T')[0];
+      // Use LOCAL date string (not UTC) so today's meals always match today's date
+      const nowLocal = new Date();
+      const todayStr = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
       const byDate = {};
       validData.forEach(log => {
         const day = log.meal_date ? log.meal_date.split('T')[0] : todayStr;
@@ -531,14 +540,19 @@ export default function PredictionsUnified({ user }) {
         byDate[day].fat += parseFloat(log.fat_g) || 0;
         byDate[day].calories += parseFloat(log.calories) || 0;
       });
-      const dayEntries = Object.entries(byDate); // [[dateStr, {protein,carbs,fat,calories}], ...]
-      const numDays = dayEntries.length;
+      // Exclude days with < 500 cal total — these are incomplete logging days that
+      // skew the average down (e.g., only logged one snack on a given day)
+      const allDayEntries = Object.entries(byDate);
+      const dayEntries = allDayEntries.filter(([, d]) => d.calories >= 500);
+      // Fall back to all entries if filtering leaves too few days
+      const entriesForAvg = dayEntries.length >= 2 ? dayEntries : allDayEntries;
+      const numDays = entriesForAvg.length;
 
       const avgMacros = {
-        protein: Math.round(dayEntries.reduce((s, [, d]) => s + d.protein, 0) / numDays),
-        carbs: Math.round(dayEntries.reduce((s, [, d]) => s + d.carbs, 0) / numDays),
-        fat: Math.round(dayEntries.reduce((s, [, d]) => s + d.fat, 0) / numDays),
-        calories: Math.round(dayEntries.reduce((s, [, d]) => s + d.calories, 0) / numDays),
+        protein: Math.round(entriesForAvg.reduce((s, [, d]) => s + d.protein, 0) / numDays),
+        carbs: Math.round(entriesForAvg.reduce((s, [, d]) => s + d.carbs, 0) / numDays),
+        fat: Math.round(entriesForAvg.reduce((s, [, d]) => s + d.fat, 0) / numDays),
+        calories: Math.round(entriesForAvg.reduce((s, [, d]) => s + d.calories, 0) / numDays),
       };
 
       // Calculate macro ratios
@@ -551,7 +565,7 @@ export default function PredictionsUnified({ user }) {
 
       // Analyze by day of week (using daily totals, not per-item)
       const byDayOfWeek = {};
-      dayEntries.forEach(([dateStr, totals]) => {
+      entriesForAvg.forEach(([dateStr, totals]) => {
         const day = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
         if (!byDayOfWeek[day]) byDayOfWeek[day] = { calories: 0, count: 0 };
         byDayOfWeek[day].calories += totals.calories;
