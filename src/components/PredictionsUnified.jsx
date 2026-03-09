@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { 
   TrendingUp, TrendingDown, Target, Calendar, Activity, AlertTriangle,
-  Heart, Pill, Apple, Dumbbell, Scale, Flame, Brain, Award, Clock
+  Heart, Pill, Apple, Dumbbell, Scale, Flame, Brain, Award, Clock, RefreshCw
 } from 'lucide-react';
 
 export default function PredictionsUnified({ user }) {
@@ -110,12 +110,14 @@ export default function PredictionsUnified({ user }) {
 
   const fetchNutritionData = async () => {
     try {
+      // Fetch up to 200 rows so we capture all meals across 30+ days
+      // (30-row limit was too low for users with many daily food entries)
       const { data, error } = await supabase
         .from('meals')
         .select('*')
         .eq('user_id', user.id)
         .order('meal_date', { ascending: false })
-        .limit(30);
+        .limit(200);
       
       if (error) throw error;
       setNutritionData(data || []);
@@ -1232,9 +1234,20 @@ export default function PredictionsUnified({ user }) {
   return (
     <div className="min-h-screen p-2 sm:p-6 overflow-x-hidden" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">🔮 AI Predictions</h1>
-          <p className="text-gray-600">Data-driven insights and forecasts based on your health journey</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">🔮 AI Predictions</h1>
+            <p className="text-gray-600">Data-driven insights and forecasts based on your health journey</p>
+          </div>
+          <button
+            onClick={fetchAllData}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+            title="Refresh predictions with latest data"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
         </div>
 
         {/* Compressed Data Disclaimer */}
