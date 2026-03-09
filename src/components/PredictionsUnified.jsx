@@ -295,18 +295,33 @@ export default function PredictionsUnified({ user }) {
       // Need at least 1 full calendar day of separation to calculate a meaningful rate
       if (daysBetween < 1) return null;
 
-      const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
+      const rawWeeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;
+
+      // When data spans fewer than 7 days, daily fluctuations (water weight, food, etc.)
+      // can produce wildly unrealistic weekly projections. Cap the displayed rate at
+      // ±2.27 kg/week (±5 lbs/week) and flag low confidence.
+      const KG_PER_LBS = 0.453592;
+      const maxReasonableWeeklyKg = 5 * KG_PER_LBS; // 5 lbs/week absolute max
+      const weeklyChange = daysBetween < 7
+        ? Math.sign(rawWeeklyChange) * Math.min(Math.abs(rawWeeklyChange), maxReasonableWeeklyKg)
+        : rawWeeklyChange;
+      const isLowDataWarning = daysBetween < 7;
+
+      // Use exact conversion factor (2.20462) to avoid round-trip rounding errors
+      const KG_TO_LBS = 2.20462;
 
       // If weight is perfectly stable, we can't project a timeline
       if (weeklyChange === 0) {
         return {
-          currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
-          goalWeight: Math.round(((userGoalWeight && userGoalWeight > 20) ? userGoalWeight : firstWeight * 0.9) * 2.2 * 10) / 10,
+          currentWeight: Math.round(lastWeight * KG_TO_LBS * 10) / 10,
+          goalWeight: Math.round(((userGoalWeight && userGoalWeight > 20) ? userGoalWeight : firstWeight * 0.9) * KG_TO_LBS * 10) / 10,
           weeklyChange: 0,
           weeksToGoal: null,
           goalDate: null,
           trend: 'stable',
-          confidence: Math.min(95, 50 + (data.length * 3))
+          confidence: Math.min(95, 50 + (data.length * 3)),
+          isLowDataWarning,
+          daysOfData: Math.round(daysBetween)
         };
       }
 
@@ -322,13 +337,15 @@ export default function PredictionsUnified({ user }) {
       const goalDate = new Date(Date.now() + adjustedWeeks * 7 * 24 * 60 * 60 * 1000);
 
       return {
-        currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
-        goalWeight: Math.round(goalWeight * 2.2 * 10) / 10,
-        weeklyChange: Math.round(weeklyChange * 2.2 * 10) / 10,
+        currentWeight: Math.round(lastWeight * KG_TO_LBS * 10) / 10,
+        goalWeight: Math.round(goalWeight * KG_TO_LBS * 10) / 10,
+        weeklyChange: Math.round(weeklyChange * KG_TO_LBS * 10) / 10,
         weeksToGoal: Math.round(adjustedWeeks),
         goalDate: goalDate.toLocaleDateString(),
         trend: weeklyChange < 0 ? 'losing' : weeklyChange > 0 ? 'gaining' : 'stable',
-        confidence: Math.min(95, 50 + (data.length * 3))
+        confidence: Math.min(95, 50 + (data.length * 3)),
+        isLowDataWarning,
+        daysOfData: Math.round(daysBetween)
       };
     } catch (error) {
       console.error('Error calculating weight loss:', error);
@@ -407,7 +424,7 @@ export default function PredictionsUnified({ user }) {
                        new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
           // Only calculate if we have meaningful time period (at least 3 days) AND complete nutrition data
           if (days >= 3 && !hasIncompleteNutritionData) {
-            const caloriesDelta = (weightChange * 2.2 * 3500) / days;
+            const caloriesDelta = (weightChange * 2.20462 * 3500) / days;
             const calculatedTDEE = Math.round(avgCalories - caloriesDelta);
             // Sanity check: TDEE should be between 1200-4000 cal/day
             if (calculatedTDEE >= 1200 && calculatedTDEE <= 4000) {
@@ -962,12 +979,12 @@ export default function PredictionsUnified({ user }) {
       }
 
       return {
-        currentWeight: Math.round(lastWeight * 2.2 * 10) / 10,
-        projectedWeight: Math.round(projectedWeight * 2.2 * 10) / 10,
-        weeklyWeightChange: Math.round(weeklyWeightChange * 2.2 * 100) / 100,
+        currentWeight: Math.round(lastWeight * 2.20462 * 10) / 10,
+        projectedWeight: Math.round(projectedWeight * 2.20462 * 10) / 10,
+        weeklyWeightChange: Math.round(weeklyWeightChange * 2.20462 * 100) / 100,
         isRecomping,
-        estimatedMuscleGain: Math.round(estimatedMuscleGain * 2.2 * 10) / 10,
-        estimatedFatLoss: Math.round(estimatedFatLoss * 2.2 * 10) / 10,
+        estimatedMuscleGain: Math.round(estimatedMuscleGain * 2.20462 * 10) / 10,
+        estimatedFatLoss: Math.round(estimatedFatLoss * 2.20462 * 10) / 10,
         volumeTrend: volumeIncrease > 5 ? 'increasing' : volumeIncrease < -5 ? 'decreasing' : 'stable',
         recommendation: isRecomping 
           ? 'Great! You\'re building muscle while losing fat'
@@ -1260,6 +1277,11 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-sm opacity-75">{predictions.weightLoss.weeksToGoal} weeks</div>
               </div>
             </div>
+            {predictions.weightLoss.isLowDataWarning && (
+              <div className="bg-yellow-400/20 border border-yellow-300/40 rounded-lg p-3 text-sm mb-3">
+                ⚠️ <strong>Early estimate:</strong> Only {predictions.weightLoss.daysOfData} day{predictions.weightLoss.daysOfData !== 1 ? 's' : ''} of data — weekly rate capped at ±5 lbs/week. Log weight daily for 7+ days for accurate projections.
+              </div>
+            )}
             <div className="bg-white/10 rounded-lg p-3 text-sm">
               <strong>Confidence:</strong> {predictions.weightLoss.confidence}% • 
               <strong className="ml-2">Trend:</strong> {predictions.weightLoss.trend}

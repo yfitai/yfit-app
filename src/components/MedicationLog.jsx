@@ -131,14 +131,21 @@ export default function MedicationLog({ user }) {
       const actualLogCount = existingLogs?.length || 0
       console.log('[DEBUG] Actual log count in database:', actualLogCount)
       
-      // If log count matches expected, use existing logs
-      if (actualLogCount === expectedLogCount && actualLogCount > 0) {
-        console.log('[DEBUG] Log count matches, using existing logs')
+      // Check if every active medication has at least one log entry today
+      // (count-matching alone is fragile: adding a med mid-day can leave it without a log)
+      const loggedMedIds = new Set((existingLogs || []).map(l => l.user_medication_id))
+      const allMedIds = allMeds.map(m => m.id)
+      const missingMedIds = allMedIds.filter(id => !loggedMedIds.has(id))
+      console.log('[DEBUG] Missing med IDs (no log today):', missingMedIds)
+      
+      // If log count matches expected AND every med has a log, use existing logs
+      if (actualLogCount === expectedLogCount && actualLogCount > 0 && missingMedIds.length === 0) {
+        console.log('[DEBUG] Log count matches and all meds covered, using existing logs')
         setTodayLogs(existingLogs)
         return
       }
       
-      // Log count mismatch or no logs - regenerate
+      // Log count mismatch, missing meds, or no logs - regenerate
       console.log('[DEBUG] Log count mismatch or no logs. Regenerating...')
       
       // Delete existing logs for today
