@@ -58,19 +58,25 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
           
           if (foodData) {
             setFood(foodData)
-            // Map common unit names to our unit values
-            const unitMap = {
-              'grams': 'g',
-              'gram': 'g',
-              'ounces': 'oz',
-              'ounce': 'oz',
-              'pounds': 'lb',
-              'pound': 'lb',
-              'milliliters': 'ml',
-              'milliliter': 'ml'
+            // If the product has a label serving size, pre-select it so the user
+            // immediately sees the correct per-label serving (e.g. "1 scoop (30g)")
+            if (foodData.serving_size_label) {
+              setServingUnit('label_serving')
+            } else {
+              // Map common unit names to our unit values
+              const unitMap = {
+                'grams': 'g',
+                'gram': 'g',
+                'ounces': 'oz',
+                'ounce': 'oz',
+                'pounds': 'lb',
+                'pound': 'lb',
+                'milliliters': 'ml',
+                'milliliter': 'ml'
+              }
+              const mappedUnit = unitMap[foodData.serving_unit?.toLowerCase()] || foodData.serving_unit || 'serving'
+              setServingUnit(mappedUnit)
             }
-            const mappedUnit = unitMap[foodData.serving_unit?.toLowerCase()] || foodData.serving_unit || 'serving'
-            setServingUnit(mappedUnit)
           } else {
             setError(`Product not found for barcode: ${decodedText}`)
           }
@@ -233,23 +239,33 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
   if (food) {
     const isLiquid = food.foodType === 'liquid'
     
+    // Build label serving option from the raw serving_size_label on the package
+    // e.g. "1 scoop (30g)" → shown as "Label: 1 scoop (30g)"
+    const labelServingOption = food.serving_size_label
+      ? [{ value: 'label_serving', label: `Label: ${food.serving_size_label}` }]
+      : []
+    
     const units = isLiquid ? [
+      ...labelServingOption,
       { value: 'ml', label: 'Milliliters (ml)' },
       { value: 'fl_oz', label: 'Fluid Ounces (fl oz)' },
       { value: 'cup', label: 'Cups' },
       { value: 'tbsp', label: 'Tablespoons (tbsp)' },
       { value: 'tsp', label: 'Teaspoons (tsp)' },
       { value: 'g', label: 'Grams (g)' },
-      { value: 'serving', label: 'Serving' }
+      { value: 'serving', label: 'Serving (100g)' }
     ] : [
+      ...labelServingOption,
       { value: 'g', label: 'Grams (g)' },
       { value: 'oz', label: 'Ounces (oz)' },
       { value: 'lb', label: 'Pounds (lb)' },
-      { value: 'serving', label: 'Serving' }
+      { value: 'serving', label: 'Serving (100g)' }
     ]
     
     // Calculate nutrition based on current serving size
+    // label_serving uses the actual grams from the product label (servingGrams)
     const unitsWithGrams = isLiquid ? [
+      { value: 'label_serving', toGrams: food.servingGrams || 100 },
       { value: 'ml', toGrams: 1 },
       { value: 'fl_oz', toGrams: 29.57 },
       { value: 'cup', toGrams: 240 },
@@ -258,6 +274,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       { value: 'g', toGrams: 1 },
       { value: 'serving', toGrams: food.servingGrams || 100 }
     ] : [
+      { value: 'label_serving', toGrams: food.servingGrams || 100 },
       { value: 'g', toGrams: 1 },
       { value: 'oz', toGrams: 28.35 },
       { value: 'lb', toGrams: 453.59 },

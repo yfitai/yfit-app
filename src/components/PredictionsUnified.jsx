@@ -253,19 +253,37 @@ export default function PredictionsUnified({ user }) {
     if (data.length < 2) return null;
 
     try {
-      const sortedWeights = [...data].sort((a, b) => 
-        new Date(a.tracker_date).getTime() - new Date(b.tracker_date).getTime()
+      // Normalize tracker_date to calendar day (strip time) so daysBetween counts
+      // whole calendar days, not hours. This prevents a 2.8 lb drop logged at
+      // different times on consecutive days from extrapolating to 19+ lbs/week.
+      const toCalendarDay = (dateStr) => {
+        const d = new Date(dateStr);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      };
+
+      // Deduplicate by calendar day: keep the last entry per day
+      const byDay = {};
+      data.forEach(row => {
+        const dayKey = new Date(row.tracker_date).toISOString().split('T')[0];
+        if (!byDay[dayKey] || new Date(row.tracker_date) > new Date(byDay[dayKey].tracker_date)) {
+          byDay[dayKey] = row;
+        }
+      });
+      const sortedWeights = Object.values(byDay).sort((a, b) =>
+        toCalendarDay(a.tracker_date) - toCalendarDay(b.tracker_date)
       );
 
-      // Calculate weekly weight change rate
+      if (sortedWeights.length < 2) return null;
+
+      // Calculate weekly weight change rate using calendar-day boundaries
       const firstWeight = parseFloat(sortedWeights[0].weight_kg);
       const lastWeight = parseFloat(sortedWeights[sortedWeights.length - 1].weight_kg);
-      const firstDate = new Date(sortedWeights[0].tracker_date).getTime();
-      const lastDate = new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime();
+      const firstDay = toCalendarDay(sortedWeights[0].tracker_date);
+      const lastDay = toCalendarDay(sortedWeights[sortedWeights.length - 1].tracker_date);
       
-      const daysBetween = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
+      const daysBetween = (lastDay - firstDay) / (1000 * 60 * 60 * 24);
 
-      // Need at least 1 full day of separation to calculate a meaningful rate
+      // Need at least 1 full calendar day of separation to calculate a meaningful rate
       if (daysBetween < 1) return null;
 
       const weeklyChange = ((lastWeight - firstWeight) / daysBetween) * 7;

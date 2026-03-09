@@ -445,9 +445,25 @@ return {
   fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
   sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
   sodium: Math.round(nutriments.sodium_100g * 1000 / correctionFactor || 0),
-  servingSize: parseFloat(product.serving_size) || 100,
+  // Parse servingGrams from strings like "1 scoop (30g)", "3/4 cup (55g)", or plain "30g"
+  // Priority: (1) grams in parentheses e.g. "(30g)" or "(30 g)"
+  //           (2) plain numeric prefix e.g. "30g"
+  //           (3) fallback 100g
+  servingSize: (() => {
+    const raw = product.serving_size || '';
+    const inParens = raw.match(/\((\d+(?:\.\d+)?)\s*g\)/i);
+    if (inParens) return parseFloat(inParens[1]);
+    return parseFloat(raw) || 100;
+  })(),
   servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
-  servingGrams: parseFloat(product.serving_size) || 100,
+  servingGrams: (() => {
+    const raw = product.serving_size || '';
+    const inParens = raw.match(/\((\d+(?:\.\d+)?)\s*g\)/i);
+    if (inParens) return parseFloat(inParens[1]);
+    return parseFloat(raw) || 100;
+  })(),
+  // Keep the raw label string for display in the serving dropdown
+  serving_size_label: product.serving_size || null,
   serving_size: product.serving_size || '100g',
   serving_unit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',  
   foodType: isLiquid ? 'liquid' : 'solid'

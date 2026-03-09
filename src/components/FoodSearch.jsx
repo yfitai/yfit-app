@@ -27,7 +27,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
     const favorites = await getFavoriteFoods(user.id)
     
     setRecentFoods(recent)
-    setFavoriteFoods(favorites.slice(0, 5))
+    setFavoriteFoods(favorites) // Show all saved foods (no limit)
   }
 
   // Debounced search

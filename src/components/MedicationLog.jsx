@@ -54,7 +54,7 @@ export default function MedicationLog({ user }) {
         .select('*, medication:medications(name)')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .eq('is_supplement', false)
+        .or('is_supplement.eq.false,is_supplement.is.null')
         .order('created_at', { ascending: false })
 
       if (error) throw error
