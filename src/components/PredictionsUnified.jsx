@@ -377,15 +377,19 @@ export default function PredictionsUnified({ user }) {
         dailyMacroMap[day].carbs += parseFloat(log.carbs_g) || 0;
         dailyMacroMap[day].fat += parseFloat(log.fat_g) || 0;
       });
-      // For the rolling average, exclude days with < 500 cal (incomplete logging days)
-      // These skew the average down and don't represent real eating patterns
-      const completeDailyTotals = Object.values(dailyCalorieMap).filter(c => c >= 500);
-      const allDailyTotals = Object.values(dailyCalorieMap);
+      // For the rolling average, exclude:
+      //   1. Today's partial data (day isn't done yet — would drag avg down mid-day)
+      //   2. Days with < 500 cal (incomplete logging days)
       const todayCalories = dailyCalorieMap[todayStr] || 0;
+      const pastDailyCalorieMap = Object.fromEntries(
+        Object.entries(dailyCalorieMap).filter(([day]) => day !== todayStr)
+      );
+      const completeDailyTotals = Object.values(pastDailyCalorieMap).filter(c => c >= 500);
+      const allPastDailyTotals = Object.values(pastDailyCalorieMap);
       const avgCalories = completeDailyTotals.length > 0
         ? Math.round(completeDailyTotals.reduce((sum, c) => sum + c, 0) / completeDailyTotals.length)
-        : allDailyTotals.length > 0
-          ? Math.round(allDailyTotals.reduce((sum, c) => sum + c, 0) / allDailyTotals.length)
+        : allPastDailyTotals.length > 0
+          ? Math.round(allPastDailyTotals.reduce((sum, c) => sum + c, 0) / allPastDailyTotals.length)
           : 1875; // Default fallback if no valid nutrition data
 
       // Check if nutrition data looks incomplete (avg < 800 cal/day is unrealistic)
@@ -584,12 +588,16 @@ export default function PredictionsUnified({ user }) {
         byDate[day].fat += parseFloat(log.fat_g) || 0;
         byDate[day].calories += parseFloat(log.calories) || 0;
       });
-      // Exclude days with < 500 cal total — these are incomplete logging days that
-      // skew the average down (e.g., only logged one snack on a given day)
+      // Exclude today's partial data (day isn't done yet) and days with < 500 cal
+      // (incomplete logging days that skew the average down)
       const allDayEntries = Object.entries(byDate);
-      const dayEntries = allDayEntries.filter(([, d]) => d.calories >= 500);
-      // Fall back to all entries if filtering leaves too few days
-      const entriesForAvg = dayEntries.length >= 2 ? dayEntries : allDayEntries;
+      const pastDayEntries = allDayEntries.filter(([day]) => day !== todayStr);
+      const dayEntries = pastDayEntries.filter(([, d]) => d.calories >= 500);
+      // Fall back to past days without 500-cal filter if filtering leaves too few,
+      // then fall back to all days (including today) only if there are no past days at all
+      const entriesForAvg = dayEntries.length >= 1 ? dayEntries
+        : pastDayEntries.length >= 1 ? pastDayEntries
+        : allDayEntries;
       const numDays = entriesForAvg.length;
 
       const avgMacros = {
