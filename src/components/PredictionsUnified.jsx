@@ -362,7 +362,9 @@ export default function PredictionsUnified({ user }) {
 
     try {
       // Group meals by day first, then average daily totals (not individual food item rows)
-      const validNutritionData = nData.filter(log => parseFloat(log.calories) > 50);
+      // Filter out truly empty/invalid entries only (> 5 cal threshold)
+      // Using > 50 was too aggressive and excluded real low-calorie foods (pickles, condiments, etc.)
+      const validNutritionData = nData.filter(log => parseFloat(log.calories) > 5);
       const dailyCalorieMap = {};
       const dailyMacroMap = {};
       // Use LOCAL date string (not UTC) so today's meals always match today's date
@@ -571,8 +573,9 @@ export default function PredictionsUnified({ user }) {
 
   // 4. Nutrition Pattern Analysis
   const analyzeNutritionPatterns = (data = nutritionData) => {
-    // Filter out invalid entries (less than 50 calories - likely incomplete)
-    const validData = data.filter(log => parseFloat(log.calories) > 50);
+    // Filter out truly empty/invalid entries only (> 5 cal threshold)
+    // Using > 50 was too aggressive and excluded real low-calorie foods (pickles, condiments, etc.)
+    const validData = data.filter(log => parseFloat(log.calories) > 5);
     
     if (validData.length < 3) return null; // Reduced from 7 to 3
 
