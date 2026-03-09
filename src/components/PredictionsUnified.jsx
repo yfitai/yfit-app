@@ -253,18 +253,27 @@ export default function PredictionsUnified({ user }) {
     if (data.length < 2) return null;
 
     try {
-      // Normalize tracker_date to calendar day (strip time) so daysBetween counts
-      // whole calendar days, not hours. This prevents a 2.8 lb drop logged at
-      // different times on consecutive days from extrapolating to 19+ lbs/week.
-      const toCalendarDay = (dateStr) => {
+      // Extract the calendar date string (YYYY-MM-DD) from a timestamp.
+      // We use the LOCAL date portion of the stored timestamp to avoid UTC-to-local
+      // timezone shifts collapsing two consecutive days into the same calendar day.
+      // e.g. "2026-03-09T02:00:00Z" in CDT (UTC-5) would become March 8 locally
+      // if we used new Date().toISOString() — instead we slice the raw string.
+      const toDateKey = (dateStr) => {
+        // If the string already looks like YYYY-MM-DD... just take the first 10 chars
+        if (typeof dateStr === 'string' && dateStr.length >= 10) return dateStr.slice(0, 10);
+        // Fallback: use local date parts
         const d = new Date(dateStr);
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
       };
+      const toCalendarDay = (dateStr) => new Date(toDateKey(dateStr) + 'T12:00:00').getTime();
 
       // Deduplicate by calendar day: keep the last entry per day
       const byDay = {};
       data.forEach(row => {
-        const dayKey = new Date(row.tracker_date).toISOString().split('T')[0];
+        const dayKey = toDateKey(row.tracker_date);
         if (!byDay[dayKey] || new Date(row.tracker_date) > new Date(byDay[dayKey].tracker_date)) {
           byDay[dayKey] = row;
         }

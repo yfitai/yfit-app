@@ -141,7 +141,20 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
     ]
     
-    const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
+    // Build the full unit lookup including label_serving so calories are correct when saving
+    const allUnitsWithGrams = [
+      { value: 'label_serving', toGrams: food?.servingGrams || 100 },
+      { value: 'ml', toGrams: 1 },
+      { value: 'fl_oz', toGrams: 29.57 },
+      { value: 'cup', toGrams: 240 },
+      { value: 'tbsp', toGrams: 15 },
+      { value: 'tsp', toGrams: 5 },
+      { value: 'g', toGrams: 1 },
+      { value: 'oz', toGrams: 28.35 },
+      { value: 'lb', toGrams: 453.59 },
+      { value: 'serving', toGrams: food?.servingGrams || 100 }
+    ]
+    const selectedUnit = allUnitsWithGrams.find(u => u.value === servingUnit) || allUnitsWithGrams.find(u => u.value === 'g')
     const totalGrams = servingQuantity * selectedUnit.toGrams
     const multiplier = totalGrams / 100
     
@@ -155,8 +168,8 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       fiber: Math.round((food.fiber || 0) * multiplier),
       sugar: Math.round((food.sugar || 0) * multiplier),
       sodium: Math.round((food.sodium || 0) * multiplier),
-      serving_quantity: servingQuantity,
-      serving_unit: servingUnit,
+      serving_quantity: servingUnit === 'label_serving' ? totalGrams : servingQuantity,
+      serving_unit: servingUnit === 'label_serving' ? 'g' : servingUnit,
       brand: food.brand || '',
       food_id: food.id || null
     }
