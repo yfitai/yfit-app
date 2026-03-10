@@ -68,10 +68,15 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null
       setUser(currentUser)
-      if (currentUser) {
+      // Only run heavy checks on actual sign-in events, NOT on TOKEN_REFRESHED
+      // TOKEN_REFRESHED fires every hour and was causing repeated Supabase queries
+      if (currentUser && (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION')) {
         setAnalyticsUser(currentUser.id)
         setupGlobalErrorHandlers(currentUser.id)
-        await checkOnboardingStatus(currentUser.id)
+        await Promise.race([
+          checkOnboardingStatus(currentUser.id),
+          new Promise(resolve => setTimeout(resolve, 3000))
+        ])
         if (_event === 'SIGNED_IN') {
           Analytics.login()
         }
