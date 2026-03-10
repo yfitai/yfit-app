@@ -28,13 +28,16 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       // FORCE HTML5 scanner to avoid native plugin crash
       const Html5Qrcode = (await import('html5-qrcode')).Html5Qrcode
       
-      // Check camera permission first
-      const permission = await Camera.checkPermissions()
-      if (permission.camera === 'denied') {
-        const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
-        if (requestResult.camera !== 'granted') {
-          setError('Camera permission denied')
-          return
+      // Check camera permission via Capacitor on native only
+      // On web, Camera.checkPermissions() hangs - let Html5Qrcode handle it natively
+      if (Capacitor.isNativePlatform()) {
+        const permission = await Camera.checkPermissions()
+        if (permission.camera === 'denied') {
+          const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
+          if (requestResult.camera !== 'granted') {
+            setError('Camera permission denied')
+            return
+          }
         }
       }
 
