@@ -28,27 +28,12 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       // FORCE HTML5 scanner to avoid native plugin crash
       const Html5Qrcode = (await import('html5-qrcode')).Html5Qrcode
       
-      // Use browser-native permission check (works on web AND native)
-      // Camera.checkPermissions() hangs on web browser - use getUserMedia instead
-      if (Capacitor.isNativePlatform()) {
-        // On native, use Capacitor Camera plugin for permissions
-        const permission = await Camera.checkPermissions()
-        if (permission.camera === 'denied') {
-          const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
-          if (requestResult.camera !== 'granted') {
-            setError('Camera permission denied. Please enable camera access in your device settings.')
-            return
-          }
-        }
-      } else {
-        // On web, check via browser API (no hanging)
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-          // Permission granted - stop the test stream immediately
-          stream.getTracks().forEach(track => track.stop())
-        } catch (permErr) {
-          setError('Camera permission denied. Please allow camera access in your browser.')
-          setScanning(false)
+      // Check camera permission first
+      const permission = await Camera.checkPermissions()
+      if (permission.camera === 'denied') {
+        const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
+        if (requestResult.camera !== 'granted') {
+          setError('Camera permission denied')
           return
         }
       }

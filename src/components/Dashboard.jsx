@@ -79,25 +79,33 @@ export default function Dashboard({ user }) {
   const loadDashboardStats = async () => {
     if (!user) return
     
-    const today = new Date().toISOString().split('T')[0]
+    const now = new Date()
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     
     // Get today's steps from daily_logs
-    const { data: trackerData, error: trackerError } = await supabase
+    // Use timezone-safe UTC window (same approach as DailyTracker)
+    const startUTC = new Date(`${localDate}T00:00:00`)
+    startUTC.setHours(startUTC.getHours() - 14)
+    const endUTC = new Date(`${localDate}T23:59:59`)
+    endUTC.setHours(endUTC.getHours() + 14)
+    
+    const { data: trackerRows } = await supabase
       .from('daily_logs')
       .select('steps')
       .eq('user_id', user.id)
-      .gte('logged_at', `${today}T00:00:00`)
-      .lte('logged_at', `${today}T23:59:59`)
+      .gte('logged_at', startUTC.toISOString())
+      .lte('logged_at', endUTC.toISOString())
       .order('logged_at', { ascending: false })
       .limit(1)
-      .single()
     
+    const trackerData = trackerRows?.[0] || null
     if (trackerData?.steps) {
       setStepsToday(trackerData.steps)
     }
     
     // Get today's calories from meals
-    const { data: mealsData, error: mealsError } = await supabase
+    const today = localDate
+    const { data: mealsData } = await supabase
       .from('meals')
       .select('calories')
       .eq('user_id', user.id)
@@ -108,16 +116,18 @@ export default function Dashboard({ user }) {
       setCaloriesToday(Math.round(totalCalories))
     }
     
-    // Get this week's workouts count
+    // Get this week's completed workout sessions
+    // Fitness page stores completed workouts in workout_sessions (not workouts table)
     const startOfWeek = new Date()
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
-    const startOfWeekStr = startOfWeek.toISOString().split('T')[0]
+    startOfWeek.setHours(0, 0, 0, 0)
     
-    const { data: workoutsData, error: workoutsError } = await supabase
-      .from('workouts')
+    const { data: workoutsData } = await supabase
+      .from('workout_sessions')
       .select('id')
       .eq('user_id', user.id)
-      .gte('created_at', `${startOfWeekStr}T00:00:00`)
+      .eq('is_completed', true)
+      .gte('start_time', startOfWeek.toISOString())
     
     if (workoutsData) {
       setWorkoutsThisWeek(workoutsData.length)
