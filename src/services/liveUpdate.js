@@ -1,66 +1,88 @@
-import { LiveUpdate } from '@capawesome/capacitor-live-update';
 import { Capacitor } from '@capacitor/core';
+
+// LiveUpdate plugin loaded lazily - only on native
+let LiveUpdate = null;
 
 const UPDATE_URL = 'https://yfit-deploy.vercel.app/updates/bundle.zip';
 const BUNDLE_ID = 'production';
 
 export class LiveUpdateService {
   static async initialize() {
-    // Only run on native platforms
+    // Never run on web - no plugin available
     if (!Capacitor.isNativePlatform()) {
       console.log('LiveUpdate: Skipping - running in browser');
       return;
     }
 
+    // Lazily import plugin so web bundle doesn't fail
     try {
-      console.log('LiveUpdate: Initializing...');
-      
-      // Check for updates on app start
-      await this.checkForUpdates();
-      
-      // Mark app as ready (important for rollback protection)
-      await LiveUpdate.ready();
-      
-      console.log('LiveUpdate: Initialized successfully');
-    } catch (error) {
-      console.error('LiveUpdate: Initialization error:', error);
+      const mod = await import('@capawesome/capacitor-live-update');
+      LiveUpdate = mod.LiveUpdate;
+    } catch (err) {
+      console.log('LiveUpdate: Plugin not available:', err.message);
+      return;
     }
+
+    // Wrap entire init in a 5-second timeout so a failed/slow
+    // update check NEVER blocks app startup (no more spinning disk)
+    await Promise.race([
+      this._doInitialize(),
+      new Promise((resolve) =>
+        setTimeout(() => {
+          console.warn('LiveUpdate: Timed out after 5s - continuing without update');
+          resolve();
+        }, 5000)
+      ),
+    ]).catch((err) => {
+      console.error('LiveUpdate: Init error (non-blocking):', err.message);
+    });
   }
 
-  static async checkForUpdates() {
+  static async _doInitialize() {
+    if (!LiveUpdate) return;
+
+    // Mark app as ready first (rollback protection) - must run even if update fails
     try {
-      console.log('LiveUpdate: Checking for updates...');
-      
-      // Get current bundle info
+      await LiveUpdate.ready();
+      console.log('LiveUpdate: App marked as ready');
+    } catch (e) {
+      console.log('LiveUpdate: ready() skipped:', e.message);
+    }
+
+    // Run update check in background - does NOT block app startup
+    this._checkForUpdatesBackground();
+  }
+
+  static async _checkForUpdatesBackground() {
+    if (!LiveUpdate) return;
+    try {
       const currentBundle = await LiveUpdate.getCurrentBundle();
       console.log('LiveUpdate: Current bundle:', currentBundle);
 
-      // Download the latest bundle from Vercel
+      // Quick HEAD check before attempting full download
+      // Avoids long hang when bundle.zip doesn't exist yet
+      const headCheck = await fetch(UPDATE_URL, { method: 'HEAD' }).catch(() => null);
+      if (!headCheck || !headCheck.ok) {
+        console.log('LiveUpdate: No bundle available at update URL - skipping download');
+        return;
+      }
+
       const result = await LiveUpdate.downloadBundle({
         url: UPDATE_URL,
         bundleId: BUNDLE_ID,
       });
 
-      console.log('LiveUpdate: Download result:', result);
-
       if (result.bundleId) {
-        // Set the downloaded bundle as next bundle
-        await LiveUpdate.setNextBundle({
-          bundleId: result.bundleId,
-        });
-
-        console.log('LiveUpdate: Update downloaded! Will apply on next app restart.');
-        
-        // Optionally reload immediately (or wait for next app launch)
-        // await LiveUpdate.reload();
+        await LiveUpdate.setNextBundle({ bundleId: result.bundleId });
+        console.log('LiveUpdate: Update downloaded - will apply on next restart');
       }
     } catch (error) {
-      // Update not available or download failed
-      console.log('LiveUpdate: No update available or error:', error.message);
+      console.log('LiveUpdate: Background check failed (non-blocking):', error.message);
     }
   }
 
   static async reload() {
+    if (!LiveUpdate) return;
     try {
       await LiveUpdate.reload();
     } catch (error) {
@@ -69,9 +91,9 @@ export class LiveUpdateService {
   }
 
   static async getCurrentVersion() {
+    if (!LiveUpdate) return null;
     try {
-      const bundle = await LiveUpdate.getCurrentBundle();
-      return bundle;
+      return await LiveUpdate.getCurrentBundle();
     } catch (error) {
       console.error('LiveUpdate: Get version error:', error);
       return null;

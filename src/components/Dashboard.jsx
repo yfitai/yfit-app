@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain, Lock, Eye, EyeOff } from 'lucide-react'
+import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain, Lock, Eye, EyeOff, Flame } from 'lucide-react'
 import { supabase, signOut, getUserProfile } from '../lib/supabase'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
@@ -22,8 +22,7 @@ export default function Dashboard({ user }) {
   const [caloriesToday, setCaloriesToday] = useState(0)
   const [caloriesGoal, setCaloriesGoal] = useState(2000)
   const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
-  const [healthScore, setHealthScore] = useState(null)
-  const [statsLoaded, setStatsLoaded] = useState(false)
+  const [streakDays, setStreakDays] = useState(null)
   
   // Change Password modal state
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -165,72 +164,50 @@ export default function Dashboard({ user }) {
     if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
     if (goalsData.adjusted_calories) setCaloriesGoal(Math.round(goalsData.adjusted_calories))
     
-    // ── Weekly Wellness Score (completed days only: Sun–yesterday) ──
-    // Fetch daily_logs for this week EXCLUDING today
-    const yesterday = new Date(now)
-    yesterday.setDate(yesterday.getDate() - 1)
-    yesterday.setHours(23, 59, 59, 999)
-
-    const { data: weeklyLogs } = await supabase
+    // ── Activity Streak: consecutive days with any log entry ──
+    // Fetch last 90 days of daily_logs to count streak
+    const ninetyDaysAgo = new Date(now)
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+    const { data: streakLogs } = await supabase
       .from('daily_logs')
-      .select('steps, logged_at')
+      .select('logged_at')
       .eq('user_id', user.id)
-      .gte('logged_at', startOfWeek.toISOString())
-      .lte('logged_at', yesterday.toISOString())
-      .order('logged_at', { ascending: true })
-
-    // Fetch weekly meals EXCLUDING today
-    const yesterdayDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
-    const startOfWeekDate = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, '0')}-${String(startOfWeek.getDate()).padStart(2, '0')}`
-
-    const { data: weeklyMeals } = await supabase
-      .from('meals')
-      .select('calories, meal_date')
-      .eq('user_id', user.id)
-      .gte('meal_date', startOfWeekDate)
-      .lte('meal_date', yesterdayDate)
-
-    // Calculate wellness score from completed days only
-    calculateWellnessScore(weeklyLogs, weeklyMeals, workoutsData, goalsData)
+      .gte('logged_at', ninetyDaysAgo.toISOString())
+      .order('logged_at', { ascending: false })
+    calculateStreak(streakLogs)
   }
 
-  const calculateWellnessScore = (weeklyLogs, weeklyMeals, workoutsData, goalsData) => {
-    let score = 0
-    let maxScore = 0
-
-    // Steps: average daily steps across logged days vs goal (33 points)
-    if (weeklyLogs && weeklyLogs.length > 0 && goalsData?.steps_goal) {
-      const avgSteps = weeklyLogs.reduce((sum, d) => sum + (d.steps || 0), 0) / weeklyLogs.length
-      const stepsPercent = Math.min(avgSteps / goalsData.steps_goal, 1)
-      score += stepsPercent * 33
+  const calculateStreak = (logs) => {
+    if (!logs || logs.length === 0) {
+      setStreakDays(0)
+      return
     }
-    maxScore += 33
-
-    // Calories: average daily calories across logged days vs goal (34 points)
-    if (weeklyMeals && weeklyMeals.length > 0 && goalsData?.adjusted_calories) {
-      // Group by date and sum per day
-      const byDate = {}
-      weeklyMeals.forEach(m => {
-        byDate[m.meal_date] = (byDate[m.meal_date] || 0) + (m.calories || 0)
+    // Build a set of unique YYYY-MM-DD dates that have a log entry
+    const loggedDates = new Set(
+      logs.map(l => {
+        const d = new Date(l.logged_at)
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
       })
-      const days = Object.values(byDate)
-      const avgCals = days.reduce((a, b) => a + b, 0) / days.length
-      const calsPercent = Math.min(avgCals / goalsData.adjusted_calories, 1)
-      score += calsPercent * 34
+    )
+    // Walk backwards from today counting consecutive days
+    let streak = 0
+    const cursor = new Date()
+    cursor.setHours(0, 0, 0, 0)
+    // Include today if already logged, otherwise start from yesterday
+    const todayStr = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
+    if (!loggedDates.has(todayStr)) {
+      cursor.setDate(cursor.getDate() - 1)
     }
-    maxScore += 34
-
-    // Workouts: strength sessions this week vs 3-per-week target (33 points)
-    if (workoutsData) {
-      const workoutScore = Math.min(workoutsData.length / 3, 1) * 33
-      score += workoutScore
+    for (let i = 0; i < 90; i++) {
+      const dateStr = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
+      if (loggedDates.has(dateStr)) {
+        streak++
+        cursor.setDate(cursor.getDate() - 1)
+      } else {
+        break
+      }
     }
-    maxScore += 33
-
-    // If no completed days yet this week, show 0
-    const hasData = (weeklyLogs && weeklyLogs.length > 0) || (weeklyMeals && weeklyMeals.length > 0) || (workoutsData && workoutsData.length > 0)
-    setHealthScore(hasData ? Math.round((score / maxScore) * 100) : 0)
-    setStatsLoaded(true)
+    setStreakDays(streak)
   }
 
   const setGreetingAndQuote = () => {
@@ -409,16 +386,16 @@ export default function Dashboard({ user }) {
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Weekly Wellness</CardTitle>
-              <Heart className="h-4 w-4 text-red-600" />
+              <CardTitle className="text-sm font-medium">Day Streak</CardTitle>
+              <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {statsLoaded ? `${healthScore}/100` : '--'}
+                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? 'day' : 'days'}` : '--'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {statsLoaded 
-                  ? healthScore >= 75 ? 'Excellent week!' : healthScore >= 50 ? 'Good progress!' : healthScore > 0 ? 'Keep going!' : 'Log days to score'
+                {streakDays !== null
+                  ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
                   : 'Loading...'
                 }
               </p>
