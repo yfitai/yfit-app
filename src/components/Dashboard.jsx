@@ -165,38 +165,71 @@ export default function Dashboard({ user }) {
     if (goalsData.steps_goal) setStepsGoal(goalsData.steps_goal)
     if (goalsData.adjusted_calories) setCaloriesGoal(Math.round(goalsData.adjusted_calories))
     
-    // Calculate health score (0-100)
-    calculateHealthScore(trackerData, mealsData, workoutsData, goalsData)
+    // ── Weekly Wellness Score (completed days only: Sun–yesterday) ──
+    // Fetch daily_logs for this week EXCLUDING today
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    yesterday.setHours(23, 59, 59, 999)
+
+    const { data: weeklyLogs } = await supabase
+      .from('daily_logs')
+      .select('steps, logged_at')
+      .eq('user_id', user.id)
+      .gte('logged_at', startOfWeek.toISOString())
+      .lte('logged_at', yesterday.toISOString())
+      .order('logged_at', { ascending: true })
+
+    // Fetch weekly meals EXCLUDING today
+    const yesterdayDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
+    const startOfWeekDate = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, '0')}-${String(startOfWeek.getDate()).padStart(2, '0')}`
+
+    const { data: weeklyMeals } = await supabase
+      .from('meals')
+      .select('calories, meal_date')
+      .eq('user_id', user.id)
+      .gte('meal_date', startOfWeekDate)
+      .lte('meal_date', yesterdayDate)
+
+    // Calculate wellness score from completed days only
+    calculateWellnessScore(weeklyLogs, weeklyMeals, workoutsData, goalsData)
   }
 
-  const calculateHealthScore = (trackerData, mealsData, workoutsData, goalsData) => {
+  const calculateWellnessScore = (weeklyLogs, weeklyMeals, workoutsData, goalsData) => {
     let score = 0
     let maxScore = 0
-    
-    // Steps contribution (25 points)
-    if (trackerData?.steps && goalsData?.steps_goal) {
-      const stepsPercent = Math.min(trackerData.steps / goalsData.steps_goal, 1)
-      score += stepsPercent * 25
+
+    // Steps: average daily steps across logged days vs goal (33 points)
+    if (weeklyLogs && weeklyLogs.length > 0 && goalsData?.steps_goal) {
+      const avgSteps = weeklyLogs.reduce((sum, d) => sum + (d.steps || 0), 0) / weeklyLogs.length
+      const stepsPercent = Math.min(avgSteps / goalsData.steps_goal, 1)
+      score += stepsPercent * 33
     }
-    maxScore += 25
-    
-    // Calories contribution (25 points)
-    if (mealsData && mealsData.length > 0 && goalsData?.adjusted_calories) {
-      const totalCalories = mealsData.reduce((sum, meal) => sum + (meal.calories || 0), 0)
-      const caloriesPercent = Math.min(totalCalories / goalsData.adjusted_calories, 1)
-      score += caloriesPercent * 25
+    maxScore += 33
+
+    // Calories: average daily calories across logged days vs goal (34 points)
+    if (weeklyMeals && weeklyMeals.length > 0 && goalsData?.adjusted_calories) {
+      // Group by date and sum per day
+      const byDate = {}
+      weeklyMeals.forEach(m => {
+        byDate[m.meal_date] = (byDate[m.meal_date] || 0) + (m.calories || 0)
+      })
+      const days = Object.values(byDate)
+      const avgCals = days.reduce((a, b) => a + b, 0) / days.length
+      const calsPercent = Math.min(avgCals / goalsData.adjusted_calories, 1)
+      score += calsPercent * 34
     }
-    maxScore += 25
-    
-    // Workouts contribution (25 points) - 3+ workouts per week = full points
+    maxScore += 34
+
+    // Workouts: strength sessions this week vs 3-per-week target (33 points)
     if (workoutsData) {
-      const workoutScore = Math.min(workoutsData.length / 3, 1) * 25
+      const workoutScore = Math.min(workoutsData.length / 3, 1) * 33
       score += workoutScore
     }
-    maxScore += 25
-    
-    // Score is based purely on activity - starts at 0 and increases with steps, calories, workouts
-    setHealthScore(Math.round((score / maxScore) * 100))
+    maxScore += 33
+
+    // If no completed days yet this week, show 0
+    const hasData = (weeklyLogs && weeklyLogs.length > 0) || (weeklyMeals && weeklyMeals.length > 0) || (workoutsData && workoutsData.length > 0)
+    setHealthScore(hasData ? Math.round((score / maxScore) * 100) : 0)
     setStatsLoaded(true)
   }
 
@@ -376,7 +409,7 @@ export default function Dashboard({ user }) {
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Weekly Wellness</CardTitle>
               <Heart className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
@@ -385,7 +418,7 @@ export default function Dashboard({ user }) {
               </div>
               <p className="text-xs text-muted-foreground">
                 {statsLoaded 
-                  ? healthScore >= 75 ? 'Excellent!' : healthScore >= 50 ? 'Good progress!' : 'Keep going!'
+                  ? healthScore >= 75 ? 'Excellent week!' : healthScore >= 50 ? 'Good progress!' : healthScore > 0 ? 'Keep going!' : 'Log days to score'
                   : 'Loading...'
                 }
               </p>
