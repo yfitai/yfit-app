@@ -23,6 +23,7 @@ export default function Dashboard({ user }) {
   const [caloriesGoal, setCaloriesGoal] = useState(2000)
   const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
   const [healthScore, setHealthScore] = useState(null)
+  const [statsLoaded, setStatsLoaded] = useState(false)
   
   // Change Password modal state
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -181,6 +182,7 @@ export default function Dashboard({ user }) {
     
     // Score is based purely on activity - starts at 0 and increases with steps, calories, workouts
     setHealthScore(Math.round((score / maxScore) * 100))
+    setStatsLoaded(true)
   }
 
   const setGreetingAndQuote = () => {
@@ -364,12 +366,12 @@ export default function Dashboard({ user }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {healthScore !== null ? `${healthScore}/100` : '--'}
+                {statsLoaded ? `${healthScore}/100` : '--'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {healthScore !== null 
-                  ? healthScore >= 75 ? 'Excellent!' : healthScore >= 50 ? 'Good progress' : 'Keep going!'
-                  : 'Complete profile to see'
+                {statsLoaded 
+                  ? healthScore >= 75 ? 'Excellent!' : healthScore >= 50 ? 'Good progress!' : 'Keep going!'
+                  : 'Loading...'
                 }
               </p>
             </CardContent>
