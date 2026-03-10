@@ -22,11 +22,16 @@ import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import VersionChecker from './utils/VersionChecker'
 import { LiveUpdateService } from './services/liveUpdate'
+import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
+import OnboardingWizard from './components/OnboardingWizard'
+import FeedbackButton from './components/FeedbackButton'
+import { setAnalyticsUser, Analytics } from './lib/analytics'
 import './App.css'
 
 function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [needsOnboarding, setNeedsOnboarding] = useState(false)
 
   useEffect(() => {
     // Initialize LiveUpdate service for OTA updates
@@ -35,18 +40,54 @@ function App() {
     })
 
     // Check for existing session
-    getCurrentUser().then((currentUser) => {
+    getCurrentUser().then(async (currentUser) => {
       setUser(currentUser)
+      if (currentUser) {
+        setAnalyticsUser(currentUser.id)
+        setupGlobalErrorHandlers(currentUser.id)
+        await checkOnboardingStatus(currentUser.id)
+      }
       setLoading(false)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      if (currentUser) {
+        setAnalyticsUser(currentUser.id)
+        setupGlobalErrorHandlers(currentUser.id)
+        await checkOnboardingStatus(currentUser.id)
+        if (_event === 'SIGNED_IN') {
+          Analytics.login()
+        }
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const checkOnboardingStatus = async (userId) => {
+    try {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('onboarding_completed')
+        .eq('user_id', userId)
+        .maybeSingle()
+      
+      // Show onboarding if profile doesn't exist or onboarding not completed
+      if (!data || !data.onboarding_completed) {
+        setNeedsOnboarding(true)
+      }
+    } catch {
+      // If table doesn't exist yet, skip onboarding gracefully
+      setNeedsOnboarding(false)
+    }
+  }
+
+  const handleOnboardingComplete = () => {
+    setNeedsOnboarding(false)
+  }
 
   const handleAuthSuccess = (authenticatedUser) => {
     setUser(authenticatedUser)
@@ -64,52 +105,67 @@ function App() {
   }
 
   if (!user) {
-    return <Auth onAuthSuccess={handleAuthSuccess} />
+    return (
+      <ErrorBoundary>
+        <Auth onAuthSuccess={handleAuthSuccess} />
+      </ErrorBoundary>
+    )
+  }
+
+  // Show onboarding wizard for new users
+  if (needsOnboarding) {
+    return (
+      <ErrorBoundary userId={user.id}>
+        <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
+      </ErrorBoundary>
+    )
   }
 
   return (
-    <UnitPreferenceProvider>
-      <VersionChecker />
-      <BrowserRouter>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-          <Navigation user={user} />
-          
+    <ErrorBoundary userId={user.id}>
+      <UnitPreferenceProvider>
+        <VersionChecker />
+        <BrowserRouter>
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+            <Navigation user={user} />
 
-                 <Routes>
-            {/* Public Routes - No login required */}
-            <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-            <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-            <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/legal" element={<Legal />} />
+            <Routes>
+              {/* Public Routes - No login required */}
+              <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+              <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/legal" element={<Legal />} />
 
-            {/* Protected Routes - Login required */}
-            {user ? (
-              <>
-                <Route path="/dashboard" element={<Dashboard user={user} />} />
-                <Route path="/goals" element={<Goals user={user} />} />
-                <Route path="/nutrition" element={<NutritionUnified user={user} />} />
-                <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
-                <Route path="/fitness" element={<Fitness user={user} />} />
-                <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
-                <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
-                <Route path="/medications" element={<Medications user={user} />} />
-                <Route path="/progress" element={<Progress user={user} />} />
-                <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
-                <Route path="/predictions" element={<PredictionsUnified user={user} />} />
-                <Route path="/manual-cleanup" element={<ManualCleanup />} />
-              </>
-            ) : (
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            )}
-          </Routes>
+              {/* Protected Routes - Login required */}
+              {user ? (
+                <>
+                  <Route path="/dashboard" element={<Dashboard user={user} />} />
+                  <Route path="/goals" element={<Goals user={user} />} />
+                  <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                  <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
+                  <Route path="/fitness" element={<Fitness user={user} />} />
+                  <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
+                  <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
+                  <Route path="/medications" element={<Medications user={user} />} />
+                  <Route path="/progress" element={<Progress user={user} />} />
+                  <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
+                  <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                  <Route path="/manual-cleanup" element={<ManualCleanup />} />
+                </>
+              ) : (
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              )}
+            </Routes>
 
-        <Footer />
+            <Footer />
 
-       
-        </div>
-      </BrowserRouter>
-    </UnitPreferenceProvider>
+            {/* Floating feedback button - visible on all authenticated pages */}
+            <FeedbackButton user={user} />
+          </div>
+        </BrowserRouter>
+      </UnitPreferenceProvider>
+    </ErrorBoundary>
   )
 }
 

@@ -33,7 +33,7 @@ export const getUserProfile = async (userId) => {
 }
 
 // Helper function to sign up
-export const signUp = async (email, password, firstName, lastName) => {
+export const signUp = async (email, password, firstName, lastName, inviteCode = null) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -62,8 +62,19 @@ export const signUp = async (email, password, firstName, lastName) => {
       .insert({
         user_id: data.user.id,
         full_name: `${firstName} ${lastName}`,
-        email: email
+        email: email,
+        beta_invite_code: inviteCode,
+        is_beta_user: true,
+        onboarding_completed: false,
+        onboarding_step: 0
       })
+
+    // Increment invite code use count
+    if (inviteCode) {
+      await supabase.rpc('increment_invite_use', { invite_code: inviteCode }).catch(() => {
+        // Non-critical: silently fail if RPC not set up yet
+      })
+    }
     
     if (profileError) {
       console.error('Error creating profile:', profileError)
