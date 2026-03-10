@@ -40,13 +40,27 @@ function App() {
     })
 
     // Check for existing session
+    // Hard 8-second safety timeout - guarantees spinner NEVER gets stuck
+    const startupTimeout = setTimeout(() => {
+      console.warn('App startup timed out after 8s - forcing load')
+      setLoading(false)
+    }, 8000)
+
     getCurrentUser().then(async (currentUser) => {
       setUser(currentUser)
       if (currentUser) {
         setAnalyticsUser(currentUser.id)
         setupGlobalErrorHandlers(currentUser.id)
-        await checkOnboardingStatus(currentUser.id)
+        // Onboarding check has its own 3-second timeout so it can't block startup
+        await Promise.race([
+          checkOnboardingStatus(currentUser.id),
+          new Promise(resolve => setTimeout(resolve, 3000))
+        ])
       }
+      clearTimeout(startupTimeout)
+      setLoading(false)
+    }).catch(() => {
+      clearTimeout(startupTimeout)
       setLoading(false)
     })
 
