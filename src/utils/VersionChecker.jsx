@@ -13,25 +13,16 @@ export const VersionChecker = () => {
 
 
   useEffect(() => {
-    // Only run on mobile (Capacitor)
     const isNative = Capacitor.isNativePlatform();
-
-    
-    if (!isNative) {
-      return;
-    }
 
     // One-time migration: clear old buildNumber-based storage
     const oldKey = 'app_version';
     if (localStorage.getItem(oldKey)) {
-      console.log('Migrating from buildNumber to timestamp-based versioning');
       localStorage.removeItem(oldKey);
-      // This will force the app to detect the next update
     }
 
     const checkVersion = async () => {
       try {
-        // Fetch version from server with cache-busting timestamp
         const response = await fetch(`/version.json?t=${Date.now()}`, {
           cache: 'no-store',
           headers: {
@@ -41,62 +32,52 @@ export const VersionChecker = () => {
           }
         });
         
-        if (!response.ok) {
-          console.log('Version check failed:', response.status);
-          return;
-        }
+        if (!response.ok) return;
 
         const serverVersion = await response.json();
         const storedVersion = localStorage.getItem(CURRENT_VERSION_KEY);
 
-        console.log('Version check:', {
-          server: serverVersion.timestamp,
-          stored: storedVersion
-        });
-        
-
-
-        // If version changed, show update banner instead of auto-reloading
         if (storedVersion && storedVersion !== serverVersion.timestamp) {
-          console.log('New version detected!', {
-            old: storedVersion,
-            new: serverVersion.timestamp
-          });
+          console.log('New version detected:', serverVersion.timestamp);
           setUpdateAvailable(true);
           setNewVersion(serverVersion);
         } else if (!storedVersion) {
-          // First time, just store the timestamp
           localStorage.setItem(CURRENT_VERSION_KEY, serverVersion.timestamp);
         }
       } catch (error) {
         console.error('Version check error:', error);
-
       }
     };
 
     // Check immediately on mount
     checkVersion();
 
-    // Check periodically
+    // Check periodically (web + native)
     const interval = setInterval(checkVersion, VERSION_CHECK_INTERVAL);
 
-    // Listen for app state changes (when user returns to app)
+    // On native: also check when app resumes from background
     let appStateListener;
-    
-    App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        console.log('App resumed - checking for updates...');
-        checkVersion();
-      }
-    }).then(listener => {
-      appStateListener = listener;
-    });
+    if (isNative) {
+      App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) checkVersion();
+      }).then(listener => {
+        appStateListener = listener;
+      });
+    } else {
+      // On web: check when tab becomes visible again
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') checkVersion();
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        clearInterval(interval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
 
     return () => {
       clearInterval(interval);
-      if (appStateListener) {
-        appStateListener.remove();
-      }
+      if (appStateListener) appStateListener.remove();
     };
   }, []);
 
