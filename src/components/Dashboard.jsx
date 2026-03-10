@@ -116,22 +116,27 @@ export default function Dashboard({ user }) {
       setCaloriesToday(Math.round(totalCalories))
     }
     
-    // Get this week's completed workout sessions
-    // Fitness page stores completed workouts in workout_sessions (not workouts table)
+    // Get this week's completed STRENGTH workout sessions
+    // Match FitnessProgress: fetch with workout name so we can filter out cardio/stretching
     const startOfWeek = new Date()
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
     startOfWeek.setHours(0, 0, 0, 0)
     
-    const { data: workoutsData } = await supabase
+    const { data: allSessionsData } = await supabase
       .from('workout_sessions')
-      .select('id')
+      .select('id, session_name, workout:workouts(name)')
       .eq('user_id', user.id)
       .eq('is_completed', true)
       .gte('start_time', startOfWeek.toISOString())
     
-    if (workoutsData) {
-      setWorkoutsThisWeek(workoutsData.length)
-    }
+    // Filter out cardio/stretching sessions (same logic as FitnessProgress)
+    const EXCLUDED_KEYWORDS = ['walking','treadmill','duration','stretching','strechting','flexibility','cardio','yoga','foam roll','running','cycling','wall sit']
+    const strengthSessions = (allSessionsData || []).filter(session => {
+      const name = (session.workout?.name || session.session_name || '').toLowerCase()
+      return !EXCLUDED_KEYWORDS.some(kw => name.includes(kw))
+    })
+    const workoutsData = strengthSessions
+    setWorkoutsThisWeek(strengthSessions.length)
     
     // Get steps goal from user_goals (most recent row)
     const { data: userGoalsData } = await supabase
