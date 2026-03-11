@@ -192,7 +192,7 @@ export default function Home() {
       <nav className="sticky top-0 w-full z-50 border-b border-primary/20 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/images/yfit-logo.png" alt="YFIT AI Logo" className="h-10 w-auto object-contain" />
+            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI Logo" className="h-10 w-auto object-contain" />
           </div>
           <div className="hidden md:flex items-center gap-8">
             <button onClick={scrollToFeatures} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Features</button>
@@ -430,7 +430,7 @@ export default function Home() {
                 {/* Left side: logo + decorative block */}
                 <div className="flex-shrink-0 flex flex-col items-center gap-4 md:w-48">
                   <div className="bg-white rounded-2xl p-4 w-full flex items-center justify-center shadow-md">
-                    <img src="/images/yfit-logo.png" alt="YFIT AI" className="w-36 object-contain" />
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI" className="w-36 object-contain" />
                   </div>
                   <div className="hidden md:flex flex-col items-center gap-2 w-full">
                     <div className="w-full h-1 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-pink-500 opacity-60" />
@@ -519,7 +519,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/images/yfit-logo.png" alt="YFIT AI" className="h-10 w-auto object-contain" />
+                <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI" className="h-10 w-auto object-contain" />
               </div>
               <p className="text-sm text-muted-foreground">The most personalized AI fitness app ever built.</p>
             </div>

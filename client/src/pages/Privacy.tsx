@@ -8,7 +8,7 @@ export default function Privacy() {
       <nav className="w-full z-50 border-b border-primary/10 bg-white/50 backdrop-blur">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/images/yfit-logo.png" alt="YFIT Logo" className="h-10 w-auto" />
+            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT Logo" className="h-10 w-auto" />
           </div>
           <a href="/" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
