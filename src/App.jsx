@@ -57,28 +57,36 @@ function App() {
       console.error('Failed to initialize LiveUpdate:', err)
     })
 
-    // Hard 8-second safety timeout - guarantees spinner NEVER gets stuck
-    const startupTimeout = setTimeout(() => {
-      console.warn('App startup timed out after 8s - forcing load')
-      setLoading(false)
-    }, 8000)
-
-    getCurrentUser().then(async (currentUser) => {
-      setUser(currentUser)
-      if (currentUser) {
-        setAnalyticsUser(currentUser.id)
-        setupGlobalErrorHandlers(currentUser.id)
-        // Onboarding check has its own 3-second timeout so it can't block startup
-        await Promise.race([
-          checkOnboardingStatus(currentUser.id),
-          new Promise(resolve => setTimeout(resolve, 3000))
-        ])
+    // OPTIMISTIC AUTH: read cached session from localStorage instantly (no network needed)
+    // This makes the app appear immediately on repeat opens
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const cachedUser = session?.user ?? null
+      if (cachedUser) {
+        // Show app immediately with cached user - no spinner needed
+        setUser(cachedUser)
+        setAnalyticsUser(cachedUser.id)
+        setupGlobalErrorHandlers(cachedUser.id)
+        setLoading(false)
+        // Check onboarding in background (non-blocking)
+        checkOnboardingStatus(cachedUser.id).catch(() => {})
+      } else {
+        // No cached session - need to show login, clear spinner
+        setLoading(false)
       }
-      clearTimeout(startupTimeout)
-      setLoading(false)
     }).catch(() => {
-      clearTimeout(startupTimeout)
-      setLoading(false)
+      // If localStorage read fails, fall back to network check
+      getCurrentUser().then(async (currentUser) => {
+        setUser(currentUser)
+        if (currentUser) {
+          setAnalyticsUser(currentUser.id)
+          setupGlobalErrorHandlers(currentUser.id)
+          await Promise.race([
+            checkOnboardingStatus(currentUser.id),
+            new Promise(resolve => setTimeout(resolve, 3000))
+          ])
+        }
+        setLoading(false)
+      }).catch(() => setLoading(false))
     })
 
     // Listen for auth changes
