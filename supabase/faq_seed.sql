@@ -22,12 +22,14 @@ CREATE TABLE IF NOT EXISTS faq_articles (
   category_id UUID REFERENCES faq_categories(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
   keywords TEXT[] DEFAULT '{}',
+  is_featured BOOLEAN DEFAULT false,
   helpful_count INT DEFAULT 0,
   not_helpful_count INT DEFAULT 0,
   view_count INT DEFAULT 0,
-  display_order INT DEFAULT 0,
   is_published BOOLEAN DEFAULT true,
+  display_order INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -101,7 +103,7 @@ INSERT INTO faq_categories (id, name, slug, description, icon, display_order) VA
 -- ============================================================
 
 -- ---- GETTING STARTED ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000001-0000-0000-0000-000000000001',
 'How do I set up my YFIT profile for the first time?',
@@ -116,7 +118,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 7. Optionally add body measurements in the Body Measurements section.
 
 Once your goals are saved, your Dashboard will show personalised calorie targets and your weekly wellness score will start tracking.',
-ARRAY['setup', 'profile', 'first time', 'getting started', 'onboarding'], 1),
+'how-do-i-set-up-my-yfit-profile-for-the-first-time',
+ARRAY['setup', 'profile', 'first time', 'getting started', 'onboarding'], false, 1),
 
 ('a0000001-0000-0000-0000-000000000001',
 'What does YFIT actually track?',
@@ -131,7 +134,8 @@ ARRAY['setup', 'profile', 'first time', 'getting started', 'onboarding'], 1),
 - AI coaching: personalised advice, workout recommendations, and Q&A
 
 Everything is connected so your AI Coach can give you advice based on your actual data.',
-ARRAY['tracking', 'features', 'what does yfit do', 'overview'], 2),
+'what-does-yfit-actually-track',
+ARRAY['tracking', 'features', 'what does yfit do', 'overview'], false, 2),
 
 ('a0000001-0000-0000-0000-000000000001',
 'How do I navigate between pages in the app?',
@@ -149,7 +153,8 @@ ARRAY['tracking', 'features', 'what does yfit do', 'overview'], 2),
 - Daily Tracker: log steps, water, sleep, and measurements
 
 Tap any icon to navigate to that section. On smaller screens, you may need to scroll the navigation bar left or right to see all icons.',
-ARRAY['navigation', 'how to use', 'tabs', 'pages', 'menu'], 3),
+'how-do-i-navigate-between-pages-in-the-app',
+ARRAY['navigation', 'how to use', 'tabs', 'pages', 'menu'], false, 3),
 
 ('a0000001-0000-0000-0000-000000000001',
 'Is my data private and secure?',
@@ -162,7 +167,8 @@ ARRAY['navigation', 'how to use', 'tabs', 'pages', 'menu'], 3),
 - You can delete your account and all associated data at any time from Account Settings.
 
 YFIT does not sell your personal data. Your health information stays yours.',
-ARRAY['privacy', 'security', 'data', 'safe', 'personal information'], 4),
+'is-my-data-private-and-secure',
+ARRAY['privacy', 'security', 'data', 'safe', 'personal information'], false, 4),
 
 ('a0000001-0000-0000-0000-000000000001',
 'Can I use YFIT on both my phone and a web browser?',
@@ -172,7 +178,8 @@ ARRAY['privacy', 'security', 'data', 'safe', 'personal information'], 4),
 - Web browser: visit the YFIT web app on any device
 
 Your data syncs automatically between all platforms. Log a meal on your phone and it will appear instantly on the web version, and vice versa. There is no separate sync button — everything updates in real time.',
-ARRAY['web', 'android', 'sync', 'cross platform', 'browser', 'phone'], 5),
+'can-i-use-yfit-on-both-my-phone-and-a-web-browser',
+ARRAY['web', 'android', 'sync', 'cross platform', 'browser', 'phone'], false, 5),
 
 ('a0000001-0000-0000-0000-000000000001',
 'How do I change my units between metric and imperial?',
@@ -184,7 +191,8 @@ ARRAY['web', 'android', 'sync', 'cross platform', 'browser', 'phone'], 5),
 4. Tap Save Goals.
 
 All measurements throughout the app will immediately display in your chosen unit system.',
-ARRAY['units', 'metric', 'imperial', 'kg', 'lbs', 'cm', 'inches', 'toggle'], 6),
+'how-do-i-change-my-units-between-metric-and-imperial',
+ARRAY['units', 'metric', 'imperial', 'kg', 'lbs', 'cm', 'inches', 'toggle'], false, 6),
 
 ('a0000001-0000-0000-0000-000000000001',
 'What is the beta programme and how do I join?',
@@ -195,7 +203,8 @@ ARRAY['units', 'metric', 'imperial', 'kg', 'lbs', 'cm', 'inches', 'toggle'], 6),
 - The ability to report bugs and request features using the feedback button (blue/green circle, bottom-right of every page)
 
 To join the beta, you need an invite code. Current codes are YFIT-BETA-2026, YFIT-EARLY, and YFIT-VIP. Enter your code during sign-up. If you''re already signed in, you''re already a beta tester!',
-ARRAY['beta', 'invite', 'testing', 'early access', 'beta code'], 7),
+'what-is-the-beta-programme-and-how-do-i-join',
+ARRAY['beta', 'invite', 'testing', 'early access', 'beta code'], false, 7),
 
 ('a0000001-0000-0000-0000-000000000001',
 'How do I log out of YFIT?',
@@ -206,7 +215,8 @@ ARRAY['beta', 'invite', 'testing', 'early access', 'beta code'], 7),
 3. Tap Sign Out.
 
 You will be returned to the login screen. Your data is saved in the cloud, so everything will be there when you log back in.',
-ARRAY['log out', 'sign out', 'logout'], 8),
+'how-do-i-log-out-of-yfit',
+ARRAY['log out', 'sign out', 'logout'], false, 8),
 
 ('a0000001-0000-0000-0000-000000000001',
 'How do I delete my account?',
@@ -218,7 +228,8 @@ ARRAY['log out', 'sign out', 'logout'], 8),
 4. Confirm by entering your email address.
 
 This action is permanent and cannot be undone. All your logs, measurements, workout history, and personal data will be deleted immediately.',
-ARRAY['delete account', 'remove account', 'cancel', 'data deletion'], 9),
+'how-do-i-delete-my-account',
+ARRAY['delete account', 'remove account', 'cancel', 'data deletion'], false, 9),
 
 ('a0000001-0000-0000-0000-000000000001',
 'What should I do first after signing up?',
@@ -231,10 +242,11 @@ ARRAY['delete account', 'remove account', 'cancel', 'data deletion'], 9),
 5. Try the AI Coach: ask it a question about your fitness or nutrition goals.
 
 Most users are fully set up within 10 minutes.',
-ARRAY['first steps', 'what to do', 'new user', 'start', 'setup guide'], 10);
+'what-should-i-do-first-after-signing-up',
+ARRAY['first steps', 'what to do', 'new user', 'start', 'setup guide'], false, 10);
 
 -- ---- NUTRITION TRACKING ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000002-0000-0000-0000-000000000002',
 'How do I log a meal or food item?',
@@ -248,7 +260,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 6. Tap Log Food.
 
 Your calories and macros will update immediately on the Nutrition page and on your Dashboard.',
-ARRAY['log food', 'add meal', 'track food', 'log meal', 'food diary'], 1),
+'how-do-i-log-a-meal-or-food-item',
+ARRAY['log food', 'add meal', 'track food', 'log meal', 'food diary'], false, 1),
 
 ('a0000002-0000-0000-0000-000000000002',
 'How does the barcode scanner work?',
@@ -261,7 +274,8 @@ ARRAY['log food', 'add meal', 'track food', 'log meal', 'food diary'], 1),
 5. Confirm the serving size and tap Log Food.
 
 The scanner works on both the Android app and the web browser (web requires camera permission). If a product is not found, you can add it manually using the Create Custom Food option.',
-ARRAY['barcode', 'scanner', 'scan food', 'camera', 'packaged food'], 2),
+'how-does-the-barcode-scanner-work',
+ARRAY['barcode', 'scanner', 'scan food', 'camera', 'packaged food'], false, 2),
 
 ('a0000002-0000-0000-0000-000000000002',
 'How do I create a custom food?',
@@ -273,7 +287,8 @@ ARRAY['barcode', 'scanner', 'scan food', 'camera', 'packaged food'], 2),
 4. Tap Save.
 
 The food is added to your My Foods list for quick access in the future.',
-ARRAY['custom food', 'add food', 'create food', 'manual entry', 'not in database'], 3),
+'how-do-i-create-a-custom-food',
+ARRAY['custom food', 'add food', 'create food', 'manual entry', 'not in database'], false, 3),
 
 ('a0000002-0000-0000-0000-000000000002',
 'What is the My Foods tab?',
@@ -285,7 +300,8 @@ ARRAY['custom food', 'add food', 'create food', 'manual entry', 'not in database
 
 To save a food to My Foods: search for it, tap the heart/star icon next to it.
 To delete a food from My Foods: go to the My Foods tab, tap the trash can icon next to the food, and confirm deletion.',
-ARRAY['my foods', 'favourites', 'saved foods', 'food library', 'delete food'], 4),
+'what-is-the-my-foods-tab',
+ARRAY['my foods', 'favourites', 'saved foods', 'food library', 'delete food'], false, 4),
 
 ('a0000002-0000-0000-0000-000000000002',
 'How do I set my calorie and macro targets?',
@@ -303,7 +319,8 @@ Manual override:
 4. Tap Save.
 
 Your targets appear as the daily limit bars on the Nutrition page.',
-ARRAY['calorie target', 'macro target', 'TDEE', 'calorie goal', 'protein goal'], 5),
+'how-do-i-set-my-calorie-and-macro-targets',
+ARRAY['calorie target', 'macro target', 'TDEE', 'calorie goal', 'protein goal'], false, 5),
 
 ('a0000002-0000-0000-0000-000000000002',
 'What is TDEE and how is it calculated?',
@@ -320,7 +337,8 @@ YFIT calculates your TDEE using the Mifflin-St Jeor formula:
    - Very Active (hard exercise daily): x 1.9
 
 Your calorie target is then adjusted based on your goal (deficit for fat loss, surplus for muscle gain).',
-ARRAY['TDEE', 'calories', 'BMR', 'activity level', 'calorie calculation'], 6),
+'what-is-tdee-and-how-is-it-calculated',
+ARRAY['TDEE', 'calories', 'BMR', 'activity level', 'calorie calculation'], false, 6),
 
 ('a0000002-0000-0000-0000-000000000002',
 'Can I log water intake?',
@@ -331,7 +349,8 @@ ARRAY['TDEE', 'calories', 'BMR', 'activity level', 'calorie calculation'], 6),
 3. Tap the + button to add glasses or enter a custom amount in ml/oz.
 
 Your daily water intake is shown on the Dashboard and in the Daily Tracker. You can set a daily water goal in the Goals page.',
-ARRAY['water', 'hydration', 'water intake', 'log water', 'drink'], 7),
+'can-i-log-water-intake',
+ARRAY['water', 'hydration', 'water intake', 'log water', 'drink'], false, 7),
 
 ('a0000002-0000-0000-0000-000000000002',
 'Why are my calories showing differently than expected?',
@@ -341,7 +360,8 @@ ARRAY['water', 'hydration', 'water intake', 'log water', 'drink'], 7),
 2. Duplicate entries: you may have logged the same food twice. Scroll through your meal log to check.
 3. Database values: nutritional values come from Open Food Facts and the USDA database. These may differ slightly from the label on your product. Use the custom food feature to enter exact values from your packaging.
 4. Calorie target: if your target seems wrong, revisit your Goals page and check your weight, activity level, and goal are set correctly.',
-ARRAY['calories wrong', 'calorie error', 'incorrect calories', 'nutrition wrong'], 8),
+'why-are-my-calories-showing-differently-than-expected',
+ARRAY['calories wrong', 'calorie error', 'incorrect calories', 'nutrition wrong'], false, 8),
 
 ('a0000002-0000-0000-0000-000000000002',
 'How do I edit or delete a food I already logged?',
@@ -357,7 +377,8 @@ To delete a logged food:
 3. Confirm deletion.
 
 Your daily totals will update immediately.',
-ARRAY['edit food', 'delete food', 'remove food', 'change serving', 'fix log'], 9),
+'how-do-i-edit-or-delete-a-food-i-already-logged',
+ARRAY['edit food', 'delete food', 'remove food', 'change serving', 'fix log'], false, 9),
 
 ('a0000002-0000-0000-0000-000000000002',
 'What food databases does YFIT use?',
@@ -367,10 +388,11 @@ ARRAY['edit food', 'delete food', 'remove food', 'change serving', 'fix log'], 9
 2. USDA FoodData Central: the official US government database with detailed nutritional data for whole foods, ingredients, and restaurant items.
 
 When you search for a food, YFIT searches both databases simultaneously and shows the best matches. If a food is not found in either database, you can create a custom food entry with your own nutritional values.',
-ARRAY['food database', 'Open Food Facts', 'USDA', 'data source', 'nutritional data'], 10);
+'what-food-databases-does-yfit-use',
+ARRAY['food database', 'Open Food Facts', 'USDA', 'data source', 'nutritional data'], false, 10);
 
 -- ---- FITNESS & WORKOUTS ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000003-0000-0000-0000-000000000003',
 'How do I log a workout?',
@@ -383,7 +405,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 5. Tap Complete Workout when finished.
 
 Your workout is saved to your history and counts toward your weekly workout total on the Dashboard.',
-ARRAY['log workout', 'start workout', 'track workout', 'exercise log'], 1),
+'how-do-i-log-a-workout',
+ARRAY['log workout', 'start workout', 'track workout', 'exercise log'], false, 1),
 
 ('a0000003-0000-0000-0000-000000000003',
 'What is Form Analysis and how does it work?',
@@ -396,7 +419,8 @@ ARRAY['log workout', 'start workout', 'track workout', 'exercise log'], 1),
 5. After the set, you receive a Form Score (0-100%) with specific feedback on what to improve.
 
 Form scores are saved to your history. Regular form analysis helps prevent injury and maximises training effectiveness.',
-ARRAY['form analysis', 'form score', 'technique', 'AI analysis', 'camera', 'posture'], 2),
+'what-is-form-analysis-and-how-does-it-work',
+ARRAY['form analysis', 'form score', 'technique', 'AI analysis', 'camera', 'posture'], false, 2),
 
 ('a0000003-0000-0000-0000-000000000003',
 'What exercises are available in the workout library?',
@@ -409,7 +433,8 @@ ARRAY['form analysis', 'form score', 'technique', 'AI analysis', 'camera', 'post
 - Flexibility: stretching routines and yoga flows
 
 Each exercise includes instructions, muscle group tags, and equipment requirements. You can also add custom exercises if something is missing.',
-ARRAY['exercise library', 'exercises', 'workout list', 'muscle groups', 'custom exercise'], 3),
+'what-exercises-are-available-in-the-workout-library',
+ARRAY['exercise library', 'exercises', 'workout list', 'muscle groups', 'custom exercise'], false, 3),
 
 ('a0000003-0000-0000-0000-000000000003',
 'How do I create a custom workout plan?',
@@ -423,7 +448,8 @@ ARRAY['exercise library', 'exercises', 'workout list', 'muscle groups', 'custom 
 6. Save the plan.
 
 Your custom plans appear in the Plans list and can be started with one tap.',
-ARRAY['workout plan', 'custom plan', 'create plan', 'routine', 'program'], 4),
+'how-do-i-create-a-custom-workout-plan',
+ARRAY['workout plan', 'custom plan', 'create plan', 'routine', 'program'], false, 4),
 
 ('a0000003-0000-0000-0000-000000000003',
 'What does the Strength Stats tab show?',
@@ -436,7 +462,8 @@ ARRAY['workout plan', 'custom plan', 'create plan', 'routine', 'program'], 4),
 - Recent sessions: a log of your last 10 completed workouts
 
 Only strength and resistance training sessions are counted here.',
-ARRAY['strength stats', 'progress', 'personal record', 'volume', 'strength tracking'], 5),
+'what-does-the-strength-stats-tab-show',
+ARRAY['strength stats', 'progress', 'personal record', 'volume', 'strength tracking'], false, 5),
 
 ('a0000003-0000-0000-0000-000000000003',
 'How do I track cardio workouts?',
@@ -448,7 +475,8 @@ ARRAY['strength stats', 'progress', 'personal record', 'volume', 'strength track
 4. Tap Complete Workout.
 
 Cardio sessions are saved to your workout history. Your step count from the Daily Tracker also contributes to your overall activity picture.',
-ARRAY['cardio', 'running', 'cycling', 'cardio tracking', 'aerobic'], 6),
+'how-do-i-track-cardio-workouts',
+ARRAY['cardio', 'running', 'cycling', 'cardio tracking', 'aerobic'], false, 6),
 
 ('a0000003-0000-0000-0000-000000000003',
 'Can I see my workout history?',
@@ -459,7 +487,8 @@ ARRAY['cardio', 'running', 'cycling', 'cardio tracking', 'aerobic'], 6),
 3. Tap any session to see the full details: exercises, sets, reps, weights, and duration.
 
 You can also see workout trends in the Progress page, which shows volume and frequency charts over time.',
-ARRAY['workout history', 'past workouts', 'exercise history', 'session log'], 7),
+'can-i-see-my-workout-history',
+ARRAY['workout history', 'past workouts', 'exercise history', 'session log'], false, 7),
 
 ('a0000003-0000-0000-0000-000000000003',
 'What is the difference between a workout session and a workout plan?',
@@ -468,7 +497,8 @@ ARRAY['workout history', 'past workouts', 'exercise history', 'session log'], 7)
 A workout session is a single completed workout — a record of what you actually did on a specific date, including the exact weights lifted and reps completed.
 
 You start a session by selecting a plan (or building one on the fly), then log your actual performance during the session.',
-ARRAY['workout plan', 'workout session', 'difference', 'template', 'routine'], 8),
+'what-is-the-difference-between-a-workout-session-and-a-worko',
+ARRAY['workout plan', 'workout session', 'difference', 'template', 'routine'], false, 8),
 
 ('a0000003-0000-0000-0000-000000000003',
 'How do I use progressive overload tracking?',
@@ -481,17 +511,19 @@ YFIT tracks progressive overload automatically:
 - The AI Coach can suggest when to increase weight based on your recent performance.
 
 Aim to increase weight or reps slightly every 1-2 weeks for each exercise.',
-ARRAY['progressive overload', 'increase weight', 'strength progress', 'personal record'], 9),
+'how-do-i-use-progressive-overload-tracking',
+ARRAY['progressive overload', 'increase weight', 'strength progress', 'personal record'], false, 9),
 
 ('a0000003-0000-0000-0000-000000000003',
 'How is my workout compliance tracked?',
 'The workout section of your Dashboard shows completed strength sessions for the current week. The target is 3 strength sessions per week — a common evidence-based recommendation for most goals.
 
 Your weekly workout count is compared against this 3-session target. If you train more or less than 3 times per week, you can discuss adjusting your programme with the AI Coach.',
-ARRAY['workout compliance', 'workout target', 'sessions per week', 'workout goal'], 10);
+'how-is-my-workout-compliance-tracked',
+ARRAY['workout compliance', 'workout target', 'sessions per week', 'workout goal'], false, 10);
 
 -- ---- GOALS & PROGRESS ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000004-0000-0000-0000-000000000004',
 'How do I set my fitness goals?',
@@ -507,7 +539,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 4. Choose your activity level.
 5. Set your target weight and target body fat % if desired.
 6. Tap Save Goals.',
-ARRAY['set goals', 'fitness goals', 'target weight', 'goal setting', 'objectives'], 1),
+'how-do-i-set-my-fitness-goals',
+ARRAY['set goals', 'fitness goals', 'target weight', 'goal setting', 'objectives'], false, 1),
 
 ('a0000004-0000-0000-0000-000000000004',
 'What is body recomposition?',
@@ -520,7 +553,8 @@ YFIT supports recomposition by:
 - Providing a body recomposition forecast in the Predictions page
 
 Recomposition is slower than pure fat loss or pure muscle gain, but the results are more balanced.',
-ARRAY['body recomposition', 'recomp', 'lose fat gain muscle', 'body composition'], 2),
+'what-is-body-recomposition',
+ARRAY['body recomposition', 'recomp', 'lose fat gain muscle', 'body composition'], false, 2),
 
 ('a0000004-0000-0000-0000-000000000004',
 'How do I track my weight and body fat?',
@@ -532,7 +566,8 @@ ARRAY['body recomposition', 'recomp', 'lose fat gain muscle', 'body composition'
 4. Tap Save.
 
 Your weight and body fat history are shown as charts on the Progress page, alongside your BMI trend.',
-ARRAY['weight tracking', 'body fat', 'log weight', 'weigh in', 'BMI'], 3),
+'how-do-i-track-my-weight-and-body-fat',
+ARRAY['weight tracking', 'body fat', 'log weight', 'weigh in', 'BMI'], false, 3),
 
 ('a0000004-0000-0000-0000-000000000004',
 'How do I track body measurements?',
@@ -544,7 +579,8 @@ ARRAY['weight tracking', 'body fat', 'log weight', 'weigh in', 'BMI'], 3),
 4. Tap Save Measurements.
 
 Your measurements are shown in the Body Recomp tab with direction-aware progress bars — reducing measurements (waist, hips) show progress as they decrease, while building measurements (biceps, neck, thighs) show progress as they increase.',
-ARRAY['body measurements', 'waist', 'hips', 'biceps', 'measurements', 'tape measure'], 4),
+'how-do-i-track-body-measurements',
+ARRAY['body measurements', 'waist', 'hips', 'biceps', 'measurements', 'tape measure'], false, 4),
 
 ('a0000004-0000-0000-0000-000000000004',
 'What does the Progress page show?',
@@ -558,14 +594,16 @@ ARRAY['body measurements', 'waist', 'hips', 'biceps', 'measurements', 'tape meas
 - Nutrition averages: average daily calories and macros over time
 
 Use the time range selector (30 / 90 / 180 days / 1 year) to zoom in or out on your progress.',
-ARRAY['progress page', 'charts', 'trends', 'progress tracking', 'history'], 5),
+'what-does-the-progress-page-show',
+ARRAY['progress page', 'charts', 'trends', 'progress tracking', 'history'], false, 5),
 
 ('a0000004-0000-0000-0000-000000000004',
 'What is the Day Streak on my Dashboard?',
 'The Day Streak counts how many consecutive days you have logged any activity in the Daily Tracker. It resets to 0 if you miss a day.
 
 The streak is shown on your Dashboard with a fire icon. Building a logging streak is one of the most effective habits for long-term fitness success — consistency beats perfection every time.',
-ARRAY['streak', 'day streak', 'consistency', 'habit', 'logging streak'], 6),
+'what-is-the-day-streak-on-my-dashboard',
+ARRAY['streak', 'day streak', 'consistency', 'habit', 'logging streak'], false, 6),
 
 ('a0000004-0000-0000-0000-000000000004',
 'How do I set body measurement goals?',
@@ -577,7 +615,8 @@ ARRAY['streak', 'day streak', 'consistency', 'habit', 'logging streak'], 6),
 4. Tap Save Goals.
 
 Your goals appear in the Body Recomp tab as target lines on the progress bars and charts.',
-ARRAY['measurement goals', 'body goals', 'waist goal', 'bicep goal', 'target measurements'], 7),
+'how-do-i-set-body-measurement-goals',
+ARRAY['measurement goals', 'body goals', 'waist goal', 'bicep goal', 'target measurements'], false, 7),
 
 ('a0000004-0000-0000-0000-000000000004',
 'How accurate are the calorie and macro calculations?',
@@ -586,7 +625,8 @@ ARRAY['measurement goals', 'body goals', 'waist goal', 'bicep goal', 'target mea
 However, individual metabolism varies. If you are consistently losing or gaining weight faster or slower than expected, adjust your calorie target by 100-200 calories and monitor for 2 weeks before adjusting again.
 
 The AI Coach can help you fine-tune your targets based on your actual results.',
-ARRAY['calorie accuracy', 'macro accuracy', 'calculation', 'metabolism', 'adjust calories'], 8),
+'how-accurate-are-the-calorie-and-macro-calculations',
+ARRAY['calorie accuracy', 'macro accuracy', 'calculation', 'metabolism', 'adjust calories'], false, 8),
 
 ('a0000004-0000-0000-0000-000000000004',
 'What is the Predictions page?',
@@ -597,7 +637,8 @@ ARRAY['calorie accuracy', 'macro accuracy', 'calculation', 'metabolism', 'adjust
 - Scenario modelling: shows how different calorie targets or workout frequencies would change your timeline
 
 The forecast updates as you log more data.',
-ARRAY['predictions', 'forecast', 'timeline', 'body composition forecast', 'goal date'], 9),
+'what-is-the-predictions-page',
+ARRAY['predictions', 'forecast', 'timeline', 'body composition forecast', 'goal date'], false, 9),
 
 ('a0000004-0000-0000-0000-000000000004',
 'How does the activity level setting affect my calorie target?',
@@ -610,10 +651,11 @@ ARRAY['predictions', 'forecast', 'timeline', 'body composition forecast', 'goal 
 - Very Active (hard exercise daily): BMR x 1.9
 
 Update your activity level in Goals if your training frequency changes significantly.',
-ARRAY['activity level', 'calorie multiplier', 'TDEE', 'exercise frequency', 'sedentary'], 10);
+'how-does-the-activity-level-setting-affect-my-calorie-target',
+ARRAY['activity level', 'calorie multiplier', 'TDEE', 'exercise frequency', 'sedentary'], false, 10);
 
 -- ---- MEDICATIONS & HEALTH ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000005-0000-0000-0000-000000000005',
 'How do I add a medication to track?',
@@ -627,7 +669,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 6. Tap Save.
 
 Your medication will appear on the Medications page with its schedule.',
-ARRAY['add medication', 'medication setup', 'drug', 'prescription', 'dosage'], 1),
+'how-do-i-add-a-medication-to-track',
+ARRAY['add medication', 'medication setup', 'drug', 'prescription', 'dosage'], false, 1),
 
 ('a0000005-0000-0000-0000-000000000005',
 'How do medication reminders work?',
@@ -639,7 +682,8 @@ On the Android app, you can enable push notifications for medication reminders:
 3. Allow notification permissions when prompted.
 
 On the web version, reminders appear as in-app alerts when you open the app. The Medications page shows a colour-coded status for each dose: green (taken), yellow (due soon), red (overdue).',
-ARRAY['medication reminder', 'reminder', 'notification', 'dose reminder', 'alert'], 2),
+'how-do-medication-reminders-work',
+ARRAY['medication reminder', 'reminder', 'notification', 'dose reminder', 'alert'], false, 2),
 
 ('a0000005-0000-0000-0000-000000000005',
 'Can I track supplements as well as medications?',
@@ -652,7 +696,8 @@ ARRAY['medication reminder', 'reminder', 'notification', 'dose reminder', 'alert
 - Pre-workout, creatine, omega-3, and other sports supplements
 
 Simply add it the same way as a medication, using the supplement name and your dosage.',
-ARRAY['supplements', 'vitamins', 'creatine', 'protein powder', 'omega-3', 'track supplements'], 3),
+'can-i-track-supplements-as-well-as-medications',
+ARRAY['supplements', 'vitamins', 'creatine', 'protein powder', 'omega-3', 'track supplements'], false, 3),
 
 ('a0000005-0000-0000-0000-000000000005',
 'How do I mark a dose as taken?',
@@ -663,7 +708,8 @@ ARRAY['supplements', 'vitamins', 'creatine', 'protein powder', 'omega-3', 'track
 3. Tap the checkmark button next to the dose.
 
 The dose will be marked as taken and the time recorded. You can also mark a dose as skipped if you intentionally did not take it.',
-ARRAY['mark taken', 'dose taken', 'medication log', 'adherence', 'check off'], 4),
+'how-do-i-mark-a-dose-as-taken',
+ARRAY['mark taken', 'dose taken', 'medication log', 'adherence', 'check off'], false, 4),
 
 ('a0000005-0000-0000-0000-000000000005',
 'Can I see my medication history?',
@@ -674,7 +720,8 @@ ARRAY['mark taken', 'dose taken', 'medication log', 'adherence', 'check off'], 4
 3. Select the History tab.
 
 You will see a calendar view showing which doses were taken, skipped, or missed over the past 30 days.',
-ARRAY['medication history', 'adherence history', 'dose history', 'medication log'], 5),
+'can-i-see-my-medication-history',
+ARRAY['medication history', 'adherence history', 'dose history', 'medication log'], false, 5),
 
 ('a0000005-0000-0000-0000-000000000005',
 'How do I edit or delete a medication?',
@@ -689,14 +736,16 @@ To delete a medication:
 3. Tap Delete and confirm.
 
 Deleting a medication removes it from your schedule but your historical dose logs are retained.',
-ARRAY['edit medication', 'delete medication', 'remove medication', 'change dosage'], 6),
+'how-do-i-edit-or-delete-a-medication',
+ARRAY['edit medication', 'delete medication', 'remove medication', 'change dosage'], false, 6),
 
 ('a0000005-0000-0000-0000-000000000005',
 'Does YFIT provide medical advice?',
 'No. YFIT is a fitness and health tracking app, not a medical service. The app does not provide medical diagnoses, treatment recommendations, or advice about specific medications.
 
 The AI Coach can answer general questions about nutrition, fitness, and healthy habits, but it is not a substitute for professional medical advice. Always consult your doctor or pharmacist before starting, stopping, or changing any medication.',
-ARRAY['medical advice', 'doctor', 'medical disclaimer', 'health advice', 'prescription'], 7),
+'does-yfit-provide-medical-advice',
+ARRAY['medical advice', 'doctor', 'medical disclaimer', 'health advice', 'prescription'], false, 7),
 
 ('a0000005-0000-0000-0000-000000000005',
 'Can I set different schedules for different days?',
@@ -708,7 +757,8 @@ ARRAY['medical advice', 'doctor', 'medical disclaimer', 'health advice', 'prescr
 - As needed: no fixed schedule, just log when taken
 
 Select the schedule type that matches your prescription or supplement routine.',
-ARRAY['medication schedule', 'days of week', 'every other day', 'weekly', 'custom schedule'], 8),
+'can-i-set-different-schedules-for-different-days',
+ARRAY['medication schedule', 'days of week', 'every other day', 'weekly', 'custom schedule'], false, 8),
 
 ('a0000005-0000-0000-0000-000000000005',
 'What health metrics can I track beyond medications?',
@@ -723,7 +773,8 @@ ARRAY['medication schedule', 'days of week', 'every other day', 'weekly', 'custo
 - Sleep: hours of sleep per night
 
 All metrics are shown in the Progress page with historical charts.',
-ARRAY['health metrics', 'tracking', 'BMI', 'body fat', 'sleep', 'steps', 'water'], 9),
+'what-health-metrics-can-i-track-beyond-medications',
+ARRAY['health metrics', 'tracking', 'BMI', 'body fat', 'sleep', 'steps', 'water'], false, 9),
 
 ('a0000005-0000-0000-0000-000000000005',
 'How do I log my daily steps?',
@@ -735,10 +786,11 @@ ARRAY['health metrics', 'tracking', 'BMI', 'body fat', 'sleep', 'steps', 'water'
 4. Tap Save.
 
 Your steps appear on the Dashboard and contribute to your daily activity summary. You can set a daily step goal in the Goals page.',
-ARRAY['steps', 'step count', 'pedometer', 'daily steps', 'walking'], 10);
+'how-do-i-log-my-daily-steps',
+ARRAY['steps', 'step count', 'pedometer', 'daily steps', 'walking'], false, 10);
 
 -- ---- AI COACH ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000006-0000-0000-0000-000000000006',
 'What can the AI Coach help me with?',
@@ -753,7 +805,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 - App help: how to use YFIT features
 
 The AI Coach has access to your logged data to give personalised advice based on your actual progress.',
-ARRAY['AI coach', 'what can AI do', 'coach features', 'personal trainer', 'nutrition advice'], 1),
+'what-can-the-ai-coach-help-me-with',
+ARRAY['AI coach', 'what can AI do', 'coach features', 'personal trainer', 'nutrition advice'], false, 1),
 
 ('a0000006-0000-0000-0000-000000000006',
 'How do I start a conversation with the AI Coach?',
@@ -765,14 +818,16 @@ ARRAY['AI coach', 'what can AI do', 'coach features', 'personal trainer', 'nutri
 4. Tap Send.
 
 The AI will respond within a few seconds. You can ask follow-up questions in the same conversation. Tap New Conversation to start a fresh chat.',
-ARRAY['start chat', 'AI conversation', 'how to use AI coach', 'chat'], 2),
+'how-do-i-start-a-conversation-with-the-ai-coach',
+ARRAY['start chat', 'AI conversation', 'how to use AI coach', 'chat'], false, 2),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Does the AI Coach remember my previous conversations?',
 'Within a single conversation session, the AI Coach remembers the full context of your chat. However, when you start a New Conversation, the previous chat history is not carried over.
 
 The AI Coach does have access to your profile data (goals, weight, activity level) to give personalised advice in every new conversation — it just does not remember the specific questions you asked in previous sessions.',
-ARRAY['AI memory', 'conversation history', 'remember', 'context', 'previous chat'], 3),
+'does-the-ai-coach-remember-my-previous-conversations',
+ARRAY['AI memory', 'conversation history', 'remember', 'context', 'previous chat'], false, 3),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Is the AI Coach advice safe to follow?',
@@ -785,7 +840,8 @@ However, the AI Coach is not a licensed personal trainer, registered dietitian, 
 - Use your own judgement and listen to your body
 
 If the AI gives advice that seems unsafe, please report it using the feedback button.',
-ARRAY['AI safety', 'AI advice', 'reliable', 'trust AI', 'disclaimer'], 4),
+'is-the-ai-coach-advice-safe-to-follow',
+ARRAY['AI safety', 'AI advice', 'reliable', 'trust AI', 'disclaimer'], false, 4),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Can the AI Coach create a workout plan for me?',
@@ -798,7 +854,8 @@ ARRAY['AI safety', 'AI advice', 'reliable', 'trust AI', 'disclaimer'], 4),
 - Any injuries or limitations
 
 The AI will generate a structured programme with exercises, sets, reps, and progression guidelines.',
-ARRAY['workout plan', 'AI workout', 'create programme', 'personalised plan', 'training plan'], 5),
+'can-the-ai-coach-create-a-workout-plan-for-me',
+ARRAY['workout plan', 'AI workout', 'create programme', 'personalised plan', 'training plan'], false, 5),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Can the AI Coach help with meal planning?',
@@ -810,14 +867,16 @@ ARRAY['workout plan', 'AI workout', 'create programme', 'personalised plan', 'tr
 - How many meals per day you prefer
 
 The AI will suggest meal ideas, portion sizes, and even full day meal plans. You can then log these meals in the Nutrition section.',
-ARRAY['meal plan', 'AI meal planning', 'diet plan', 'food suggestions', 'meal ideas'], 6),
+'can-the-ai-coach-help-with-meal-planning',
+ARRAY['meal plan', 'AI meal planning', 'diet plan', 'food suggestions', 'meal ideas'], false, 6),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Why is the AI Coach slow to respond sometimes?',
 'The AI Coach response time depends on your internet connection speed, server load, and the complexity of your question.
 
 Typical response time is 3-10 seconds. If the AI does not respond after 30 seconds, try sending your message again. If the problem persists, check your internet connection and try refreshing the app.',
-ARRAY['AI slow', 'response time', 'AI not responding', 'loading', 'delay'], 7),
+'why-is-the-ai-coach-slow-to-respond-sometimes',
+ARRAY['AI slow', 'response time', 'AI not responding', 'loading', 'delay'], false, 7),
 
 ('a0000006-0000-0000-0000-000000000006',
 'How do I give feedback on an AI response?',
@@ -828,14 +887,16 @@ ARRAY['AI slow', 'response time', 'AI not responding', 'loading', 'delay'], 7),
 3. Describe the issue — include the question you asked and what was wrong with the response.
 
 Your feedback helps improve the AI Coach for all users.',
-ARRAY['AI feedback', 'report AI', 'bad response', 'incorrect answer', 'improve AI'], 8),
+'how-do-i-give-feedback-on-an-ai-response',
+ARRAY['AI feedback', 'report AI', 'bad response', 'incorrect answer', 'improve AI'], false, 8),
 
 ('a0000006-0000-0000-0000-000000000006',
 'What is the FAQ tab in the AI Coach section?',
 'The FAQ tab contains a searchable library of common questions and answers about using YFIT. It covers all major features and is organised into 9 categories.
 
 Use the search bar at the top to find answers quickly, or browse by category using the filter buttons. If you cannot find what you need in the FAQ, tap Ask AI Coach to switch to the chat interface and ask your question directly.',
-ARRAY['FAQ', 'help articles', 'knowledge base', 'support', 'FAQ tab'], 9),
+'what-is-the-faq-tab-in-the-ai-coach-section',
+ARRAY['FAQ', 'help articles', 'knowledge base', 'support', 'FAQ tab'], false, 9),
 
 ('a0000006-0000-0000-0000-000000000006',
 'Does the AI Coach use my personal data?',
@@ -847,10 +908,11 @@ ARRAY['FAQ', 'help articles', 'knowledge base', 'support', 'FAQ tab'], 9),
 - Your calorie and macro targets
 
 This data is sent to the AI model only to generate your response and is not stored by the AI provider or used to train future models.',
-ARRAY['AI data', 'privacy', 'personal data', 'AI training', 'data usage'], 10);
+'does-the-ai-coach-use-my-personal-data',
+ARRAY['AI data', 'privacy', 'personal data', 'AI training', 'data usage'], false, 10);
 
 -- ---- ACCOUNT SETTINGS ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I change my email address or password?',
@@ -860,7 +922,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 2. Tap Edit Profile.
 3. To change email: enter your new email address and tap Save. You will receive a confirmation email.
 4. To change password: tap Change Password, enter your current password, then your new password twice, and tap Save.',
-ARRAY['change email', 'change password', 'update email', 'reset password', 'account security'], 1),
+'how-do-i-change-my-email-address-or-password',
+ARRAY['change email', 'change password', 'update email', 'reset password', 'account security'], false, 1),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I turn on or off notifications?',
@@ -875,7 +938,8 @@ ARRAY['change email', 'change password', 'update email', 'reset password', 'acco
    - App updates
 
 On Android, you may also need to allow notifications in your phone''s system settings (Settings > Apps > YFIT > Notifications).',
-ARRAY['notifications', 'reminders', 'push notifications', 'alerts', 'turn off notifications'], 2),
+'how-do-i-turn-on-or-off-notifications',
+ARRAY['notifications', 'reminders', 'push notifications', 'alerts', 'turn off notifications'], false, 2),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I export my data?',
@@ -887,7 +951,8 @@ ARRAY['notifications', 'reminders', 'push notifications', 'alerts', 'turn off no
 - Progress charts (PDF)
 
 In the meantime, you can view all your historical data in the Progress page. If you need a data export urgently, use the feedback button to submit a request.',
-ARRAY['export data', 'download data', 'data export', 'CSV', 'backup'], 3),
+'how-do-i-export-my-data',
+ARRAY['export data', 'download data', 'data export', 'CSV', 'backup'], false, 3),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I reset my data and start fresh?',
@@ -900,21 +965,24 @@ ARRAY['export data', 'download data', 'data export', 'CSV', 'backup'], 3),
 5. Confirm the reset.
 
 This permanently deletes the selected data. Your account, goals, and settings are not affected.',
-ARRAY['reset data', 'start fresh', 'clear data', 'delete logs', 'wipe data'], 4),
+'how-do-i-reset-my-data-and-start-fresh',
+ARRAY['reset data', 'start fresh', 'clear data', 'delete logs', 'wipe data'], false, 4),
 
 ('a0000007-0000-0000-0000-000000000007',
 'Can I connect YFIT to other health apps?',
 'Integration with other health platforms (Apple Health, Google Fit, Fitbit, Garmin, etc.) is on the roadmap for a future update.
 
 Currently, step counts can be entered manually in the Daily Tracker. Use the feedback button to vote for specific integrations — your requests help prioritise our development roadmap.',
-ARRAY['integrations', 'Apple Health', 'Google Fit', 'Fitbit', 'connect apps', 'sync'], 5),
+'can-i-connect-yfit-to-other-health-apps',
+ARRAY['integrations', 'Apple Health', 'Google Fit', 'Fitbit', 'connect apps', 'sync'], false, 5),
 
 ('a0000007-0000-0000-0000-000000000007',
 'What happens to my data if I uninstall the app?',
 'Your data is stored in the cloud (not on your device), so uninstalling the app does not delete your data. When you reinstall and log back in, all your logs, measurements, and history will be exactly as you left them.
 
 To permanently delete your data, you must delete your account from Account Settings before uninstalling.',
-ARRAY['uninstall', 'reinstall', 'data loss', 'cloud storage', 'delete app'], 6),
+'what-happens-to-my-data-if-i-uninstall-the-app',
+ARRAY['uninstall', 'reinstall', 'data loss', 'cloud storage', 'delete app'], false, 6),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I contact support?',
@@ -924,7 +992,8 @@ ARRAY['uninstall', 'reinstall', 'data loss', 'cloud storage', 'delete app'], 6),
 2. For urgent issues, email support directly at support@yfitai.com.
 
 The feedback button is the fastest way to reach us — reports are reviewed daily. Include as much detail as possible about the issue.',
-ARRAY['contact support', 'help', 'support', 'bug report', 'customer service', 'email support'], 7),
+'how-do-i-contact-support',
+ARRAY['contact support', 'help', 'support', 'bug report', 'customer service', 'email support'], false, 7),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I update my display name?',
@@ -936,7 +1005,8 @@ ARRAY['contact support', 'help', 'support', 'bug report', 'customer service', 'e
 4. Tap Save.
 
 Your display name appears in the app header and in your profile.',
-ARRAY['display name', 'username', 'name', 'change name'], 8),
+'how-do-i-update-my-display-name',
+ARRAY['display name', 'username', 'name', 'change name'], false, 8),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I manage my privacy settings?',
@@ -947,7 +1017,8 @@ ARRAY['display name', 'username', 'name', 'change name'], 8),
 - Data deletion: delete your account and all data at any time
 
 For full details, review the YFIT Privacy Policy in Account Settings > Privacy Policy.',
-ARRAY['privacy settings', 'data privacy', 'account privacy', 'privacy policy'], 9),
+'how-do-i-manage-my-privacy-settings',
+ARRAY['privacy settings', 'data privacy', 'account privacy', 'privacy policy'], false, 9),
 
 ('a0000007-0000-0000-0000-000000000007',
 'How do I update my profile photo?',
@@ -959,10 +1030,11 @@ ARRAY['privacy settings', 'data privacy', 'account privacy', 'privacy policy'], 
 4. Crop and confirm.
 
 Your profile photo appears in the Account Settings page and in the app header.',
-ARRAY['profile photo', 'avatar', 'profile picture', 'change photo'], 10);
+'how-do-i-update-my-profile-photo',
+ARRAY['profile photo', 'avatar', 'profile picture', 'change photo'], false, 10);
 
 -- ---- SUBSCRIPTION & BILLING ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000008-0000-0000-0000-000000000008',
 'What subscription plans does YFIT offer?',
@@ -974,7 +1046,8 @@ INSERT INTO faq_articles (category_id, question, answer, keywords, display_order
 - Lifetime ($249.99 one-time): permanent Pro access, Founder''s Badge, direct developer access
 
 During the beta period, all features are available to beta testers at no charge.',
-ARRAY['subscription', 'pricing', 'plans', 'cost', 'price', 'pro', 'free'], 1),
+'what-subscription-plans-does-yfit-offer',
+ARRAY['subscription', 'pricing', 'plans', 'cost', 'price', 'pro', 'free'], false, 1),
 
 ('a0000008-0000-0000-0000-000000000008',
 'How do I upgrade to Pro?',
@@ -986,7 +1059,8 @@ ARRAY['subscription', 'pricing', 'plans', 'cost', 'price', 'pro', 'free'], 1),
 4. Complete payment through the secure checkout.
 
 Your Pro features will be activated immediately after payment.',
-ARRAY['upgrade', 'pro plan', 'subscribe', 'payment', 'upgrade to pro'], 2),
+'how-do-i-upgrade-to-pro',
+ARRAY['upgrade', 'pro plan', 'subscribe', 'payment', 'upgrade to pro'], false, 2),
 
 ('a0000008-0000-0000-0000-000000000008',
 'How do I cancel my subscription?',
@@ -998,21 +1072,24 @@ ARRAY['upgrade', 'pro plan', 'subscribe', 'payment', 'upgrade to pro'], 2),
 4. Confirm the cancellation.
 
 Your Pro features will remain active until the end of your current billing period. After that, your account will revert to the free Starter plan.',
-ARRAY['cancel subscription', 'cancel', 'unsubscribe', 'stop payment', 'end subscription'], 3),
+'how-do-i-cancel-my-subscription',
+ARRAY['cancel subscription', 'cancel', 'unsubscribe', 'stop payment', 'end subscription'], false, 3),
 
 ('a0000008-0000-0000-0000-000000000008',
 'Can I get a refund?',
 'Refund requests are handled on a case-by-case basis. If you are unsatisfied with YFIT Pro, contact support within 7 days of your purchase using the feedback button and we will review your request.
 
 Lifetime purchases are non-refundable after 30 days. Monthly and yearly subscriptions cancelled within 7 days of the initial purchase may be eligible for a full refund.',
-ARRAY['refund', 'money back', 'refund policy', 'cancel and refund'], 4),
+'can-i-get-a-refund',
+ARRAY['refund', 'money back', 'refund policy', 'cancel and refund'], false, 4),
 
 ('a0000008-0000-0000-0000-000000000008',
 'Is there a free trial?',
 'Yes! New users get a free trial of Pro features. During the beta period, all features are available to all beta testers at no charge.
 
 When YFIT launches publicly, new users will receive a 14-day free trial of Pro before being asked to subscribe.',
-ARRAY['free trial', 'trial', 'try pro', 'test pro'], 5),
+'is-there-a-free-trial',
+ARRAY['free trial', 'trial', 'try pro', 'test pro'], false, 5),
 
 ('a0000008-0000-0000-0000-000000000008',
 'What happens to my data if I downgrade to free?',
@@ -1023,7 +1100,8 @@ ARRAY['free trial', 'trial', 'try pro', 'test pro'], 5),
 - Your data remains in your account and will be accessible again if you re-upgrade
 
 Nothing is deleted when you downgrade.',
-ARRAY['downgrade', 'free plan', 'data after downgrade', 'lose access'], 6),
+'what-happens-to-my-data-if-i-downgrade-to-free',
+ARRAY['downgrade', 'free plan', 'data after downgrade', 'lose access'], false, 6),
 
 ('a0000008-0000-0000-0000-000000000008',
 'How do I update my payment method?',
@@ -1035,7 +1113,8 @@ ARRAY['downgrade', 'free plan', 'data after downgrade', 'lose access'], 6),
 4. Enter your new card details.
 
 Your payment method is stored securely and is never visible to YFIT staff.',
-ARRAY['payment method', 'credit card', 'update card', 'billing details'], 7),
+'how-do-i-update-my-payment-method',
+ARRAY['payment method', 'credit card', 'update card', 'billing details'], false, 7),
 
 ('a0000008-0000-0000-0000-000000000008',
 'What is the Lifetime plan?',
@@ -1047,7 +1126,8 @@ Lifetime members also receive:
 - Early access to all new features before general release
 
 The Lifetime plan is ideal if you plan to use YFIT long-term.',
-ARRAY['lifetime', 'one time payment', 'lifetime access', 'founders', 'permanent'], 8),
+'what-is-the-lifetime-plan',
+ARRAY['lifetime', 'one time payment', 'lifetime access', 'founders', 'permanent'], false, 8),
 
 ('a0000008-0000-0000-0000-000000000008',
 'Is my payment information secure?',
@@ -1058,15 +1138,17 @@ ARRAY['lifetime', 'one time payment', 'lifetime access', 'founders', 'permanent'
 - Encrypted end-to-end during transmission
 
 YFIT staff cannot see your full card number.',
-ARRAY['payment security', 'card security', 'PCI', 'secure payment', 'safe payment'], 9),
+'is-my-payment-information-secure',
+ARRAY['payment security', 'card security', 'PCI', 'secure payment', 'safe payment'], false, 9),
 
 ('a0000008-0000-0000-0000-000000000008',
 'Do you offer student or family discounts?',
 'Student and family plan discounts are planned for a future update. Use the feedback button to register your interest — demand from users helps prioritise these features.',
-ARRAY['discount', 'student discount', 'family plan', 'group plan', 'cheaper'], 10);
+'do-you-offer-student-or-family-discounts',
+ARRAY['discount', 'student discount', 'family plan', 'group plan', 'cheaper'], false, 10);
 
 -- ---- TROUBLESHOOTING ----
-INSERT INTO faq_articles (category_id, question, answer, keywords, display_order) VALUES
+INSERT INTO faq_articles (category_id, question, answer, slug, keywords, is_featured, display_order) VALUES
 
 ('a0000009-0000-0000-0000-000000000009',
 'The app shows a spinning loading screen and will not open. What do I do?',
@@ -1083,7 +1165,8 @@ On web browser:
 3. Alternatively: Chrome Settings > Privacy > Clear browsing data > Cached images and files.
 
 Your data is stored in the cloud and will not be lost by clearing the app cache.',
-ARRAY['spinning', 'loading', 'stuck', 'wont open', 'spinning disk', 'loading screen', 'cache'], 1),
+'the-app-shows-a-spinning-loading-screen-and-will-not-open-wh',
+ARRAY['spinning', 'loading', 'stuck', 'wont open', 'spinning disk', 'loading screen', 'cache'], false, 1),
 
 ('a0000009-0000-0000-0000-000000000009',
 'The barcode scanner is not working. How do I fix it?',
@@ -1100,7 +1183,8 @@ On web browser:
 3. Refresh the page after changing permissions.
 
 If a product scans but shows "not found", the product may not be in the database. Use Create Custom Food to add it manually.',
-ARRAY['barcode scanner', 'scanner not working', 'camera permission', 'scan error', 'barcode error'], 2),
+'the-barcode-scanner-is-not-working-how-do-i-fix-it',
+ARRAY['barcode scanner', 'scanner not working', 'camera permission', 'scan error', 'barcode error'], false, 2),
 
 ('a0000009-0000-0000-0000-000000000009',
 'My nutrition data is not saving. What should I check?',
@@ -1112,7 +1196,8 @@ ARRAY['barcode scanner', 'scanner not working', 'camera permission', 'scan error
 4. If the problem persists, log out and back in, then try again.
 
 If you continue to have saving issues, use the feedback button to report the problem.',
-ARRAY['not saving', 'data not saving', 'food not logging', 'save error', 'sync error'], 3),
+'my-nutrition-data-is-not-saving-what-should-i-check',
+ARRAY['not saving', 'data not saving', 'food not logging', 'save error', 'sync error'], false, 3),
 
 ('a0000009-0000-0000-0000-000000000009',
 'The app is very slow. How can I speed it up?',
@@ -1129,7 +1214,8 @@ On web browser:
 - Close other browser tabs.
 - Try a different browser (Chrome is recommended).
 - Check your internet connection.',
-ARRAY['slow', 'slow app', 'performance', 'lag', 'speed up'], 4),
+'the-app-is-very-slow-how-can-i-speed-it-up',
+ARRAY['slow', 'slow app', 'performance', 'lag', 'speed up'], false, 4),
 
 ('a0000009-0000-0000-0000-000000000009',
 'I cannot log in to my account. What should I do?',
@@ -1142,7 +1228,8 @@ ARRAY['slow', 'slow app', 'performance', 'lag', 'speed up'], 4),
 5. Check your internet connection.
 
 If you still cannot log in after resetting your password, use the feedback button or email support@yfitai.com.',
-ARRAY['cant login', 'login error', 'forgot password', 'password reset', 'sign in error'], 5),
+'i-cannot-log-in-to-my-account-what-should-i-do',
+ARRAY['cant login', 'login error', 'forgot password', 'password reset', 'sign in error'], false, 5),
 
 ('a0000009-0000-0000-0000-000000000009',
 'My workout history has disappeared. What happened?',
@@ -1154,7 +1241,8 @@ ARRAY['cant login', 'login error', 'forgot password', 'password reset', 'sign in
 4. Pull down to refresh the list.
 
 If workouts are genuinely missing, use the feedback button to report the issue with the dates of the missing sessions.',
-ARRAY['workout missing', 'history gone', 'data missing', 'lost workouts', 'disappeared'], 6),
+'my-workout-history-has-disappeared-what-happened',
+ARRAY['workout missing', 'history gone', 'data missing', 'lost workouts', 'disappeared'], false, 6),
 
 ('a0000009-0000-0000-0000-000000000009',
 'The AI Coach is not responding. What should I do?',
@@ -1166,7 +1254,8 @@ ARRAY['workout missing', 'history gone', 'data missing', 'lost workouts', 'disap
 4. Refresh the page or restart the app.
 
 If the problem persists for more than an hour, use the feedback button to report it.',
-ARRAY['AI not working', 'AI not responding', 'coach error', 'AI down', 'chat not working'], 7),
+'the-ai-coach-is-not-responding-what-should-i-do',
+ARRAY['AI not working', 'AI not responding', 'coach error', 'AI down', 'chat not working'], false, 7),
 
 ('a0000009-0000-0000-0000-000000000009',
 'My step count is not updating. How do I fix it?',
@@ -1177,7 +1266,8 @@ To log your steps:
 2. Find the Steps section.
 3. Enter your step count for today.
 4. Tap Save.',
-ARRAY['steps not updating', 'step count wrong', 'steps not syncing', 'pedometer'], 8),
+'my-step-count-is-not-updating-how-do-i-fix-it',
+ARRAY['steps not updating', 'step count wrong', 'steps not syncing', 'pedometer'], false, 8),
 
 ('a0000009-0000-0000-0000-000000000009',
 'How do I report a bug?',
@@ -1191,7 +1281,8 @@ ARRAY['steps not updating', 'step count wrong', 'steps not syncing', 'pedometer'
 6. Tap Submit.
 
 Bug reports are reviewed daily. The more detail you provide, the faster we can fix the issue.',
-ARRAY['report bug', 'bug report', 'feedback', 'report issue', 'error report'], 9),
+'how-do-i-report-a-bug',
+ARRAY['report bug', 'bug report', 'feedback', 'report issue', 'error report'], false, 9),
 
 ('a0000009-0000-0000-0000-000000000009',
 'The app updated and now something is broken. What should I do?',
@@ -1203,7 +1294,8 @@ Fix steps:
 3. Restart the app.
 
 If the problem persists after clearing cache, use the feedback button to report exactly what is broken.',
-ARRAY['after update', 'update broke', 'new version broken', 'update issue', 'post update'], 10);
+'the-app-updated-and-now-something-is-broken-what-should-i-do',
+ARRAY['after update', 'update broke', 'new version broken', 'update issue', 'post update'], false, 10);
 
 -- Done!
 SELECT 'FAQ seed complete: ' || COUNT(*) || ' articles inserted' AS result FROM faq_articles;
