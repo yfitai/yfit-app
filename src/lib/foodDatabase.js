@@ -607,13 +607,14 @@ export async function getFavoriteFoods(userId) {
   try {
     const { data, error } = await supabase
       .from('favorite_foods')
-      .select('food_data')
+      .select('id, food_data')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
     if (error) throw error
 
-    return (data || []).map(entry => entry.food_data)
+    // Attach the favorite_foods row id so delete can use it directly
+    return (data || []).map(entry => ({ ...entry.food_data, _favoriteRowId: entry.id }))
   } catch (error) {
     console.error('Error getting favorite foods:', error)
     return []
@@ -643,9 +644,20 @@ export async function addFavoriteFood(userId, foodData) {
 /**
  * Remove food from favorites
  */
-export async function removeFavoriteFood(userId, foodId) {
+export async function removeFavoriteFood(userId, foodId, favoriteRowId) {
   try {
-    // First, get all favorites for this user
+    // If we have the direct row id (from _favoriteRowId), use it — no extra query needed
+    if (favoriteRowId) {
+      const { error } = await supabase
+        .from('favorite_foods')
+        .delete()
+        .eq('id', favoriteRowId)
+        .eq('user_id', userId) // Safety check
+      if (error) throw error
+      return true
+    }
+
+    // Fallback: find by food_data.id (for backwards compatibility)
     const { data: favorites, error: fetchError } = await supabase
       .from('favorite_foods')
       .select('id, food_data')
@@ -653,7 +665,6 @@ export async function removeFavoriteFood(userId, foodId) {
     
     if (fetchError) throw fetchError
     
-    // Find the favorite with matching food ID
     const favoriteToDelete = favorites?.find(fav => fav.food_data?.id === foodId)
     
     if (!favoriteToDelete) {
@@ -661,7 +672,6 @@ export async function removeFavoriteFood(userId, foodId) {
       return false
     }
     
-    // Delete by the favorite_foods table ID (not the food ID)
     const { error } = await supabase
       .from('favorite_foods')
       .delete()

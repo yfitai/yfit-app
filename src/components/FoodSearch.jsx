@@ -136,8 +136,8 @@ const handleSaveCustomFood = async (customFood) => {
 
 const handleToggleFavorite = async (food, isFavorited) => {
   if (isFavorited) {
-    // Remove from favorites
-    const success = await removeFavoriteFood(user.id, food.id)
+    // Remove from favorites - pass _favoriteRowId for direct delete (no extra query needed)
+    const success = await removeFavoriteFood(user.id, food.id, food._favoriteRowId)
     if (success) {
       // Reload favorites list
       await loadQuickAccessFoods()
