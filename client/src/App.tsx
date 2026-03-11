@@ -10,6 +10,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/terms"} component={Terms} />
       <Route path={"/signin"} component={SignIn} />
       <Route path={"/signup"} component={SignUp} />
+      <Route path={"/payment-success"} component={PaymentSuccess} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

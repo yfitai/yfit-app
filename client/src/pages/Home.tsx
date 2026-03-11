@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, ArrowRight, Activity, Zap, Smartphone, BarChart3, Pill, Eye, Target, Dumbbell, TrendingUp, Apple, Calendar, Brain } from "lucide-react";
+import { Check, ArrowRight, Activity, Zap, Smartphone, BarChart3, Pill, Eye, Target, Dumbbell, TrendingUp, Apple, Calendar, Brain, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -16,6 +17,7 @@ export default function Home() {
 
   const goToSignIn = () => navigate('/signin');
   const goToSignUp = () => navigate('/signup');
+  const { startCheckout, isLoading: checkoutLoading } = useStripeCheckout();
   const goToContact = () => navigate('/contact');
   const goToPrivacy = () => navigate('/privacy');
   const goToTerms = () => navigate('/terms');
@@ -99,6 +101,7 @@ export default function Home() {
       buttonText: "Get Started Free",
       buttonStyle: "outline" as const,
       highlighted: false,
+      stripeKey: null as null | "proMonthly" | "proYearly" | "proLifetime" | "freeTrial",
     },
     {
       name: "Pro Monthly",
@@ -119,6 +122,7 @@ export default function Home() {
       buttonText: "Start Pro Monthly",
       buttonStyle: "default" as const,
       highlighted: false,
+      stripeKey: "proMonthly" as const,
     },
     {
       name: "Pro Yearly",
@@ -139,6 +143,7 @@ export default function Home() {
       buttonText: "Start Pro Yearly",
       buttonStyle: "default" as const,
       highlighted: true,
+      stripeKey: "proYearly" as const,
     },
     {
       name: "Pro Lifetime",
@@ -159,6 +164,7 @@ export default function Home() {
       buttonText: "Get Lifetime Access",
       buttonStyle: "default" as const,
       highlighted: false,
+      stripeKey: "proLifetime" as const,
     },
     {
       name: "Limited Time Offer",
@@ -178,6 +184,7 @@ export default function Home() {
       buttonStyle: "default" as const,
       highlighted: false,
       isOffer: true,
+      stripeKey: "freeTrial" as const,
     },
   ];
 
@@ -399,11 +406,22 @@ export default function Home() {
                   </CardContent>
                   <CardFooter>
                     <Button
-                      onClick={goToSignUp}
+                      onClick={() => {
+                        if (!plan.stripeKey) {
+                          goToSignUp();
+                        } else {
+                          startCheckout({ plan: plan.stripeKey });
+                        }
+                      }}
+                      disabled={checkoutLoading === plan.stripeKey}
                       className={`w-full text-sm ${plan.isOffer ? 'bg-orange-500 hover:bg-orange-600 text-white' : plan.highlighted ? 'bg-green-600 hover:bg-green-700 text-white' : plan.buttonStyle === 'outline' ? '' : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white'}`}
                       variant={plan.buttonStyle === 'outline' ? 'outline' : 'default'}
                     >
-                      {plan.buttonText}
+                      {checkoutLoading === plan.stripeKey ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+                      ) : (
+                        plan.buttonText
+                      )}
                     </Button>
                   </CardFooter>
                 </Card>
