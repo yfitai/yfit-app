@@ -431,6 +431,131 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Feature Comparison Table */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">Compare Plans</h2>
+            <p className="text-muted-foreground text-lg">Everything you need to choose the right plan for your fitness journey.</p>
+          </div>
+          <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-900 text-white">
+                  <th className="text-left px-5 py-4 font-semibold w-52">Feature</th>
+                  <th className="text-center px-4 py-4 font-semibold">Free</th>
+                  <th className="text-center px-4 py-4 font-semibold">Pro Monthly</th>
+                  <th className="text-center px-4 py-4 font-semibold bg-green-700">Pro Yearly</th>
+                  <th className="text-center px-4 py-4 font-semibold bg-violet-700">Pro Lifetime</th>
+                </tr>
+                <tr className="bg-gray-800 text-gray-300 text-xs">
+                  <td className="px-5 py-2 text-gray-400">Price</td>
+                  <td className="text-center px-4 py-2 font-medium text-white">$0</td>
+                  <td className="text-center px-4 py-2 font-medium text-white">$12.99/mo</td>
+                  <td className="text-center px-4 py-2 font-medium text-white bg-green-900">$99.99/yr</td>
+                  <td className="text-center px-4 py-2 font-medium text-white bg-violet-900">$249.99 once</td>
+                </tr>
+                <tr className="bg-orange-50 text-xs border-b border-orange-100">
+                  <td className="px-5 py-2 text-gray-500 italic">Promotional Offer</td>
+                  <td className="text-center px-4 py-2 text-gray-400">—</td>
+                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">+1 Month FREE</td>
+                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">+1 Month FREE</td>
+                  <td className="text-center px-4 py-2 text-gray-400">—</td>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Section header helper */}
+                {([
+                  {
+                    section: "TRACKING",
+                    rows: [
+                      { label: "Basic Workout Tracking",   free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Manual Meal Logging",       free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Weight & Body Metrics",     free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Step Count & Daily Activity",free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Barcode Scanner",           free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Micronutrient Tracking",    free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Water Intake Logging",      free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Medication Tracking",       free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                    ]
+                  },
+                  {
+                    section: "AI FEATURES",
+                    rows: [
+                      { label: "AI Form Analysis",          free: "5/month", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
+                      { label: "AI Coach",                  free: "Limited", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
+                      { label: "AI Predictions & Forecasts",free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Personalised Meal Plans",   free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Workout Recommendations",   free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                    ]
+                  },
+                  {
+                    section: "PLANNING",
+                    rows: [
+                      { label: "Saved Workout Routines",    free: "3", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
+                      { label: "Grocery Lists",             free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Provider Reports",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Medication Reminders",      free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                    ]
+                  },
+                  {
+                    section: "ANALYTICS",
+                    rows: [
+                      { label: "Basic Progress Charts",     free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Advanced Analytics",        free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Trend Analysis Over Time",  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                    ]
+                  },
+                  {
+                    section: "SUPPORT & PERKS",
+                    rows: [
+                      { label: "Community Support",         free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "Priority Support",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: "VIP Support",               free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: "All Future Features",       free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: "No Recurring Charges",      free: "✅", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: "Exclusive Community Access",free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                    ]
+                  },
+                ] as { section: string; rows: { label: string; free: string; monthly: string; yearly: string; lifetime: string }[] }[]).map((group, gi) => (
+                  <>
+                    <tr key={`section-${gi}`} className="bg-gray-100">
+                      <td colSpan={5} className="px-5 py-2 text-xs font-bold tracking-widest text-gray-500 uppercase">{group.section}</td>
+                    </tr>
+                    {group.rows.map((row, ri) => (
+                      <tr key={`row-${gi}-${ri}`} className={ri % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                        <td className="px-5 py-3 text-gray-700 font-medium">{row.label}</td>
+                        <td className="text-center px-4 py-3 text-gray-600">{row.free}</td>
+                        <td className="text-center px-4 py-3 text-gray-700">{row.monthly}</td>
+                        <td className="text-center px-4 py-3 text-gray-700 bg-green-50">{row.yearly}</td>
+                        <td className="text-center px-4 py-3 text-gray-700 bg-violet-50">{row.lifetime}</td>
+                      </tr>
+                    ))}
+                  </>
+                ))}
+                {/* CTA row */}
+                <tr className="bg-gray-900">
+                  <td className="px-5 py-4 text-white font-semibold text-sm">Ready to start?</td>
+                  <td className="text-center px-4 py-4">
+                    <button onClick={() => window.location.href='/signup'} className="text-xs bg-white text-gray-900 font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">Get Free</button>
+                  </td>
+                  <td className="text-center px-4 py-4">
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-blue-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors">Choose Monthly</button>
+                  </td>
+                  <td className="text-center px-4 py-4 bg-green-900">
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-green-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-green-400 transition-colors">Best Value</button>
+                  </td>
+                  <td className="text-center px-4 py-4 bg-violet-900">
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-violet-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-violet-400 transition-colors">Own Forever</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-4">All prices in USD. Taxes calculated at checkout. Cancel anytime for monthly and yearly plans.</p>
+        </div>
+      </section>
+
       {/* Core Features Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
