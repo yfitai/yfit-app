@@ -178,7 +178,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
 
       {/* Category Filter */}
       <div className="p-4 border-b">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant={selectedCategory === null ? 'default' : 'outline'}
             size="sm"
@@ -192,7 +192,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
               variant={selectedCategory === category.id ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap flex-shrink-0"
             >
               <span className="mr-1">{getCategoryIcon(category.icon)}</span>
               {category.name}
@@ -259,7 +259,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
 
                   {isExpanded && (
                     <div className="px-4 pb-4 border-t">
-                      <div className="pt-4 text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      <div className="pt-4 text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
                         {article.answer}
                       </div>
                       
