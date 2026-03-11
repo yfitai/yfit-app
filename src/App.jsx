@@ -1,32 +1,50 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Auth from './components/Auth'
-import ResetPassword from './components/ResetPassword'
-import LandingPage from './pages/LandingPage'
-import Legal from './pages/Legal'
-import Dashboard from './components/Dashboard'
-import Goals from './components/Goals'
-import NutritionUnified from './components/NutritionUnified'
-import DailyTracker from './components/DailyTracker'
-import Progress from './components/Progress'
-import Fitness from './components/Fitness'
-import Medications from './components/Medications'
-import FormAnalysis from './pages/FormAnalysis'
-import WorkoutSessionTracker from './components/WorkoutSessionTracker'
-import AICoachFAQ from './components/AICoachFAQ'
-import PredictionsUnified from './components/PredictionsUnified'
-import Navigation from './components/Navigation'
-import ManualCleanup from './pages/ManualCleanup'
 import { supabase, getCurrentUser } from './lib/supabase'
-import Footer from './components/Footer'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
-import VersionChecker from './utils/VersionChecker'
 import { LiveUpdateService } from './services/liveUpdate'
-import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
-import OnboardingWizard from './components/OnboardingWizard'
-import FeedbackButton from './components/FeedbackButton'
 import { setAnalyticsUser, Analytics } from './lib/analytics'
 import './App.css'
+
+// Always-needed components loaded eagerly (small, needed immediately)
+import Navigation from './components/Navigation'
+import Footer from './components/Footer'
+import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
+import VersionChecker from './utils/VersionChecker'
+import FeedbackButton from './components/FeedbackButton'
+
+// Auth & onboarding loaded eagerly (needed before dashboard)
+import Auth from './components/Auth'
+import OnboardingWizard from './components/OnboardingWizard'
+
+// All page-level components lazy loaded — only downloaded when user navigates to that page
+const Dashboard = lazy(() => import('./components/Dashboard'))
+const Goals = lazy(() => import('./components/Goals'))
+const NutritionUnified = lazy(() => import('./components/NutritionUnified'))
+const DailyTracker = lazy(() => import('./components/DailyTracker'))
+const Progress = lazy(() => import('./components/Progress'))
+const Fitness = lazy(() => import('./components/Fitness'))
+const Medications = lazy(() => import('./components/Medications'))
+const FormAnalysis = lazy(() => import('./pages/FormAnalysis'))
+const WorkoutSessionTracker = lazy(() => import('./components/WorkoutSessionTracker'))
+const AICoachFAQ = lazy(() => import('./components/AICoachFAQ'))
+const PredictionsUnified = lazy(() => import('./components/PredictionsUnified'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const Legal = lazy(() => import('./pages/Legal'))
+const ResetPassword = lazy(() => import('./components/ResetPassword'))
+const ManualCleanup = lazy(() => import('./pages/ManualCleanup'))
+
+// Minimal page-level loading spinner shown while lazy chunks download
+function PageLoader() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-3 text-sm text-gray-500">Loading...</p>
+      </div>
+    </div>
+  )
+}
 
 function App() {
   const [user, setUser] = useState(null)
@@ -34,12 +52,11 @@ function App() {
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
 
   useEffect(() => {
-    // Initialize LiveUpdate service for OTA updates
+    // Initialize LiveUpdate service for OTA updates (non-blocking)
     LiveUpdateService.initialize().catch(err => {
       console.error('Failed to initialize LiveUpdate:', err)
     })
 
-    // Check for existing session
     // Hard 8-second safety timeout - guarantees spinner NEVER gets stuck
     const startupTimeout = setTimeout(() => {
       console.warn('App startup timed out after 8s - forcing load')
@@ -148,34 +165,36 @@ function App() {
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
             <Navigation user={user} />
 
-            <Routes>
-              {/* Public Routes - No login required */}
-              <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-              <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-              <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/legal" element={<Legal />} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+                <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+                <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/legal" element={<Legal />} />
 
-              {/* Protected Routes - Login required */}
-              {user ? (
-                <>
-                  <Route path="/dashboard" element={<Dashboard user={user} />} />
-                  <Route path="/goals" element={<Goals user={user} />} />
-                  <Route path="/nutrition" element={<NutritionUnified user={user} />} />
-                  <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
-                  <Route path="/fitness" element={<Fitness user={user} />} />
-                  <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
-                  <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
-                  <Route path="/medications" element={<Medications user={user} />} />
-                  <Route path="/progress" element={<Progress user={user} />} />
-                  <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
-                  <Route path="/predictions" element={<PredictionsUnified user={user} />} />
-                  <Route path="/manual-cleanup" element={<ManualCleanup />} />
-                </>
-              ) : (
-                <Route path="*" element={<Navigate to="/login" replace />} />
-              )}
-            </Routes>
+                {/* Protected Routes - Login required */}
+                {user ? (
+                  <>
+                    <Route path="/dashboard" element={<Dashboard user={user} />} />
+                    <Route path="/goals" element={<Goals user={user} />} />
+                    <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                    <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
+                    <Route path="/fitness" element={<Fitness user={user} />} />
+                    <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
+                    <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
+                    <Route path="/medications" element={<Medications user={user} />} />
+                    <Route path="/progress" element={<Progress user={user} />} />
+                    <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
+                    <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                    <Route path="/manual-cleanup" element={<ManualCleanup />} />
+                  </>
+                ) : (
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+                )}
+              </Routes>
+            </Suspense>
 
             <Footer />
 
@@ -189,4 +208,3 @@ function App() {
 }
 
 export default App
-// Force rebuild for camera fix Tue Feb 24 14:38:13 EST 2026
