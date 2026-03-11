@@ -8,11 +8,13 @@
 CREATE TABLE IF NOT EXISTS faq_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
   description TEXT,
   icon TEXT,
   display_order INT DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS faq_articles (
@@ -83,16 +85,16 @@ DELETE FROM faq_article_views;
 DELETE FROM faq_articles;
 DELETE FROM faq_categories;
 
-INSERT INTO faq_categories (id, name, description, icon, display_order) VALUES
-  ('a0000001-0000-0000-0000-000000000001', 'Getting Started',        'New to YFIT? Start here.',                       '🚀', 1),
-  ('a0000002-0000-0000-0000-000000000002', 'Nutrition Tracking',     'Logging food, macros, and meal planning.',       '🥗', 2),
-  ('a0000003-0000-0000-0000-000000000003', 'Fitness & Workouts',     'Workout logging, form analysis, and strength.',  '💪', 3),
-  ('a0000004-0000-0000-0000-000000000004', 'Goals & Progress',       'Setting goals and tracking your results.',       '🎯', 4),
-  ('a0000005-0000-0000-0000-000000000005', 'Medications & Health',   'Medication reminders and health tracking.',      '💊', 5),
-  ('a0000006-0000-0000-0000-000000000006', 'AI Coach',               'Using the AI coaching and chat features.',       '🤖', 6),
-  ('a0000007-0000-0000-0000-000000000007', 'Account Settings',       'Profile, preferences, and privacy.',             '⚙️', 7),
-  ('a0000008-0000-0000-0000-000000000008', 'Subscription & Billing', 'Plans, payments, and upgrades.',                 '💳', 8),
-  ('a0000009-0000-0000-0000-000000000009', 'Troubleshooting',        'Fixing common issues and errors.',               '🔧', 9);
+INSERT INTO faq_categories (id, name, slug, description, icon, display_order) VALUES
+  ('a0000001-0000-0000-0000-000000000001', 'Getting Started',        'getting-started',        'New to YFIT? Start here.',                       '🚀', 1),
+  ('a0000002-0000-0000-0000-000000000002', 'Nutrition Tracking',     'nutrition-tracking',     'Logging food, macros, and meal planning.',       '🥗', 2),
+  ('a0000003-0000-0000-0000-000000000003', 'Fitness & Workouts',     'fitness-workouts',       'Workout logging, form analysis, and strength.',  '💪', 3),
+  ('a0000004-0000-0000-0000-000000000004', 'Goals & Progress',       'goals-progress',         'Setting goals and tracking your results.',       '🎯', 4),
+  ('a0000005-0000-0000-0000-000000000005', 'Medications & Health',   'medications-health',     'Medication reminders and health tracking.',      '💊', 5),
+  ('a0000006-0000-0000-0000-000000000006', 'AI Coach',               'ai-coach',               'Using the AI coaching and chat features.',       '🤖', 6),
+  ('a0000007-0000-0000-0000-000000000007', 'Account Settings',       'account-settings',       'Profile, preferences, and privacy.',             '⚙️', 7),
+  ('a0000008-0000-0000-0000-000000000008', 'Subscription & Billing', 'subscription-billing',   'Plans, payments, and upgrades.',                 '💳', 8),
+  ('a0000009-0000-0000-0000-000000000009', 'Troubleshooting',        'troubleshooting',        'Fixing common issues and errors.',               '🔧', 9);
 
 -- ============================================================
 -- 3. SEED ARTICLES
