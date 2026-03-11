@@ -29,6 +29,7 @@ const FormAnalysis = lazy(() => import('./pages/FormAnalysis'))
 const WorkoutSessionTracker = lazy(() => import('./components/WorkoutSessionTracker'))
 const AICoachFAQ = lazy(() => import('./components/AICoachFAQ'))
 const PredictionsUnified = lazy(() => import('./components/PredictionsUnified'))
+const BodyRecomp = lazy(() => import('./components/BodyRecomp'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const Legal = lazy(() => import('./pages/Legal'))
 const ResetPassword = lazy(() => import('./components/ResetPassword'))
@@ -196,6 +197,7 @@ function App() {
                     <Route path="/progress" element={<Progress user={user} />} />
                     <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
                     <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                    <Route path="/body-recomp" element={<BodyRecomp user={user} />} />
                     <Route path="/manual-cleanup" element={<ManualCleanup />} />
                   </>
                 ) : (
