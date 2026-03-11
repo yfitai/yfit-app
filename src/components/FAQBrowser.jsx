@@ -176,29 +176,42 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="p-4 border-b">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={selectedCategory === null ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory(null)}
-          >
-            All
-          </Button>
-          {categories.map(category => (
-            <Button
+      {/* Category Filter - Compact Vertical List */}
+      <div className="border-b">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
+            selectedCategory === null
+              ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-l-2 border-blue-500'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 border-l-2 border-transparent'
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <span>📚</span>
+            <span>All Categories</span>
+          </span>
+          <span className="text-xs text-gray-400">{articles.length}</span>
+        </button>
+        {categories.map(category => {
+          const count = articles.filter(a => a.category_id === category.id).length
+          return (
+            <button
               key={category.id}
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setSelectedCategory(category.id)}
-              className="whitespace-nowrap flex-shrink-0"
+              className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                selectedCategory === category.id
+                  ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium border-l-2 border-blue-500'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 border-l-2 border-transparent'
+              }`}
             >
-              <span className="mr-1">{getCategoryIcon(category.icon)}</span>
-              {category.name}
-            </Button>
-          ))}
-        </div>
+              <span className="flex items-center gap-2">
+                <span>{getCategoryIcon(category.icon)}</span>
+                <span>{category.name}</span>
+              </span>
+              <span className="text-xs text-gray-400">{count}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Articles List */}
