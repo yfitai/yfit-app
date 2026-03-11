@@ -8,9 +8,9 @@ import {
 import { TrendingDown, TrendingUp, Minus, Target, Activity, ChevronDown, ChevronUp } from 'lucide-react'
 
 // Measurements that should DECREASE toward goal (fat loss areas)
-const REDUCING_MEASUREMENTS = ['waist', 'hips', 'neck']
+const REDUCING_MEASUREMENTS = ['waist', 'hips']
 // Measurements that should INCREASE toward goal (muscle gain areas)
-const INCREASING_MEASUREMENTS = ['shoulders', 'chest', 'biceps', 'forearms', 'thighs', 'calves']
+const INCREASING_MEASUREMENTS = ['shoulders', 'chest', 'neck', 'biceps', 'forearms', 'thighs', 'calves']
 
 const MEASUREMENT_LABELS = {
   neck: 'Neck',
@@ -25,8 +25,8 @@ const MEASUREMENT_LABELS = {
 }
 
 const MEASUREMENT_GROUPS = {
-  'Fat Loss': ['waist', 'hips', 'neck'],
-  'Muscle Gain': ['biceps', 'forearms', 'thighs', 'calves'],
+  'Fat Loss': ['waist', 'hips'],
+  'Muscle Gain': ['neck', 'biceps', 'forearms', 'thighs', 'calves'],
   'Overall Build': ['shoulders', 'chest']
 }
 
