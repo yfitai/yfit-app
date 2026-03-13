@@ -1023,11 +1023,24 @@ export default function PredictionsUnified({ user }) {
 
   // 10. Habit Streak Predictions
   const predictHabitStreak = (data = workoutData) => {
-    if (data.length < 7) return null;
+    // Filter to strength/resistance sessions only — exclude cardio, walking, stretching
+    // This matches the same filter used in injury risk and workout analytics
+    const strengthData = data.filter(w => {
+      const name = (w.workout?.name || w.session_name || '').toLowerCase();
+      return !name.includes('walking') && !name.includes('treadmill') &&
+             !name.includes('duration') && !name.includes('stretching') &&
+             !name.includes('strechting') &&
+             !name.includes('flexibility') && !name.includes('cardio') &&
+             !name.includes('yoga') && !name.includes('foam roll') &&
+             !name.includes('running') && !name.includes('cycling') &&
+             !name.includes('wall sit');
+    });
+    
+    if (strengthData.length < 7) return null;
 
     try {
-      // Calculate current streak
-      const sortedDates = data.map(w => new Date(w.start_time).toDateString()).sort();
+      // Calculate current streak using strength workouts only
+      const sortedDates = strengthData.map(w => new Date(w.start_time).toDateString()).sort();
       const uniqueDates = [...new Set(sortedDates)];
       
       let currentStreak = 0;
@@ -1049,16 +1062,16 @@ export default function PredictionsUnified({ user }) {
       longestStreak = Math.max(longestStreak, tempStreak);
 
       // Check if still on streak
-      // data is sorted descending (newest first), uniqueDates is sorted ascending
+      // strengthData is sorted descending (newest first), uniqueDates is sorted ascending
       // The most recent workout date is uniqueDates[uniqueDates.length - 1]
       const lastWorkoutDate = new Date(uniqueDates[uniqueDates.length - 1]);
       const daysSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60 * 24);
       // Allow up to 2 days gap (1 rest day) before breaking streak
       currentStreak = daysSinceLastWorkout <= 2 ? tempStreak : 0;
 
-      // Calculate consistency rate
+      // Calculate consistency rate using strength workouts only
       // Use at least 28 days as denominator to avoid inflated rates from short data windows
-      const rawTotalDays = (Date.now() - new Date(data[data.length - 1].start_time).getTime()) / (1000 * 60 * 60 * 24);
+      const rawTotalDays = (Date.now() - new Date(strengthData[strengthData.length - 1].start_time).getTime()) / (1000 * 60 * 60 * 24);
       const totalDays = Math.max(28, rawTotalDays);
       const consistencyRate = Math.min(100, (uniqueDates.length / totalDays) * 100);
 
@@ -1074,7 +1087,7 @@ export default function PredictionsUnified({ user }) {
         longestStreak,
         consistencyRate: Math.round(consistencyRate),
         streakProbability: Math.round(streakProbability),
-        totalWorkouts: data.length,
+        totalWorkouts: strengthData.length, // Only count strength sessions
         avgWorkoutsPerWeek: Math.round(cappedFrequency * 10) / 10,
         status: currentStreak > 0 ? 'active' : 'broken',
         recommendation: streakProbability > 70 
