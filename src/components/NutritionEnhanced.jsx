@@ -188,9 +188,23 @@ export default function NutritionEnhanced({ user: propUser }) {
 
  const handleFoodSelected = (food) => {
   setSelectedFood(food)
-  // Use preferred serving if saved (My Foods), otherwise default to 1
-  setServingQuantity(food.preferred_serving_quantity ?? 1)
-  setServingUnit(food.preferred_serving_unit || food.serving_unit || 'serving')
+  
+  const knownUnits = ['g', 'oz', 'lb', 'ml', 'fl_oz', 'cup', 'tbsp', 'tsp', 'serving', 'label_serving']
+  
+  // If the food has a saved preferred unit (from My Foods), use it
+  if (food.preferred_serving_unit && knownUnits.includes(food.preferred_serving_unit)) {
+    setServingQuantity(food.preferred_serving_quantity ?? 1)
+    setServingUnit(food.preferred_serving_unit)
+  } else if (food.serving_size_label) {
+    // Fresh scan with a label serving — pre-select the label option
+    setServingQuantity(1)
+    setServingUnit('label_serving')
+  } else {
+    // No label, no saved preference — default to grams with the product's serving size
+    setServingQuantity(food.servingGrams || 100)
+    setServingUnit('g')
+  }
+  
   setShowFoodSearch(false)
   setShowBarcodeScanner(false)
   setShowServingSelector(true)
@@ -230,6 +244,7 @@ const handleBarcodeScanned = async (barcode) => {
     // Get the unit conversion (same logic as ServingSizeSelector)
     const isLiquid = selectedFood.foodType === 'liquid'
     const units = isLiquid ? [
+      { value: 'label_serving', toGrams: selectedFood.servingGrams || 100 },
       { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
       { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
       { value: 'cup', label: 'Cups', toGrams: 240 },
@@ -237,13 +252,14 @@ const handleBarcodeScanned = async (barcode) => {
       { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
       { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
     ] : [
+      { value: 'label_serving', toGrams: selectedFood.servingGrams || 100 },
       { value: 'g', label: 'Grams (g)', toGrams: 1 },
       { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
       { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
       { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
     ]
     
-    const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
+    const selectedUnit = units.find(u => u.value === servingUnit) || { toGrams: 1 } // fallback to 1g/unit
     const totalGrams = (servingQuantity || 0) * selectedUnit.toGrams
     const multiplier = totalGrams / 100 // All nutrition is per 100g
     
@@ -982,7 +998,13 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
   // Available units - show different options based on food type
   const isLiquid = food.foodType === 'liquid'
   
+  // If the food has a label serving (e.g. "2 slices (56g)"), add it as the first option
+  const labelServingOption = food.serving_size_label
+    ? [{ value: 'label_serving', label: `Label: ${food.serving_size_label}`, toGrams: food.servingGrams || 100 }]
+    : []
+  
   const units = isLiquid ? [
+    ...labelServingOption,
     // Liquid foods: volume units + grams + serving
     { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
     { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
@@ -992,6 +1014,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
     { value: 'g', label: 'Grams (g)', toGrams: 1 },
     { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
   ] : [
+    ...labelServingOption,
     // Solid foods: weight units + serving
     { value: 'g', label: 'Grams (g)', toGrams: 1 },
     { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
@@ -1001,7 +1024,8 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
 
 
   // Calculate multiplier based on quantity and unit
-  const selectedUnit = units.find(u => u.value === servingUnit) || units[0]
+  // Fallback to grams (1g/unit) if unit is unknown to prevent showing wrong values
+  const selectedUnit = units.find(u => u.value === servingUnit) || { toGrams: 1 }
   const totalGrams = (servingQuantity || 0) * selectedUnit.toGrams
   const multiplier = totalGrams / 100 // All nutrition is per 100g
   const displayCalories = Math.round((food.calories || 0) * multiplier)

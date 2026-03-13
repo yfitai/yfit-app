@@ -103,8 +103,23 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       // Import the favorite foods functions
       const { addFavoriteFood } = await import('../lib/foodDatabase')
       
+      // Save the current serving selection so My Foods remembers it
+      // When label_serving is selected, convert to grams so it loads correctly
+      const savedServingUnit = servingUnit === 'label_serving' ? 'g' : servingUnit
+      const savedServingQuantity = servingUnit === 'label_serving'
+        ? (food.servingGrams || 100)
+        : servingQuantity
+      
+      const foodWithServing = {
+        ...food,
+        preferred_serving_quantity: savedServingQuantity,
+        preferred_serving_unit: savedServingUnit,
+        serving_quantity: savedServingQuantity,
+        serving_unit: savedServingUnit
+      }
+      
       // Save to favorite_foods
-      const success = await addFavoriteFood(user.id, food)
+      const success = await addFavoriteFood(user.id, foodWithServing)
       
       if (success) {
         alert('⭐ Saved to My Foods!')
