@@ -425,14 +425,16 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         );
         
         // Calculate streaks
+        // Allow gaps of up to 2 days (1 rest day between workouts) so schedules like
+        // Mon/Tue, rest Wed, Thu/Fri don't break the streak
         for (let i = 0; i < sortedDays.length; i++) {
           const currentDate = new Date(sortedDays[i].week_start_date);
           const prevDate = i > 0 ? new Date(sortedDays[i-1].week_start_date) : null;
           
-          // Check if consecutive day
           if (prevDate) {
             const dayDiff = Math.round((currentDate - prevDate) / (1000 * 60 * 60 * 24));
-            if (dayDiff === 1) {
+            // Continue streak if gap is 1 workout day (dayDiff 1) or 1 rest day between (dayDiff 2)
+            if (dayDiff <= 2) {
               tempStreak++;
             } else {
               tempStreak = 1;

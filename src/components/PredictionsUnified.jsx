@@ -776,8 +776,17 @@ export default function PredictionsUnified({ user }) {
     console.log('🔍 Deload Week Debug:');
     console.log('Workout data length:', data.length);
     
-    if (data.length < 14) {
-      console.log('❌ Not enough workouts for deload prediction (need 14, have ' + data.length + ')');
+    // Need at least 8 workouts AND data spanning at least 3 weeks
+    if (data.length < 8) {
+      console.log('❌ Not enough workouts for deload prediction (need 8, have ' + data.length + ')');
+      return null;
+    }
+    
+    // Check that data spans at least 3 weeks
+    const oldestWorkout = new Date(data[data.length - 1]?.start_time);
+    const daysSinceOldest = (Date.now() - oldestWorkout.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceOldest < 21) {
+      console.log('❌ Need at least 3 weeks of data for deload prediction (have ' + Math.round(daysSinceOldest) + ' days)');
       return null;
     }
 
@@ -812,8 +821,9 @@ export default function PredictionsUnified({ user }) {
       const fatigueScore = totalSets / 4; // Average sets per week
 
       // Deload recommendation
+      // Only recommend deload if MULTIPLE indicators align - not just one factor
       const weeksOfTraining = weeks.filter(w => w.workouts >= 3).length;
-      const needsDeload = weeksOfTraining >= 4 || fatigueScore > 100 || volumeTrend === 'increasing';
+      const needsDeload = (weeksOfTraining >= 4 && fatigueScore > 80) || fatigueScore > 120;
 
       console.log('✅ Deload prediction calculated:', { needsDeload, fatigueScore });
       
@@ -1013,7 +1023,7 @@ export default function PredictionsUnified({ user }) {
 
   // 10. Habit Streak Predictions
   const predictHabitStreak = (data = workoutData) => {
-    if (data.length < 14) return null;
+    if (data.length < 7) return null;
 
     try {
       // Calculate current streak
@@ -1039,19 +1049,24 @@ export default function PredictionsUnified({ user }) {
       longestStreak = Math.max(longestStreak, tempStreak);
 
       // Check if still on streak
-      const lastWorkout = new Date(data[0].start_time);
-      const daysSinceLastWorkout = (Date.now() - lastWorkout.getTime()) / (1000 * 60 * 60 * 24);
+      // data is sorted descending (newest first), uniqueDates is sorted ascending
+      // The most recent workout date is uniqueDates[uniqueDates.length - 1]
+      const lastWorkoutDate = new Date(uniqueDates[uniqueDates.length - 1]);
+      const daysSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60 * 24);
+      // Allow up to 2 days gap (1 rest day) before breaking streak
       currentStreak = daysSinceLastWorkout <= 2 ? tempStreak : 0;
 
       // Calculate consistency rate
-      const totalDays = (Date.now() - new Date(data[data.length - 1].start_time).getTime()) / (1000 * 60 * 60 * 24);
-      const consistencyRate = (uniqueDates.length / totalDays) * 100;
+      // Use at least 28 days as denominator to avoid inflated rates from short data windows
+      const rawTotalDays = (Date.now() - new Date(data[data.length - 1].start_time).getTime()) / (1000 * 60 * 60 * 24);
+      const totalDays = Math.max(28, rawTotalDays);
+      const consistencyRate = Math.min(100, (uniqueDates.length / totalDays) * 100);
 
       // Predict streak maintenance
       const streakProbability = Math.min(95, consistencyRate * 1.2);
 
-      // Cap frequency at 7x/week max
-      const rawFrequency = (data.length / totalDays) * 7;
+      // Cap frequency at 7x/week max, use same floored totalDays
+      const rawFrequency = (uniqueDates.length / totalDays) * 7; // Use unique workout days not total sessions
       const cappedFrequency = Math.min(7, rawFrequency);
 
       return {

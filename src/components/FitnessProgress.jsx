@@ -116,7 +116,7 @@ const FitnessProgress = () => {
         .eq('user_id', user.id)
         .eq('is_completed', true)
         .order('start_time', { ascending: false })
-        .limit(10);
+        .limit(50); // Increased from 10 so weighted-session filter has enough data to work with
       
       // Calculate total_duration for each session from exercise_sets
       if (sessionsData && sessionsData.length > 0) {
@@ -157,7 +157,8 @@ const FitnessProgress = () => {
         }
       }
       
-      setRecentSessions(sessionsData || []);
+      // Show only the 10 most recent sessions in the UI, but use all 50 for stats/PRs
+      setRecentSessions((sessionsData || []).slice(0, 10));
 
       // Calculate personal records from exercise_sets
       // Get all session_exercises for this user
