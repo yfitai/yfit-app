@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Activity, Apple, Dumbbell, Heart, Pill, TrendingUp, LogOut, Sparkles, Target, Calendar, BarChart3, Brain, Lock, Eye, EyeOff, Flame } from 'lucide-react'
+import DailyInsight from './DailyInsight'
 import { supabase, signOut, getUserProfile } from '../lib/supabase'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
@@ -403,20 +404,8 @@ export default function Dashboard({ user }) {
           </Card>
         </div>
 
-        {/* Did You Know */}
-        <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              <span>Daily Health Tip</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700">
-              {didYouKnowFacts[Math.floor(Math.random() * didYouKnowFacts.length)]}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Daily Insight — live from Supabase scraped_articles */}
+        <DailyInsight variant="card" className="mb-8" />
 
         {/* Quick Actions */}
         <Card>

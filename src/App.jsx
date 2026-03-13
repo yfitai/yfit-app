@@ -8,6 +8,7 @@ import './App.css'
 
 // Always-needed components loaded eagerly (small, needed immediately)
 import Navigation from './components/Navigation'
+import DailyInsight from './components/DailyInsight'
 import Footer from './components/Footer'
 import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
 import VersionChecker from './utils/VersionChecker'
@@ -173,6 +174,8 @@ function App() {
         <BrowserRouter>
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
             <Navigation user={user} />
+            {/* Daily Insight strip — visible on all authenticated pages, dismissible per day */}
+            {user && <DailyInsight variant="strip" />}
 
             <Suspense fallback={<PageLoader />}>
               <Routes>
