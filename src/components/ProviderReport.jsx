@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase, getUserProfile } from '../lib/supabase'
 import { FileText, Printer, Download, Plus, User, Calendar, Trash2 } from 'lucide-react'
 import jsPDF from 'jspdf'
 import { Filesystem, Directory } from '@capacitor/filesystem'
@@ -13,6 +13,8 @@ export default function ProviderReport({ user }) {
   const [providers, setProviders] = useState([])
   const [loading, setLoading] = useState(true)
   const [showProviderForm, setShowProviderForm] = useState(false)
+  const [profile, setProfile] = useState(null)
+  const [selectedProviderId, setSelectedProviderId] = useState('')
 
   const [providerForm, setProviderForm] = useState({
     name: '',
@@ -29,6 +31,8 @@ export default function ProviderReport({ user }) {
   const loadData = async () => {
     setLoading(true)
     try {
+      const profileData = await getUserProfile(user.id)
+      setProfile(profileData)
       await Promise.all([
         loadMedications(),
         loadSupplements(),
@@ -218,14 +222,26 @@ export default function ProviderReport({ user }) {
       console.log('Starting PDF generation...')
       const doc = new jsPDF()
       let y = 20
+
+      const patientName = profile?.full_name ||
+        (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
+        user.email
+      const selectedProvider = providers.find(p => p.id === selectedProviderId)
       
       doc.setFontSize(16)
-      doc.text('Medication Report', 105, y, { align: 'center' })
+      doc.text('Medication List', 105, y, { align: 'center' })
       y += 10
       
       doc.setFontSize(10)
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 105, y, { align: 'center' })
-      y += 15
+      doc.text(`Patient: ${patientName}`, 20, y)
+      y += 6
+      doc.text(`Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 20, y)
+      y += 6
+      if (selectedProvider) {
+        doc.text(`Prepared for: ${selectedProvider.name}${selectedProvider.specialty ? ', ' + selectedProvider.specialty : ''}`, 20, y)
+        y += 6
+      }
+      y += 5
       
       if (medications.length > 0) {
         doc.setFontSize(12)
@@ -383,6 +399,23 @@ export default function ProviderReport({ user }) {
         </div>
       </div>
 
+      {/* Provider selector - shown above the printable area, hidden when printing */}
+      {providers.length > 0 && (
+        <div className="mb-4 print:hidden">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Addressed To (optional)</label>
+          <select
+            value={selectedProviderId}
+            onChange={(e) => setSelectedProviderId(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          >
+            <option value="">— Select a provider —</option>
+            {providers.map(p => (
+              <option key={p.id} value={p.id}>{p.name}{p.specialty ? ` (${p.specialty})` : ''}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Printable Report */}
       <div className="bg-white border border-gray-300 rounded-lg p-8 print:border-0 print:p-0">
         {/* Header */}
@@ -391,7 +424,11 @@ export default function ProviderReport({ user }) {
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
               <p className="text-sm text-gray-600">Patient</p>
-              <p className="font-medium text-gray-900">{user.email}</p>
+              <p className="font-medium text-gray-900">
+                {profile?.full_name ||
+                  (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
+                  user.email}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Date Generated</p>
@@ -399,6 +436,17 @@ export default function ProviderReport({ user }) {
                 {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
+            {selectedProviderId && (() => {
+              const prov = providers.find(p => p.id === selectedProviderId)
+              return prov ? (
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">Prepared for</p>
+                  <p className="font-medium text-gray-900">
+                    {prov.name}{prov.specialty ? `, ${prov.specialty}` : ''}
+                  </p>
+                </div>
+              ) : null
+            })()}
           </div>
         </div>
 
