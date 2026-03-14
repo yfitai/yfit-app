@@ -186,28 +186,86 @@ export default function ProviderReport({ user }) {
       
       if (medications.length > 0) {
         doc.setFontSize(12)
-        doc.text('Medications:', 20, y)
+        doc.text('Current Medications:', 20, y)
         y += 7
         doc.setFontSize(10)
         medications.forEach((med, i) => {
-          doc.text(`${i+1}. ${med.medication?.name || med.custom_name}`, 25, y)
+          const medName = med.medication?.name || med.custom_name || 'Unknown Medication'
+          const dosage = med.dosage || 'N/A'
+          const frequency = med.frequency || 'N/A'
+          const route = med.route ? ` (${med.route})` : ''
+          const started = med.start_date ? `  Started: ${new Date(med.start_date).toLocaleDateString()}` : ''
+          // Check page overflow
+          if (y > 270) { doc.addPage(); y = 20 }
+          doc.setFont(undefined, 'bold')
+          doc.text(`${i+1}. ${medName}`, 25, y)
+          doc.setFont(undefined, 'normal')
           y += 5
-          doc.text(`   ${med.dosage} - ${med.frequency}`, 25, y)
+          doc.text(`   Dosage: ${dosage}${route}   Frequency: ${frequency}${started}`, 25, y)
           y += 7
+          if (med.prescriber?.name) {
+            doc.text(`   Prescribed by: Dr. ${med.prescriber.name}`, 25, y)
+            y += 5
+          }
+          if (med.notes) {
+            const noteLines = doc.splitTextToSize(`   Notes: ${med.notes}`, 160)
+            noteLines.forEach(line => {
+              if (y > 270) { doc.addPage(); y = 20 }
+              doc.text(line, 25, y)
+              y += 5
+            })
+          }
+          y += 2
         })
+      } else {
+        doc.setFontSize(10)
+        doc.text('No current medications on file.', 25, y)
+        y += 10
       }
       
       if (supplements.length > 0) {
         y += 5
+        if (y > 270) { doc.addPage(); y = 20 }
         doc.setFontSize(12)
-        doc.text('Supplements:', 20, y)
+        doc.text('Supplements & Vitamins:', 20, y)
         y += 7
         doc.setFontSize(10)
         supplements.forEach((sup, i) => {
-          doc.text(`${i+1}. ${sup.medication?.name || sup.custom_name}`, 25, y)
+          const supName = sup.supplement?.name || sup.custom_name || 'Unknown Supplement'
+          const dosage = sup.dosage || 'N/A'
+          const frequency = sup.frequency || 'N/A'
+          const started = sup.start_date ? `  Started: ${new Date(sup.start_date).toLocaleDateString()}` : ''
+          if (y > 270) { doc.addPage(); y = 20 }
+          doc.setFont(undefined, 'bold')
+          doc.text(`${i+1}. ${supName}`, 25, y)
+          doc.setFont(undefined, 'normal')
           y += 5
-          doc.text(`   ${sup.dosage} - ${sup.frequency}`, 25, y)
+          doc.text(`   Dosage: ${dosage}   Frequency: ${frequency}${started}`, 25, y)
           y += 7
+        })
+      }
+
+      // Allergies section in PDF
+      if (allergies.length > 0) {
+        y += 5
+        if (y > 270) { doc.addPage(); y = 20 }
+        doc.setFontSize(12)
+        doc.setTextColor(180, 0, 0)
+        doc.text('⚠ ALLERGIES:', 20, y)
+        doc.setTextColor(0, 0, 0)
+        y += 7
+        doc.setFontSize(10)
+        allergies.forEach((allergy, i) => {
+          if (y > 270) { doc.addPage(); y = 20 }
+          doc.setFont(undefined, 'bold')
+          doc.text(`${i+1}. ${allergy.allergen} (${allergy.severity || 'Unknown severity'})`, 25, y)
+          doc.setFont(undefined, 'normal')
+          y += 5
+          if (allergy.reaction) {
+            doc.text(`   Reaction: ${allergy.reaction}`, 25, y)
+            y += 5
+          }
+          y += 2
         })
       }
       
