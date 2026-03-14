@@ -42,23 +42,37 @@ export default function ProviderReport({ user }) {
 
   const loadMedications = async () => {
     try {
-      // Fetch all active medications (both DB-linked and custom), excluding supplements
-      // Use or() to include rows where is_supplement is false OR null (not set)
-      const { data, error } = await supabase
+      // Fetch medications where is_supplement is explicitly false
+      const { data: explicitMeds, error: err1 } = await supabase
         .from('user_medications')
         .select(`
           *,
-          medication:medications(*),
-          prescriber:medical_providers(name)
+          medication:medications(*)
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .or('is_supplement.is.null,is_supplement.eq.false')
+        .eq('is_supplement', false)
         .order('created_at')
 
-      if (error) throw error
-      console.log('[ProviderReport] Medications loaded:', data?.length, data)
-      setMedications(data || [])
+      if (err1) console.error('[ProviderReport] Error loading explicit meds:', err1)
+
+      // Fetch medications where is_supplement is null (custom meds added without the flag)
+      const { data: nullFlagMeds, error: err2 } = await supabase
+        .from('user_medications')
+        .select(`
+          *,
+          medication:medications(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .is('is_supplement', null)
+        .order('created_at')
+
+      if (err2) console.error('[ProviderReport] Error loading null-flag meds:', err2)
+
+      const combined = [...(explicitMeds || []), ...(nullFlagMeds || [])]
+      console.log('[ProviderReport] Medications loaded:', combined.length, combined)
+      setMedications(combined)
     } catch (error) {
       console.error('Error loading medications:', error)
     }
@@ -232,8 +246,8 @@ export default function ProviderReport({ user }) {
           y += 5
           doc.text(`   Dosage: ${dosage}${route}   Frequency: ${frequency}${started}`, 25, y)
           y += 7
-          if (med.prescriber?.name) {
-            doc.text(`   Prescribed by: Dr. ${med.prescriber.name}`, 25, y)
+          if (med.prescriber_name) {
+            doc.text(`   Prescribed by: ${med.prescriber_name}`, 25, y)
             y += 5
           }
           if (med.notes) {
@@ -353,6 +367,13 @@ export default function ProviderReport({ user }) {
         </div>
         <div className="flex gap-2">
           <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
+          >
+            <Printer className="w-4 h-4" />
+            Print
+          </button>
+          <button
             onClick={handleDownloadPDF}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
           >
@@ -444,9 +465,9 @@ export default function ProviderReport({ user }) {
                       </span>
                     </div>
                   </div>
-                  {med.prescriber && (
+                  {med.prescriber_name && (
                     <p className="text-sm text-gray-600 mt-2">
-                      Prescribed by: Dr. {med.prescriber.name}
+                      Prescribed by: {med.prescriber_name}
                     </p>
                   )}
                   {med.notes && (
