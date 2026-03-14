@@ -168,13 +168,25 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
   }
 
   if (nutritionData.length === 0) {
+    // Determine if today is Sunday (start of a new week) to show a contextual message
+    const todayDay = new Date().getDay(); // 0 = Sunday
+    const isNewWeek = todayDay === 0;
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Micronutrients</h3>
         <div className="text-center py-12">
           <ChartNoAxesCombined className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600">No nutrition data yet</p>
-          <p className="text-sm text-gray-500 mt-2">Start logging meals to see your progress!</p>
+          {isNewWeek ? (
+            <>
+              <p className="text-gray-700 font-medium">Fresh week — no meals logged yet</p>
+              <p className="text-sm text-gray-500 mt-2">Your weekly nutrition resets every Sunday. Log your first meal to start tracking!</p>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-600">No nutrition data for this period</p>
+              <p className="text-sm text-gray-500 mt-2">Start logging meals to see your micronutrient progress.</p>
+            </>
+          )}
         </div>
       </div>
     )

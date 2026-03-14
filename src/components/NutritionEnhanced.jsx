@@ -768,6 +768,27 @@ const handleBarcodeScanned = async (barcode) => {
           </div>
         )}
 
+        {/* New-week banner: shown on Sunday when no meals have been logged yet today */}
+        {(() => {
+          const todayDay = new Date().getDay(); // 0 = Sunday
+          const isToday = selectedDate === formatDateString(new Date());
+          const noMealsToday = todaysMeals.length === 0;
+          if (isToday && todayDay === 0 && noMealsToday) {
+            return (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
+                <span className="text-2xl mt-0.5">🌅</span>
+                <div>
+                  <p className="font-semibold text-green-800">Fresh week — no meals logged yet</p>
+                  <p className="text-sm text-green-700 mt-1">
+                    Your weekly nutrition tracking resets every Sunday. Log your first meal below to kick off the new week!
+                  </p>
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         {/* Meals by Type */}
         {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => (
           <MealTypeSection
