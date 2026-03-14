@@ -352,49 +352,51 @@ export default function Dashboard({ user }) {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Steps Today</CardTitle>
-              <Activity className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-sm font-medium text-teal-800">Steps Today</CardTitle>
+              <Activity className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stepsToday.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Goal: {stepsGoal.toLocaleString()} steps</p>
+              <div className="text-2xl font-bold text-gray-900">{stepsToday.toLocaleString()}</div>
+              <p className="text-xs text-teal-600">Goal: {stepsGoal.toLocaleString()} steps</p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Calories</CardTitle>
-              <Apple className="h-4 w-4 text-green-600" />
+              <CardTitle className="text-sm font-medium text-teal-800">Calories</CardTitle>
+              <Apple className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{caloriesToday.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">of {caloriesGoal.toLocaleString()} kcal goal</p>
+              <div className="text-2xl font-bold text-gray-900">{caloriesToday.toLocaleString()}</div>
+              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal goal</p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Workouts</CardTitle>
-              <Dumbbell className="h-4 w-4 text-purple-600" />
+              <CardTitle className="text-sm font-medium text-teal-800">Workouts</CardTitle>
+              <Dumbbell className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{workoutsThisWeek}</div>
-              <p className="text-xs text-muted-foreground">This week</p>
+              <div className="text-2xl font-bold text-gray-900">{workoutsThisWeek}</div>
+              <p className="text-xs text-teal-600">
+                {new Date().getDay() === 0 ? 'New week — reset today' : 'This week'}
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Day Streak</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">Day Streak</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900">
                 {streakDays !== null ? `${streakDays} ${streakDays === 1 ? 'day' : 'days'}` : '--'}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-teal-600">
                 {streakDays !== null
                   ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
                   : 'Loading...'
@@ -403,6 +405,27 @@ export default function Dashboard({ user }) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Monday recap banner */}
+        {new Date().getDay() === 1 && (
+          <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
+            <div className="flex items-center gap-3 mb-3">
+              <TrendingUp className="w-6 h-6" />
+              <h3 className="text-lg font-bold">New Week — Fresh Start! 🎉</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-3">
+              <div className="bg-white/15 rounded-lg p-3 text-center">
+                <div className="text-2xl font-bold">{workoutsThisWeek}</div>
+                <div className="text-sm opacity-90">Workouts this week</div>
+              </div>
+              <div className="bg-white/15 rounded-lg p-3 text-center">
+                <div className="text-2xl font-bold">{streakDays !== null ? streakDays : '--'}</div>
+                <div className="text-sm opacity-90">Day streak</div>
+              </div>
+            </div>
+            <p className="text-sm opacity-80">Week starts fresh today. Head to Predictions to see last week's full recap!</p>
+          </div>
+        )}
 
         {/* Daily Insight — live from Supabase scraped_articles */}
         <DailyInsight variant="card" className="mb-8" />

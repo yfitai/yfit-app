@@ -1281,6 +1281,73 @@ export default function PredictionsUnified({ user }) {
           </button>
         </div>
 
+        {/* New-week / Monday recap banner */}
+        {(() => {
+          const now = new Date();
+          const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon
+          const isSunday = dayOfWeek === 0;
+          const isMonday = dayOfWeek === 1;
+
+          // Gather last-week stats for Monday recap
+          if (isMonday) {
+            // Last week: Sun–Sat
+            const lastSunday = new Date(now);
+            lastSunday.setDate(now.getDate() - 1);
+            lastSunday.setHours(0,0,0,0);
+            const lastMonday = new Date(lastSunday);
+            lastMonday.setDate(lastSunday.getDate() - 6);
+
+            const lastWeekWorkouts = workoutData.filter(w => {
+              const d = new Date(w.start_time);
+              return d >= lastMonday && d <= lastSunday;
+            });
+            const lastWeekNutrition = nutritionData.filter(n => {
+              const d = new Date(n.meal_date || n.created_at);
+              return d >= lastMonday && d <= lastSunday;
+            });
+            const totalCals = lastWeekNutrition.reduce((s, n) => s + (n.calories || 0), 0);
+            const avgCals = lastWeekNutrition.length > 0 ? Math.round(totalCals / 7) : 0;
+
+            return (
+              <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-6 text-white">
+                <div className="flex items-center gap-3 mb-3">
+                  <Award className="w-7 h-7" />
+                  <h3 className="text-xl font-bold">Last Week Recap 🎉</h3>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-3xl font-bold">{lastWeekWorkouts.length}</div>
+                    <div className="text-sm opacity-90">Workouts</div>
+                  </div>
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-3xl font-bold">{avgCals > 0 ? avgCals.toLocaleString() : '—'}</div>
+                    <div className="text-sm opacity-90">Avg Cal/Day</div>
+                  </div>
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-3xl font-bold">{lastWeekWorkouts.length >= 4 ? '🔥' : lastWeekWorkouts.length >= 2 ? '👍' : '💪'}</div>
+                    <div className="text-sm opacity-90">{lastWeekWorkouts.length >= 4 ? 'Strong week!' : lastWeekWorkouts.length >= 2 ? 'Good effort!' : 'New week ahead!'}</div>
+                  </div>
+                </div>
+                <p className="text-sm opacity-80 mt-3">Fresh week starts today — let's build on last week's momentum!</p>
+              </div>
+            );
+          }
+
+          if (isSunday) {
+            return (
+              <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 mb-6 text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  <Calendar className="w-6 h-6" />
+                  <h3 className="text-lg font-bold">Weekly Reset Day</h3>
+                </div>
+                <p className="text-sm opacity-90">Predictions are building for the new week. Log your first workout or meal today to start fresh data — predictions will populate as the week progresses.</p>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
+
         {/* Compressed Data Disclaimer */}
         {predictions.isCompressedData && (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
@@ -1340,10 +1407,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Scale className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Weight Loss Prediction</h3>
-            <p className="text-gray-600">Log weight on 2+ different days to see predictions</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Scale className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Weight Loss Prediction</h3>
+            <p className="text-teal-700">Log weight on 2+ different days to see predictions</p>
           </div>
         )}
 
@@ -1398,10 +1465,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Flame className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Calorie Needs (TDEE)</h3>
-            <p className="text-gray-600">Log 7+ days of weight and nutrition to calculate TDEE</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Flame className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Calorie Needs (TDEE)</h3>
+            <p className="text-teal-700">Log 7+ days of weight and nutrition to calculate TDEE</p>
           </div>
         )}
 
@@ -1453,10 +1520,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <AlertTriangle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Injury Risk Assessment</h3>
-            <p className="text-gray-600">Log 3+ strength workouts to assess injury risk</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <AlertTriangle className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Injury Risk Assessment</h3>
+            <p className="text-teal-700">Log 3+ strength workouts to assess injury risk</p>
           </div>
         )}
 
@@ -1506,10 +1573,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Deload Week Predictor</h3>
-            <p className="text-gray-600">Log 14+ workouts to predict deload timing</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Deload Week Predictor</h3>
+            <p className="text-teal-700">Log 8+ workouts across 3+ weeks to predict deload timing</p>
           </div>
         )}
 
@@ -1553,10 +1620,10 @@ export default function PredictionsUnified({ user }) {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Pill className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Medication Adherence</h3>
-            <p className="text-gray-600">Log 14+ medication doses to analyze adherence</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Pill className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Medication Adherence</h3>
+            <p className="text-teal-700">Log 14+ medication doses to analyze adherence</p>
           </div>
         )}
 
@@ -1605,10 +1672,10 @@ export default function PredictionsUnified({ user }) {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Apple className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nutrition Pattern Analysis</h3>
-            <p className="text-gray-600">Log 7+ days of nutrition to analyze patterns</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Apple className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Nutrition Pattern Analysis</h3>
+            <p className="text-teal-700">Log 7+ days of nutrition to analyze patterns</p>
           </div>
         )}
 
@@ -1644,10 +1711,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Optimal Training Time</h3>
-            <p className="text-gray-600">Log 10+ workouts at different times to find your peak performance window</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Clock className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Optimal Training Time</h3>
+            <p className="text-teal-700">Log 10+ workouts at different times to find your peak performance window</p>
           </div>
         )}
 
@@ -1694,10 +1761,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Body Recomposition Forecast</h3>
-            <p className="text-gray-600">Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Body Recomposition Forecast</h3>
+            <p className="text-teal-700">Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition</p>
           </div>
         )}
 
@@ -1747,10 +1814,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Flame className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Habit Streak Predictions</h3>
-            <p className="text-gray-600">Log 14+ workouts to analyze consistency and predict streaks</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Flame className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Habit Streak Predictions</h3>
+            <p className="text-teal-700">Building this week's data — log workouts to see streak predictions</p>
           </div>
         )}
 
@@ -1809,10 +1876,10 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Blood Pressure Goal Tracking</h3>
-            <p className="text-gray-600">Log 7+ blood pressure readings in Daily Tracker to track progress</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Blood Pressure Goal Tracking</h3>
+            <p className="text-teal-700">Log 7+ blood pressure readings in Daily Tracker to track progress</p>
           </div>
         )}
 
@@ -1871,15 +1938,15 @@ export default function PredictionsUnified({ user }) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center mb-6">
-            <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Blood Glucose Goal Tracking</h3>
-            <p className="text-gray-600">Log 7+ blood glucose readings in Daily Tracker to track progress</p>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
+            <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Blood Glucose Goal Tracking</h3>
+            <p className="text-teal-700">Log 7+ blood glucose readings in Daily Tracker to track progress</p>
           </div>
         )}
 
         {/* Info Footer */}
-        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+        <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-6 text-center">
           <Brain className="w-12 h-12 text-blue-600 mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">All Predictions are FREE</h3>
           <p className="text-gray-600">

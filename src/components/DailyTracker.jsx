@@ -378,7 +378,7 @@ export default function DailyTracker({ user }) {
         {/* Today's Progress Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           {/* Sleep */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center mb-2">
               <Moon className="w-5 h-5 text-indigo-600 mr-2" />
               <span className="font-semibold text-gray-900">Sleep</span>
@@ -396,7 +396,7 @@ export default function DailyTracker({ user }) {
           </div>
 
           {/* Water */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <Droplets className="w-5 h-5 text-blue-600 mr-2" />
@@ -429,7 +429,7 @@ export default function DailyTracker({ user }) {
           </div>
 
           {/* Steps */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center mb-2">
               <Footprints className="w-5 h-5 text-green-600 mr-2" />
               <span className="font-semibold text-gray-900">Steps</span>
@@ -447,7 +447,7 @@ export default function DailyTracker({ user }) {
           </div>
 
           {/* Blood Pressure */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center mb-2">
               <Heart className="w-5 h-5 text-red-600 mr-2" />
               <span className="font-semibold text-gray-900">BP</span>
@@ -462,7 +462,7 @@ export default function DailyTracker({ user }) {
           </div>
 
           {/* Blood Glucose */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <Activity className="w-5 h-5 text-purple-600 mr-2" />
@@ -913,8 +913,9 @@ export default function DailyTracker({ user }) {
 
         {/* Weekly Summary */}
         {weeklyData.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">📈 7-Day Summary</h2>
+            {/* teal theme applied to parent card via outer div */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Avg Sleep</div>

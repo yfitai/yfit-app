@@ -1086,61 +1086,89 @@ const FitnessProgress = () => {
           </select>
         </div>
 
+        {/* Sunday reset / Monday recap banner */}
+        {(() => {
+          const dayOfWeek = new Date().getDay();
+          if (dayOfWeek === 0) {
+            return (
+              <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 mb-6 text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  <Calendar className="w-6 h-6" />
+                  <h3 className="text-lg font-bold">Weekly Reset — New Week Starting</h3>
+                </div>
+                <p className="text-sm opacity-90">Your weekly workout count resets on Sunday. Stats below reflect your selected time range. Log your first workout today to kick off the new week!</p>
+              </div>
+            );
+          }
+          if (dayOfWeek === 1 && stats.totalWorkouts === 0) {
+            return (
+              <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-6 text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  <Award className="w-6 h-6" />
+                  <h3 className="text-lg font-bold">Fresh Week — Let's Go!</h3>
+                </div>
+                <p className="text-sm opacity-90">No workouts logged yet this week. Your first session today will start building this week's stats.</p>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-teal-100 rounded-lg">
+                <Calendar className="w-6 h-6 text-teal-600" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalWorkouts}</div>
-            <div className="text-sm text-gray-600">Total Workouts</div>
+            <div className="text-sm text-teal-700">Total Workouts</div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Dumbbell className="w-6 h-6 text-purple-600" />
+              <div className="p-2 bg-teal-100 rounded-lg">
+                <Dumbbell className="w-6 h-6 text-teal-600" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalVolume.toLocaleString()}</div>
-            <div className="text-sm text-gray-600">Total Volume (lbs)</div>
+            <div className="text-sm text-teal-700">Total Volume (lbs)</div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Target className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-teal-100 rounded-lg">
+                <Target className="w-6 h-6 text-teal-600" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalReps.toLocaleString()}</div>
-            <div className="text-sm text-gray-600">Total Reps</div>
+            <div className="text-sm text-teal-700">Total Reps</div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="p-2 bg-cyan-100 rounded-lg">
                 <Navigation className="w-6 h-6 text-cyan-600" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalDistance.toFixed(2)}</div>
-            <div className="text-sm text-gray-600">Total Distance (miles)</div>
+            <div className="text-sm text-teal-700">Total Distance (miles)</div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <Award className="w-6 h-6 text-orange-600" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.avgFormScore}</div>
-            <div className="text-sm text-gray-600">Avg Form Score</div>
+            <div className="text-sm text-teal-700">Avg Form Score</div>
           </div>
         </div>
 
@@ -1510,7 +1538,7 @@ const FitnessProgress = () => {
         )}
 
         {/* Personal Records */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Personal Records</h2>
             <Award className="w-6 h-6 text-yellow-600" />
@@ -1540,7 +1568,7 @@ const FitnessProgress = () => {
         </div>
 
         {/* Recent Sessions */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Workouts</h2>
           {recentSessions.length === 0 ? (
             <p className="text-gray-600 text-center py-8">No workout sessions yet</p>

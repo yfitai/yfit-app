@@ -618,7 +618,7 @@ const handleBarcodeScanned = async (barcode) => {
         </div>
 
         {/* Daily Summary Card */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-800">
               {selectedDate === formatDateString(new Date()) ? "Today's Summary" : "Daily Summary"}
@@ -912,7 +912,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
   const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0)
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl shadow-sm p-6 mb-4">
       <div
         className="flex items-center justify-between cursor-pointer"
         onClick={() => setExpanded(!expanded)}

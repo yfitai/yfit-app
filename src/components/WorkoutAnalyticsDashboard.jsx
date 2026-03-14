@@ -334,10 +334,21 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <p className="text-sm text-gray-600 mt-1">Showing {timeRange === '7' ? '1 week' : timeRange === '30' ? '1 month' : timeRange === '90' ? '3 months' : '1 year'} of data</p>
       </div>
 
+      {/* Sunday reset banner */}
+      {new Date().getDay() === 0 && (
+        <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 text-white">
+          <div className="flex items-center gap-3 mb-2">
+            <Calendar className="w-6 h-6" />
+            <h3 className="text-lg font-bold">Weekly Reset — New Week Starting</h3>
+          </div>
+          <p className="text-sm opacity-90">Weekly workout count resets today. Log your first workout to start building this week's analytics!</p>
+        </div>
+      )}
+
       {/* Total Volume Card - Keep this one */}
       {currentWeekStats && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm text-gray-600">Total Volume</div>
               <TrendingUp className="text-green-600" size={20} />
@@ -371,7 +382,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Card 1: Next Week Volume */}
-            <div className="bg-white rounded-lg p-4 border border-blue-200">
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1">Next Week Volume</div>
               <div className="text-2xl font-bold text-blue-600">
                 {predictions.nextWeekVolume.toLocaleString()} lbs
@@ -382,7 +393,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             </div>
 
             {/* Card 2: Projected Strength Gain */}
-            <div className="bg-white rounded-lg p-4 border border-blue-200">
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
                 Projected Strength Gain
                 <span className="text-xs text-gray-400" title="Expected weekly increase in your max lifts based on recent progress">ⓘ</span>
@@ -396,7 +407,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             </div>
 
             {/* Card 3: Goal Achievement */}
-            <div className="bg-white rounded-lg p-4 border border-blue-200">
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
                 Goal Achievement
                 <span className="text-xs text-gray-400" title="Progress toward your weekly workout volume and frequency goals">ⓘ</span>
