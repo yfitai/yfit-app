@@ -115,7 +115,7 @@ export default function MedicationList({ user, onAddMedication }) {
     return (
       <div
         key={item.id}
-        className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all bg-white"
+        className="border border-teal-200 rounded-lg p-5 hover:shadow-md transition-all bg-gradient-to-br from-teal-50 to-cyan-50"
       >
         {isEditing ? (
           // Edit Mode
@@ -264,7 +264,7 @@ export default function MedicationList({ user, onAddMedication }) {
               )}
 
               {item.notes && (
-                <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                <div className="mt-2 p-3 bg-teal-100/60 rounded-lg">
                   <p className="text-sm text-gray-700">
                     <span className="font-medium">Notes:</span> {item.notes}
                   </p>

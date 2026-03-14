@@ -464,8 +464,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Workouts</h2>
             {workouts.length === 0 ? (
-              <div className="bg-white rounded-lg p-8 text-center">
-                <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-8 text-center border border-teal-200">
+                <Dumbbell className="w-16 h-16 text-teal-300 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No saved workouts yet</p>
                 <button 
                   onClick={onNavigateToBuilder}
@@ -479,7 +479,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                 {workouts.map(workout => (
                   <div
                     key={workout.id}
-                    className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative"
+                    className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative border border-teal-200"
                     onClick={() => startWorkoutSession(workout)}
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -586,8 +586,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         </div>
 
         <div className="max-w-4xl mx-auto p-6">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-8 text-center border border-teal-200">
+            <Dumbbell className="w-16 h-16 text-teal-300 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Empty Workout</h2>
             <p className="text-gray-600 mb-6">Add exercises as you go or complete this freestyle session</p>
             <div className="flex gap-4 justify-center">
@@ -673,7 +673,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
       {/* Current Exercise */}
       <div className="max-w-4xl mx-auto p-6">
         {currentExercise && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-6 mb-6 border border-teal-200">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-2xl font-bold text-gray-900">
                 {currentExercise.exercises.name}
@@ -689,7 +689,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
             {/* Target Sets/Reps - Only show for strength exercises */}
             {exerciseType === 'strength' && (
-              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="bg-teal-100/60 p-4 rounded-lg mb-6">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Target Sets</div>

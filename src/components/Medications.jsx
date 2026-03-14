@@ -48,7 +48,7 @@ export default function Medications({ user }) {
         </div>
 
      {/* Tab Navigation */}
-<div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+<div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-md mb-6 overflow-hidden border border-teal-200">
   <div className="flex flex-col sm:flex-row">
     {tabs.map((tab) => {
       const Icon = tab.icon
@@ -59,7 +59,7 @@ export default function Medications({ user }) {
           className={`flex items-center gap-2 px-4 py-3 font-medium transition-all text-sm sm:text-base border-b sm:border-b-0 sm:border-r last:border-b-0 last:border-r-0 ${
             activeTab === tab.id
               ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
-              : 'text-gray-600 hover:bg-gray-50'
+              : 'text-gray-600 hover:bg-teal-50'
           }`}
         >
           <Icon className="w-5 h-5" />
@@ -71,7 +71,7 @@ export default function Medications({ user }) {
 </div>   
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-md p-6 border border-teal-200">
         {activeTab === 'my-medications' && <MedicationList user={user} onAddMedication={() => setActiveTab('add-medication')} />}
           {activeTab === 'add-medication' && <MedicationSearch user={user} />}
           {activeTab === 'interactions' && <InteractionChecker user={user} />}

@@ -332,7 +332,7 @@ const WorkoutBuilder = () => {
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Create Workout</h1>
 
         {/* Workout Details */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-6 mb-6 border border-teal-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Workout Details</h2>
           
           <div className="space-y-4">
@@ -369,7 +369,7 @@ const WorkoutBuilder = () => {
         </div>
 
         {/* Selected Exercises */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-6 mb-6 border border-teal-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">
               Exercises ({selectedExercises.length})
@@ -401,7 +401,7 @@ const WorkoutBuilder = () => {
                 const exerciseType = getExerciseType(item.exercise);
                 
                 return (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div key={index} className="border border-teal-200 rounded-lg p-4 bg-white/70">
                   <div className="flex items-start gap-4">
                     {/* Drag Handle */}
                     <div className="flex flex-col gap-1 pt-2">

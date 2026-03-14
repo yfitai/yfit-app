@@ -433,12 +433,12 @@ export default function Dashboard({ user }) {
           </Card>
         </div>
 
-        {/* Monday recap banner */}
-        {new Date().getDay() === 1 && lastWeekWorkouts !== null && (
+        {/* Last Week Summary — always visible */}
+        {lastWeekWorkouts !== null && (
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6" />
-              <h3 className="text-lg font-bold">New Week — Here's How Last Week Went! 🎉</h3>
+              <h3 className="text-lg font-bold">Last Week Summary 📊</h3>
             </div>
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div className="bg-white/15 rounded-lg p-3 text-center">
@@ -458,7 +458,7 @@ export default function Dashboard({ user }) {
                 </div>
               </div>
             </div>
-            <p className="text-sm opacity-80">New week starts now — let's beat last week! Head to Predictions for your full analysis.</p>
+            <p className="text-sm opacity-80">Head to Predictions for your full weekly analysis and upcoming forecasts.</p>
           </div>
         )}
 
