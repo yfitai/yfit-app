@@ -24,6 +24,8 @@ export default function Dashboard({ user }) {
   const [caloriesGoal, setCaloriesGoal] = useState(2000)
   const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
   const [streakDays, setStreakDays] = useState(null)
+  const [lastWeekWorkouts, setLastWeekWorkouts] = useState(null)
+  const [lastWeekStreak, setLastWeekStreak] = useState(null)
   
   // Change Password modal state
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -122,21 +124,46 @@ export default function Dashboard({ user }) {
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
     startOfWeek.setHours(0, 0, 0, 0)
     
+    // Also compute last week's window for Monday recap
+    const startOfLastWeek = new Date(startOfWeek)
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7)
+    const endOfLastWeek = new Date(startOfWeek)
+    
     const { data: allSessionsData } = await supabase
       .from('workout_sessions')
-      .select('id, session_name, workout:workouts(name)')
+      .select('id, session_name, start_time, workout:workouts(name)')
       .eq('user_id', user.id)
       .eq('is_completed', true)
-      .gte('start_time', startOfWeek.toISOString())
+      .gte('start_time', startOfLastWeek.toISOString()) // fetch 2 weeks so we can split
     
     // Filter out cardio/stretching sessions (same logic as FitnessProgress)
-    const EXCLUDED_KEYWORDS = ['walking','treadmill','duration','stretching','strechting','flexibility','cardio','yoga','foam roll','running','cycling','wall sit']
-    const strengthSessions = (allSessionsData || []).filter(session => {
-      const name = (session.workout?.name || session.session_name || '').toLowerCase()
-      return !EXCLUDED_KEYWORDS.some(kw => name.includes(kw))
+    const EXCLUDED_KEYWORDS = [
+      'walking','treadmill','duration','stretching','strechting','flexibility',
+      'cardio','yoga','foam roll','running','cycling','wall sit',
+      'bike','elliptical','hiit','circuit','swim','rowing','stair',
+      'jump rope','aerobic','spin','dance','pilates','zumba','kickbox','boxing','martial'
+    ]
+    const isStrength = (session) => {
+      const combinedName = [
+        session.workout?.name || '',
+        session.session_name || ''
+      ].join(' ').toLowerCase().trim()
+      if (!combinedName) return false
+      return !EXCLUDED_KEYWORDS.some(kw => combinedName.includes(kw))
+    }
+    
+    const allStrength = (allSessionsData || []).filter(isStrength)
+    const strengthSessions = allStrength.filter(s => new Date(s.start_time) >= startOfWeek)
+    const lastWeekSessions = allStrength.filter(s => {
+      const t = new Date(s.start_time)
+      return t >= startOfLastWeek && t < endOfLastWeek
     })
-    const workoutsData = strengthSessions
     setWorkoutsThisWeek(strengthSessions.length)
+    setLastWeekWorkouts(lastWeekSessions.length)
+    
+    // Calculate last week's streak from workout_sessions (unique strength days in last week)
+    const lastWeekDays = new Set(lastWeekSessions.map(s => new Date(s.start_time).toDateString()))
+    setLastWeekStreak(lastWeekDays.size)
     
     // Get steps goal from user_goals (most recent row)
     const { data: userGoalsData } = await supabase
@@ -407,23 +434,31 @@ export default function Dashboard({ user }) {
         </div>
 
         {/* Monday recap banner */}
-        {new Date().getDay() === 1 && (
+        {new Date().getDay() === 1 && lastWeekWorkouts !== null && (
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6" />
-              <h3 className="text-lg font-bold">New Week — Fresh Start! 🎉</h3>
+              <h3 className="text-lg font-bold">New Week — Here's How Last Week Went! 🎉</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-3">
+            <div className="grid grid-cols-3 gap-3 mb-3">
               <div className="bg-white/15 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">{workoutsThisWeek}</div>
-                <div className="text-sm opacity-90">Workouts this week</div>
+                <div className="text-2xl font-bold">{lastWeekWorkouts}</div>
+                <div className="text-sm opacity-90">Workouts last week</div>
               </div>
               <div className="bg-white/15 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">{streakDays !== null ? streakDays : '--'}</div>
-                <div className="text-sm opacity-90">Day streak</div>
+                <div className="text-2xl font-bold">{lastWeekStreak !== null ? lastWeekStreak : '--'}</div>
+                <div className="text-sm opacity-90">Active days</div>
+              </div>
+              <div className="bg-white/15 rounded-lg p-3 text-center">
+                <div className="text-2xl font-bold">
+                  {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
+                </div>
+                <div className="text-sm opacity-90">
+                  {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
+                </div>
               </div>
             </div>
-            <p className="text-sm opacity-80">Week starts fresh today. Head to Predictions to see last week's full recap!</p>
+            <p className="text-sm opacity-80">New week starts now — let's beat last week! Head to Predictions for your full analysis.</p>
           </div>
         )}
 

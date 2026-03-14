@@ -718,7 +718,7 @@ export default function Goals({ user: propUser }) {
         </div>
 
         {/* Body Type Education Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
             <User className="w-6 h-6 text-blue-500" />
             Understanding Your Body Type
@@ -793,7 +793,7 @@ export default function Goals({ user: propUser }) {
         </div>
 
         {/* Basic Information Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Basic Information</h2>
           
           <div className="grid md:grid-cols-2 gap-6">
@@ -949,7 +949,7 @@ export default function Goals({ user: propUser }) {
         </div>
 
         {/* Body Measurements Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Body Measurements</h2>
           <p className="text-gray-600 mb-6">
             Enter all 10 measurements for accurate body composition analysis. Measure at the widest/narrowest point of each area.
@@ -1287,7 +1287,7 @@ export default function Goals({ user: propUser }) {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Manual Body Fat Override */}
-            <div className="bg-white rounded-lg p-4 border border-purple-200">
+            <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
               <div className="flex items-center gap-3 mb-3">
                 <input
                   type="checkbox"
@@ -1323,7 +1323,7 @@ export default function Goals({ user: propUser }) {
             </div>
 
             {/* Manual TDEE Override */}
-            <div className="bg-white rounded-lg p-4 border border-purple-200">
+            <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
               <div className="flex items-center gap-3 mb-3">
                 <input
                   type="checkbox"

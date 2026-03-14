@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, TrendingDown, Target, Calendar, Activity, AlertTriangle,
   Heart, Pill, Apple, Dumbbell, Scale, Flame, Brain, Award, Clock, RefreshCw
 } from 'lucide-react';
 
 export default function PredictionsUnified({ user }) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [weightData, setWeightData] = useState([]);
   const [workoutData, setWorkoutData] = useState([]);
@@ -680,16 +682,26 @@ export default function PredictionsUnified({ user }) {
     console.log('Workout data length:', data.length);
     console.log('Workout data sample:', data.slice(0, 2));
     
-    // Filter out duration exercises and stretching - only count strength workouts
+    // Filter out cardio/stretching/duration — only count strength workouts
+    // Check all available name fields: joined workout name, session_name, workout_type, notes
+    const CARDIO_KEYWORDS = [
+      'walking', 'treadmill', 'duration', 'stretching', 'strechting',
+      'flexibility', 'cardio', 'yoga', 'foam roll', 'running', 'cycling',
+      'wall sit', 'bike', 'elliptical', 'hiit', 'circuit', 'swim',
+      'rowing', 'stair', 'jump rope', 'aerobic', 'spin', 'dance',
+      'pilates', 'zumba', 'kickbox', 'boxing', 'martial'
+    ];
     const strengthWorkouts = data.filter(w => {
-      const name = (w.workout?.name || w.session_name || '').toLowerCase();
-      return !name.includes('walking') && !name.includes('treadmill') &&
-             !name.includes('duration') && !name.includes('stretching') &&
-             !name.includes('strechting') && // typo variant used in session name
-             !name.includes('flexibility') && !name.includes('cardio') &&
-             !name.includes('yoga') && !name.includes('foam roll') &&
-             !name.includes('running') && !name.includes('cycling') &&
-             !name.includes('wall sit');
+      // Combine all name-bearing fields into one string to check
+      const combinedName = [
+        w.workout?.name || '',
+        w.session_name || '',
+        w.workout_type || '',
+        w.notes || ''
+      ].join(' ').toLowerCase().trim();
+      // If no name at all, exclude (can't confirm it's a strength session)
+      if (!combinedName) return false;
+      return !CARDIO_KEYWORDS.some(kw => combinedName.includes(kw));
     });
     
     console.log('Filtered to strength workouts only:', strengthWorkouts.length, 'of', data.length);
@@ -712,13 +724,24 @@ export default function PredictionsUnified({ user }) {
       const rawVolumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
       const volumeIncrease = Math.max(-200, Math.min(200, rawVolumeIncrease)); // Cap at ±200%
 
-      // Calculate workout frequency (using filtered strength workouts only)
-      // Use minimum of 7 days to prevent division-by-near-zero when sessions cluster on same day
+      // Calculate workout frequency: count unique strength workout DAYS in the current week (Sun-Sat)
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+      const thisWeekDays = new Set(
+        strengthWorkouts
+          .filter(w => {
+            const t = new Date(w.start_time).getTime();
+            return t >= startOfWeek.getTime() && t < endOfWeek.getTime();
+          })
+          .map(w => new Date(w.start_time).toDateString())
+      );
+      const frequency = thisWeekDays.size; // exact count of unique strength days this week
       const dates = strengthWorkouts.map(w => new Date(w.start_time));
-      const rawDaysBetween = (dates[0].getTime() - dates[dates.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-      const daysBetween = Math.max(7, rawDaysBetween);
-      const rawFrequency = (strengthWorkouts.length / daysBetween) * 7;
-      const frequency = Math.min(7, rawFrequency); // Cap at 7x/week
 
       // Risk factors
       const riskFactors = [];
@@ -954,7 +977,10 @@ export default function PredictionsUnified({ user }) {
       const weightChange = lastWeight - firstWeight;
       const days = (new Date(sortedWeights[sortedWeights.length - 1].tracker_date).getTime() - 
                    new Date(sortedWeights[0].tracker_date).getTime()) / (1000 * 60 * 60 * 24);
-      const weeklyWeightChange = (weightChange / days) * 7;
+      // Cap weekly weight change to ±1 kg/week to prevent daily fluctuations from
+      // producing wildly unrealistic 12-week projections (e.g. -51 lbs fat loss)
+      const rawWeeklyWeightChange = days > 0 ? (weightChange / days) * 7 : 0;
+      const weeklyWeightChange = Math.max(-1.0, Math.min(1.0, rawWeeklyWeightChange));
 
       // Calculate training volume trend
       const recentWorkouts = woData.slice(0, Math.floor(woData.length / 2));
@@ -984,10 +1010,12 @@ export default function PredictionsUnified({ user }) {
       if (isRecomping) {
         // Recomping: slow muscle gain, moderate fat loss
         estimatedMuscleGain = Math.min(maxMuscleGain, 3); // Conservative: 3 lbs max
-        estimatedFatLoss = Math.abs(projectedWeightChange) + estimatedMuscleGain;
+        // Fat loss in recomp = projected weight loss + muscle gained (body replaced fat with muscle)
+        // Cap at 15 lbs max for 12 weeks (realistic upper bound)
+        estimatedFatLoss = Math.min(15, Math.abs(projectedWeightChange) + estimatedMuscleGain);
       } else if (weeklyWeightChange < 0) {
-        // Losing weight: preserve muscle, lose fat
-        estimatedFatLoss = Math.abs(projectedWeightChange) * 0.80; // 80% fat loss
+        // Losing weight: preserve muscle, lose fat — cap at 20 lbs for 12 weeks
+        estimatedFatLoss = Math.min(20, Math.abs(projectedWeightChange) * 0.80);
         // Muscle gain while cutting is minimal, even with high volume
         estimatedMuscleGain = volumeIncrease > 30 ? Math.min(maxMuscleGain * 0.5, 2) : 0; // Max 2 lbs if training very hard
       } else if (weeklyWeightChange > 0) {
@@ -1025,17 +1053,23 @@ export default function PredictionsUnified({ user }) {
   const predictHabitStreak = (data = workoutData) => {
     // Filter to strength/resistance sessions only — exclude cardio, walking, stretching
     // This matches the same filter used in injury risk and workout analytics
+    const HABIT_CARDIO_KEYWORDS = [
+      'walking', 'treadmill', 'duration', 'stretching', 'strechting',
+      'flexibility', 'cardio', 'yoga', 'foam roll', 'running', 'cycling',
+      'wall sit', 'bike', 'elliptical', 'hiit', 'circuit', 'swim',
+      'rowing', 'stair', 'jump rope', 'aerobic', 'spin', 'dance',
+      'pilates', 'zumba', 'kickbox', 'boxing', 'martial'
+    ];
     const strengthData = data.filter(w => {
-      const name = (w.workout?.name || w.session_name || '').toLowerCase();
-      return !name.includes('walking') && !name.includes('treadmill') &&
-             !name.includes('duration') && !name.includes('stretching') &&
-             !name.includes('strechting') &&
-             !name.includes('flexibility') && !name.includes('cardio') &&
-             !name.includes('yoga') && !name.includes('foam roll') &&
-             !name.includes('running') && !name.includes('cycling') &&
-             !name.includes('wall sit');
+      const combinedName = [
+        w.workout?.name || '',
+        w.session_name || '',
+        w.workout_type || '',
+        w.notes || ''
+      ].join(' ').toLowerCase().trim();
+      if (!combinedName) return false; // exclude unnamed sessions
+      return !HABIT_CARDIO_KEYWORDS.some(kw => combinedName.includes(kw));
     });
-    
     if (strengthData.length < 7) return null;
 
     try {
@@ -1338,9 +1372,25 @@ export default function PredictionsUnified({ user }) {
               <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 mb-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Weekly Reset Day</h3>
+                  <h3 className="text-lg font-bold">Weekly Reset Day — Finish Strong!</h3>
                 </div>
-                <p className="text-sm opacity-90">Predictions are building for the new week. Log your first workout or meal today to start fresh data — predictions will populate as the week progresses.</p>
+                <p className="text-sm opacity-90 mb-4">Predictions reset each Sunday. Log a workout today to close out the week strong — it counts toward your streak and weekly total!</p>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => navigate('/fitness')}
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <Dumbbell className="w-4 h-4" />
+                    Log Today's Workout
+                  </button>
+                  <button
+                    onClick={() => navigate('/nutrition')}
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <Apple className="w-4 h-4" />
+                    Log a Meal
+                  </button>
+                </div>
               </div>
             );
           }
