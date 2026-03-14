@@ -282,7 +282,7 @@ export default function BodyRecomp({ user }) {
                 const currentDisplay = convertCm(currentCm || startCm, unitSystem)
 
                 return (
-                  <div key={type} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div key={type} className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-200 shadow-sm overflow-hidden">
                     {/* Card Header */}
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-3">

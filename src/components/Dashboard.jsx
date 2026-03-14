@@ -124,10 +124,10 @@ export default function Dashboard({ user }) {
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
     startOfWeek.setHours(0, 0, 0, 0)
     
-    // Also compute last week's window for Monday recap
+    // Last week window: previous Sunday 00:00 → this Sunday 00:00 (Sun–Sat inclusive)
     const startOfLastWeek = new Date(startOfWeek)
-    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7)
-    const endOfLastWeek = new Date(startOfWeek)
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7) // go back 7 days to last Sunday
+    const endOfLastWeek = new Date(startOfWeek) // this Sunday 00:00 = exclusive end of last week
     
     const { data: allSessionsData } = await supabase
       .from('workout_sessions')

@@ -392,18 +392,32 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
               </div>
             </div>
 
-            {/* Card 2: Projected Strength Gain */}
+            {/* Card 2: Volume Trend (was: Projected Strength Gain) */}
+            {/* Note: strength_change_percent = week-over-week volume % change.
+                Raw volume swings can be 20%+ early on (few weeks of data), so we
+                clamp the display to a realistic range and show it as a trend, not
+                an absolute strength gain prediction. */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
-                Projected Strength Gain
-                <span className="text-xs text-gray-400" title="Expected weekly increase in your max lifts based on recent progress">ⓘ</span>
+                Volume Trend
+                <span className="text-xs text-gray-400" title="Week-over-week change in total workout volume (weight × reps). Positive = you're lifting more than last week.">ⓘ</span>
               </div>
-              <div className="text-2xl font-bold text-green-600">
-                +{Math.abs(predictions.strengthChange).toFixed(1)}%
-              </div>
-              <div className="text-xs text-gray-600 mt-1">
-                Per week average
-              </div>
+              {(() => {
+                // Clamp to ±15% for display — raw swings are large with limited data
+                const rawChange = predictions.strengthChange;
+                const clampedChange = Math.max(-15, Math.min(15, rawChange));
+                const isUp = clampedChange >= 0;
+                return (
+                  <>
+                    <div className={`text-2xl font-bold ${isUp ? 'text-green-600' : 'text-red-500'}`}>
+                      {isUp ? '+' : ''}{clampedChange.toFixed(1)}%
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {isUp ? 'Volume increasing' : 'Volume decreasing'} vs last week
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Card 3: Goal Achievement */}

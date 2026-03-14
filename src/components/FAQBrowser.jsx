@@ -182,8 +182,8 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
           onClick={() => setSelectedCategory(null)}
           className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
             selectedCategory === null
-              ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-l-2 border-blue-500'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 border-l-2 border-transparent'
+              ? 'bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border-l-2 border-teal-500'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-teal-50/50 dark:hover:bg-gray-800 border-l-2 border-transparent'
           }`}
         >
           <span className="flex items-center gap-2">
@@ -200,8 +200,8 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
               onClick={() => setSelectedCategory(category.id)}
               className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
                 selectedCategory === category.id
-                  ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium border-l-2 border-blue-500'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 border-l-2 border-transparent'
+                  ? 'bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-medium border-l-2 border-teal-500'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-teal-50/50 dark:hover:bg-gray-800 border-l-2 border-transparent'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -244,16 +244,16 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
               const isExpanded = expandedArticle === article.id
 
               return (
-                <Card key={article.id} className="overflow-hidden">
+                <Card key={article.id} className="overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
                   <button
                     onClick={() => toggleArticle(article.id)}
-                    className="w-full text-left p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    className="w-full text-left p-4 hover:bg-teal-100/60 dark:hover:bg-gray-800 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           {category && (
-                            <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
+                            <span className="text-xs px-2 py-1 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300">
                               {getCategoryIcon(category.icon)} {category.name}
                             </span>
                           )}

@@ -448,27 +448,39 @@ export default function PredictionsUnified({ user }) {
         console.log('✅ Using authoritative Goals TDEE — skipping back-calculation:', tdee);
       }
 
-      // Activity level classification — only count weighted/resistance sessions,
-      // not cardio (walking, treadmill) or stretching which inflate the frequency
-      const weightedWoData = woData.filter(w => {
-        const name = (w.workout?.name || w.session_name || '').toLowerCase();
-        return !name.includes('walking') && !name.includes('treadmill') &&
-               !name.includes('duration') && !name.includes('stretching') &&
-               !name.includes('strechting') && // typo variant used in session name
-               !name.includes('flexibility') && !name.includes('cardio') &&
-               !name.includes('yoga') && !name.includes('foam roll') &&
-               !name.includes('running') && !name.includes('cycling') &&
-               !name.includes('wall sit');
-      });
-      // Use the span of the weighted workouts themselves for frequency calculation.
-      // Minimum of 7 days prevents division-by-near-zero when all sessions are on the same day.
-      let activityDays = 7;
-      if (weightedWoData.length >= 2) {
-        const woTimes = weightedWoData.map(w => new Date(w.start_time).getTime());
-        const woSpanDays = (Math.max(...woTimes) - Math.min(...woTimes)) / (1000 * 60 * 60 * 24);
-        activityDays = Math.max(7, woSpanDays);
-      }
-      const workoutsPerWeek = weightedWoData.length > 0 ? Math.min(14, (weightedWoData.length / activityDays) * 7) : 0; // Cap at 14x/week (2x per day max)
+      // Activity level classification — only count weighted/resistance sessions this week,
+      // not cardio (walking, treadmill) or stretching which inflate the frequency.
+      // Use current week (Sun–Sat) count for accuracy, matching assessInjuryRisk.
+      const TDEE_CARDIO_KEYWORDS = [
+        'walking','treadmill','duration','stretching','strechting','flexibility',
+        'cardio','yoga','foam roll','running','cycling','wall sit',
+        'bike','elliptical','hiit','circuit','swim','rowing','stair',
+        'jump rope','aerobic','spin','dance','pilates','zumba','kickbox','boxing','martial'
+      ];
+      const isTDEEStrength = (session) => {
+        const combinedName = [
+          session.workout?.name || '',
+          session.session_name || ''
+        ].join(' ').toLowerCase().trim();
+        if (!combinedName) return false;
+        return !TDEE_CARDIO_KEYWORDS.some(kw => combinedName.includes(kw));
+      };
+      // Count unique strength workout days in the current week (Sun–Sat)
+      const tdeeNow = new Date();
+      const tdeeStartOfWeek = new Date(tdeeNow);
+      tdeeStartOfWeek.setDate(tdeeNow.getDate() - tdeeNow.getDay()); // back to Sunday
+      tdeeStartOfWeek.setHours(0, 0, 0, 0);
+      const tdeeEndOfWeek = new Date(tdeeStartOfWeek);
+      tdeeEndOfWeek.setDate(tdeeStartOfWeek.getDate() + 7);
+      const thisWeekStrengthDays = new Set(
+        woData
+          .filter(w => {
+            const t = new Date(w.start_time).getTime();
+            return t >= tdeeStartOfWeek.getTime() && t < tdeeEndOfWeek.getTime() && isTDEEStrength(w);
+          })
+          .map(w => new Date(w.start_time).toDateString())
+      );
+      const workoutsPerWeek = thisWeekStrengthDays.size;
       let activityLevel = 'sedentary';
       if (workoutsPerWeek >= 5) activityLevel = 'very active';
       else if (workoutsPerWeek >= 3) activityLevel = 'active';
@@ -1324,20 +1336,21 @@ export default function PredictionsUnified({ user }) {
 
           // Gather last-week stats for Monday recap
           if (isMonday) {
-            // Last week: Sun–Sat
-            const lastSunday = new Date(now);
-            lastSunday.setDate(now.getDate() - 1);
-            lastSunday.setHours(0,0,0,0);
-            const lastMonday = new Date(lastSunday);
-            lastMonday.setDate(lastSunday.getDate() - 6);
+            // Last week: last Sunday (yesterday) back to the Sunday before that
+            // Week = Sun 00:00 → Sat 23:59 (i.e. Sun–Sat)
+            const thisWeekSunday = new Date(now);
+            thisWeekSunday.setDate(now.getDate() - now.getDay()); // this Sunday
+            thisWeekSunday.setHours(0, 0, 0, 0);
+            const lastWeekSunday = new Date(thisWeekSunday);
+            lastWeekSunday.setDate(thisWeekSunday.getDate() - 7); // previous Sunday
 
             const lastWeekWorkouts = workoutData.filter(w => {
               const d = new Date(w.start_time);
-              return d >= lastMonday && d <= lastSunday;
+              return d >= lastWeekSunday && d < thisWeekSunday;
             });
             const lastWeekNutrition = nutritionData.filter(n => {
               const d = new Date(n.meal_date || n.created_at);
-              return d >= lastMonday && d <= lastSunday;
+              return d >= lastWeekSunday && d < thisWeekSunday;
             });
             const totalCals = lastWeekNutrition.reduce((s, n) => s + (n.calories || 0), 0);
             const avgCals = lastWeekNutrition.length > 0 ? Math.round(totalCals / 7) : 0;
