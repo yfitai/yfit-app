@@ -440,25 +440,36 @@ export default function Dashboard({ user }) {
               <TrendingUp className="w-6 h-6" />
               <h3 className="text-lg font-bold">Last Week Summary 📊</h3>
             </div>
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              <div className="bg-white/15 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">{lastWeekWorkouts}</div>
-                <div className="text-sm opacity-90">Workouts last week</div>
+            {lastWeekWorkouts === 0 && (lastWeekStreak === null || lastWeekStreak === 0) ? (
+              // First full week — no prior week data yet
+              <div className="bg-white/15 rounded-lg p-4 text-center">
+                <div className="text-3xl mb-2">🌱</div>
+                <p className="font-semibold text-sm">Your first full week summary will appear next Sunday.</p>
+                <p className="text-xs opacity-80 mt-1">Keep logging workouts this week — your recap will show here once the week wraps on Saturday night.</p>
               </div>
-              <div className="bg-white/15 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">{lastWeekStreak !== null ? lastWeekStreak : '--'}</div>
-                <div className="text-sm opacity-90">Active days</div>
-              </div>
-              <div className="bg-white/15 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">
-                  {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
+            ) : (
+              <>
+                <div className="grid grid-cols-3 gap-3 mb-3">
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold">{lastWeekWorkouts}</div>
+                    <div className="text-sm opacity-90">Workouts last week</div>
+                  </div>
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold">{lastWeekStreak !== null ? lastWeekStreak : '--'}</div>
+                    <div className="text-sm opacity-90">Active days</div>
+                  </div>
+                  <div className="bg-white/15 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold">
+                      {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
+                    </div>
+                    <div className="text-sm opacity-90">
+                      {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm opacity-90">
-                  {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
-                </div>
-              </div>
-            </div>
-            <p className="text-sm opacity-80">Head to Predictions for your full weekly analysis and upcoming forecasts.</p>
+                <p className="text-sm opacity-80">Head to Predictions for your full weekly analysis and upcoming forecasts.</p>
+              </>
+            )}
           </div>
         )}
 
