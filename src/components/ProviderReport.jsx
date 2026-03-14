@@ -42,6 +42,7 @@ export default function ProviderReport({ user }) {
 
   const loadMedications = async () => {
     try {
+      // Fetch all active medications (both DB-linked and custom), excluding supplements
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -51,9 +52,11 @@ export default function ProviderReport({ user }) {
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
+        .neq('is_supplement', true)
         .order('created_at')
 
       if (error) throw error
+      console.log('[ProviderReport] Medications loaded:', data?.length, data)
       setMedications(data || [])
     } catch (error) {
       console.error('Error loading medications:', error)
@@ -62,7 +65,8 @@ export default function ProviderReport({ user }) {
 
   const loadSupplements = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch from user_supplements table (DB-linked supplements)
+      const { data: suppData, error: suppError } = await supabase
         .from('user_supplements')
         .select(`
           *,
@@ -72,8 +76,32 @@ export default function ProviderReport({ user }) {
         .eq('is_active', true)
         .order('created_at')
 
-      if (error) throw error
-      setSupplements(data || [])
+      if (suppError) console.error('Error loading user_supplements:', suppError)
+
+      // Also fetch custom supplements saved via user_medications with is_supplement=true
+      const { data: customSuppData, error: customSuppError } = await supabase
+        .from('user_medications')
+        .select(`
+          *,
+          medication:medications(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .eq('is_supplement', true)
+        .order('created_at')
+
+      if (customSuppError) console.error('Error loading custom supplements:', customSuppError)
+
+      // Normalize custom supplement records to match supplement shape
+      const normalizedCustomSupps = (customSuppData || []).map(s => ({
+        ...s,
+        supplement: s.medication || null,
+        custom_name: s.custom_name || s.medication?.name || 'Unknown Supplement'
+      }))
+
+      const combined = [...(suppData || []), ...normalizedCustomSupps]
+      console.log('[ProviderReport] Supplements loaded:', combined.length, combined)
+      setSupplements(combined)
     } catch (error) {
       console.error('Error loading supplements:', error)
     }
