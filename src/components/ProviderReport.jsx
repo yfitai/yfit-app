@@ -43,6 +43,7 @@ export default function ProviderReport({ user }) {
   const loadMedications = async () => {
     try {
       // Fetch all active medications (both DB-linked and custom), excluding supplements
+      // Use or() to include rows where is_supplement is false OR null (not set)
       const { data, error } = await supabase
         .from('user_medications')
         .select(`
@@ -52,7 +53,7 @@ export default function ProviderReport({ user }) {
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .neq('is_supplement', true)
+        .or('is_supplement.is.null,is_supplement.eq.false')
         .order('created_at')
 
       if (error) throw error
