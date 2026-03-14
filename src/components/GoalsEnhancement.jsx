@@ -343,7 +343,7 @@ export default function GoalsEnhancement({
         
         {/* Estimated Completion */}
         {estimatedDate && (
-          <div className="mt-4 p-3 bg-white rounded-md border border-green-200">
+          <div className="mt-4 p-3 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-md border border-teal-100">
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="w-4 h-4 text-green-600" />
               <div className="text-gray-700">
@@ -512,7 +512,7 @@ export default function GoalsEnhancement({
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Goal Summary</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-md border border-gray-200">
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
               <p className="text-sm text-gray-600 mb-1">Weight Change</p>
               <p className="text-2xl font-bold text-gray-900">
                 {Math.abs(parseFloat(targetWeight) - parseFloat(startingWeight)).toFixed(1)} {weightUnit}
@@ -523,7 +523,7 @@ export default function GoalsEnhancement({
             </div>
             
             {startingBodyFat && targetBodyFat && (
-              <div className="bg-white p-4 rounded-md border border-gray-200">
+              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
                 <p className="text-sm text-gray-600 mb-1">Body Fat Change</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {Math.abs(parseFloat(targetBodyFat) - parseFloat(startingBodyFat)).toFixed(1)}%
@@ -535,7 +535,7 @@ export default function GoalsEnhancement({
             )}
             
             {estimatedDate && (
-              <div className="bg-white p-4 rounded-md border border-gray-200">
+              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
                 <p className="text-sm text-gray-600 mb-1">Timeline</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {estimatedDate.days} days

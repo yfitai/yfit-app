@@ -26,8 +26,8 @@ import { supabase } from '../lib/supabase'
                 onClick={() => setActiveTab('daily')}
                 className={`flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all ${
                   activeTab === 'daily'
-                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
+                    : 'bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100'
                 }`}
               >
                 <Apple className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -38,8 +38,8 @@ import { supabase } from '../lib/supabase'
                 onClick={() => setActiveTab('weekly')}
                 className={`flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all ${
                   activeTab === 'weekly'
-                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
+                    : 'bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100'
                 }`}
               >
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -50,8 +50,8 @@ import { supabase } from '../lib/supabase'
                 onClick={() => setActiveTab('templates')}
                 className={`flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all ${
                   activeTab === 'templates'
-                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
+                    : 'bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100'
                 }`}
               >
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -66,8 +66,8 @@ import { supabase } from '../lib/supabase'
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {activeTab === 'daily' && (
           <div>
-            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
+            <div className="mb-4 bg-teal-50 border border-teal-200 rounded-lg p-4">
+              <p className="text-sm text-teal-800">
                 <strong>💡 Tip:</strong> Log your meals throughout the day. Use templates from the Templates tab for quick entry, or switch to Weekly Planner to plan ahead!
               </p>
             </div>
@@ -77,8 +77,8 @@ import { supabase } from '../lib/supabase'
         
         {activeTab === 'weekly' && (
           <div>
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-sm text-green-800">
+            <div className="mb-4 bg-teal-50 border border-teal-200 rounded-lg p-4">
+              <p className="text-sm text-teal-800">
                 <strong>💡 Tip:</strong> Plan your meals for the week ahead. Create templates from your favorite meals, then generate a grocery list with one click!
               </p>
             </div>
@@ -89,8 +89,8 @@ import { supabase } from '../lib/supabase'
    
        {activeTab === 'templates' && (
   <div>
-    <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
-      <p className="text-sm text-purple-800">
+    <div className="mb-4 bg-teal-50 border border-teal-200 rounded-lg p-4">
+      <p className="text-sm text-teal-800">
         <strong>💡 Tip:</strong> Templates save time! Create templates from your favorite meals, then quickly add them to Daily Tracker or Weekly Planner.
       </p>
     </div>

@@ -471,7 +471,7 @@ const FormAnalysis = () => {
                 <div
                   key={exercise.id}
                   onClick={() => setSelectedExercise(exercise)}
-                  className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md cursor-pointer transition-shadow"
+                  className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-lg p-4 shadow-sm hover:shadow-md hover:border-teal-300 cursor-pointer transition-all"
                 >
                   <h3 className="font-semibold text-gray-900 mb-1">{exercise.name}</h3>
                   <p className="text-sm text-gray-600">{exercise.primary_muscle?.name}</p>
