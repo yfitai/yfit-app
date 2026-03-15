@@ -914,8 +914,8 @@ export default function DailyTracker({ user }) {
         {/* Weekly Summary */}
         {weeklyData.length > 0 && (
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">📈 7-Day Summary</h2>
-            {/* teal theme applied to parent card via outer div */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">📈 Last 7 Days</h2>
+            <p className="text-xs text-gray-500 -mt-3 mb-4">Rolling average — today minus 7 days</p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Avg Sleep</div>

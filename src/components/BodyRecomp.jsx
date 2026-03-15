@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import {
@@ -42,6 +43,7 @@ function unitLabel(unitSystem) {
 
 export default function BodyRecomp({ user }) {
   const { unitSystem } = useUnitPreference()
+  const location = useLocation()
   const [loading, setLoading] = useState(true)
   const [startMeasurements, setStartMeasurements] = useState({})
   const [goalMeasurements, setGoalMeasurements] = useState({})
@@ -49,8 +51,20 @@ export default function BodyRecomp({ user }) {
   const [expandedChart, setExpandedChart] = useState(null)
   const [timeRange, setTimeRange] = useState(90) // days
 
+  // Re-fetch when user, timeRange, or the route location changes (catches navigation back to this page)
   useEffect(() => {
     if (user?.id) loadData(user.id)
+  }, [user, timeRange, location.key])
+
+  // Also re-fetch when the tab/app regains visibility (covers Android app switching)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user?.id) {
+        loadData(user.id)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [user, timeRange])
 
   const loadData = async (userId) => {
