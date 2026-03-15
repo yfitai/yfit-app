@@ -186,27 +186,44 @@ export default function DailyTracker({ user }) {
       
       // Save each measurement as a separate row
       const measurementTypes = ['neck', 'shoulders', 'chest', 'waist', 'hips', 'biceps', 'forearms', 'thighs', 'calves'];
-      const promises = measurementTypes.map(type => {
-        const value = measurements[`${type}_cm`];
-        if (value) {
-          return supabase.from('progress_measurements').insert({
+      const results = await Promise.all(
+        measurementTypes.map(async type => {
+          const value = measurements[`${type}_cm`];
+          if (!value && value !== 0) return { type, skipped: true };
+          const { error } = await supabase.from('progress_measurements').insert({
             user_id: user.id,
             measurement_type: type,
             measurement_value: parseFloat(value),
             unit: unitSystem === 'imperial' ? 'in' : 'cm',
             measured_at: now
           });
-        }
-        return Promise.resolve();
-      });
+          if (error) {
+            console.error(`[DailyTracker] Failed to save ${type}:`, error);
+            return { type, error };
+          }
+          console.log(`[DailyTracker] Saved ${type} = ${value}`);
+          return { type, saved: true };
+        })
+      );
 
-      await Promise.all(promises);
-      setLastMeasurementDate(new Date().toLocaleDateString());
-      setShowMeasurements(false);
-      alert('✅ Measurements saved!');
+      const failures = results.filter(r => r.error);
+      const saved = results.filter(r => r.saved);
+
+      if (failures.length > 0) {
+        const failedTypes = failures.map(f => f.type).join(', ');
+        const firstError = failures[0].error;
+        console.error('[DailyTracker] Save failures:', failures);
+        alert(`❌ Failed to save: ${failedTypes}\nError: ${firstError.message || firstError.code || JSON.stringify(firstError)}`);
+      } else if (saved.length === 0) {
+        alert('⚠️ No measurements to save — please enter at least one value.');
+      } else {
+        setLastMeasurementDate(new Date().toLocaleDateString());
+        setShowMeasurements(false);
+        alert(`✅ ${saved.length} measurement${saved.length > 1 ? 's' : ''} saved!`);
+      }
     } catch (error) {
       console.error('Error saving measurements:', error);
-      alert('❌ Error saving measurements');
+      alert('❌ Error saving measurements: ' + (error.message || JSON.stringify(error)));
     } finally {
       setSavingMeasurements(false);
     }
