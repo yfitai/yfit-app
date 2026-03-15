@@ -190,11 +190,16 @@ export default function DailyTracker({ user }) {
         measurementTypes.map(async type => {
           const value = measurements[`${type}_cm`];
           if (!value && value !== 0) return { type, skipped: true };
+          // Always store in cm — convert from inches if user is in imperial mode
+          // This avoids the DB unit check constraint which only allows 'cm'
+          const valueCm = unitSystem === 'imperial'
+            ? parseFloat(value) * 2.54
+            : parseFloat(value);
           const { error } = await supabase.from('progress_measurements').insert({
             user_id: user.id,
             measurement_type: type,
-            measurement_value: parseFloat(value),
-            unit: unitSystem === 'imperial' ? 'in' : 'cm',
+            measurement_value: parseFloat(valueCm.toFixed(2)),
+            unit: 'cm',
             measured_at: now
           });
           if (error) {
