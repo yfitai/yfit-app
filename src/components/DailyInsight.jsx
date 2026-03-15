@@ -33,34 +33,57 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
 
   const fetchDailyInsight = async () => {
     try {
-      // Try to get today's top article first
+      // Try to get a fresh article added today first
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
-      let { data, error } = await supabase
+      let { data: todayData } = await supabase
         .from('scraped_articles')
         .select('id, title, summary, url, source_name, category, relevance_score')
         .gte('created_at', today.toISOString())
         .order('relevance_score', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
-      // If no article today, fall back to the most recent high-relevance article
-      if (error || !data) {
-        const fallback = await supabase
-          .from('scraped_articles')
-          .select('id, title, summary, url, source_name, category, relevance_score')
-          .order('relevance_score', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (!fallback.error && fallback.data) {
-          setArticle(fallback.data)
-        }
-      } else {
-        setArticle(data)
+      if (todayData) {
+        setArticle(todayData)
+        return
       }
+
+      // No new article today — rotate through the library using today's date as a seed
+      // This ensures a different article shows each day without needing a live scraper
+      const { data: allArticles } = await supabase
+        .from('scraped_articles')
+        .select('id, title, summary, url, source_name, category, relevance_score')
+        .order('relevance_score', { ascending: false })
+        .limit(60) // fetch top 60 by relevance to rotate through
+
+      if (!allArticles || allArticles.length === 0) return
+
+      // Get recently seen article IDs from localStorage (last 30 days)
+      let seenIds = []
+      try {
+        const raw = localStorage.getItem('yfit_insight_seen_ids')
+        seenIds = raw ? JSON.parse(raw) : []
+        // Keep only last 30 entries
+        if (seenIds.length > 30) seenIds = seenIds.slice(-30)
+      } catch {}
+
+      // Prefer articles not recently seen; fall back to full list if all seen
+      const unseen = allArticles.filter(a => !seenIds.includes(a.id))
+      const pool = unseen.length > 0 ? unseen : allArticles
+
+      // Use day-of-year as a stable daily index (same article all day, different each day)
+      const dayOfYear = Math.floor((Date.now() - new Date(today.getFullYear(), 0, 0)) / 86400000)
+      const picked = pool[dayOfYear % pool.length]
+
+      // Record this article as seen
+      try {
+        const updated = [...seenIds.filter(id => id !== picked.id), picked.id]
+        localStorage.setItem('yfit_insight_seen_ids', JSON.stringify(updated))
+      } catch {}
+
+      setArticle(picked)
     } catch (err) {
       console.error('DailyInsight fetch error:', err)
     } finally {
