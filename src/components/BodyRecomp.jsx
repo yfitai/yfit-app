@@ -92,13 +92,16 @@ export default function BodyRecomp({ user }) {
 
       // Load measurement history from progress_measurements (saved by DailyTracker)
       const since = new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000).toISOString()
-      const { data: hist } = await supabase
+      const { data: hist, error: histError } = await supabase
         .from('progress_measurements')
         .select('measurement_type, measurement_value, unit, measured_at')
         .eq('user_id', userId)
         .gte('measured_at', since)
         .order('measured_at', { ascending: true })
 
+      console.log('[BodyRecomp] History query - since:', since, 'rows:', hist?.length, 'error:', histError)
+      console.log('[BodyRecomp] History data:', hist)
+      console.log('[BodyRecomp] Start measurements:', Object.keys(bm || {}).filter(k => k.endsWith('_cm') && !k.includes('goal')).map(k => `${k}=${bm[k]}`).join(', '))
       setHistory(hist || [])
     } catch (err) {
       console.error('Error loading body recomp data:', err)
@@ -194,6 +197,14 @@ export default function BodyRecomp({ user }) {
           <h1 className="text-2xl font-bold text-gray-900">Body Recomp</h1>
           <p className="text-sm text-gray-500 mt-1">Track your body measurement progress toward goals</p>
         </div>
+        <div className="flex items-center gap-2">
+        <button
+          onClick={() => loadData(user.id)}
+          className="text-sm px-3 py-2 bg-teal-100 text-teal-700 border border-teal-300 rounded-lg hover:bg-teal-200 transition-colors"
+          title="Refresh measurements"
+        >
+          ↻ Refresh
+        </button>
         <select
           value={timeRange}
           onChange={e => setTimeRange(Number(e.target.value))}
@@ -204,6 +215,7 @@ export default function BodyRecomp({ user }) {
           <option value={180}>Last 6 months</option>
           <option value={365}>Last year</option>
         </select>
+        </div>
       </div>
 
       {/* Setup prompt if no goals set */}
