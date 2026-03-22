@@ -92,11 +92,13 @@ export default function Home() {
       badge: null,
       badgeColor: null,
       features: [
-        "Basic goal tracking",
-        "Manual nutrition logging",
-        "Workout library access",
+        "Basic workout tracking",
+        "Manual meal logging",
+        "3 saved workout routines",
         "Basic progress tracking",
-        "Community support"
+        "Weight & body metrics",
+        "5 AI form analyses/month",
+        "Limited AI Coach queries"
       ],
       buttonText: "Start Free — No Credit Card",
       buttonStyle: "outline" as const,
@@ -133,12 +135,10 @@ export default function Home() {
       badgeColor: "bg-green-600",
       features: [
         "Everything in Pro Monthly",
-        "AI Coach access",
-        "Unlimited predictions",
-        "Custom meal plans",
-        "Form analysis videos",
+        "Exclusive workshops",
+        "Early access to new features",
         "Advanced health insights",
-        "VIP support"
+        "Priority support"
       ],
       buttonText: "Start Pro Yearly",
       buttonStyle: "default" as const,
@@ -154,12 +154,11 @@ export default function Home() {
       badgeColor: "bg-violet-600",
       features: [
         "Everything in Pro Yearly",
-        "Lifetime access",
-        "All future features",
-        "Premium support",
-        "No recurring charges",
-        "Exclusive community",
-        "Priority updates"
+        "Lifetime access — pay once",
+        "All future features included",
+        "Founder's Badge",
+        "Direct developer access",
+        "No recurring charges ever"
       ],
       buttonText: "Get Lifetime Access",
       buttonStyle: "default" as const,
@@ -577,7 +576,7 @@ export default function Home() {
                   {
                     section: "AI FEATURES",
                     rows: [
-                      { label: "AI Form Analysis",          free: "3/month", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
+                      { label: "AI Form Analysis",          free: "5/month", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
                       { label: "AI Coach",                  free: "Limited", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
                       { label: "AI Predictions & Forecasts",free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Personalised Meal Plans",   free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -587,7 +586,7 @@ export default function Home() {
                   {
                     section: "PLANNING",
                     rows: [
-                      { label: "Saved Workout Routines",    free: "2", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
+                      { label: "Saved Workout Routines",    free: "3", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
                       { label: "Grocery Lists",             free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Provider Reports",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Medication Reminders",      free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -606,10 +605,12 @@ export default function Home() {
                     rows: [
                       { label: "Community Support",         free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Priority Support",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "VIP Support",               free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: "Exclusive Workshops",       free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: "Early Access Features",     free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: "Founder's Badge",           free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: "Direct Dev Access",         free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
                       { label: "All Future Features",       free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
                       { label: "No Recurring Charges",      free: "✅", monthly: "❌", yearly: "❌", lifetime: "✅" },
-                      { label: "Exclusive Community Access",free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
                     ]
                   },
                 ] as { section: string; rows: { label: string; free: string; monthly: string; yearly: string; lifetime: string }[] }[]).map((group, gi) => (
