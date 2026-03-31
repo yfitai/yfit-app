@@ -102,7 +102,7 @@ export default function PredictionsUnified({ user }) {
         .select('*, workout:workouts(name)')
         .eq('user_id', user.id)
         .order('start_time', { ascending: false })
-        .limit(30);
+        .limit(200); // Need full history for accurate streak calculation
       
       if (error) throw error;
       setWorkoutData(data || []);
@@ -1100,26 +1100,32 @@ export default function PredictionsUnified({ user }) {
         w.workout_type || '',
         w.notes || ''
       ].join(' ').toLowerCase().trim();
-      if (!combinedName) return false; // exclude unnamed sessions
+      // Include unnamed sessions (they are likely strength sessions logged without a name)
+      // Only exclude sessions that explicitly match a cardio keyword
+      if (!combinedName) return true;
       return !HABIT_CARDIO_KEYWORDS.some(kw => combinedName.includes(kw));
     });
-    if (strengthData.length < 7) return null;
+    if (strengthData.length < 3) return null;
 
     try {
-      // Calculate current streak using strength workouts only
-      const sortedDates = strengthData.map(w => new Date(w.start_time).toDateString()).sort();
-      const uniqueDates = [...new Set(sortedDates)];
-      
+      // Build sorted unique workout days (ascending) — same approach as WorkoutAnalyticsDashboard
+      const uniqueDateStrings = [...new Set(
+        strengthData.map(w => {
+          const d = new Date(w.start_time);
+          // Normalise to local date string so timezone doesn't split one day into two
+          return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        })
+      )].sort();
+
       let currentStreak = 0;
       let longestStreak = 0;
       let tempStreak = 1;
 
-      for (let i = 1; i < uniqueDates.length; i++) {
-        const prevDate = new Date(uniqueDates[i - 1]);
-        const currDate = new Date(uniqueDates[i]);
-        const daysDiff = (currDate - prevDate) / (1000 * 60 * 60 * 24);
-
-        if (daysDiff <= 2) { // Allow 1 rest day
+      for (let i = 1; i < uniqueDateStrings.length; i++) {
+        const prevDate = new Date(uniqueDateStrings[i - 1]);
+        const currDate = new Date(uniqueDateStrings[i]);
+        const daysDiff = Math.round((currDate - prevDate) / (1000 * 60 * 60 * 24));
+        if (daysDiff <= 2) { // consecutive day OR 1 rest day — same rule as Progress page
           tempStreak++;
         } else {
           longestStreak = Math.max(longestStreak, tempStreak);
@@ -1128,13 +1134,16 @@ export default function PredictionsUnified({ user }) {
       }
       longestStreak = Math.max(longestStreak, tempStreak);
 
-      // Check if still on streak
-      // strengthData is sorted descending (newest first), uniqueDates is sorted ascending
-      // The most recent workout date is uniqueDates[uniqueDates.length - 1]
-      const lastWorkoutDate = new Date(uniqueDates[uniqueDates.length - 1]);
-      const daysSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60 * 24);
-      // Allow up to 2 days gap (1 rest day) before breaking streak
+      // Check if current streak is still active (last workout within 2 days)
+      const lastDateStr = uniqueDateStrings[uniqueDateStrings.length - 1];
+      const lastWorkoutDate = new Date(lastDateStr);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const daysSinceLastWorkout = Math.round((today - lastWorkoutDate) / (1000 * 60 * 60 * 24));
       currentStreak = daysSinceLastWorkout <= 2 ? tempStreak : 0;
+
+      // Use uniqueDateStrings for all downstream calculations
+      const uniqueDates = uniqueDateStrings;
 
       // Calculate consistency rate using strength workouts only
       // Use at least 28 days as denominator to avoid inflated rates from short data windows
