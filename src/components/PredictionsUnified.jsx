@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -8,6 +9,9 @@ import {
 
 export default function PredictionsUnified({ user }) {
   const navigate = useNavigate();
+  const { unitSystem } = useUnitPreference();
+  // Read glucose unit preference from localStorage (set in DailyTracker)
+  const glucoseUnit = localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
   const [loading, setLoading] = useState(true);
   const [weightData, setWeightData] = useState([]);
   const [workoutData, setWorkoutData] = useState([]);
@@ -724,20 +728,34 @@ export default function PredictionsUnified({ user }) {
     }
 
     try {
-      // Use 5 most recent workouts for analysis
-      const recentWorkouts = strengthWorkouts.slice(0, 5);
-      const olderWorkouts = strengthWorkouts.slice(5, 10);
-
-      const recentAvgVolume = recentWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / recentWorkouts.length;
-      const olderAvgVolume = olderWorkouts.length > 0 
-        ? olderWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0) / olderWorkouts.length 
-        : recentAvgVolume;
-
-      const rawVolumeIncrease = ((recentAvgVolume - olderAvgVolume) / olderAvgVolume) * 100;
-      const volumeIncrease = Math.max(-200, Math.min(200, rawVolumeIncrease)); // Cap at ±200%
-
-      // Calculate workout frequency: count unique strength workout DAYS in the current week (Sun-Sat)
+      // Compare current week volume vs previous week volume (more meaningful than 5-workout slices)
       const now = new Date();
+      const thisWeekStart = new Date(now);
+      thisWeekStart.setDate(now.getDate() - now.getDay());
+      thisWeekStart.setHours(0, 0, 0, 0);
+      const lastWeekStart = new Date(thisWeekStart);
+      lastWeekStart.setDate(thisWeekStart.getDate() - 7);
+
+      const thisWeekWorkouts = strengthWorkouts.filter(w => new Date(w.start_time) >= thisWeekStart);
+      const lastWeekWorkouts = strengthWorkouts.filter(w => {
+        const t = new Date(w.start_time);
+        return t >= lastWeekStart && t < thisWeekStart;
+      });
+
+      const thisWeekVolume = thisWeekWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0);
+      const lastWeekVolume = lastWeekWorkouts.reduce((sum, w) => sum + (w.total_volume || 0), 0);
+
+      // If no last week data, fall back to comparing recent 5 vs older 5 workouts
+      let rawVolumeIncrease = 0;
+      if (lastWeekVolume > 0) {
+        rawVolumeIncrease = ((thisWeekVolume - lastWeekVolume) / lastWeekVolume) * 100;
+      } else if (thisWeekVolume > 0) {
+        // First week of data — show 0% change rather than inflated number
+        rawVolumeIncrease = 0;
+      }
+      const volumeIncrease = Math.max(-100, Math.min(100, rawVolumeIncrease)); // Cap at ±100%
+      // Calculate workout frequency: count unique strength workout DAYS in the current week (Sun-Sat)
+      // reuse 'now' already defined above
       const startOfWeek = new Date(now);
       startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
       startOfWeek.setHours(0, 0, 0, 0);
@@ -936,10 +954,13 @@ export default function PredictionsUnified({ user }) {
       const bestTimeRange = `${formatHour(bestHour)} - ${formatHour(bestHour + 1)}`;
       const worstTimeRange = `${formatHour(worstHour)} - ${formatHour(worstHour + 1)}`;
 
+      // Need at least 2 distinct training hours to make a meaningful comparison
+      if (hours.length < 2) return null;
+
       // Calculate performance difference (handle zero volume)
       const performanceDiff = byHour[worstHour].avgVolume > 0
         ? ((byHour[bestHour].avgVolume - byHour[worstHour].avgVolume) / byHour[worstHour].avgVolume) * 100
-        : 100; // If worst is 0, just show 100% better
+        : 50; // If worst is 0, cap at 50% rather than 100% to avoid misleading display
 
       return {
         bestTime: bestTimeRange,
@@ -1154,8 +1175,8 @@ export default function PredictionsUnified({ user }) {
       const bpLogs = healthData.filter(d => d.bp_systolic && d.bp_diastolic);
       if (bpLogs.length < 7) return null;
 
-      // Sort by date
-      const sorted = bpLogs.sort((a, b) => new Date(a.log_date) - new Date(b.log_date));
+      // Sort by date — use logged_at (the actual DB field)
+      const sorted = bpLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
       
       // Calculate averages and trends
       const avgSystolic = sorted.reduce((sum, d) => sum + d.bp_systolic, 0) / sorted.length;
@@ -1232,8 +1253,8 @@ export default function PredictionsUnified({ user }) {
       const glucoseLogs = healthData.filter(d => d.glucose_mg_dl);
       if (glucoseLogs.length < 7) return null;
 
-      // Sort by date
-      const sorted = glucoseLogs.sort((a, b) => new Date(a.log_date) - new Date(b.log_date));
+      // Sort by date — use logged_at (the actual DB field)
+      const sorted = glucoseLogs.sort((a, b) => new Date(a.logged_at) - new Date(b.logged_at));
       
       // Calculate average
       const avgGlucose = sorted.reduce((sum, d) => sum + d.glucose_mg_dl, 0) / sorted.length;
@@ -1961,8 +1982,12 @@ export default function PredictionsUnified({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
                 <div className="text-sm opacity-90 mb-1">Current Average</div>
-                <div className="text-4xl font-bold">{predictions.glucoseGoal.avgGlucose}</div>
-                <div className="text-sm opacity-75">mg/dL</div>
+                <div className="text-4xl font-bold">
+                  {glucoseUnit === 'mmol/l'
+                    ? (predictions.glucoseGoal.avgGlucose / 18.0182).toFixed(1)
+                    : predictions.glucoseGoal.avgGlucose}
+                </div>
+                <div className="text-sm opacity-75">{glucoseUnit === 'mmol/l' ? 'mmol/L' : 'mg/dL'}</div>
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">Status</div>
@@ -1979,11 +2004,22 @@ export default function PredictionsUnified({ user }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm opacity-90">Recent Change</div>
-                  <div className="text-2xl font-bold">{predictions.glucoseGoal.glucoseChange > 0 ? '+' : ''}{predictions.glucoseGoal.glucoseChange} mg/dL</div>
+                  <div className="text-2xl font-bold">
+                    {predictions.glucoseGoal.glucoseChange > 0 ? '+' : ''}
+                    {glucoseUnit === 'mmol/l'
+                      ? (predictions.glucoseGoal.glucoseChange / 18.0182).toFixed(2)
+                      : predictions.glucoseGoal.glucoseChange}
+                    {glucoseUnit === 'mmol/l' ? ' mmol/L' : ' mg/dL'}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm opacity-90">Goal</div>
-                  <div className="text-2xl font-bold">&lt;{predictions.glucoseGoal.goal} mg/dL</div>
+                  <div className="text-2xl font-bold">
+                    &lt;{glucoseUnit === 'mmol/l'
+                      ? (predictions.glucoseGoal.goal / 18.0182).toFixed(1)
+                      : predictions.glucoseGoal.goal}
+                    {glucoseUnit === 'mmol/l' ? ' mmol/L' : ' mg/dL'}
+                  </div>
                 </div>
               </div>
             </div>
