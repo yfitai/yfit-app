@@ -60,6 +60,7 @@ export default function NutritionEnhanced({ user: propUser }) {
   const [lookingUpBarcode, setLookingUpBarcode] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
   const [selectedMealType, setSelectedMealType] = useState('breakfast')
+  const [lastFoodSearchQuery, setLastFoodSearchQuery] = useState('')  // for back-to-results
   
   // Template state
   const [showTemplateModal, setShowTemplateModal] = useState(false)
@@ -186,10 +187,11 @@ export default function NutritionEnhanced({ user: propUser }) {
     setShowBarcodeScanner(true)
   }
 
- const handleFoodSelected = (food) => {
+ const handleFoodSelected = (food, searchQuery = '') => {
   setSelectedFood(food)
+  setLastFoodSearchQuery(searchQuery)  // remember query so Cancel can go back to results
   
-  const knownUnits = ['g', 'oz', 'lb', 'ml', 'fl_oz', 'cup', 'tbsp', 'tsp', 'serving', 'label_serving']
+  const knownUnits = ['g', 'oz', 'lb', 'ml', 'fl_oz', 'cup', 'tbsp', 'tsp', 'serving', 'label_serving', 'piece']
   
   // If the food has a saved preferred unit (from My Foods), use it
   if (food.preferred_serving_unit && knownUnits.includes(food.preferred_serving_unit)) {
@@ -241,22 +243,19 @@ const handleBarcodeScanned = async (barcode) => {
     if (!selectedFood) return
 
     // Calculate nutrition based on serving quantity and unit
-    // Get the unit conversion (same logic as ServingSizeSelector)
-    const isLiquid = selectedFood.foodType === 'liquid'
-    const units = isLiquid ? [
+    // Unified unit list — must match ServingSizeSelector exactly
+    const units = [
       { value: 'label_serving', toGrams: selectedFood.servingGrams || 100 },
-      { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
-      { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
-      { value: 'cup', label: 'Cups', toGrams: 240 },
-      { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
-      { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
-      { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
-    ] : [
-      { value: 'label_serving', toGrams: selectedFood.servingGrams || 100 },
-      { value: 'g', label: 'Grams (g)', toGrams: 1 },
-      { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
-      { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
-      { value: 'serving', label: 'Serving', toGrams: selectedFood.servingGrams || 100 }
+      { value: 'piece', toGrams: selectedFood.servingGrams || 100 },
+      { value: 'serving', toGrams: selectedFood.servingGrams || 100 },
+      { value: 'g', toGrams: 1 },
+      { value: 'oz', toGrams: 28.35 },
+      { value: 'lb', toGrams: 453.59 },
+      { value: 'ml', toGrams: 1 },
+      { value: 'fl_oz', toGrams: 29.57 },
+      { value: 'cup', toGrams: 240 },
+      { value: 'tbsp', toGrams: 15 },
+      { value: 'tsp', toGrams: 5 },
     ]
     
     const selectedUnit = units.find(u => u.value === servingUnit) || { toGrams: 1 } // fallback to 1g/unit
@@ -808,7 +807,8 @@ const handleBarcodeScanned = async (barcode) => {
           <FoodSearch
             user={user}
             onSelectFood={handleFoodSelected}
-            onClose={() => setShowFoodSearch(false)}
+            onClose={() => { setShowFoodSearch(false); setLastFoodSearchQuery('') }}
+            initialQuery={lastFoodSearchQuery}
           />
         )}
 
@@ -860,8 +860,10 @@ const handleBarcodeScanned = async (barcode) => {
             setServingUnit={setServingUnit}
             onConfirm={handleLogFood}
             onCancel={() => {
+              // Go back to search results instead of closing entirely
               setShowServingSelector(false)
               setSelectedFood(null)
+              setShowFoodSearch(true)  // reopen FoodSearch with previous query
             }}
             user={user}
             onSaveToMyFoods={handleSaveToMyFoods}
@@ -1024,23 +1026,24 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
     ? [{ value: 'label_serving', label: `Label: ${food.serving_size_label}`, toGrams: food.servingGrams || 100 }]
     : []
   
-  const units = isLiquid ? [
+  // Unified unit list for all foods — users pick what applies to their food.
+  // Liquids naturally use ml/fl oz/cups; whole foods use piece/serving; packaged foods use label serving.
+  // Saving to My Foods remembers the choice so they only pick once.
+  const units = [
     ...labelServingOption,
-    // Liquid foods: volume units + grams + serving
+    // Whole-item options (great for fruits, eggs, etc.)
+    { value: 'piece', label: '1 Piece / Whole', toGrams: food.servingGrams || 100 },
+    { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 },
+    // Weight units
+    { value: 'g', label: 'Grams (g)', toGrams: 1 },
+    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+    // Volume units (liquids, sauces, oils, etc.)
     { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
     { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
     { value: 'cup', label: 'Cups', toGrams: 240 },
     { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
     { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
-    { value: 'g', label: 'Grams (g)', toGrams: 1 },
-    { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
-  ] : [
-    ...labelServingOption,
-    // Solid foods: weight units + serving
-    { value: 'g', label: 'Grams (g)', toGrams: 1 },
-    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
-    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
-    { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
   ]
 
 

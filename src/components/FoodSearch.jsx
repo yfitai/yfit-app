@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { searchFoods, getRecentFoods, getFavoriteFoods, addCustomFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
 import CustomFoodModal from './CustomFoodModal'
 
-export default function FoodSearch({ user, onSelectFood, onClose }) {
-  const [query, setQuery] = useState('')
+export default function FoodSearch({ user, onSelectFood, onClose, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState([])
   const [recentFoods, setRecentFoods] = useState([])
   const [favoriteFoods, setFavoriteFoods] = useState([])
@@ -18,6 +18,14 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
   useEffect(() => {
     loadQuickAccessFoods()
   }, [user])
+
+  // If we are restoring from a back-navigation, re-run the previous search immediately
+  useEffect(() => {
+    if (initialQuery && initialQuery.length >= 2) {
+      performSearch(initialQuery, 'all')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])  // run once on mount only
 
   const loadQuickAccessFoods = async () => {
     if (!user) return
@@ -82,7 +90,7 @@ export default function FoodSearch({ user, onSelectFood, onClose }) {
 }
 
   const handleSelectFood = (food) => {
-    onSelectFood(food)
+    onSelectFood(food, query)  // pass current query so parent can restore search on back
   }
 
 const handleFilterChange = (newFilter) => {
