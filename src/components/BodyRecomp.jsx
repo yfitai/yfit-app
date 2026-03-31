@@ -435,6 +435,20 @@ export default function BodyRecomp({ user }) {
           <p className="text-sm mt-1">Set goals in the Goals page and log measurements in the Daily Tracker</p>
         </div>
       )}
+
+      {/* Upgrade CTA — gentle nudge */}
+      <div className="mt-8 rounded-2xl bg-gradient-to-r from-green-500 to-teal-600 p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <p className="font-bold text-lg">Get AI-Powered Recomp Recommendations</p>
+          <p className="text-white/80 text-sm mt-0.5">Pro unlocks personalised cutting, bulking, and maintenance plans based on your actual data.</p>
+        </div>
+        <a
+          href="/subscription"
+          className="flex-shrink-0 bg-white text-green-700 font-bold px-5 py-2.5 rounded-xl hover:bg-green-50 transition-colors text-sm whitespace-nowrap"
+        >
+          View Plans →
+        </a>
+      </div>
     </div>
   )
 }

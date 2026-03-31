@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -10,6 +11,7 @@ import {
 export default function PredictionsUnified({ user }) {
   const navigate = useNavigate();
   const { unitSystem } = useUnitPreference();
+  const { isPro, isTrialing, trialDaysRemaining } = useSubscription();
   // Read glucose unit preference from localStorage (set in DailyTracker)
   const glucoseUnit = localStorage.getItem('yfit_glucose_unit') || 'mg/dl';
   const [loading, setLoading] = useState(true);
@@ -1441,6 +1443,25 @@ export default function PredictionsUnified({ user }) {
           return null;
         })()}
 
+        {/* Predictions content — blurred for free users after trial */}
+        <div className={!isPro ? 'relative' : ''}>
+          {!isPro && (
+            <div className="absolute inset-0 z-10 backdrop-blur-md bg-white/30 rounded-xl flex flex-col items-center justify-center text-center p-8" style={{minHeight: '400px'}}>
+              <Brain className="w-16 h-16 text-purple-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Predictions — Pro Feature</h2>
+              <p className="text-gray-600 max-w-sm mb-6">
+                Your 30-day free trial has ended. Upgrade to Pro to unlock your full health forecasts.
+              </p>
+              <button
+                onClick={() => navigate('/subscription')}
+                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity shadow-lg"
+              >
+                Upgrade to Pro — $12.99/mo
+              </button>
+              <p className="text-sm text-gray-500 mt-3">First month FREE · Cancel anytime</p>
+            </div>
+          )}
+
         {/* Compressed Data Disclaimer */}
         {predictions.isCompressedData && (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
@@ -2053,15 +2074,60 @@ export default function PredictionsUnified({ user }) {
           </div>
         )}
 
-        {/* Info Footer */}
-        <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-6 text-center">
-          <Brain className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">All Predictions are FREE</h3>
-          <p className="text-gray-600">
-            Powered by statistical analysis and machine learning algorithms. 
-            Predictions become more accurate as you log more data.
-          </p>
-        </div>
+        </div>{/* end blur wrapper */}
+
+        {/* Info Footer — shows trial countdown or upgrade CTA */}
+        {isTrialing ? (
+          <div className="bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg p-6 text-center text-white">
+            <Brain className="w-12 h-12 mx-auto mb-3 opacity-90" />
+            <h3 className="text-lg font-semibold mb-2">🎉 You're on your free Pro trial</h3>
+            <p className="opacity-90 mb-1">
+              Full AI Predictions are included during your trial.
+            </p>
+            <p className="text-sm opacity-75">
+              {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining — upgrade anytime to keep access.
+            </p>
+            <button
+              onClick={() => navigate('/subscription')}
+              className="mt-4 px-6 py-2 bg-white text-teal-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              View Plans
+            </button>
+          </div>
+        ) : isPro ? (
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-6 text-center">
+            <Brain className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Predictions — Pro Feature</h3>
+            <p className="text-gray-600">
+              Powered by statistical analysis and machine learning algorithms.
+              Predictions become more accurate as you log more data.
+            </p>
+          </div>
+        ) : (
+          /* Free tier — upgrade CTA */
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-8 text-center text-white shadow-xl">
+            <Brain className="w-14 h-14 mx-auto mb-4 opacity-90" />
+            <h3 className="text-2xl font-bold mb-2">Unlock Full AI Predictions</h3>
+            <p className="opacity-90 mb-4 max-w-md mx-auto">
+              Your free trial has ended. Upgrade to Pro to see your complete forecasts — weight loss timeline, injury risk, habit streaks, and more.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => navigate('/subscription')}
+                className="px-8 py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-md"
+              >
+                Upgrade to Pro — $12.99/mo
+              </button>
+              <button
+                onClick={() => navigate('/subscription')}
+                className="px-8 py-3 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-colors border border-white/40"
+              >
+                View All Plans
+              </button>
+            </div>
+            <p className="text-sm opacity-75 mt-3">First month FREE · Cancel anytime · No hidden fees</p>
+          </div>
+        )}
       </div>
     </div>
   );

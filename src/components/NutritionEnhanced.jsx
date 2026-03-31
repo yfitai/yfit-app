@@ -7,6 +7,8 @@ import BarcodeScannerSelfContained from './BarcodeScannerSelfContained'
 import MacroSettings from './MacroSettings'
 import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
+import { useSubscription } from '../contexts/SubscriptionContext'
+import UpgradeModal from './UpgradeModal'
 import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import NutrientProgressCard from './NutrientProgressCard'
 
@@ -29,6 +31,11 @@ export default function NutritionEnhanced({ user: propUser }) {
   
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
+
+  // Subscription enforcement
+  const { canUse } = useSubscription()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [upgradeFeature, setUpgradeFeature] = useState({ feature: '', label: '', description: '' })
   const [userProfile, setUserProfile] = useState(null)
   const [tdee, setTdee] = useState(null)
   const [adjustedCalories, setAdjustedCalories] = useState(null)
@@ -183,6 +190,16 @@ export default function NutritionEnhanced({ user: propUser }) {
   }
 
   const handleOpenBarcodeScanner = (mealType) => {
+    const { allowed } = canUse('barcode_scanner')
+    if (!allowed) {
+      setUpgradeFeature({
+        feature: 'barcode_scanner',
+        label: 'Barcode Scanner',
+        description: 'Instantly log any packaged food by scanning its barcode. Macros and serving sizes are pulled automatically from the label.'
+      })
+      setShowUpgradeModal(true)
+      return
+    }
     setSelectedMealType(mealType)
     setShowBarcodeScanner(true)
   }
@@ -880,7 +897,7 @@ const handleBarcodeScanned = async (barcode) => {
           />
         )}
 
-        {showSaveTemplateModal && (
+         {showSaveTemplateModal && (
           <SaveNutritionTemplateModal
             mealType={templateMealType}
             meals={todaysMeals.filter(m => m.meal_type === templateMealType)}
@@ -888,11 +905,19 @@ const handleBarcodeScanned = async (barcode) => {
             onClose={() => setShowSaveTemplateModal(false)}
           />
         )}
+
+        {/* Subscription Upgrade Modal */}
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          feature={upgradeFeature.feature}
+          featureLabel={upgradeFeature.label}
+          featureDescription={upgradeFeature.description}
+        />
       </div>
     </div>
   )
 }
-
 // Meal Type Section Component
 function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onUseTemplate, onSaveAsTemplate }) {
   const [expanded, setExpanded] = useState(true)

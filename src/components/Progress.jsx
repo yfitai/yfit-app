@@ -586,6 +586,20 @@ export default function Progress({ user: propUser }) {
       
       {/* Progress Photos */}
       {user && <ProgressPhotos userId={user.id} />}
+
+      {/* Upgrade CTA — gentle nudge for free/trial users */}
+      <div className="mt-8 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-700 p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <p className="font-bold text-lg">Unlock Advanced Analytics</p>
+          <p className="text-white/80 text-sm mt-0.5">AI Predictions, injury risk forecasts, and deep performance insights — all in Pro.</p>
+        </div>
+        <a
+          href="/subscription"
+          className="flex-shrink-0 bg-white text-blue-700 font-bold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap"
+        >
+          View Plans →
+        </a>
+      </div>
     </div>
   )
 }

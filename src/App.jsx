@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase, getCurrentUser } from './lib/supabase'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
+import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { LiveUpdateService } from './services/liveUpdate'
 import { setAnalyticsUser, Analytics } from './lib/analytics'
 import './App.css'
@@ -13,6 +14,7 @@ import Footer from './components/Footer'
 import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
 import VersionChecker from './utils/VersionChecker'
 import FeedbackButton from './components/FeedbackButton'
+import ProRoute from './components/ProRoute'
 
 // Auth & onboarding loaded eagerly (needed before dashboard)
 import Auth from './components/Auth'
@@ -35,6 +37,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'))
 const Legal = lazy(() => import('./pages/Legal'))
 const ResetPassword = lazy(() => import('./components/ResetPassword'))
 const ManualCleanup = lazy(() => import('./pages/ManualCleanup'))
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
 
 // Minimal page-level loading spinner shown while lazy chunks download
 function PageLoader() {
@@ -169,53 +172,73 @@ function App() {
 
   return (
     <ErrorBoundary userId={user.id}>
-      <UnitPreferenceProvider>
-        <VersionChecker />
-        <BrowserRouter>
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-            <Navigation user={user} />
-            {/* Daily Insight strip — visible on all authenticated pages, dismissible per day */}
-            {user && <DailyInsight variant="strip" />}
+      <SubscriptionProvider>
+        <UnitPreferenceProvider>
+          <VersionChecker />
+          <BrowserRouter>
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+              <Navigation user={user} />
+              {/* Daily Insight strip — visible on all authenticated pages, dismissible per day */}
+              {user && <DailyInsight variant="strip" />}
 
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-                <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-                <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/legal" element={<Legal />} />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+                  <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+                  <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/legal" element={<Legal />} />
 
-                {/* Protected Routes - Login required */}
-                {user ? (
-                  <>
-                    <Route path="/dashboard" element={<Dashboard user={user} />} />
-                    <Route path="/goals" element={<Goals user={user} />} />
-                    <Route path="/nutrition" element={<NutritionUnified user={user} />} />
-                    <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
-                    <Route path="/fitness" element={<Fitness user={user} />} />
-                    <Route path="/fitness/form-analysis/:slug" element={<FormAnalysis user={user} />} />
-                    <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
-                    <Route path="/medications" element={<Medications user={user} />} />
-                    <Route path="/progress" element={<Progress user={user} />} />
-                    <Route path="/ai-coach-faq" element={<AICoachFAQ userId={user.id} />} />
-                    <Route path="/predictions" element={<PredictionsUnified user={user} />} />
-                    <Route path="/body-recomp" element={<BodyRecomp user={user} />} />
-                    <Route path="/manual-cleanup" element={<ManualCleanup />} />
-                  </>
-                ) : (
-                  <Route path="*" element={<Navigate to="/login" replace />} />
-                )}
-              </Routes>
-            </Suspense>
+                  {/* Protected Routes - Login required */}
+                  {user ? (
+                    <>
+                      {/* Free + Pro routes */}
+                      <Route path="/dashboard" element={<Dashboard user={user} />} />
+                      <Route path="/goals" element={<Goals user={user} />} />
+                      <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                      <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
+                      <Route path="/fitness" element={<Fitness user={user} />} />
+                      <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
+                      <Route path="/progress" element={<Progress user={user} />} />
+                      <Route path="/body-recomp" element={<BodyRecomp user={user} />} />
+                      <Route path="/manual-cleanup" element={<ManualCleanup />} />
+                      <Route path="/subscription" element={<SubscriptionPage user={user} />} />
 
-            <Footer />
+                      {/* Pro-only routes — gated with ProRoute */}
+                      <Route path="/medications" element={
+                        <ProRoute feature="medication_tracking" featureLabel="Medication Tracking">
+                          <Medications user={user} />
+                        </ProRoute>
+                      } />
+                      {/* Predictions: free users see blurred preview (handled inside PredictionsUnified) */}
+                      <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                      {/* Usage-limited routes: free users get 3/month form analysis, 10/month AI coach */}
+                      <Route path="/fitness/form-analysis/:slug" element={
+                        <ProRoute feature="form_analysis" featureLabel="AI Form Analysis">
+                          <FormAnalysis user={user} />
+                        </ProRoute>
+                      } />
+                      <Route path="/ai-coach-faq" element={
+                        <ProRoute feature="ai_coach" featureLabel="AI Coach">
+                          <AICoachFAQ userId={user.id} />
+                        </ProRoute>
+                      } />
+                    </>
+                  ) : (
+                    <Route path="*" element={<Navigate to="/login" replace />} />
+                  )}
+                </Routes>
+              </Suspense>
 
-            {/* Floating feedback button - visible on all authenticated pages */}
-            <FeedbackButton user={user} />
-          </div>
-        </BrowserRouter>
-      </UnitPreferenceProvider>
+              <Footer />
+
+              {/* Floating feedback button - visible on all authenticated pages */}
+              <FeedbackButton user={user} />
+            </div>
+          </BrowserRouter>
+        </UnitPreferenceProvider>
+      </SubscriptionProvider>
     </ErrorBoundary>
   )
 }
