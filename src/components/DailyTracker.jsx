@@ -170,7 +170,11 @@ export default function DailyTracker({ user }) {
         setLastMeasurementDate(new Date(data[0].measured_at).toLocaleDateString());
         const measurementData = {};
         data.forEach(m => {
-          measurementData[`${m.measurement_type}_cm`] = m.measurement_value;
+          // DB always stores in cm — convert back to inches for imperial users
+          const displayValue = unitSystem === 'imperial'
+            ? parseFloat((m.measurement_value / 2.54).toFixed(1))
+            : m.measurement_value;
+          measurementData[`${m.measurement_type}_cm`] = displayValue;
         });
         setMeasurements(measurementData);
       }
