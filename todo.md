@@ -98,8 +98,8 @@
 - [x] NutritionTemplateModal.jsx - loadTemplates now loads from Supabase
 
 ### Weekly Planner Template Issues
-- [ ] Apply template fails with "Failed to add meal"
-- [ ] Need console logs to debug
+- [x] Apply template fails with "Failed to add meal"
+- [x] **FIXED:** NutritionTemplateModal was fetching templates without meal_template_items (select('*') only). Template had no meals array so nothing was applied. Fixed by joining meal_template_items and mapping to meals array with correct field names.
 
 ### Supabase 406 Errors
 - [x] User profile missing (user deleted goals during Start Fresh test)
@@ -582,3 +582,13 @@
 - ✅ **Promise lifetime Pro access** ($249.99 value) as thank you
 
 ---
+
+## 🍽️ Nutrition Page UX Improvements (Apr 3, 2026)
+
+### Food Search Bar
+- [ ] Search bar does not clear when user wants to search for a different food — must manually backspace
+- [ ] Add a clear/X button (or auto-clear on new search intent) so users can start a fresh search without backspacing
+
+### Edit Logged Meal Items
+- [ ] Add ability to click on a logged food item in the meals list to edit serving size or quantity
+- [ ] Editing should recalculate and update the macros (calories, protein, carbs, fat) for that entry
