@@ -201,9 +201,21 @@ export default function Progress({ user: propUser }) {
       .maybeSingle()
 
     if (goalsData) {
-      // Calculate current BMI from height and starting weight
-      const currentBMI = goalsData.height_cm && goalsData.weight_kg
-        ? (goalsData.weight_kg / Math.pow(goalsData.height_cm / 100, 2))
+      // Fetch the most recent weight log to use as actual current weight
+      const { data: latestWeightLog } = await supabase
+        .from('weight_logs')
+        .select('weight_kg, logged_at')
+        .eq('user_id', userId)
+        .order('logged_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      // Use latest weight log if available, otherwise fall back to goal-setup weight
+      const actualCurrentWeightKg = latestWeightLog?.weight_kg || goalsData.weight_kg
+
+      // Calculate current BMI from height and actual current weight
+      const currentBMI = goalsData.height_cm && actualCurrentWeightKg
+        ? (actualCurrentWeightKg / Math.pow(goalsData.height_cm / 100, 2))
         : null
 
       // Calculate goal BMI from height and target weight
@@ -211,13 +223,23 @@ export default function Progress({ user: propUser }) {
         ? (goalsData.target_weight_kg / Math.pow(goalsData.height_cm / 100, 2))
         : null
 
-      // starting_weight_kg is the weight the user entered when they set goals
-      const startingWeightLbs = (goalsData.starting_weight_kg || goalsData.weight_kg)
-        ? (goalsData.starting_weight_kg || goalsData.weight_kg) * 2.20462
+      // starting_weight_kg is the weight the user entered when they first set goals
+      const startingWeightKg = goalsData.starting_weight_kg || goalsData.weight_kg
+      const startingWeightLbs = startingWeightKg ? startingWeightKg * 2.20462 : null
+      const startingBMI = goalsData.height_cm && startingWeightKg
+        ? (startingWeightKg / Math.pow(goalsData.height_cm / 100, 2))
         : null
-      const startingBMI = goalsData.height_cm && (goalsData.starting_weight_kg || goalsData.weight_kg)
-        ? ((goalsData.starting_weight_kg || goalsData.weight_kg) / Math.pow(goalsData.height_cm / 100, 2))
-        : null
+
+      // Fetch latest body composition log for current body fat
+      const { data: latestBodyComp } = await supabase
+        .from('body_composition_logs')
+        .select('body_fat_percentage, bmi')
+        .eq('user_id', userId)
+        .order('logged_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const actualCurrentBodyFat = latestBodyComp?.body_fat_percentage || goalsData.starting_body_fat_percentage || null
 
       setStartingMetrics({
         weight: startingWeightLbs,
@@ -225,8 +247,8 @@ export default function Progress({ user: propUser }) {
         bmi: startingBMI
       })
       setCurrentMetrics({
-        weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null,
-        bodyFat: goalsData.starting_body_fat_percentage || null,
+        weight: actualCurrentWeightKg ? actualCurrentWeightKg * 2.20462 : null,
+        bodyFat: actualCurrentBodyFat,
         bmi: currentBMI
       })
       setGoalMetrics({
@@ -236,7 +258,7 @@ export default function Progress({ user: propUser }) {
       })
 
       console.log('Starting metrics:', { weight: startingWeightLbs, bmi: startingBMI })
-      console.log('Current metrics:', { weight: goalsData.weight_kg ? goalsData.weight_kg * 2.20462 : null, bmi: currentBMI })
+      console.log('Current metrics (from latest log):', { weight: actualCurrentWeightKg ? actualCurrentWeightKg * 2.20462 : null, bmi: currentBMI })
       console.log('Goal metrics:', { weight: goalsData.target_weight_kg ? goalsData.target_weight_kg * 2.20462 : null, bmi: goalBMI })
     }
   }
@@ -244,23 +266,50 @@ export default function Progress({ user: propUser }) {
   const calculatePredictions = () => {
     if (weightData.length < 2) return
 
-    // Calculate trend
-    const recentWeights = weightData.slice(-7) // Last 7 data points
+    // Use the most recent weight log entry as current weight for prediction
+    const latestWeight = weightData[weightData.length - 1].weight
+
+    // Calculate weekly rate using last 7 data points (or all if fewer)
+    const recentWeights = weightData.slice(-7)
     const weightChange = recentWeights[recentWeights.length - 1].weight - recentWeights[0].weight
-    const daysSpan = 7
+    // Calculate actual days spanned between first and last of the recent entries
+    const firstTs = new Date(recentWeights[0].timestamp || recentWeights[0].date).getTime()
+    const lastTs = new Date(recentWeights[recentWeights.length - 1].timestamp || recentWeights[recentWeights.length - 1].date).getTime()
+    const daysSpan = Math.max(1, (lastTs - firstTs) / (1000 * 60 * 60 * 24))
     const weeklyRate = (weightChange / daysSpan) * 7
 
-    // Project to goal
-    if (goalMetrics && currentMetrics) {
-      const weightToLose = currentMetrics.weight - goalMetrics.weight
-      const weeksToGoal = Math.abs(weightToLose / weeklyRate)
-      const projectedDate = new Date(Date.now() + weeksToGoal * 7 * 24 * 60 * 60 * 1000)
+    // Guard against zero or near-zero rate (no meaningful trend yet)
+    if (Math.abs(weeklyRate) < 0.01) return
+
+    // Project to goal using actual current weight from logs
+    if (goalMetrics && goalMetrics.weight != null) {
+      const weightToLose = latestWeight - goalMetrics.weight
+
+      // If already at or past goal, show achieved
+      if (Math.abs(weightToLose) < 0.5) {
+        setPredictions({
+          weeklyRate: weeklyRate.toFixed(2),
+          weeksToGoal: 0,
+          projectedDate: 'Goal Reached!',
+          onTrack: true,
+          goalReached: true
+        })
+        return
+      }
+
+      // If trending wrong direction, still show but flag
+      const trendingRight = (weightToLose > 0 && weeklyRate < 0) || (weightToLose < 0 && weeklyRate > 0)
+      const weeksToGoal = trendingRight ? Math.abs(weightToLose / weeklyRate) : null
+      const projectedDate = weeksToGoal
+        ? new Date(Date.now() + weeksToGoal * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : null
 
       setPredictions({
         weeklyRate: weeklyRate.toFixed(2),
-        weeksToGoal: Math.ceil(weeksToGoal),
-        projectedDate: projectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-        onTrack: Math.abs(weeklyRate) >= 0.5 && Math.abs(weeklyRate) <= 2
+        weeksToGoal: weeksToGoal ? Math.ceil(weeksToGoal) : null,
+        projectedDate: projectedDate || 'Adjust your pace',
+        onTrack: trendingRight && Math.abs(weeklyRate) >= 0.5 && Math.abs(weeklyRate) <= 2,
+        trendingWrong: !trendingRight
       })
     }
   }
@@ -336,22 +385,56 @@ export default function Progress({ user: propUser }) {
 
       {/* Predictive Analytics Banner */}
       {predictions && (
-        <div className={`mb-8 p-6 rounded-xl ${predictions.onTrack ? 'bg-green-50 border-2 border-green-200' : 'bg-yellow-50 border-2 border-yellow-200'}`}>
+        <div className={`mb-8 p-6 rounded-xl ${
+          predictions.goalReached
+            ? 'bg-blue-50 border-2 border-blue-200'
+            : predictions.onTrack
+              ? 'bg-green-50 border-2 border-green-200'
+              : predictions.trendingWrong
+                ? 'bg-red-50 border-2 border-red-200'
+                : 'bg-yellow-50 border-2 border-yellow-200'
+        }`}>
           <div className="flex items-start gap-4">
-            <Zap className={`w-8 h-8 ${predictions.onTrack ? 'text-green-600' : 'text-yellow-600'}`} />
+            <Zap className={`w-8 h-8 ${
+              predictions.goalReached ? 'text-blue-600'
+              : predictions.onTrack ? 'text-green-600'
+              : predictions.trendingWrong ? 'text-red-600'
+              : 'text-yellow-600'
+            }`} />
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-2">
-                {predictions.onTrack ? '🎯 You\'re On Track!' : '⚠️ Adjust Your Pace'}
+                {predictions.goalReached
+                  ? '🏆 Goal Reached!'
+                  : predictions.onTrack
+                    ? '🎯 You\'re On Track!'
+                    : predictions.trendingWrong
+                      ? '↩️ Trending Away from Goal'
+                      : '⚠️ Adjust Your Pace'}
               </h3>
-              <p className="text-gray-700 mb-2">
-                At your current pace of <strong>{Math.abs(parseFloat(predictions.weeklyRate))} lbs/week</strong>, 
-                you'll reach your goal weight in approximately <strong>{predictions.weeksToGoal} weeks</strong> 
-                (by <strong>{predictions.projectedDate}</strong>).
-              </p>
-              {!predictions.onTrack && (
-                <p className="text-sm text-gray-600">
-                  Tip: Aim for 0.5-2 lbs per week for sustainable, healthy weight loss.
-                </p>
+              {predictions.goalReached ? (
+                <p className="text-gray-700">Congratulations! You have reached your goal weight. Keep up the great work!</p>
+              ) : predictions.trendingWrong ? (
+                <>
+                  <p className="text-gray-700 mb-2">
+                    Your weight is currently moving <strong>away</strong> from your goal at <strong>{Math.abs(parseFloat(predictions.weeklyRate))} lbs/week</strong>.
+                  </p>
+                  <p className="text-sm text-gray-600">Review your nutrition and workout plan to get back on track.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-700 mb-2">
+                    At your current pace of <strong>{Math.abs(parseFloat(predictions.weeklyRate))} lbs/week</strong>,
+                    you'll reach your goal weight in approximately <strong>{predictions.weeksToGoal} weeks</strong>
+                    {predictions.projectedDate && predictions.projectedDate !== 'Adjust your pace' && (
+                      <> (by <strong>{predictions.projectedDate}</strong>)</>
+                    )}.
+                  </p>
+                  {!predictions.onTrack && (
+                    <p className="text-sm text-gray-600">
+                      Tip: Aim for 0.5–2 lbs per week for sustainable, healthy progress.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
