@@ -9,7 +9,7 @@ import NutritionTemplateModal from './Nutrition/NutritionTemplateModal'
 import SaveNutritionTemplateModal from './Nutrition/SaveNutritionTemplateModal'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import UpgradeModal from './UpgradeModal'
-import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react'
 import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
@@ -80,6 +80,11 @@ export default function NutritionEnhanced({ user: propUser }) {
   
   // Date selection state
   const [selectedDate, setSelectedDate] = useState(formatDateString(new Date()))
+
+  // Edit meal state
+  const [editingMeal, setEditingMeal] = useState(null)
+  const [editServingQuantity, setEditServingQuantity] = useState(1)
+  const [editServingUnit, setEditServingUnit] = useState('serving')
 
   useEffect(() => {
     loadData()
@@ -351,6 +356,77 @@ const handleBarcodeScanned = async (barcode) => {
     }
 
     await loadTodaysMeals(user.id, selectedDate)
+  }
+
+  const handleEditMeal = (meal) => {
+    setEditingMeal(meal)
+    setEditServingQuantity(meal.serving_quantity || 1)
+    setEditServingUnit(meal.serving_unit || 'serving')
+  }
+
+  const handleSaveEditedMeal = async () => {
+    if (!editingMeal) return
+
+    // Reconstruct per-100g nutrition from the stored meal data
+    // We reverse the original multiplier to get per-100g base values
+    const knownUnits = [
+      { value: 'label_serving', toGrams: editingMeal.serving_grams_per_unit || 100 },
+      { value: 'piece', toGrams: editingMeal.serving_grams_per_unit || 100 },
+      { value: 'serving', toGrams: editingMeal.serving_grams_per_unit || 100 },
+      { value: 'g', toGrams: 1 },
+      { value: 'oz', toGrams: 28.35 },
+      { value: 'lb', toGrams: 453.59 },
+      { value: 'ml', toGrams: 1 },
+      { value: 'fl_oz', toGrams: 29.57 },
+      { value: 'cup', toGrams: 240 },
+      { value: 'tbsp', toGrams: 15 },
+      { value: 'tsp', toGrams: 5 },
+    ]
+
+    // Calculate the original multiplier from stored serving data
+    const originalUnit = knownUnits.find(u => u.value === (editingMeal.serving_unit || 'serving')) || { toGrams: 1 }
+    const originalTotalGrams = (editingMeal.serving_quantity || 1) * originalUnit.toGrams
+    const originalMultiplier = originalTotalGrams / 100
+
+    // Derive per-100g values by reversing the original multiplier
+    const per100gCalories = originalMultiplier > 0 ? (editingMeal.calories || 0) / originalMultiplier : 0
+    const per100gProtein = originalMultiplier > 0 ? (editingMeal.protein_g || editingMeal.protein || 0) / originalMultiplier : 0
+    const per100gCarbs = originalMultiplier > 0 ? (editingMeal.carbs_g || editingMeal.carbs || 0) / originalMultiplier : 0
+    const per100gFat = originalMultiplier > 0 ? (editingMeal.fat_g || editingMeal.fat || 0) / originalMultiplier : 0
+    const per100gFiber = originalMultiplier > 0 ? (editingMeal.fiber || 0) / originalMultiplier : 0
+    const per100gSugar = originalMultiplier > 0 ? (editingMeal.sugar || 0) / originalMultiplier : 0
+    const per100gSodium = originalMultiplier > 0 ? (editingMeal.sodium || 0) / originalMultiplier : 0
+
+    // Calculate new multiplier from the new serving
+    const newUnit = knownUnits.find(u => u.value === editServingUnit) || { toGrams: 1 }
+    const newTotalGrams = (editServingQuantity || 1) * newUnit.toGrams
+    const newMultiplier = newTotalGrams / 100
+
+    const updatedData = {
+      calories: Math.round(per100gCalories * newMultiplier),
+      protein_g: Math.round(per100gProtein * newMultiplier),
+      carbs_g: Math.round(per100gCarbs * newMultiplier),
+      fat_g: Math.round(per100gFat * newMultiplier),
+      fiber: Math.round(per100gFiber * newMultiplier),
+      sugar: Math.round(per100gSugar * newMultiplier),
+      sodium: Math.round(per100gSodium * newMultiplier),
+      serving_quantity: editServingQuantity,
+      serving_unit: editServingUnit,
+    }
+
+    const { error } = await supabase
+      .from('meals')
+      .update(updatedData)
+      .eq('id', editingMeal.id)
+
+    if (error) {
+      console.error('Error updating meal:', error)
+      alert('Error updating meal. Please try again.')
+      return
+    }
+
+    await loadTodaysMeals(user.id, selectedDate)
+    setEditingMeal(null)
   }
 
   const handleSaveToMyFoods = async (alsoLog) => {
@@ -814,6 +890,7 @@ const handleBarcodeScanned = async (barcode) => {
             onAddFood={() => handleOpenFoodSearch(mealType)}
             onScanBarcode={() => handleOpenBarcodeScanner(mealType)}
             onDeleteMeal={handleDeleteMeal}
+            onEditMeal={handleEditMeal}
             onUseTemplate={() => handleUseTemplate(mealType)}
             onSaveAsTemplate={() => handleSaveAsTemplate(mealType)}
           />
@@ -914,12 +991,25 @@ const handleBarcodeScanned = async (barcode) => {
           featureLabel={upgradeFeature.label}
           featureDescription={upgradeFeature.description}
         />
+
+        {/* Edit Meal Modal */}
+        {editingMeal && (
+          <EditMealModal
+            meal={editingMeal}
+            servingQuantity={editServingQuantity}
+            setServingQuantity={setEditServingQuantity}
+            servingUnit={editServingUnit}
+            setServingUnit={setEditServingUnit}
+            onSave={handleSaveEditedMeal}
+            onCancel={() => setEditingMeal(null)}
+          />
+        )}
       </div>
     </div>
   )
 }
 // Meal Type Section Component
-function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onUseTemplate, onSaveAsTemplate }) {
+function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onEditMeal, onUseTemplate, onSaveAsTemplate }) {
   const [expanded, setExpanded] = useState(true)
 
   const mealTypeIcons = {
@@ -984,12 +1074,22 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                       </p>
                     )}
                   </div>
-                  <button
-                    onClick={() => onDeleteMeal(meal.id)}
-                    className="text-red-500 hover:text-red-700 p-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onEditMeal && onEditMeal(meal)}
+                      className="text-blue-400 hover:text-blue-600 p-2"
+                      title="Edit serving size"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => onDeleteMeal(meal.id)}
+                      className="text-red-500 hover:text-red-700 p-2"
+                      title="Delete meal"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1204,6 +1304,137 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Edit Meal Modal Component
+function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onSave, onCancel }) {
+  // Available units (same as ServingSizeSelector)
+  const units = [
+    { value: 'label_serving', label: 'Label Serving', toGrams: meal.serving_grams_per_unit || 100 },
+    { value: 'piece', label: '1 Piece / Whole', toGrams: meal.serving_grams_per_unit || 100 },
+    { value: 'serving', label: 'Serving', toGrams: meal.serving_grams_per_unit || 100 },
+    { value: 'g', label: 'Grams (g)', toGrams: 1 },
+    { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+    { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+    { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
+    { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
+    { value: 'cup', label: 'Cups', toGrams: 240 },
+    { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
+    { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
+  ]
+
+  // Reverse-calculate per-100g values from stored meal
+  const originalUnit = units.find(u => u.value === (meal.serving_unit || 'serving')) || { toGrams: 1 }
+  const originalTotalGrams = (meal.serving_quantity || 1) * originalUnit.toGrams
+  const originalMultiplier = originalTotalGrams / 100
+
+  const per100gCalories = originalMultiplier > 0 ? (meal.calories || 0) / originalMultiplier : 0
+  const per100gProtein = originalMultiplier > 0 ? (meal.protein_g || meal.protein || 0) / originalMultiplier : 0
+  const per100gCarbs = originalMultiplier > 0 ? (meal.carbs_g || meal.carbs || 0) / originalMultiplier : 0
+  const per100gFat = originalMultiplier > 0 ? (meal.fat_g || meal.fat || 0) / originalMultiplier : 0
+
+  // Calculate preview with new serving
+  const newUnit = units.find(u => u.value === servingUnit) || { toGrams: 1 }
+  const newTotalGrams = (servingQuantity || 0) * newUnit.toGrams
+  const newMultiplier = newTotalGrams / 100
+
+  const previewCalories = Math.round(per100gCalories * newMultiplier)
+  const previewProtein = Math.round(per100gProtein * newMultiplier)
+  const previewCarbs = Math.round(per100gCarbs * newMultiplier)
+  const previewFat = Math.round(per100gFat * newMultiplier)
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">Edit Serving Size</h2>
+          <p className="text-sm text-gray-600 mt-1">{meal.food_name}</p>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {/* Quantity and Unit */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Quantity &amp; Unit
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={servingQuantity}
+                onChange={(e) => {
+                  const value = e.target.value
+                  if (value === '' || value === '0') {
+                    setServingQuantity('')
+                  } else {
+                    setServingQuantity(parseFloat(value) || 1)
+                  }
+                }}
+                onFocus={() => setServingQuantity('')}
+                min="0.1"
+                step="0.1"
+                className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <select
+                value={servingUnit}
+                onChange={(e) => setServingUnit(e.target.value)}
+                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+              >
+                {units.map(unit => (
+                  <option key={unit.value} value={unit.value}>
+                    {unit.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              ≈ {newTotalGrams.toFixed(1)}g total
+            </p>
+          </div>
+
+          {/* Nutrition Preview */}
+          <div className="bg-blue-50 rounded-lg p-4 mb-4">
+            <h3 className="font-semibold text-gray-800 mb-2">Updated Nutrition</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="text-gray-600">Calories:</span>
+                <span className="font-semibold text-gray-900 ml-2">{previewCalories} kcal</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Protein:</span>
+                <span className="font-semibold text-blue-600 ml-2">{previewProtein}g</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Carbs:</span>
+                <span className="font-semibold text-orange-600 ml-2">{previewCarbs}g</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Fat:</span>
+                <span className="font-semibold text-purple-600 ml-2">{previewFat}g</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onSave}
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
+            >
+              Save Changes
+            </button>
           </div>
         </div>
       </div>

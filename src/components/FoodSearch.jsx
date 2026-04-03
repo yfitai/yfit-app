@@ -187,7 +187,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               value={query}
               onChange={handleSearchChange}
               placeholder="Search for food..."
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${query ? 'pr-10' : ''}`}
               autoFocus
             />
             <svg
@@ -203,6 +203,20 @@ const handleToggleFavorite = async (food, isFavorited) => {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
+            {/* Clear button — only shown when there is text in the search bar */}
+            {query.length > 0 && (
+              <button
+                onClick={() => {
+                  setQuery('')
+                  setResults([])
+                  setShowQuickAdd(true)
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-700 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                title="Clear search"
+              >
+                ×
+              </button>
+            )}
           </div>
 
           {/* Filter Chips */}
