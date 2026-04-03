@@ -30,7 +30,7 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
         
         const { data, error } = await supabase
           .from('meal_templates')
-          .select('*, meal_template_items(*)')
+          .select('*')
           .eq('user_id', user.id)
           .eq('meal_type', plannerMealType)
           .order('created_at', { ascending: false })
@@ -40,27 +40,13 @@ export default function NutritionTemplateModal({ mealType, onSelectTemplate, onC
           setTemplates([])
         } else {
           console.log('[NutritionTemplate] Loaded templates from Supabase:', data)
-          // Convert template_name to name, string macros to numbers, and map meal_template_items to meals
+          // Convert template_name to name and string macros to numbers for display
           const formattedTemplates = (data || []).map(t => ({
             ...t,
             name: t.template_name,
             total_protein: parseFloat(t.total_protein) || 0,
             total_carbs: parseFloat(t.total_carbs) || 0,
-            total_fat: parseFloat(t.total_fat) || 0,
-            // Map meal_template_items to meals so handleSelectTemplate can iterate them
-            meals: (t.meal_template_items || []).map(item => ({
-              food_name: item.food_name,
-              brand: item.brand || '',
-              calories: item.calories,
-              protein: item.protein_g ?? item.protein ?? 0,
-              carbs: item.carbs_g ?? item.carbs ?? 0,
-              fat: item.fat_g ?? item.fat ?? 0,
-              fiber: item.fiber || 0,
-              sugar: item.sugar || 0,
-              sodium: item.sodium || 0,
-              serving_quantity: item.serving_quantity,
-              serving_unit: item.serving_unit
-            }))
+            total_fat: parseFloat(t.total_fat) || 0
           }))
           setTemplates(formattedTemplates)
         }
