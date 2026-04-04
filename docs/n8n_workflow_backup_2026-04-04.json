@@ -1,0 +1,1402 @@
+{
+  "updatedAt": "2026-04-04T03:31:01.184Z",
+  "createdAt": "2026-03-12T22:35:30.505Z",
+  "id": "h7bRds9UOUfmP36F",
+  "name": "YFIT Social Media Automation v2",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "yfit-social-content",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook from Supabase",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        304
+      ],
+      "webhookId": "yfit-social-content"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse incoming payload from Supabase generate-social-content function\n// Split content items into:\n//   - video_items: tiktok, instagram, youtube, facebook (need voiceover + video)\n//   - text_items: pinterest, linkedin (text/image posts only)\n\nconst payload = $input.first().json.body || $input.first().json;\n\nconst videoItems = (payload.content_items || []).filter(item =>\n  ['tiktok', 'instagram', 'youtube', 'facebook'].includes(item.platform)\n);\n\nconst textItems = (payload.content_items || []).filter(item =>\n  ['pinterest', 'linkedin'].includes(item.platform)\n);\n\n// Use first video item's script for voiceover (all video platforms share same script)\nconst primaryVideoItem = videoItems[0] || {};\n\nreturn [{\n  json: {\n    run_date: payload.run_date,\n    content_angle: payload.content_angle,\n    pexels_query: payload.pexels_query || 'fitness workout health',\n    voice_gender: payload.voice_gender || 'female',\n    script: payload.script || primaryVideoItem.script || '',\n    video_items: videoItems,\n    text_items: textItems,\n    all_items: payload.content_items || [],\n  }\n}];"
+      },
+      "id": "parse-payload",
+      "name": "Parse Supabase Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.elevenlabs.io/v1/text-to-speech/' + ($json.voice_gender === 'male' ? 'AZnzlk1XvdvUeBnXmlld' : '21m00Tcm4TlvDq8ikWAM') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_c73588c45da807e6ba8119f20e1fe445fb496d336c837d11"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ text: $json.script, model_id: \"eleven_turbo_v2\", voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.3, use_speaker_boost: true } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "elevenlabs-voiceover",
+      "name": "ElevenLabs \u2014 Generate Voiceover",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        208
+      ],
+      "notes": "Female voice: 21m00Tcm4TlvDq8ikWAM (Rachel - warm, educational). Male voice: AZnzlk1XvdvUeBnXmlld (Adam - professional, workout content). API key hardcoded."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/yfit-voiceovers/voiceovers/{{ $('Parse Supabase Payload').first().json.run_date }}_{{ $('Parse Supabase Payload').first().json.content_angle.replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80) }}.mp3",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzEyMjk2NiwiZXhwIjoyMDcyNjk4OTY2fQ.2wMo_cE2q9xpVAj5fMrOwrASN8Dps010sTPVxw9Cmp0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "x-upsert",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "upload-audio-supabase",
+      "name": "Upload Audio to Supabase Storage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        912,
+        208
+      ],
+      "notes": "Uploads ElevenLabs MP3 to Supabase Storage via REST API (no credential node needed). Replace YOUR_SUPABASE_PROJECT_ID and YOUR_SUPABASE_SERVICE_KEY."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the audio public URL from Supabase Storage\n// IMPORTANT: Must match exact URL pattern used by Upload Audio to Supabase Storage node\n\nconst supabaseUrl = 'https://mxggxpoxgqubojvumjlt.supabase.co';\nconst bucketName = 'yfit-voiceovers';\n\nconst parseData = $('Parse Supabase Payload').first().json;\nconst runDate = parseData.run_date || new Date().toISOString().split('T')[0];\nconst rawAngle = parseData.content_angle || 'workout';\n\n// Use EXACT same sanitization as Upload Audio node:\n// .replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80)\nconst sanitizedAngle = rawAngle.replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80);\n\n// Build the public URL - no extra encoding needed since the filename is already sanitized\nconst audioUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/voiceovers/${runDate}_${sanitizedAngle}.mp3`;\n\nconsole.log('Audio URL:', audioUrl);\n\n// Get first video item for caption text\nconst firstVideoItem = (parseData.video_items || [])[0] || {};\nconst captionText = ((firstVideoItem.caption || parseData.script || '').split('\\n')[0]).substring(0, 60);\n\nreturn [{\n  json: {\n    ...parseData,\n    voiceover_url: audioUrl,\n    caption_text: captionText,\n    video_items: parseData.video_items,\n    text_items: parseData.text_items,\n  }\n}];"
+      },
+      "id": "prepare-assembly-request",
+      "name": "Prepare Assembly Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://yfitai-yfit-video-service-production.up.railway.app/assemble",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer yfit-video-secret-2026"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "run_date",
+              "value": "={{ $json.run_date }}"
+            },
+            {
+              "name": "content_angle",
+              "value": "={{ $json.content_angle }}"
+            },
+            {
+              "name": "caption_text",
+              "value": "={{ $json.caption_text }}"
+            },
+            {
+              "name": "voiceover_url",
+              "value": "={{ $json.voiceover_url }}"
+            },
+            {
+              "name": "video_items",
+              "value": "={{ JSON.stringify($json.video_items) }}"
+            },
+            {
+              "name": "text_items",
+              "value": "={{ JSON.stringify($json.text_items) }}"
+            },
+            {
+              "name": "dry_run",
+              "value": "=false"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "id": "assemble-video",
+      "name": "Assemble Video (Railway ffmpeg)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        208
+      ],
+      "notes": "Calls Supabase assemble-video Edge Function. Pexels fetches stock footage, FFmpeg combines with ElevenLabs audio + captions. Returns public video URL. Timeout: 2 minutes."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if video assembly succeeded\nconst result = $input.first().json;\n\nif (!result.success || !result.video_url) {\n  throw new Error('Video assembly failed: ' + (result.error || 'No video URL returned'));\n}\n\nconst parseData = $('Parse Supabase Payload').first().json;\n\n// Return one item per video platform\nreturn parseData.video_items.map(item => ({\n  json: {\n    platform: item.platform,\n    video_url: result.video_url,\n    caption: item.caption || '',\n    title: item.script ? item.script.substring(0, 100) : 'YFIT Fitness Tip',\n    hashtags: item.hashtags || [],\n    content_angle: parseData.content_angle,\n    run_date: parseData.run_date,\n  }\n}));"
+      },
+      "id": "split-by-platform",
+      "name": "Split by Video Platform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.upload-post.com/api/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Apikey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cHBvcnRAeWZpdGFpLmNvbSIsImV4cCI6NDkyNjk1OTUwMSwianRpIjoiNTFiNjY0YWQtMGNkZS00ODI3LTgzMWMtNDY4NTVhODJkZTA1In0.3ZkZ5_MzFvu7nmlVcJNtbz4SgtxibhQltUWMFGSWkbU"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.video_url }}"
+            },
+            {
+              "name": "platform[]",
+              "value": "={{ $json.platform }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "user",
+              "value": "YFIT"
+            }
+          ]
+        },
+        "options": {},
+        "method": "POST"
+      },
+      "id": "upload-post-video",
+      "name": "Upload-Post \u2014 Post Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        208
+      ],
+      "notes": "Posts video to each platform via Upload-Post API. API key hardcoded. Runs once per platform (tiktok, instagram, youtube, facebook) due to split above."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle Pinterest and LinkedIn text posts\n// These don't need video \u2014 just text + hashtags via Upload-Post\n\nconst parseData = $('Parse Supabase Payload').first().json;\nreturn (parseData.text_items || []).map(item => ({\n  json: {\n    platform: item.platform,\n    caption: item.caption || item.script || '',\n    hashtags: (item.hashtags || []).join(' '),\n  }\n}));"
+      },
+      "id": "prepare-text-posts",
+      "name": "Prepare Text Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://v1.upload-post.com/api/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Apikey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cHBvcnRAeWZpdGFpLmNvbSIsImV4cCI6NDkyNjk1OTUwMSwianRpIjoiNTFiNjY0YWQtMGNkZS00ODI3LTgzMWMtNDY4NTVhODJkZTA1In0.3ZkZ5_MzFvu7nmlVcJNtbz4SgtxibhQltUWMFGSWkbU"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "platform[]",
+              "value": "={{ $json.platform }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.caption + '\\n\\n' + $json.hashtags }}"
+            },
+            {
+              "name": "user",
+              "value": "YFIT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "upload-post-text",
+      "name": "Upload-Post \u2014 Post Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        432
+      ],
+      "notes": "Posts text content to Pinterest and LinkedIn. No video needed for these platforms."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect results from both video and text posting branches\n// Log summary to console\n\nconst videoResult = $input.first().json;\nconsole.log('Post result:', JSON.stringify(videoResult));\n\nreturn [{\n  json: {\n    success: true,\n    posted_at: new Date().toISOString(),\n    result: videoResult,\n  }\n}];"
+      },
+      "id": "log-results",
+      "name": "Log Post Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"message\": \"YFIT content generated and posted to all platforms\", \"timestamp\": \"{{ $now.toISO() }}\" }",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2224,
+        304
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "manual-test-trigger",
+      "name": "Manual Test Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        128
+      ],
+      "notes": "Click 'Test workflow' to run a test. Feeds sample data into the pipeline."
+    },
+    {
+      "parameters": {
+        "jsCode": "// YFIT Social Media \u2014 Test Data\n// Edit this to change what gets tested.\n// This simulates what Supabase normally sends to the webhook.\n\nreturn [{\n  json: {\n    run_date: new Date().toISOString().split('T')[0],\n    content_angle: 'Test: 3 quick tips to boost your morning workout energy',\n    pexels_query: 'fitness workout morning',\n    voice_gender: 'female',\n    script: 'Here are 3 quick tips to boost your morning workout energy. Number one: hydrate immediately after waking up. Number two: do a 5-minute dynamic warm-up. Number three: eat a light protein snack 30 minutes before training.',\n    dry_run: true,  // Set to false to actually post to social media\n    content_items: [\n      {\n        platform: 'tiktok',\n        script: 'Here are 3 quick tips to boost your morning workout energy. Hydrate, warm up, and fuel up!',\n        caption: '3 morning workout tips that actually work \ud83d\udcaa #fitness #morningworkout #yfitai',\n        hashtags: ['#fitness', '#morningworkout', '#yfitai', '#healthylifestyle']\n      },\n      {\n        platform: 'instagram',\n        script: 'Here are 3 quick tips to boost your morning workout energy.',\n        caption: 'Start your morning right \ud83c\udf05 These 3 tips will transform your workout energy. Save this post! #YFIT #FitnessMotivation',\n        hashtags: ['#YFIT', '#FitnessMotivation', '#MorningWorkout']\n      },\n      {\n        platform: 'linkedin',\n        title: '3 Science-Backed Tips to Maximize Morning Workout Performance',\n        body: 'Morning workouts are proven to boost productivity and mood throughout the day. Here are 3 evidence-based strategies: 1) Hydration first \u2014 drink 500ml of water immediately upon waking. 2) Dynamic warm-up \u2014 5 minutes of movement prep reduces injury risk by 40%. 3) Pre-workout nutrition \u2014 a light protein snack 30 min before training improves performance by up to 20%. Try these tomorrow and track the difference. #Fitness #Wellness #YFIT'\n      },\n      {\n        platform: 'pinterest',\n        title: '3 Morning Workout Energy Tips',\n        description: 'Boost your morning workout with these 3 simple tips: hydrate, warm up dynamically, and eat a light protein snack. Save this pin for your fitness routine!',\n        board: 'Fitness Tips'\n      }\n    ]\n  }\n}];"
+      },
+      "id": "test-data-node",
+      "name": "Test Data (Sample Payload)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        128
+      ],
+      "notes": "Edit the content_items here to test different content angles."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dry Run Logger \u2014 summarizes what would have been posted\nconst items = $input.all();\n\nconst report = {\n  dry_run: true,\n  timestamp: new Date().toISOString(),\n  total_platforms: items.length,\n  summary: items.map(item => ({\n    platform: item.json.platform,\n    content_type: item.json.content_type,\n    caption_preview: (item.json.caption || item.json.body || '').substring(0, 120) + '...',\n    hashtags: item.json.hashtags || [],\n    status: 'WOULD_POST'\n  }))\n};\n\nconsole.log('\\n=== DRY RUN COMPLETE ===');\nconsole.log(JSON.stringify(report, null, 2));\nconsole.log('\\nTo run for real: set dry_run: false in the Test Data node');\n\nreturn [{ json: report }];"
+      },
+      "id": "dry-run-logger",
+      "name": "Dry Run Logger",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        80
+      ],
+      "notes": "Shows a summary of what would have been posted. Check the Output tab to see the full report."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "dry-run-condition",
+              "leftValue": "={{ $json.dry_run }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "dry-run-if",
+      "name": "Is Dry Run?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        208
+      ],
+      "notes": "Routes to Dry Run Logger if dry_run=true, otherwise proceeds to actual posting"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "dry-run-text-condition",
+              "leftValue": "={{ $json.dry_run }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "dry-run-if-text",
+      "name": "Is Dry Run? (Text)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        480
+      ],
+      "notes": "Routes text posts to Dry Run Logger if dry_run=true"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dry Run Logger (Text Posts)\nconst items = $input.all();\n\nconst report = {\n  dry_run: true,\n  post_type: 'text',\n  timestamp: new Date().toISOString(),\n  total_platforms: items.length,\n  summary: items.map(item => ({\n    platform: item.json.platform,\n    title: item.json.title || '(no title)',\n    body_preview: (item.json.body || item.json.description || item.json.caption || '').substring(0, 150) + '...',\n    status: 'WOULD_POST'\n  }))\n};\n\nconsole.log('\\n=== DRY RUN \u2014 TEXT POSTS ===');\nconsole.log(JSON.stringify(report, null, 2));\n\nreturn [{ json: report }];"
+      },
+      "id": "dry-run-logger-text",
+      "name": "Dry Run Logger (Text)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        368
+      ],
+      "notes": "Shows what text posts (LinkedIn, Pinterest) would have been sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Rename binary field to 'data' for the Upload node\nconst item = $input.first();\nconst binaryData = item.binary || {};\nconst binaryKeys = Object.keys(binaryData);\nconsole.log('Binary fields from ElevenLabs:', binaryKeys);\n\nif (binaryKeys.length === 0) {\n  throw new Error('No binary audio data received from ElevenLabs');\n}\n\n// Get the first binary field (whatever name ElevenLabs gave it)\nconst firstKey = binaryKeys[0];\nconst audioData = binaryData[firstKey];\nconsole.log('Audio field:', firstKey, '- mimeType:', audioData.mimeType);\n\n// Return with field explicitly named 'data'\nreturn [{\n  json: item.json,\n  binary: {\n    data: {\n      ...audioData,\n      mimeType: 'audio/mpeg',\n      fileExtension: 'mp3'\n    }\n  }\n}];"
+      },
+      "id": "binary-rename",
+      "name": "Rename Binary to data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        304
+      ],
+      "notes": "Renames the ElevenLabs audio binary field to 'data' so the Upload node can find it"
+    }
+  ],
+  "connections": {
+    "Webhook from Supabase": {
+      "main": [
+        [
+          {
+            "node": "Parse Supabase Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Supabase Payload": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs \u2014 Generate Voiceover",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Text Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs \u2014 Generate Voiceover": {
+      "main": [
+        [
+          {
+            "node": "Rename Binary to data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Audio to Supabase Storage": {
+      "main": [
+        [
+          {
+            "node": "Prepare Assembly Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Assembly Request": {
+      "main": [
+        [
+          {
+            "node": "Assemble Video (Railway ffmpeg)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Video Platform": {
+      "main": [
+        [
+          {
+            "node": "Is Dry Run?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload-Post \u2014 Post Video": {
+      "main": [
+        [
+          {
+            "node": "Log Post Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Text Posts": {
+      "main": [
+        [
+          {
+            "node": "Is Dry Run? (Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload-Post \u2014 Post Text": {
+      "main": [
+        [
+          {
+            "node": "Log Post Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Post Results": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Test Trigger": {
+      "main": [
+        [
+          {
+            "node": "Test Data (Sample Payload)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Data (Sample Payload)": {
+      "main": [
+        [
+          {
+            "node": "Parse Supabase Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Dry Run?": {
+      "main": [
+        [
+          {
+            "node": "Dry Run Logger",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload-Post \u2014 Post Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Dry Run? (Text)": {
+      "main": [
+        [
+          {
+            "node": "Dry Run Logger (Text)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload-Post \u2014 Post Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Binary to data": {
+      "main": [
+        [
+          {
+            "node": "Upload Audio to Supabase Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Video (Railway ffmpeg)": {
+      "main": [
+        [
+          {
+            "node": "Split by Video Platform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ac069442-deee-46e6-83af-eabae652a257",
+  "activeVersionId": "ac069442-deee-46e6-83af-eabae652a257",
+  "versionCounter": 55,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-12T22:35:30.505Z",
+      "createdAt": "2026-03-12T22:35:30.505Z",
+      "role": "workflow:owner",
+      "workflowId": "h7bRds9UOUfmP36F",
+      "projectId": "e1KiHS29UIm08V0m",
+      "project": {
+        "updatedAt": "2026-03-12T22:14:24.042Z",
+        "createdAt": "2026-03-12T21:57:36.777Z",
+        "id": "e1KiHS29UIm08V0m",
+        "name": "Don Campbell <support@yfitai.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "20ad00bc-fcec-4978-89ec-5b240341ff6f"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-04-04T03:31:01.194Z",
+    "createdAt": "2026-04-04T03:31:01.194Z",
+    "versionId": "ac069442-deee-46e6-83af-eabae652a257",
+    "workflowId": "h7bRds9UOUfmP36F",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "yfit-social-content",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "webhook-trigger",
+        "name": "Webhook from Supabase",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          304
+        ],
+        "webhookId": "yfit-social-content"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse incoming payload from Supabase generate-social-content function\n// Split content items into:\n//   - video_items: tiktok, instagram, youtube, facebook (need voiceover + video)\n//   - text_items: pinterest, linkedin (text/image posts only)\n\nconst payload = $input.first().json.body || $input.first().json;\n\nconst videoItems = (payload.content_items || []).filter(item =>\n  ['tiktok', 'instagram', 'youtube', 'facebook'].includes(item.platform)\n);\n\nconst textItems = (payload.content_items || []).filter(item =>\n  ['pinterest', 'linkedin'].includes(item.platform)\n);\n\n// Use first video item's script for voiceover (all video platforms share same script)\nconst primaryVideoItem = videoItems[0] || {};\n\nreturn [{\n  json: {\n    run_date: payload.run_date,\n    content_angle: payload.content_angle,\n    pexels_query: payload.pexels_query || 'fitness workout health',\n    voice_gender: payload.voice_gender || 'female',\n    script: payload.script || primaryVideoItem.script || '',\n    video_items: videoItems,\n    text_items: textItems,\n    all_items: payload.content_items || [],\n  }\n}];"
+        },
+        "id": "parse-payload",
+        "name": "Parse Supabase Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          464,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ 'https://api.elevenlabs.io/v1/text-to-speech/' + ($json.voice_gender === 'male' ? 'AZnzlk1XvdvUeBnXmlld' : '21m00Tcm4TlvDq8ikWAM') }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "xi-api-key",
+                "value": "sk_c73588c45da807e6ba8119f20e1fe445fb496d336c837d11"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Accept",
+                "value": "audio/mpeg"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "raw",
+          "rawContentType": "application/json",
+          "body": "={{ JSON.stringify({ text: $json.script, model_id: \"eleven_turbo_v2\", voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.3, use_speaker_boost: true } }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "file"
+              }
+            }
+          }
+        },
+        "id": "elevenlabs-voiceover",
+        "name": "ElevenLabs \u2014 Generate Voiceover",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          688,
+          208
+        ],
+        "notes": "Female voice: 21m00Tcm4TlvDq8ikWAM (Rachel - warm, educational). Male voice: AZnzlk1XvdvUeBnXmlld (Adam - professional, workout content). API key hardcoded."
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/yfit-voiceovers/voiceovers/{{ $('Parse Supabase Payload').first().json.run_date }}_{{ $('Parse Supabase Payload').first().json.content_angle.replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80) }}.mp3",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzEyMjk2NiwiZXhwIjoyMDcyNjk4OTY2fQ.2wMo_cE2q9xpVAj5fMrOwrASN8Dps010sTPVxw9Cmp0"
+              },
+              {
+                "name": "Content-Type",
+                "value": "audio/mpeg"
+              },
+              {
+                "name": "x-upsert",
+                "value": "true"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "binaryData",
+          "inputDataFieldName": "data",
+          "options": {}
+        },
+        "id": "upload-audio-supabase",
+        "name": "Upload Audio to Supabase Storage",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          912,
+          208
+        ],
+        "notes": "Uploads ElevenLabs MP3 to Supabase Storage via REST API (no credential node needed). Replace YOUR_SUPABASE_PROJECT_ID and YOUR_SUPABASE_SERVICE_KEY."
+      },
+      {
+        "parameters": {
+          "jsCode": "// Build the audio public URL from Supabase Storage\n// IMPORTANT: Must match exact URL pattern used by Upload Audio to Supabase Storage node\n\nconst supabaseUrl = 'https://mxggxpoxgqubojvumjlt.supabase.co';\nconst bucketName = 'yfit-voiceovers';\n\nconst parseData = $('Parse Supabase Payload').first().json;\nconst runDate = parseData.run_date || new Date().toISOString().split('T')[0];\nconst rawAngle = parseData.content_angle || 'workout';\n\n// Use EXACT same sanitization as Upload Audio node:\n// .replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80)\nconst sanitizedAngle = rawAngle.replace(/[^a-z0-9\\-]/gi, '_').substring(0, 80);\n\n// Build the public URL - no extra encoding needed since the filename is already sanitized\nconst audioUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/voiceovers/${runDate}_${sanitizedAngle}.mp3`;\n\nconsole.log('Audio URL:', audioUrl);\n\n// Get first video item for caption text\nconst firstVideoItem = (parseData.video_items || [])[0] || {};\nconst captionText = ((firstVideoItem.caption || parseData.script || '').split('\\n')[0]).substring(0, 60);\n\nreturn [{\n  json: {\n    ...parseData,\n    voiceover_url: audioUrl,\n    caption_text: captionText,\n    video_items: parseData.video_items,\n    text_items: parseData.text_items,\n  }\n}];"
+        },
+        "id": "prepare-assembly-request",
+        "name": "Prepare Assembly Request",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://yfitai-yfit-video-service-production.up.railway.app/assemble",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer yfit-video-secret-2026"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "keypair",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "run_date",
+                "value": "={{ $json.run_date }}"
+              },
+              {
+                "name": "content_angle",
+                "value": "={{ $json.content_angle }}"
+              },
+              {
+                "name": "caption_text",
+                "value": "={{ $json.caption_text }}"
+              },
+              {
+                "name": "voiceover_url",
+                "value": "={{ $json.voiceover_url }}"
+              },
+              {
+                "name": "video_items",
+                "value": "={{ JSON.stringify($json.video_items) }}"
+              },
+              {
+                "name": "text_items",
+                "value": "={{ JSON.stringify($json.text_items) }}"
+              },
+              {
+                "name": "dry_run",
+                "value": "=false"
+              }
+            ]
+          },
+          "options": {
+            "timeout": 180000
+          }
+        },
+        "id": "assemble-video",
+        "name": "Assemble Video (Railway ffmpeg)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1344,
+          208
+        ],
+        "notes": "Calls Supabase assemble-video Edge Function. Pexels fetches stock footage, FFmpeg combines with ElevenLabs audio + captions. Returns public video URL. Timeout: 2 minutes."
+      },
+      {
+        "parameters": {
+          "jsCode": "// Check if video assembly succeeded\nconst result = $input.first().json;\n\nif (!result.success || !result.video_url) {\n  throw new Error('Video assembly failed: ' + (result.error || 'No video URL returned'));\n}\n\nconst parseData = $('Parse Supabase Payload').first().json;\n\n// Return one item per video platform\nreturn parseData.video_items.map(item => ({\n  json: {\n    platform: item.platform,\n    video_url: result.video_url,\n    caption: item.caption || '',\n    title: item.script ? item.script.substring(0, 100) : 'YFIT Fitness Tip',\n    hashtags: item.hashtags || [],\n    content_angle: parseData.content_angle,\n    run_date: parseData.run_date,\n  }\n}));"
+        },
+        "id": "split-by-platform",
+        "name": "Split by Video Platform",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://api.upload-post.com/api/upload",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Apikey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cHBvcnRAeWZpdGFpLmNvbSIsImV4cCI6NDkyNjk1OTUwMSwianRpIjoiNTFiNjY0YWQtMGNkZS00ODI3LTgzMWMtNDY4NTVhODJkZTA1In0.3ZkZ5_MzFvu7nmlVcJNtbz4SgtxibhQltUWMFGSWkbU"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "url",
+                "value": "={{ $json.video_url }}"
+              },
+              {
+                "name": "platform[]",
+                "value": "={{ $json.platform }}"
+              },
+              {
+                "name": "title",
+                "value": "={{ $json.title }}"
+              },
+              {
+                "name": "description",
+                "value": "={{ $json.caption }}"
+              },
+              {
+                "name": "user",
+                "value": "YFIT"
+              }
+            ]
+          },
+          "options": {},
+          "method": "POST"
+        },
+        "id": "upload-post-video",
+        "name": "Upload-Post \u2014 Post Video",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1792,
+          208
+        ],
+        "notes": "Posts video to each platform via Upload-Post API. API key hardcoded. Runs once per platform (tiktok, instagram, youtube, facebook) due to split above."
+      },
+      {
+        "parameters": {
+          "jsCode": "// Handle Pinterest and LinkedIn text posts\n// These don't need video \u2014 just text + hashtags via Upload-Post\n\nconst parseData = $('Parse Supabase Payload').first().json;\nreturn (parseData.text_items || []).map(item => ({\n  json: {\n    platform: item.platform,\n    caption: item.caption || item.script || '',\n    hashtags: (item.hashtags || []).join(' '),\n  }\n}));"
+        },
+        "id": "prepare-text-posts",
+        "name": "Prepare Text Posts",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://v1.upload-post.com/api/upload",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Apikey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cHBvcnRAeWZpdGFpLmNvbSIsImV4cCI6NDkyNjk1OTUwMSwianRpIjoiNTFiNjY0YWQtMGNkZS00ODI3LTgzMWMtNDY4NTVhODJkZTA1In0.3ZkZ5_MzFvu7nmlVcJNtbz4SgtxibhQltUWMFGSWkbU"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "platform[]",
+                "value": "={{ $json.platform }}"
+              },
+              {
+                "name": "description",
+                "value": "={{ $json.caption + '\\n\\n' + $json.hashtags }}"
+              },
+              {
+                "name": "user",
+                "value": "YFIT"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "upload-post-text",
+        "name": "Upload-Post \u2014 Post Text",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          912,
+          432
+        ],
+        "notes": "Posts text content to Pinterest and LinkedIn. No video needed for these platforms."
+      },
+      {
+        "parameters": {
+          "jsCode": "// Collect results from both video and text posting branches\n// Log summary to console\n\nconst videoResult = $input.first().json;\nconsole.log('Post result:', JSON.stringify(videoResult));\n\nreturn [{\n  json: {\n    success: true,\n    posted_at: new Date().toISOString(),\n    result: videoResult,\n  }\n}];"
+        },
+        "id": "log-results",
+        "name": "Log Post Results",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2000,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={ \"success\": true, \"message\": \"YFIT content generated and posted to all platforms\", \"timestamp\": \"{{ $now.toISO() }}\" }",
+          "options": {}
+        },
+        "id": "webhook-response",
+        "name": "Webhook Response",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          2224,
+          304
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "manual-test-trigger",
+        "name": "Manual Test Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          240,
+          128
+        ],
+        "notes": "Click 'Test workflow' to run a test. Feeds sample data into the pipeline."
+      },
+      {
+        "parameters": {
+          "jsCode": "// YFIT Social Media \u2014 Test Data\n// Edit this to change what gets tested.\n// This simulates what Supabase normally sends to the webhook.\n\nreturn [{\n  json: {\n    run_date: new Date().toISOString().split('T')[0],\n    content_angle: 'Test: 3 quick tips to boost your morning workout energy',\n    pexels_query: 'fitness workout morning',\n    voice_gender: 'female',\n    script: 'Here are 3 quick tips to boost your morning workout energy. Number one: hydrate immediately after waking up. Number two: do a 5-minute dynamic warm-up. Number three: eat a light protein snack 30 minutes before training.',\n    dry_run: true,  // Set to false to actually post to social media\n    content_items: [\n      {\n        platform: 'tiktok',\n        script: 'Here are 3 quick tips to boost your morning workout energy. Hydrate, warm up, and fuel up!',\n        caption: '3 morning workout tips that actually work \ud83d\udcaa #fitness #morningworkout #yfitai',\n        hashtags: ['#fitness', '#morningworkout', '#yfitai', '#healthylifestyle']\n      },\n      {\n        platform: 'instagram',\n        script: 'Here are 3 quick tips to boost your morning workout energy.',\n        caption: 'Start your morning right \ud83c\udf05 These 3 tips will transform your workout energy. Save this post! #YFIT #FitnessMotivation',\n        hashtags: ['#YFIT', '#FitnessMotivation', '#MorningWorkout']\n      },\n      {\n        platform: 'linkedin',\n        title: '3 Science-Backed Tips to Maximize Morning Workout Performance',\n        body: 'Morning workouts are proven to boost productivity and mood throughout the day. Here are 3 evidence-based strategies: 1) Hydration first \u2014 drink 500ml of water immediately upon waking. 2) Dynamic warm-up \u2014 5 minutes of movement prep reduces injury risk by 40%. 3) Pre-workout nutrition \u2014 a light protein snack 30 min before training improves performance by up to 20%. Try these tomorrow and track the difference. #Fitness #Wellness #YFIT'\n      },\n      {\n        platform: 'pinterest',\n        title: '3 Morning Workout Energy Tips',\n        description: 'Boost your morning workout with these 3 simple tips: hydrate, warm up dynamically, and eat a light protein snack. Save this pin for your fitness routine!',\n        board: 'Fitness Tips'\n      }\n    ]\n  }\n}];"
+        },
+        "id": "test-data-node",
+        "name": "Test Data (Sample Payload)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          464,
+          128
+        ],
+        "notes": "Edit the content_items here to test different content angles."
+      },
+      {
+        "parameters": {
+          "jsCode": "// Dry Run Logger \u2014 summarizes what would have been posted\nconst items = $input.all();\n\nconst report = {\n  dry_run: true,\n  timestamp: new Date().toISOString(),\n  total_platforms: items.length,\n  summary: items.map(item => ({\n    platform: item.json.platform,\n    content_type: item.json.content_type,\n    caption_preview: (item.json.caption || item.json.body || '').substring(0, 120) + '...',\n    hashtags: item.json.hashtags || [],\n    status: 'WOULD_POST'\n  }))\n};\n\nconsole.log('\\n=== DRY RUN COMPLETE ===');\nconsole.log(JSON.stringify(report, null, 2));\nconsole.log('\\nTo run for real: set dry_run: false in the Test Data node');\n\nreturn [{ json: report }];"
+        },
+        "id": "dry-run-logger",
+        "name": "Dry Run Logger",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1104,
+          80
+        ],
+        "notes": "Shows a summary of what would have been posted. Check the Output tab to see the full report."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "dry-run-condition",
+                "leftValue": "={{ $json.dry_run }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "dry-run-if",
+        "name": "Is Dry Run?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          960,
+          208
+        ],
+        "notes": "Routes to Dry Run Logger if dry_run=true, otherwise proceeds to actual posting"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "dry-run-text-condition",
+                "leftValue": "={{ $json.dry_run }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "dry-run-if-text",
+        "name": "Is Dry Run? (Text)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          960,
+          480
+        ],
+        "notes": "Routes text posts to Dry Run Logger if dry_run=true"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Dry Run Logger (Text Posts)\nconst items = $input.all();\n\nconst report = {\n  dry_run: true,\n  post_type: 'text',\n  timestamp: new Date().toISOString(),\n  total_platforms: items.length,\n  summary: items.map(item => ({\n    platform: item.json.platform,\n    title: item.json.title || '(no title)',\n    body_preview: (item.json.body || item.json.description || item.json.caption || '').substring(0, 150) + '...',\n    status: 'WOULD_POST'\n  }))\n};\n\nconsole.log('\\n=== DRY RUN \u2014 TEXT POSTS ===');\nconsole.log(JSON.stringify(report, null, 2));\n\nreturn [{ json: report }];"
+        },
+        "id": "dry-run-logger-text",
+        "name": "Dry Run Logger (Text)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          960,
+          368
+        ],
+        "notes": "Shows what text posts (LinkedIn, Pinterest) would have been sent"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Rename binary field to 'data' for the Upload node\nconst item = $input.first();\nconst binaryData = item.binary || {};\nconst binaryKeys = Object.keys(binaryData);\nconsole.log('Binary fields from ElevenLabs:', binaryKeys);\n\nif (binaryKeys.length === 0) {\n  throw new Error('No binary audio data received from ElevenLabs');\n}\n\n// Get the first binary field (whatever name ElevenLabs gave it)\nconst firstKey = binaryKeys[0];\nconst audioData = binaryData[firstKey];\nconsole.log('Audio field:', firstKey, '- mimeType:', audioData.mimeType);\n\n// Return with field explicitly named 'data'\nreturn [{\n  json: item.json,\n  binary: {\n    data: {\n      ...audioData,\n      mimeType: 'audio/mpeg',\n      fileExtension: 'mp3'\n    }\n  }\n}];"
+        },
+        "id": "binary-rename",
+        "name": "Rename Binary to data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          304
+        ],
+        "notes": "Renames the ElevenLabs audio binary field to 'data' so the Upload node can find it"
+      }
+    ],
+    "connections": {
+      "Webhook from Supabase": {
+        "main": [
+          [
+            {
+              "node": "Parse Supabase Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Supabase Payload": {
+        "main": [
+          [
+            {
+              "node": "ElevenLabs \u2014 Generate Voiceover",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Prepare Text Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ElevenLabs \u2014 Generate Voiceover": {
+        "main": [
+          [
+            {
+              "node": "Rename Binary to data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Upload Audio to Supabase Storage": {
+        "main": [
+          [
+            {
+              "node": "Prepare Assembly Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Assembly Request": {
+        "main": [
+          [
+            {
+              "node": "Assemble Video (Railway ffmpeg)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split by Video Platform": {
+        "main": [
+          [
+            {
+              "node": "Is Dry Run?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Upload-Post \u2014 Post Video": {
+        "main": [
+          [
+            {
+              "node": "Log Post Results",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Text Posts": {
+        "main": [
+          [
+            {
+              "node": "Is Dry Run? (Text)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Upload-Post \u2014 Post Text": {
+        "main": [
+          [
+            {
+              "node": "Log Post Results",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Post Results": {
+        "main": [
+          [
+            {
+              "node": "Webhook Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Test Trigger": {
+        "main": [
+          [
+            {
+              "node": "Test Data (Sample Payload)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Test Data (Sample Payload)": {
+        "main": [
+          [
+            {
+              "node": "Parse Supabase Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Dry Run?": {
+        "main": [
+          [
+            {
+              "node": "Dry Run Logger",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Upload-Post \u2014 Post Video",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Dry Run? (Text)": {
+        "main": [
+          [
+            {
+              "node": "Dry Run Logger (Text)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Upload-Post \u2014 Post Text",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Rename Binary to data": {
+        "main": [
+          [
+            {
+              "node": "Upload Audio to Supabase Storage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Assemble Video (Railway ffmpeg)": {
+        "main": [
+          [
+            {
+              "node": "Split by Video Platform",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Don Campbell",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-04T03:31:01.582Z",
+        "id": 22,
+        "workflowId": "h7bRds9UOUfmP36F",
+        "versionId": "ac069442-deee-46e6-83af-eabae652a257",
+        "event": "deactivated",
+        "userId": "20ad00bc-fcec-4978-89ec-5b240341ff6f"
+      },
+      {
+        "createdAt": "2026-04-04T03:31:01.690Z",
+        "id": 23,
+        "workflowId": "h7bRds9UOUfmP36F",
+        "versionId": "ac069442-deee-46e6-83af-eabae652a257",
+        "event": "activated",
+        "userId": "20ad00bc-fcec-4978-89ec-5b240341ff6f"
+      }
+    ]
+  }
+}
