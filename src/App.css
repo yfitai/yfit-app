@@ -118,3 +118,21 @@
     @apply bg-background text-foreground;
   }
 }
+/* ── Print styles for Provider Report ────────────────────────────────────────
+   When window.print() is called, hide everything except #provider-report-print.
+   No DOM manipulation needed — pure CSS approach works on Android/iOS/desktop.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media print {
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  #provider-report-print {
+    display: block !important;
+  }
+
+  @page {
+    margin: 16mm;
+  }
+}

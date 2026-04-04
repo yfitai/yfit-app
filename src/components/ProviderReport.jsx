@@ -437,171 +437,13 @@ export default function ProviderReport({ user }) {
     }
   }
 
-  // ── Print (hidden iframe — works on Android, iOS, and desktop) ──────────────
-  // Using window.open() on Android triggers the app chooser instead of print.
-  // Injecting a hidden <iframe> into the current page and calling
-  // iframe.contentWindow.print() bypasses that entirely.
+  // ── Print: pure CSS @media print approach ─────────────────────────────────
+  // @media print in App.css hides nav and .no-print elements.
+  // #provider-report-print stays visible. No DOM manipulation needed.
   const handlePrint = () => {
-    const reportEl = reportRef.current
-    if (!reportEl) return
-
-    const patientName =
-      profile?.full_name ||
-      (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
-      user.email
-
-    // Remove any previous print iframe
-    const existing = document.getElementById('yfit-print-frame')
-    if (existing) existing.remove()
-
-    const iframe = document.createElement('iframe')
-    iframe.id = 'yfit-print-frame'
-    // Use position:absolute off-screen (not fixed at 0,0) to avoid
-    // intercepting touch events on Android over the main page buttons.
-    iframe.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;border:0;visibility:hidden;'
-    document.body.appendChild(iframe)
-
-    const printStyles = `
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-        font-size: 11pt; color: #111827; background: #fff; padding: 16mm;
-      }
-      /* Strip Tailwind utility classes — redefine what we need */
-      .text-3xl { font-size: 22pt; }
-      .text-xl  { font-size: 14pt; }
-      .text-lg  { font-size: 12pt; }
-      .text-sm  { font-size: 9pt; }
-      .text-xs  { font-size: 8pt; }
-      .font-bold { font-weight: 700; }
-      .font-semibold { font-weight: 600; }
-      .font-medium { font-weight: 500; }
-      .italic { font-style: italic; }
-      .text-gray-900 { color: #111827; }
-      .text-gray-800 { color: #1f2937; }
-      .text-gray-700 { color: #374151; }
-      .text-gray-600 { color: #4b5563; }
-      .text-gray-500 { color: #6b7280; }
-      .text-red-700  { color: #b91c1c; }
-      .text-red-900  { color: #7f1d1d; }
-      .text-red-700  { color: #b91c1c; }
-      .text-blue-600 { color: #2563eb; }
-      .text-green-500 { color: #22c55e; }
-      .text-yellow-500 { color: #eab308; }
-      .grid { display: grid; }
-      .grid-cols-2 { grid-template-columns: 1fr 1fr; }
-      .gap-4 { gap: 16px; }
-      .gap-x-4 { column-gap: 16px; }
-      .gap-y-2 { row-gap: 8px; }
-      .col-span-2 { grid-column: span 2; }
-      .flex { display: flex; }
-      .flex-col { flex-direction: column; }
-      .items-center { align-items: center; }
-      .justify-between { justify-content: space-between; }
-      .gap-2 { gap: 8px; }
-      .space-y-4 > * + * { margin-top: 16px; }
-      .space-y-3 > * + * { margin-top: 12px; }
-      .mb-2 { margin-bottom: 8px; }
-      .mb-4 { margin-bottom: 16px; }
-      .mb-6 { margin-bottom: 24px; }
-      .mb-8 { margin-bottom: 32px; }
-      .mt-1 { margin-top: 4px; }
-      .mt-2 { margin-top: 8px; }
-      .mt-12 { margin-top: 48px; }
-      .p-2  { padding: 8px; }
-      .p-4  { padding: 16px; }
-      .p-8  { padding: 32px; }
-      .pl-4 { padding-left: 16px; }
-      .py-2 { padding-top: 8px; padding-bottom: 8px; }
-      .pb-6 { padding-bottom: 24px; }
-      .pt-6 { padding-top: 24px; }
-      .rounded-lg { border-radius: 8px; }
-      .border   { border: 1px solid #e5e7eb; }
-      .border-2 { border: 2px solid; }
-      .border-b-2 { border-bottom: 2px solid #d1d5db; }
-      .border-t-2 { border-top: 2px solid #d1d5db; }
-      .border-l-4 { border-left: 4px solid; }
-      .border-gray-300 { border-color: #d1d5db; }
-      .border-blue-500 { border-color: #3b82f6; }
-      .border-green-500 { border-color: #22c55e; }
-      .border-red-300 { border-color: #fca5a5; }
-      .bg-red-50 { background: #fef2f2; }
-      .bg-gray-50 { background: #f9fafb; }
-      .bg-white { background: #ffffff; }
-      .break-words { word-break: break-word; }
-      .last\:mb-0:last-child { margin-bottom: 0; }
-      .text-center { text-align: center; }
-      .text-2xl { font-size: 18pt; }
-      /* Print header */
-      .print-header {
-        background: #1d4ed8 !important;
-        color: #fff !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        padding: 8px 16mm;
-        margin: -16mm -16mm 16px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 9pt;
-      }
-      .print-footer {
-        margin-top: 24px;
-        padding-top: 10px;
-        border-top: 1px solid #e5e7eb;
-        font-size: 8.5pt;
-        color: #9ca3af;
-        text-align: center;
-      }
-      /* Hide action buttons and provider form inside the report area */
-      button, select, input, textarea, label { display: none !important; }
-      @media print {
-        @page { margin: 16mm; }
-        body { padding: 0; }
-        .print-header { margin: 0 0 16px; }
-      }
-    `
-
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
-    iframeDoc.open()
-    iframeDoc.write(`<!DOCTYPE html><html><head>
-      <meta charset="UTF-8" />
-      <title>Medication List — ${patientName}</title>
-      <style>${printStyles}</style>
-    </head><body>
-      <div class="print-header">
-        <span>YFIT AI — Health &amp; Fitness Tracker</span>
-        <span>Confidential Medical Document</span>
-      </div>
-      ${reportEl.innerHTML}
-      <div class="print-footer">
-        Generated by YFIT AI — Please review this list with your healthcare provider
-      </div>
-    </body></html>`)
-    iframeDoc.close()
-
-    // Give the iframe a moment to render, then print and immediately remove
-    iframe.onload = () => {
-      try {
-        iframe.contentWindow.focus()
-        iframe.contentWindow.print()
-      } catch (e) {
-        console.error('Print error:', e)
-      } finally {
-        // Remove immediately — the print dialog is synchronous on most browsers
-        setTimeout(() => {
-          if (document.getElementById('yfit-print-frame')) {
-            iframe.remove()
-          }
-        }, 500)
-      }
-    }
-    // Fallback: also remove after 5 seconds in case onload never fires
-    setTimeout(() => {
-      if (document.getElementById('yfit-print-frame')) {
-        iframe.remove()
-      }
-    }, 5000)
+    window.print()
   }
+
 
   if (loading) {
     return (
@@ -620,8 +462,8 @@ export default function ProviderReport({ user }) {
 
   return (
     <div>
-      {/* Action Bar */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Action Bar — hidden when printing */}
+      <div className="no-print flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Provider Report</h2>
           <p className="text-gray-600 mt-1">
@@ -656,9 +498,9 @@ export default function ProviderReport({ user }) {
         </div>
       </div>
 
-      {/* Provider selector */}
+      {/* Provider selector — hidden when printing */}
       {providers.length > 0 && (
-        <div className="mb-4">
+        <div className="no-print mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Addressed To (optional)</label>
           <select
             value={selectedProviderId}
@@ -678,6 +520,7 @@ export default function ProviderReport({ user }) {
       {/* ── Printable / PDF Report ── */}
       <div
         ref={reportRef}
+        id="provider-report-print"
         className="bg-white border border-gray-300 rounded-lg p-8"
       >
         {/* Header */}
@@ -832,8 +675,8 @@ export default function ProviderReport({ user }) {
         </div>
       </div>
 
-      {/* Healthcare Providers Section */}
-      <div className="mt-8">
+      {/* Healthcare Providers Section — hidden when printing */}
+      <div className="no-print mt-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">My Healthcare Providers</h3>
           <button
