@@ -269,7 +269,7 @@
     },
     {
       "parameters": {
-        "url": "https://v1.upload-post.com/api/upload",
+        "url": "https://api.upload-post.com/api/upload_text",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -297,7 +297,8 @@
             }
           ]
         },
-        "options": {}
+        "options": {},
+        "method": "POST"
       },
       "id": "upload-post-text",
       "name": "Upload-Post \u2014 Post Text",
