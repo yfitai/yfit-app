@@ -4,7 +4,7 @@
  */
 
 // Static cache name - old caches are cleared on activate
-const CACHE_NAME = 'yfit-cache-v2';
+const CACHE_NAME = 'yfit-cache-v3'; // bumped Apr 4 2026 to clear cached broken jsPDF bundle
 
 // Install event - skip waiting to activate immediately
 self.addEventListener('install', (event) => {
