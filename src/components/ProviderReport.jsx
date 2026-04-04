@@ -1,10 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase, getUserProfile } from '../lib/supabase'
-import { FileText, Printer, Download, Plus, User, Calendar, Trash2 } from 'lucide-react'
+import { FileText, Printer, Download, Plus, User, Trash2 } from 'lucide-react'
 import jsPDF from 'jspdf'
-import { Filesystem, Directory } from '@capacitor/filesystem'
-import { Share } from '@capacitor/share'
-import { Capacitor } from '@capacitor/core'
 
 export default function ProviderReport({ user }) {
   const [medications, setMedications] = useState([])
@@ -15,6 +12,8 @@ export default function ProviderReport({ user }) {
   const [showProviderForm, setShowProviderForm] = useState(false)
   const [profile, setProfile] = useState(null)
   const [selectedProviderId, setSelectedProviderId] = useState('')
+  const [pdfGenerating, setPdfGenerating] = useState(false)
+  const reportRef = useRef(null)
 
   const [providerForm, setProviderForm] = useState({
     name: '',
@@ -46,13 +45,9 @@ export default function ProviderReport({ user }) {
 
   const loadMedications = async () => {
     try {
-      // Fetch medications where is_supplement is explicitly false
       const { data: explicitMeds, error: err1 } = await supabase
         .from('user_medications')
-        .select(`
-          *,
-          medication:medications(*)
-        `)
+        .select(`*, medication:medications(*)`)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .eq('is_supplement', false)
@@ -60,13 +55,9 @@ export default function ProviderReport({ user }) {
 
       if (err1) console.error('[ProviderReport] Error loading explicit meds:', err1)
 
-      // Fetch medications where is_supplement is null (custom meds added without the flag)
       const { data: nullFlagMeds, error: err2 } = await supabase
         .from('user_medications')
-        .select(`
-          *,
-          medication:medications(*)
-        `)
+        .select(`*, medication:medications(*)`)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .is('is_supplement', null)
@@ -75,7 +66,6 @@ export default function ProviderReport({ user }) {
       if (err2) console.error('[ProviderReport] Error loading null-flag meds:', err2)
 
       const combined = [...(explicitMeds || []), ...(nullFlagMeds || [])]
-      console.log('[ProviderReport] Medications loaded:', combined.length, combined)
       setMedications(combined)
     } catch (error) {
       console.error('Error loading medications:', error)
@@ -84,26 +74,18 @@ export default function ProviderReport({ user }) {
 
   const loadSupplements = async () => {
     try {
-      // Fetch from user_supplements table (DB-linked supplements)
       const { data: suppData, error: suppError } = await supabase
         .from('user_supplements')
-        .select(`
-          *,
-          supplement:vitamins_supplements(*)
-        `)
+        .select(`*, supplement:vitamins_supplements(*)`)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .order('created_at')
 
       if (suppError) console.error('Error loading user_supplements:', suppError)
 
-      // Also fetch custom supplements saved via user_medications with is_supplement=true
       const { data: customSuppData, error: customSuppError } = await supabase
         .from('user_medications')
-        .select(`
-          *,
-          medication:medications(*)
-        `)
+        .select(`*, medication:medications(*)`)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .eq('is_supplement', true)
@@ -111,7 +93,6 @@ export default function ProviderReport({ user }) {
 
       if (customSuppError) console.error('Error loading custom supplements:', customSuppError)
 
-      // Normalize custom supplement records to match supplement shape
       const normalizedCustomSupps = (customSuppData || []).map(s => ({
         ...s,
         supplement: s.medication || null,
@@ -119,7 +100,6 @@ export default function ProviderReport({ user }) {
       }))
 
       const combined = [...(suppData || []), ...normalizedCustomSupps]
-      console.log('[ProviderReport] Supplements loaded:', combined.length, combined)
       setSupplements(combined)
     } catch (error) {
       console.error('Error loading supplements:', error)
@@ -163,7 +143,6 @@ export default function ProviderReport({ user }) {
     }
 
     try {
-      // Auto-add "Dr." prefix if not present
       let providerName = providerForm.name.trim()
       if (!providerName.toLowerCase().startsWith('dr.') && !providerName.toLowerCase().startsWith('dr ')) {
         providerName = 'Dr. ' + providerName
@@ -171,23 +150,13 @@ export default function ProviderReport({ user }) {
 
       const { error } = await supabase
         .from('medical_providers')
-        .insert({
-          user_id: user.id,
-          ...providerForm,
-          name: providerName
-        })
+        .insert({ user_id: user.id, ...providerForm, name: providerName })
 
       if (error) throw error
 
       alert('Provider added successfully!')
       setShowProviderForm(false)
-      setProviderForm({
-        name: '',
-        specialty: '',
-        phone: '',
-        email: '',
-        address: ''
-      })
+      setProviderForm({ name: '', specialty: '', phone: '', email: '', address: '' })
       loadProviders()
     } catch (error) {
       console.error('Error adding provider:', error)
@@ -196,9 +165,7 @@ export default function ProviderReport({ user }) {
   }
 
   const handleDeleteProvider = async (providerId) => {
-    if (!confirm('Are you sure you want to delete this provider?')) {
-      return
-    }
+    if (!confirm('Are you sure you want to delete this provider?')) return
 
     try {
       const { error } = await supabase
@@ -208,7 +175,6 @@ export default function ProviderReport({ user }) {
         .eq('user_id', user.id)
 
       if (error) throw error
-
       alert('Provider deleted successfully!')
       loadProviders()
     } catch (error) {
@@ -217,151 +183,324 @@ export default function ProviderReport({ user }) {
     }
   }
 
+  // ── PDF Generation (web-safe, no Capacitor dependency) ──────────────────────
   const handleDownloadPDF = async () => {
+    setPdfGenerating(true)
     try {
-      console.log('Starting PDF generation...')
-      const doc = new jsPDF()
-      let y = 20
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+      const pageW = doc.internal.pageSize.getWidth()
+      const pageH = doc.internal.pageSize.getHeight()
+      const margin = 20
+      const contentW = pageW - margin * 2
+      let y = margin
 
-      const patientName = profile?.full_name ||
+      const patientName =
+        profile?.full_name ||
         (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
         user.email
+
       const selectedProvider = providers.find(p => p.id === selectedProviderId)
-      
-      doc.setFontSize(16)
-      doc.text('Medication List', 105, y, { align: 'center' })
-      y += 10
-      
+      const dateStr = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })
+
+      // ── Header bar ──
+      doc.setFillColor(37, 99, 235) // blue-600
+      doc.rect(0, 0, pageW, 14, 'F')
+      doc.setFontSize(9)
+      doc.setTextColor(255, 255, 255)
+      doc.text('YFIT AI — Health & Fitness Tracker', margin, 9)
+      doc.text('Confidential Medical Document', pageW - margin, 9, { align: 'right' })
+      y = 24
+
+      // ── Title ──
+      doc.setTextColor(17, 24, 39)
+      doc.setFontSize(22)
+      doc.setFont(undefined, 'bold')
+      doc.text('Medication List', margin, y)
+      y += 8
+
+      // ── Patient info row ──
       doc.setFontSize(10)
-      doc.text(`Patient: ${patientName}`, 20, y)
+      doc.setFont(undefined, 'normal')
+      doc.setTextColor(75, 85, 99)
+      doc.text(`Patient: `, margin, y)
+      doc.setTextColor(17, 24, 39)
+      doc.setFont(undefined, 'bold')
+      doc.text(patientName, margin + 18, y)
+      doc.setFont(undefined, 'normal')
+      doc.setTextColor(75, 85, 99)
+      doc.text(`Date: ${dateStr}`, pageW - margin, y, { align: 'right' })
       y += 6
-      doc.text(`Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 20, y)
-      y += 6
+
       if (selectedProvider) {
-        doc.text(`Prepared for: ${selectedProvider.name}${selectedProvider.specialty ? ', ' + selectedProvider.specialty : ''}`, 20, y)
+        doc.setTextColor(75, 85, 99)
+        doc.text('Prepared for: ', margin, y)
+        doc.setTextColor(17, 24, 39)
+        doc.setFont(undefined, 'bold')
+        doc.text(
+          `${selectedProvider.name}${selectedProvider.specialty ? ', ' + selectedProvider.specialty : ''}`,
+          margin + 26,
+          y
+        )
+        doc.setFont(undefined, 'normal')
         y += 6
       }
-      y += 5
-      
+
+      // Divider
+      doc.setDrawColor(209, 213, 219)
+      doc.setLineWidth(0.4)
+      doc.line(margin, y, pageW - margin, y)
+      y += 8
+
+      const checkPage = (needed = 12) => {
+        if (y + needed > pageH - 15) {
+          doc.addPage()
+          y = margin
+        }
+      }
+
+      const sectionHeader = (title, r, g, b) => {
+        checkPage(14)
+        doc.setFillColor(r, g, b)
+        doc.rect(margin, y - 4, contentW, 8, 'F')
+        doc.setFontSize(11)
+        doc.setFont(undefined, 'bold')
+        doc.setTextColor(255, 255, 255)
+        doc.text(title, margin + 3, y + 1)
+        doc.setFont(undefined, 'normal')
+        doc.setTextColor(17, 24, 39)
+        y += 10
+      }
+
+      // ── Allergies ──
+      if (allergies.length > 0) {
+        sectionHeader('⚠  ALLERGIES', 185, 28, 28)
+        allergies.forEach((allergy, i) => {
+          checkPage(12)
+          doc.setFontSize(10)
+          doc.setFont(undefined, 'bold')
+          doc.setTextColor(185, 28, 28)
+          doc.text(`${i + 1}. ${allergy.allergen} (${allergy.severity || 'Unknown'})`, margin + 4, y)
+          doc.setFont(undefined, 'normal')
+          doc.setTextColor(17, 24, 39)
+          y += 5
+          if (allergy.reaction) {
+            checkPage(6)
+            doc.setFontSize(9)
+            doc.setTextColor(75, 85, 99)
+            doc.text(`   Reaction: ${allergy.reaction}`, margin + 4, y)
+            doc.setTextColor(17, 24, 39)
+            y += 5
+          }
+          y += 2
+        })
+        y += 4
+      }
+
+      // ── Medications ──
       if (medications.length > 0) {
-        doc.setFontSize(12)
-        doc.text('Current Medications:', 20, y)
-        y += 7
-        doc.setFontSize(10)
+        sectionHeader('Current Medications', 37, 99, 235)
         medications.forEach((med, i) => {
           const medName = med.medication?.name || med.custom_name || 'Unknown Medication'
           const dosage = med.dosage || 'N/A'
           const frequency = med.frequency || 'N/A'
-          const route = med.route ? ` (${med.route})` : ''
-          const started = med.start_date ? `  Started: ${new Date(med.start_date).toLocaleDateString()}` : ''
-          // Check page overflow
-          if (y > 270) { doc.addPage(); y = 20 }
+          const route = med.route || ''
+          const started = med.start_date
+            ? new Date(med.start_date).toLocaleDateString()
+            : 'N/A'
+
+          checkPage(20)
+          // Left accent bar
+          doc.setFillColor(37, 99, 235)
+          doc.rect(margin, y - 3, 2, 14, 'F')
+
+          doc.setFontSize(11)
           doc.setFont(undefined, 'bold')
-          doc.text(`${i+1}. ${medName}`, 25, y)
-          doc.setFont(undefined, 'normal')
+          doc.text(`${i + 1}. ${medName}`, margin + 6, y)
           y += 5
-          doc.text(`   Dosage: ${dosage}${route}   Frequency: ${frequency}${started}`, 25, y)
-          y += 7
+
+          if (med.medication?.generic_name && med.medication.name !== med.medication.generic_name) {
+            doc.setFontSize(9)
+            doc.setFont(undefined, 'italic')
+            doc.setTextColor(107, 114, 128)
+            doc.text(`Generic: ${med.medication.generic_name}`, margin + 6, y)
+            doc.setFont(undefined, 'normal')
+            doc.setTextColor(17, 24, 39)
+            y += 4
+          }
+
+          doc.setFontSize(9)
+          doc.setFont(undefined, 'normal')
+          doc.setTextColor(75, 85, 99)
+          const details = [
+            `Dosage: ${dosage}`,
+            route ? `Route: ${route}` : null,
+            `Frequency: ${frequency}`,
+            `Started: ${started}`,
+          ].filter(Boolean).join('   |   ')
+          doc.text(details, margin + 6, y)
+          doc.setTextColor(17, 24, 39)
+          y += 5
+
           if (med.prescriber_name) {
-            doc.text(`   Prescribed by: ${med.prescriber_name}`, 25, y)
+            checkPage(6)
+            doc.setFontSize(9)
+            doc.setTextColor(75, 85, 99)
+            doc.text(`Prescribed by: ${med.prescriber_name}`, margin + 6, y)
+            doc.setTextColor(17, 24, 39)
             y += 5
           }
+
           if (med.notes) {
-            const noteLines = doc.splitTextToSize(`   Notes: ${med.notes}`, 160)
+            checkPage(8)
+            const noteLines = doc.splitTextToSize(`Notes: ${med.notes}`, contentW - 12)
+            doc.setFontSize(9)
+            doc.setTextColor(75, 85, 99)
             noteLines.forEach(line => {
-              if (y > 270) { doc.addPage(); y = 20 }
-              doc.text(line, 25, y)
-              y += 5
+              checkPage(5)
+              doc.text(line, margin + 6, y)
+              y += 4
             })
+            doc.setTextColor(17, 24, 39)
           }
-          y += 2
+          y += 5
         })
+        y += 2
       } else {
+        checkPage(10)
         doc.setFontSize(10)
-        doc.text('No current medications on file.', 25, y)
+        doc.setTextColor(107, 114, 128)
+        doc.text('No current medications on file.', margin + 4, y)
+        doc.setTextColor(17, 24, 39)
         y += 10
       }
-      
+
+      // ── Supplements ──
       if (supplements.length > 0) {
-        y += 5
-        if (y > 270) { doc.addPage(); y = 20 }
-        doc.setFontSize(12)
-        doc.text('Supplements & Vitamins:', 20, y)
-        y += 7
-        doc.setFontSize(10)
+        sectionHeader('Supplements & Vitamins', 5, 150, 105)
         supplements.forEach((sup, i) => {
           const supName = sup.supplement?.name || sup.custom_name || 'Unknown Supplement'
           const dosage = sup.dosage || 'N/A'
           const frequency = sup.frequency || 'N/A'
-          const started = sup.start_date ? `  Started: ${new Date(sup.start_date).toLocaleDateString()}` : ''
-          if (y > 270) { doc.addPage(); y = 20 }
+          const started = sup.start_date
+            ? new Date(sup.start_date).toLocaleDateString()
+            : 'N/A'
+
+          checkPage(16)
+          doc.setFillColor(5, 150, 105)
+          doc.rect(margin, y - 3, 2, 10, 'F')
+
+          doc.setFontSize(11)
           doc.setFont(undefined, 'bold')
-          doc.text(`${i+1}. ${supName}`, 25, y)
-          doc.setFont(undefined, 'normal')
+          doc.setTextColor(17, 24, 39)
+          doc.text(`${i + 1}. ${supName}`, margin + 6, y)
           y += 5
-          doc.text(`   Dosage: ${dosage}   Frequency: ${frequency}${started}`, 25, y)
+
+          doc.setFontSize(9)
+          doc.setFont(undefined, 'normal')
+          doc.setTextColor(75, 85, 99)
+          doc.text(
+            `Dosage: ${dosage}   |   Frequency: ${frequency}   |   Started: ${started}`,
+            margin + 6,
+            y
+          )
+          doc.setTextColor(17, 24, 39)
           y += 7
         })
       }
 
-      // Allergies section in PDF
-      if (allergies.length > 0) {
-        y += 5
-        if (y > 270) { doc.addPage(); y = 20 }
-        doc.setFontSize(12)
-        doc.setTextColor(180, 0, 0)
-        doc.text('⚠ ALLERGIES:', 20, y)
-        doc.setTextColor(0, 0, 0)
-        y += 7
-        doc.setFontSize(10)
-        allergies.forEach((allergy, i) => {
-          if (y > 270) { doc.addPage(); y = 20 }
-          doc.setFont(undefined, 'bold')
-          doc.text(`${i+1}. ${allergy.allergen} (${allergy.severity || 'Unknown severity'})`, 25, y)
-          doc.setFont(undefined, 'normal')
-          y += 5
-          if (allergy.reaction) {
-            doc.text(`   Reaction: ${allergy.reaction}`, 25, y)
-            y += 5
-          }
-          y += 2
-        })
+      // ── Footer ──
+      const totalPages = doc.internal.getNumberOfPages()
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i)
+        doc.setFillColor(243, 244, 246)
+        doc.rect(0, pageH - 12, pageW, 12, 'F')
+        doc.setFontSize(8)
+        doc.setTextColor(107, 114, 128)
+        doc.text(
+          'Generated by YFIT AI — Please review this list with your healthcare provider',
+          margin,
+          pageH - 5
+        )
+        doc.text(`Page ${i} of ${totalPages}`, pageW - margin, pageH - 5, { align: 'right' })
       }
-      
-      console.log('PDF generated, preparing to save...')
-      
-      // Check if running on native platform
-      if (Capacitor.isNativePlatform()) {
-        // Get PDF as base64
-        const pdfOutput = doc.output('datauristring')
-        const base64Data = pdfOutput.split(',')[1]
-        
-        const fileName = `Medication_Report_${new Date().toISOString().split('T')[0]}.pdf`
-        
-        // Save to filesystem
-        const savedFile = await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: Directory.Documents
-        })
-        
-        console.log('File saved:', savedFile.uri)
-        
-        // Share the file
-        await Share.share({
-          title: 'Medication Report',
-          text: 'My medication list',
-          url: savedFile.uri,
-          dialogTitle: 'Share or Save Medication Report'
-        })
-      } else {
-        // Fallback for web
-        doc.save('Medication_Report.pdf')
-      }
+
+      // ── Save ──
+      const fileName = `Medication_Report_${new Date().toISOString().split('T')[0]}.pdf`
+      doc.save(fileName)
     } catch (error) {
       console.error('PDF Error:', error)
       alert(`Failed to generate PDF: ${error.message}`)
+    } finally {
+      setPdfGenerating(false)
     }
+  }
+
+  // ── Print (opens a clean print window with only the report) ─────────────────
+  const handlePrint = () => {
+    const reportEl = reportRef.current
+    if (!reportEl) return
+
+    const printWindow = window.open('', '_blank', 'width=800,height=900')
+    if (!printWindow) {
+      alert('Pop-up blocked. Please allow pop-ups for this site and try again.')
+      return
+    }
+
+    const patientName =
+      profile?.full_name ||
+      (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
+      user.email
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Medication List — ${patientName}</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #111827; background: #fff; padding: 20mm; }
+            h1 { font-size: 22pt; font-weight: 700; margin-bottom: 4px; }
+            h2 { font-size: 13pt; font-weight: 700; margin: 16px 0 8px; padding: 4px 8px; border-radius: 4px; }
+            h3 { font-size: 11pt; font-weight: 700; margin-bottom: 3px; }
+            .header-bar { background: #1d4ed8; color: #fff; padding: 6px 12px; font-size: 9pt; display: flex; justify-content: space-between; margin: -20mm -20mm 16px; padding: 8px 20mm; }
+            .meta { display: flex; gap: 32px; margin-bottom: 12px; font-size: 10pt; color: #4b5563; }
+            .meta strong { color: #111827; }
+            .divider { border: none; border-top: 1.5px solid #d1d5db; margin: 12px 0; }
+            .section-allergies { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; }
+            .section-allergies h2 { background: #dc2626; color: #fff; margin: -10px -14px 10px; padding: 6px 14px; border-radius: 4px 4px 0 0; }
+            .section-meds h2 { background: #2563eb; color: #fff; }
+            .section-supps h2 { background: #059669; color: #fff; }
+            .med-item { border-left: 3px solid #2563eb; padding: 6px 0 6px 12px; margin-bottom: 10px; }
+            .supp-item { border-left: 3px solid #059669; padding: 6px 0 6px 12px; margin-bottom: 8px; }
+            .allergy-item { margin-bottom: 6px; }
+            .detail-row { display: flex; gap: 24px; font-size: 9.5pt; color: #374151; margin-top: 3px; flex-wrap: wrap; }
+            .detail-row span { color: #6b7280; margin-right: 4px; }
+            .notes { background: #f9fafb; border-radius: 4px; padding: 4px 8px; font-size: 9pt; color: #4b5563; margin-top: 4px; }
+            .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 8.5pt; color: #9ca3af; text-align: center; }
+            @media print { body { padding: 0; } .header-bar { margin: 0 0 16px; } }
+          </style>
+        </head>
+        <body>
+          <div class="header-bar">
+            <span>YFIT AI — Health &amp; Fitness Tracker</span>
+            <span>Confidential Medical Document</span>
+          </div>
+          ${reportEl.innerHTML}
+          <div class="footer">
+            Generated by YFIT AI — Please review this list with your healthcare provider
+          </div>
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+    setTimeout(() => {
+      printWindow.print()
+      printWindow.close()
+    }, 400)
   }
 
   if (loading) {
@@ -372,9 +511,17 @@ export default function ProviderReport({ user }) {
     )
   }
 
+  const patientName =
+    profile?.full_name ||
+    (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
+    user.email
+
+  const selectedProvider = providers.find(p => p.id === selectedProviderId)
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6 print:hidden">
+      {/* Action Bar */}
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Provider Report</h2>
           <p className="text-gray-600 mt-1">
@@ -383,7 +530,7 @@ export default function ProviderReport({ user }) {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
           >
             <Printer className="w-4 h-4" />
@@ -391,17 +538,27 @@ export default function ProviderReport({ user }) {
           </button>
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+            disabled={pdfGenerating}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <Download className="w-4 h-4" />
-            Download PDF
+            {pdfGenerating ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating…
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                Download PDF
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Provider selector - shown above the printable area, hidden when printing */}
+      {/* Provider selector */}
       {providers.length > 0 && (
-        <div className="mb-4 print:hidden">
+        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Addressed To (optional)</label>
           <select
             value={selectedProviderId}
@@ -410,47 +567,47 @@ export default function ProviderReport({ user }) {
           >
             <option value="">— Select a provider —</option>
             {providers.map(p => (
-              <option key={p.id} value={p.id}>{p.name}{p.specialty ? ` (${p.specialty})` : ''}</option>
+              <option key={p.id} value={p.id}>
+                {p.name}{p.specialty ? ` (${p.specialty})` : ''}
+              </option>
             ))}
           </select>
         </div>
       )}
 
-      {/* Printable Report */}
-      <div className="bg-white border border-gray-300 rounded-lg p-8 print:border-0 print:p-0">
+      {/* ── Printable / PDF Report ── */}
+      <div
+        ref={reportRef}
+        className="bg-white border border-gray-300 rounded-lg p-8"
+      >
         {/* Header */}
         <div className="mb-8 pb-6 border-b-2 border-gray-300">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Medication List</h1>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
               <p className="text-sm text-gray-600">Patient</p>
-              <p className="font-medium text-gray-900">
-                {profile?.full_name ||
-                  (`${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`).trim() ||
-                  user.email}
-              </p>
+              <p className="font-medium text-gray-900">{patientName}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Date Generated</p>
               <p className="font-medium text-gray-900">
-                {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date().toLocaleDateString('en-US', {
+                  year: 'numeric', month: 'long', day: 'numeric'
+                })}
               </p>
             </div>
-            {selectedProviderId && (() => {
-              const prov = providers.find(p => p.id === selectedProviderId)
-              return prov ? (
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600">Prepared for</p>
-                  <p className="font-medium text-gray-900">
-                    {prov.name}{prov.specialty ? `, ${prov.specialty}` : ''}
-                  </p>
-                </div>
-              ) : null
-            })()}
+            {selectedProvider && (
+              <div className="col-span-2">
+                <p className="text-sm text-gray-600">Prepared for</p>
+                <p className="font-medium text-gray-900">
+                  {selectedProvider.name}{selectedProvider.specialty ? `, ${selectedProvider.specialty}` : ''}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Allergies Section */}
+        {/* Allergies */}
         {allergies.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
@@ -462,14 +619,10 @@ export default function ProviderReport({ user }) {
                 <div key={index} className="mb-2 last:mb-0">
                   <p className="font-semibold text-red-900">
                     {allergy.allergen}
-                    <span className="ml-2 text-sm font-normal">
-                      ({allergy.severity})
-                    </span>
+                    <span className="ml-2 text-sm font-normal">({allergy.severity})</span>
                   </p>
                   {allergy.reaction && (
-                    <p className="text-sm text-red-700 mt-1">
-                      Reaction: {allergy.reaction}
-                    </p>
+                    <p className="text-sm text-red-700 mt-1">Reaction: {allergy.reaction}</p>
                   )}
                 </div>
               ))}
@@ -477,8 +630,8 @@ export default function ProviderReport({ user }) {
           </div>
         )}
 
-        {/* Medications Section */}
-        {medications.length > 0 && (
+        {/* Medications */}
+        {medications.length > 0 ? (
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Current Medications</h2>
             <div className="space-y-4">
@@ -487,8 +640,8 @@ export default function ProviderReport({ user }) {
                   <h3 className="font-semibold text-gray-900 text-lg">
                     {med.medication?.name || med.custom_name}
                   </h3>
-                  {med.medication?.generic_name && 
-                   med.medication.name !== med.medication.generic_name && (
+                  {med.medication?.generic_name &&
+                    med.medication.name !== med.medication.generic_name && (
                     <p className="text-sm text-gray-600 italic">
                       Generic: {med.medication.generic_name}
                     </p>
@@ -502,16 +655,20 @@ export default function ProviderReport({ user }) {
                       <span className="text-gray-600">Frequency:</span>
                       <span className="font-medium break-words">{med.frequency}</span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-gray-600">Route:</span>
-                      <span className="font-medium">{med.route}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-gray-600">Started:</span>
-                      <span className="font-medium">
-                        {new Date(med.start_date).toLocaleDateString()}
-                      </span>
-                    </div>
+                    {med.route && (
+                      <div className="flex flex-col">
+                        <span className="text-gray-600">Route:</span>
+                        <span className="font-medium">{med.route}</span>
+                      </div>
+                    )}
+                    {med.start_date && (
+                      <div className="flex flex-col">
+                        <span className="text-gray-600">Started:</span>
+                        <span className="font-medium">
+                          {new Date(med.start_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   {med.prescriber_name && (
                     <p className="text-sm text-gray-600 mt-2">
@@ -527,12 +684,17 @@ export default function ProviderReport({ user }) {
               ))}
             </div>
           </div>
+        ) : (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Current Medications</h2>
+            <p className="text-gray-500 italic">No current medications on file.</p>
+          </div>
         )}
 
-        {/* Supplements Section */}
+        {/* Supplements */}
         {supplements.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Supplements & Vitamins</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Supplements &amp; Vitamins</h2>
             <div className="space-y-3">
               {supplements.map((supp, index) => (
                 <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
@@ -548,12 +710,14 @@ export default function ProviderReport({ user }) {
                       <span className="text-gray-600">Frequency:</span>
                       <span className="font-medium break-words">{supp.frequency}</span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-gray-600">Started:</span>
-                      <span className="font-medium">
-                        {new Date(supp.start_date).toLocaleDateString()}
-                      </span>
-                    </div>
+                    {supp.start_date && (
+                      <div className="flex flex-col">
+                        <span className="text-gray-600">Started:</span>
+                        <span className="font-medium">
+                          {new Date(supp.start_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -563,13 +727,13 @@ export default function ProviderReport({ user }) {
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-600">
-          <p>This medication list was generated by YFIT AI - Health & Fitness Tracker</p>
+          <p>This medication list was generated by YFIT AI - Health &amp; Fitness Tracker</p>
           <p className="mt-1">Please review this list with your healthcare provider</p>
         </div>
       </div>
 
       {/* Healthcare Providers Section */}
-      <div className="mt-8 print:hidden">
+      <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">My Healthcare Providers</h3>
           <button
@@ -587,7 +751,7 @@ export default function ProviderReport({ user }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name *
+                  Provider Name *
                 </label>
                 <input
                   type="text"
@@ -598,9 +762,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Specialty
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
                 <input
                   type="text"
                   value={providerForm.specialty}
@@ -610,9 +772,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                 <input
                   type="tel"
                   value={providerForm.phone}
@@ -622,9 +782,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
                   value={providerForm.email}
@@ -634,9 +792,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <textarea
                   value={providerForm.address}
                   onChange={(e) => setProviderForm({...providerForm, address: e.target.value})}

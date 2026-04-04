@@ -604,3 +604,11 @@
 - [ ] Test on real iPhone (Safari → Share → Add to Home Screen)
 - [ ] Test on real Android (Chrome install prompt appears automatically)
 - [ ] Verify YFIT AI icon appears correctly on home screen after install
+
+---
+## 🔧 Bug Fixes (Apr 4, 2026)
+- [x] Fix Medications Provider Report: PDF generation rewritten (removed broken Capacitor imports, uses jsPDF web-safe save with styled header/footer)
+- [x] Fix Medications Provider Report: Print button now opens a clean print window with only the report content (no app nav/sidebar)
+- [x] Add FormScoreGauge component: color-coded circular gauge with letter grade (A/B/C/D/F) used in live overlay and session results
+- [x] Upgrade Form Analysis live overlay score: replaced plain number with animated circular gauge
+- [x] Upgrade Form Analysis results summary: Avg Score and Best Score now use the same circular gauge for visual consistency

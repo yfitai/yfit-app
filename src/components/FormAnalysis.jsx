@@ -5,6 +5,53 @@ import {
   TrendingUp, Award, BarChart3, X, Info
 } from 'lucide-react';
 
+// ── Form Score Gauge ─────────────────────────────────────────────────────────
+// Consistent color-coded circular gauge with letter grade used in both the
+// live overlay and the post-session results summary.
+function FormScoreGauge({ score, size = 'md', showLabel = true }) {
+  const s = Math.max(0, Math.min(100, Math.round(score)))
+  const grade = s >= 90 ? 'A' : s >= 80 ? 'B' : s >= 70 ? 'C' : s >= 60 ? 'D' : 'F'
+  const color = s >= 85 ? '#22c55e' : s >= 75 ? '#eab308' : s >= 60 ? '#f97316' : '#ef4444'
+  const label = s >= 85 ? 'Excellent' : s >= 75 ? 'Good' : s >= 60 ? 'Fair' : 'Needs Work'
+
+  const radius = size === 'lg' ? 38 : size === 'sm' ? 22 : 30
+  const stroke = size === 'lg' ? 6 : size === 'sm' ? 4 : 5
+  const svgSize = (radius + stroke) * 2 + 4
+  const circumference = 2 * Math.PI * radius
+  const dashOffset = circumference - (s / 100) * circumference
+
+  const numSize = size === 'lg' ? 'text-3xl' : size === 'sm' ? 'text-base' : 'text-2xl'
+  const gradeSize = size === 'lg' ? 'text-lg' : size === 'sm' ? 'text-xs' : 'text-sm'
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="relative" style={{ width: svgSize, height: svgSize }}>
+        <svg width={svgSize} height={svgSize} className="-rotate-90" style={{ display: 'block' }}>
+          <circle
+            cx={svgSize / 2} cy={svgSize / 2} r={radius}
+            fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={stroke}
+          />
+          <circle
+            cx={svgSize / 2} cy={svgSize / 2} r={radius}
+            fill="none" stroke={color} strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={dashOffset}
+            style={{ transition: 'stroke-dashoffset 0.4s ease' }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className={`${numSize} font-bold leading-none`} style={{ color }}>{s}</span>
+          <span className={`${gradeSize} font-bold leading-none mt-0.5`} style={{ color }}>{grade}</span>
+        </div>
+      </div>
+      {showLabel && (
+        <span className="text-xs font-medium" style={{ color }}>{label}</span>
+      )}
+    </div>
+  )
+}
+
 const FormAnalysis = () => {
   const [user, setUser] = useState(null);
   const [exercises, setExercises] = useState([]);
@@ -368,13 +415,13 @@ const FormAnalysis = () => {
                 <div className="text-3xl font-bold text-blue-600">{repCount}</div>
                 <div className="text-sm text-gray-600">Total Reps</div>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg text-center">
-                <div className="text-3xl font-bold text-green-600">{Math.round(avgScore)}</div>
-                <div className="text-sm text-gray-600">Avg Score</div>
+              <div className="bg-gray-900 p-4 rounded-lg text-center">
+                <FormScoreGauge score={avgScore} size="md" />
+                <div className="text-sm text-gray-300 mt-1">Avg Score</div>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg text-center">
-                <div className="text-3xl font-bold text-purple-600">{Math.max(...repData.map(r => r.form_score), 0).toFixed(0)}</div>
-                <div className="text-sm text-gray-600">Best Score</div>
+              <div className="bg-gray-900 p-4 rounded-lg text-center">
+                <FormScoreGauge score={Math.max(...repData.map(r => r.form_score), 0)} size="md" />
+                <div className="text-sm text-gray-300 mt-1">Best Score</div>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg text-center">
                 <div className="text-3xl font-bold text-orange-600">{duration}s</div>
@@ -525,9 +572,9 @@ const FormAnalysis = () => {
                     <div className="text-3xl font-bold">{repCount}</div>
                     <div className="text-xs">Reps</div>
                   </div>
-                  <div className="bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg">
-                    <div className="text-3xl font-bold">{Math.round(currentFormScore)}</div>
-                    <div className="text-xs">Form Score</div>
+                  <div className="bg-black bg-opacity-60 text-white px-3 py-2 rounded-xl">
+                    <FormScoreGauge score={currentFormScore} size="sm" showLabel={false} />
+                    <div className="text-xs text-center mt-1 text-gray-300">Form</div>
                   </div>
                 </div>
 
