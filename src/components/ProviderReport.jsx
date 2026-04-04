@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase, getUserProfile } from '../lib/supabase'
 import { FileText, Printer, Download, Plus, User, Trash2 } from 'lucide-react'
-import jsPDF from 'jspdf'
+import { jsPDF } from 'jspdf'
 
 export default function ProviderReport({ user }) {
   const [medications, setMedications] = useState([])
@@ -463,7 +463,7 @@ export default function ProviderReport({ user }) {
   return (
     <div>
       {/* Action Bar — hidden when printing */}
-      <div className="no-print flex items-center justify-between mb-6">
+      <div className="print:hidden flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Provider Report</h2>
           <p className="text-gray-600 mt-1">
@@ -500,7 +500,7 @@ export default function ProviderReport({ user }) {
 
       {/* Provider selector — hidden when printing */}
       {providers.length > 0 && (
-        <div className="no-print mb-4">
+        <div className="print:hidden mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Addressed To (optional)</label>
           <select
             value={selectedProviderId}
@@ -676,7 +676,7 @@ export default function ProviderReport({ user }) {
       </div>
 
       {/* Healthcare Providers Section — hidden when printing */}
-      <div className="no-print mt-8">
+      <div className="print:hidden mt-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">My Healthcare Providers</h3>
           <button
