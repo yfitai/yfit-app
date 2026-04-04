@@ -456,7 +456,9 @@ export default function ProviderReport({ user }) {
 
     const iframe = document.createElement('iframe')
     iframe.id = 'yfit-print-frame'
-    iframe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;border:0;opacity:0;pointer-events:none;'
+    // Use position:absolute off-screen (not fixed at 0,0) to avoid
+    // intercepting touch events on Android over the main page buttons.
+    iframe.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;border:0;visibility:hidden;'
     document.body.appendChild(iframe)
 
     const printStyles = `
@@ -577,17 +579,28 @@ export default function ProviderReport({ user }) {
     </body></html>`)
     iframeDoc.close()
 
-    // Give the iframe a moment to render, then print
-    setTimeout(() => {
+    // Give the iframe a moment to render, then print and immediately remove
+    iframe.onload = () => {
       try {
         iframe.contentWindow.focus()
         iframe.contentWindow.print()
       } catch (e) {
         console.error('Print error:', e)
+      } finally {
+        // Remove immediately — the print dialog is synchronous on most browsers
+        setTimeout(() => {
+          if (document.getElementById('yfit-print-frame')) {
+            iframe.remove()
+          }
+        }, 500)
       }
-      // Clean up after print dialog closes
-      setTimeout(() => iframe.remove(), 2000)
-    }, 300)
+    }
+    // Fallback: also remove after 5 seconds in case onload never fires
+    setTimeout(() => {
+      if (document.getElementById('yfit-print-frame')) {
+        iframe.remove()
+      }
+    }, 5000)
   }
 
   if (loading) {
