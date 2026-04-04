@@ -592,3 +592,15 @@
 ### Edit Logged Meal Items
 - [ ] Add ability to click on a logged food item in the meals list to edit serving size or quantity
 - [ ] Editing should recalculate and update the macros (calories, protein, carbs, fat) for that entry
+
+---
+## 📱 PWA Install Prompts (Apr 4, 2026)
+- [x] Create manifest.json with YFIT AI branding, icons, shortcuts, and theme color
+- [x] Generate PWA icon sizes: 76x76, 120x120, 152x152, 180x180, 192x192, 512x512
+- [x] Generate apple-touch-icon.png for iOS home screen
+- [x] Add PWA meta tags to index.html: manifest link, apple-mobile-web-app-capable, theme-color
+- [x] Create InstallBanner.jsx component: iOS manual instructions + Android auto-prompt
+- [x] Inject InstallBanner into App.jsx (renders on all pages, dismissible for 30 days)
+- [ ] Test on real iPhone (Safari → Share → Add to Home Screen)
+- [ ] Test on real Android (Chrome install prompt appears automatically)
+- [ ] Verify YFIT AI icon appears correctly on home screen after install

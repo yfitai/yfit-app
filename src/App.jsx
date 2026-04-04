@@ -9,6 +9,7 @@ import './App.css'
 
 // Always-needed components loaded eagerly (small, needed immediately)
 import Navigation from './components/Navigation'
+import InstallBanner from './components/InstallBanner'
 import DailyInsight from './components/DailyInsight'
 import Footer from './components/Footer'
 import ErrorBoundary, { setupGlobalErrorHandlers } from './components/ErrorBoundary'
@@ -231,10 +232,11 @@ function App() {
                 </Routes>
               </Suspense>
 
-              <Footer />
-
+               <Footer />
               {/* Floating feedback button - visible on all authenticated pages */}
               <FeedbackButton user={user} />
+              {/* PWA install prompt for iOS and Android */}
+              <InstallBanner />
             </div>
           </BrowserRouter>
         </UnitPreferenceProvider>
