@@ -612,3 +612,21 @@
 - [x] Add FormScoreGauge component: color-coded circular gauge with letter grade (A/B/C/D/F) used in live overlay and session results
 - [x] Upgrade Form Analysis live overlay score: replaced plain number with animated circular gauge
 - [x] Upgrade Form Analysis results summary: Avg Score and Best Score now use the same circular gauge for visual consistency
+
+---
+## Session: Apr 4, 2026 — Domain & PWA Setup
+
+- [x] Fix jsPDF named import bug (was crashing Print/PDF buttons silently)
+- [x] Fix service worker cache version bump to v3 (force-clear stale bundles)
+- [x] Add FormScoreGauge component to FormAnalysis (live overlay + results summary)
+- [x] Fix ProviderReport print handler — use CSS @media print + window.print()
+- [x] Add PWA manifest.json with YFIT branding and shortcuts
+- [x] Generate square app icons (76/120/152/180/192/512px) from logo
+- [x] Add iOS install instruction banner (InstallBanner.jsx)
+- [x] Add Android install prompt handler
+- [x] Add iOS apple-mobile-web-app meta tags to index.html
+- [x] Move yfitai.com domain from yfit-marketing to yfit-app in Vercel
+- [x] Add www.yfitai.com to yfit-app in Vercel
+- [x] Change yfitai.com redirect from 307 temporary to 308 permanent
+- [x] Confirmed: yfitai.com now serves full YFIT app directly
+- [x] Confirmed: Print and PDF buttons working on web app
