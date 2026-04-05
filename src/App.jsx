@@ -154,93 +154,93 @@ function App() {
     )
   }
 
-  if (!user) {
-    return (
-      <ErrorBoundary>
-        <Auth onAuthSuccess={handleAuthSuccess} />
-      </ErrorBoundary>
-    )
-  }
-
-  // Show onboarding wizard for new users
-  if (needsOnboarding) {
-    return (
-      <ErrorBoundary userId={user.id}>
-        <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
-      </ErrorBoundary>
-    )
-  }
-
+  // All routing lives inside BrowserRouter so public pages (/, /legal, /signup)
+  // are accessible without being logged in. Protected routes redirect to /login.
   return (
-    <ErrorBoundary userId={user.id}>
-      <SubscriptionProvider>
-        <UnitPreferenceProvider>
-          <VersionChecker />
-          <BrowserRouter>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-              <Navigation user={user} />
-              {/* Daily Insight strip — visible on all authenticated pages, dismissible per day */}
-              {user && <DailyInsight variant="strip" />}
+    <ErrorBoundary userId={user?.id}>
+      <BrowserRouter>
+        {needsOnboarding && user ? (
+          // New user onboarding — full-screen wizard, no nav
+          <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
+        ) : !user ? (
+          // Logged-out: show public routes only
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/legal" element={<Legal />} />
+              {/* Any other path redirects to landing page for logged-out users */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        ) : (
+          // Logged-in: full app with navigation
+          <SubscriptionProvider>
+            <UnitPreferenceProvider>
+              <VersionChecker />
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+                <Navigation user={user} />
+                {/* Daily Insight strip — visible on all authenticated pages, dismissible per day */}
+                <DailyInsight variant="strip" />
 
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-                  <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-                  <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/legal" element={<Legal />} />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    {/* Redirect / to dashboard when logged in */}
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/legal" element={<Legal />} />
 
-                  {/* Protected Routes - Login required */}
-                  {user ? (
-                    <>
-                      {/* Free + Pro routes */}
-                      <Route path="/dashboard" element={<Dashboard user={user} />} />
-                      <Route path="/goals" element={<Goals user={user} />} />
-                      <Route path="/nutrition" element={<NutritionUnified user={user} />} />
-                      <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
-                      <Route path="/fitness" element={<Fitness user={user} />} />
-                      <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
-                      <Route path="/progress" element={<Progress user={user} />} />
-                      <Route path="/body-recomp" element={<BodyRecomp user={user} />} />
-                      <Route path="/manual-cleanup" element={<ManualCleanup />} />
-                      <Route path="/subscription" element={<SubscriptionPage user={user} />} />
+                    {/* Free + Pro routes */}
+                    <Route path="/dashboard" element={<Dashboard user={user} />} />
+                    <Route path="/goals" element={<Goals user={user} />} />
+                    <Route path="/nutrition" element={<NutritionUnified user={user} />} />
+                    <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
+                    <Route path="/fitness" element={<Fitness user={user} />} />
+                    <Route path="/fitness/workout" element={<WorkoutSessionTracker user={user} />} />
+                    <Route path="/progress" element={<Progress user={user} />} />
+                    <Route path="/body-recomp" element={<BodyRecomp user={user} />} />
+                    <Route path="/manual-cleanup" element={<ManualCleanup />} />
+                    <Route path="/subscription" element={<SubscriptionPage user={user} />} />
 
-                      {/* Pro-only routes — gated with ProRoute */}
-                      <Route path="/medications" element={
-                        <ProRoute feature="medication_tracking" featureLabel="Medication Tracking">
-                          <Medications user={user} />
-                        </ProRoute>
-                      } />
-                      {/* Predictions: free users see blurred preview (handled inside PredictionsUnified) */}
-                      <Route path="/predictions" element={<PredictionsUnified user={user} />} />
-                      {/* Usage-limited routes: free users get 3/month form analysis, 10/month AI coach */}
-                      <Route path="/fitness/form-analysis/:slug" element={
-                        <ProRoute feature="form_analysis" featureLabel="AI Form Analysis">
-                          <FormAnalysis user={user} />
-                        </ProRoute>
-                      } />
-                      <Route path="/ai-coach-faq" element={
-                        <ProRoute feature="ai_coach" featureLabel="AI Coach">
-                          <AICoachFAQ userId={user.id} />
-                        </ProRoute>
-                      } />
-                    </>
-                  ) : (
-                    <Route path="*" element={<Navigate to="/login" replace />} />
-                  )}
-                </Routes>
-              </Suspense>
+                    {/* Pro-only routes — gated with ProRoute */}
+                    <Route path="/medications" element={
+                      <ProRoute feature="medication_tracking" featureLabel="Medication Tracking">
+                        <Medications user={user} />
+                      </ProRoute>
+                    } />
+                    {/* Predictions: free users see blurred preview (handled inside PredictionsUnified) */}
+                    <Route path="/predictions" element={<PredictionsUnified user={user} />} />
+                    {/* Usage-limited routes: free users get 3/month form analysis, 10/month AI coach */}
+                    <Route path="/fitness/form-analysis/:slug" element={
+                      <ProRoute feature="form_analysis" featureLabel="AI Form Analysis">
+                        <FormAnalysis user={user} />
+                      </ProRoute>
+                    } />
+                    <Route path="/ai-coach-faq" element={
+                      <ProRoute feature="ai_coach" featureLabel="AI Coach">
+                        <AICoachFAQ userId={user.id} />
+                      </ProRoute>
+                    } />
 
-               <Footer />
-              {/* Floating feedback button - visible on all authenticated pages */}
-              <FeedbackButton user={user} />
-              {/* PWA install prompt for iOS and Android */}
-              <InstallBanner />
-            </div>
-          </BrowserRouter>
-        </UnitPreferenceProvider>
-      </SubscriptionProvider>
+                    {/* Fallback: redirect unknown paths to dashboard */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </Suspense>
+
+                <Footer />
+                {/* Floating feedback button - visible on all authenticated pages */}
+                <FeedbackButton user={user} />
+                {/* PWA install prompt for iOS and Android */}
+                <InstallBanner />
+              </div>
+            </UnitPreferenceProvider>
+          </SubscriptionProvider>
+        )}
+      </BrowserRouter>
     </ErrorBoundary>
   )
 }

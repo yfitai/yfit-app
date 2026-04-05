@@ -4,7 +4,21 @@
  */
 
 // Static cache name - old caches are cleared on activate
-const CACHE_NAME = 'yfit-cache-v3'; // bumped Apr 4 2026 to clear cached broken jsPDF bundle
+const CACHE_NAME = 'yfit-cache-v4'; // bumped Apr 5 2026 - force clear for new maskable PWA icons
+
+// PWA icon filenames that must NEVER be cached (always fetch fresh so
+// the home-screen icon updates when the user re-installs the PWA)
+const NEVER_CACHE = [
+  '/icon-76x76.png',
+  '/icon-120x120.png',
+  '/icon-152x152.png',
+  '/icon-180x180.png',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
+  '/icon-maskable-512x512.png',
+  '/apple-touch-icon.png',
+  '/manifest.json',
+];
 
 // Install event - skip waiting to activate immediately
 self.addEventListener('install', (event) => {
@@ -40,6 +54,15 @@ self.addEventListener('fetch', (event) => {
   
   // Skip non-GET and chrome-extension requests
   if (event.request.method !== 'GET' || url.protocol === 'chrome-extension:') {
+    return;
+  }
+
+  // Never cache PWA icons or manifest — always fetch fresh from network
+  if (NEVER_CACHE.includes(url.pathname)) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .catch(() => caches.match(event.request))
+    );
     return;
   }
 
