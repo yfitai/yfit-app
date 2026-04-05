@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <meta name="version" content="2.0.0" />
+    <meta name="version" content="2.0.1" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -23,35 +23,35 @@
     <!-- Android / Chrome PWA -->
     <meta name="theme-color" content="#10b981" />
     <meta name="mobile-web-app-capable" content="yes" />
-    
-    <!-- Content Security Policy for Capacitor remote loading -->
+
+    <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self' https://yfit-deploy.vercel.app https://*.supabase.co https://*.openfoodfacts.org https://api.nal.usda.gov https://cdn.jsdelivr.net capacitor://localhost http://localhost;
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://yfit-deploy.vercel.app https://cdn.jsdelivr.net capacitor://localhost http://localhost;
-      style-src 'self' 'unsafe-inline' https://yfit-deploy.vercel.app https://fonts.googleapis.com capacitor://localhost;
+      default-src 'self' https://yfitai.com https://*.supabase.co https://*.openfoodfacts.org https://api.nal.usda.gov https://cdn.jsdelivr.net capacitor://localhost http://localhost;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://yfitai.com https://cdn.jsdelivr.net capacitor://localhost http://localhost;
+      style-src 'self' 'unsafe-inline' https://yfitai.com https://fonts.googleapis.com capacitor://localhost;
       img-src 'self' data: blob: https: capacitor://localhost http://localhost;
       font-src 'self' data: https://fonts.gstatic.com capacitor://localhost;
-      connect-src 'self' https://yfit-deploy.vercel.app https://*.supabase.co https://*.openfoodfacts.org https://api.nal.usda.gov https://cdn.jsdelivr.net capacitor://localhost http://localhost ws://localhost wss://localhost;
+      connect-src 'self' https://yfitai.com https://*.supabase.co https://*.openfoodfacts.org https://api.nal.usda.gov https://cdn.jsdelivr.net capacitor://localhost http://localhost ws://localhost wss://localhost;
       media-src 'self' blob: data: capacitor://localhost http://localhost;
       frame-src 'self' capacitor://localhost http://localhost;
     ">
-    
+
     <title>YFIT AI - Your Intelligent Health Companion</title>
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://yfitai.com/" />
     <meta property="og:title" content="YFIT AI - Your Intelligent Health Companion" />
     <meta property="og:description" content="AI-powered fitness and nutrition tracking. Smart workout plans, real-time form correction, and instant nutrition scanning." />
     <meta property="og:image" content="https://yfitai.com/icon-512x512.png" />
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://yfitai.com/" />
     <meta property="twitter:title" content="YFIT AI - Your Intelligent Health Companion" />
     <meta property="twitter:description" content="AI-powered fitness and nutrition tracking. Smart workout plans, real-time form correction, and instant nutrition scanning." />
     <meta property="twitter:image" content="https://yfitai.com/icon-512x512.png" />
-    
+
     <!-- Additional SEO -->
     <meta name="description" content="YFIT AI - AI-powered fitness and nutrition tracking. Smart workout plans, real-time form correction, and instant nutrition scanning." />
     <meta name="keywords" content="fitness, nutrition, AI, workout tracker, health, wellness, YFIT" />
@@ -61,6 +61,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-
   </body>
 </html>

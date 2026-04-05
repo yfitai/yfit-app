@@ -2,7 +2,7 @@
   "name": "YFIT AI - Your Intelligent Health Companion",
   "short_name": "YFIT AI",
   "description": "AI-powered fitness and nutrition tracking. Smart workout plans, real-time form correction, and instant nutrition scanning.",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#10b981",
