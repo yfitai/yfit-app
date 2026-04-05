@@ -630,3 +630,14 @@
 - [x] Change yfitai.com redirect from 307 temporary to 308 permanent
 - [x] Confirmed: yfitai.com now serves full YFIT app directly
 - [x] Confirmed: Print and PDF buttons working on web app
+
+---
+## Session: Apr 5, 2026 — FAQ & PWA Icon Improvements
+- [x] Round PWA icons to iOS/Android squircle style (22% corner radius, all sizes: 76/120/152/180/192/512px + apple-touch-icon)
+- [x] Add "Help & FAQ" tab to Legal page (first tab, most visible)
+- [x] FAQ section: Login & Account (6 questions — web-only login, no Play Store, password reset, multi-device)
+- [x] FAQ section: Add to Home Screen (5 questions — Android Chrome steps, iPhone Safari steps, desktop install, icon troubleshooting)
+- [x] FAQ section: Subscriptions & Billing (3 questions — free plan, cancel, refund)
+- [x] FAQ section: Technical Help (3 questions — app not loading, data not saving, contact support)
+- [ ] Test FAQ page on mobile — verify accordion expand/collapse works on touch
+- [ ] Test rounded icon appears correctly after PWA reinstall on Android and iPhone
