@@ -1,6 +1,7 @@
 
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, Brain, TrendingUp, Heart, Dumbbell, Apple, Calendar, Sparkles } from 'lucide-react'
+import { Activity, Brain, TrendingUp, Heart, Dumbbell, Apple, Calendar, Sparkles, ChevronDown, ChevronUp, HelpCircle, Smartphone, Monitor } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -112,6 +113,9 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* FAQ Section */}
+      <FAQSection />
+
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         <h2 className="text-4xl font-bold text-gray-900 mb-6">
@@ -127,6 +131,164 @@ export default function LandingPage() {
           <Sparkles className="w-6 h-6" />
           Start Your Free Trial
         </Link>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-gradient-to-r from-blue-500 to-green-500 p-2 rounded-lg">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-white font-bold text-lg">YFIT AI</span>
+          </div>
+          <div className="flex gap-6 text-sm">
+            <Link to="/legal" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/legal" className="hover:text-white transition-colors">Terms of Service</Link>
+            <a href="mailto:support@yfitai.com" className="hover:text-white transition-colors">support@yfitai.com</a>
+          </div>
+          <p className="text-sm">© 2025 YFIT AI. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function FAQSection() {
+  const [openItem, setOpenItem] = useState(null)
+  const toggle = (id) => setOpenItem(openItem === id ? null : id)
+
+  const faqs = [
+    {
+      id: 'what-is',
+      q: 'What is YFIT AI and how does it work?',
+      a: 'YFIT AI is a web-based fitness and nutrition app you access directly from your browser at yfitai.com — no app store download needed. Create a free account, set your goals, and start tracking workouts, meals, medications, and progress right away.'
+    },
+    {
+      id: 'no-app-store',
+      q: 'Is YFIT AI on the Google Play Store or Apple App Store?',
+      a: 'YFIT AI is a Progressive Web App (PWA) — you use it through your browser, not the Play Store or App Store. The good news: you can add it to your home screen so it opens and feels exactly like a native app. See the install instructions below.'
+    },
+    {
+      id: 'android-install',
+      q: 'How do I add YFIT AI to my Android home screen?',
+      a: (
+        <div>
+          <div className="flex items-center gap-2 mb-3 text-blue-600 font-medium">
+            <Smartphone className="w-4 h-4" />
+            <span>Android — Chrome browser</span>
+          </div>
+          <ol className="list-decimal ml-5 space-y-2 text-gray-700">
+            <li>Open <strong>Chrome</strong> and go to <strong>yfitai.com</strong></li>
+            <li>Tap the <strong>three-dot menu (⋮)</strong> in the top-right corner</li>
+            <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
+            <li>Tap <strong>"Add"</strong> to confirm</li>
+            <li>The YFIT AI icon appears on your home screen — tap it anytime to open!</li>
+          </ol>
+        </div>
+      )
+    },
+    {
+      id: 'iphone-install',
+      q: 'How do I add YFIT AI to my iPhone home screen?',
+      a: (
+        <div>
+          <div className="flex items-center gap-2 mb-3 text-blue-600 font-medium">
+            <Smartphone className="w-4 h-4" />
+            <span>iPhone — must use Safari (not Chrome)</span>
+          </div>
+          <ol className="list-decimal ml-5 space-y-2 text-gray-700">
+            <li>Open <strong>Safari</strong> and go to <strong>yfitai.com</strong></li>
+            <li>Tap the <strong>Share button</strong> at the bottom (box with arrow pointing up)</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+            <li>Tap <strong>"Add"</strong> in the top-right corner</li>
+            <li>The YFIT AI icon appears on your home screen — tap it anytime to open!</li>
+          </ol>
+        </div>
+      )
+    },
+    {
+      id: 'desktop-install',
+      q: 'Can I install YFIT AI on my computer?',
+      a: (
+        <div>
+          <div className="flex items-center gap-2 mb-3 text-blue-600 font-medium">
+            <Monitor className="w-4 h-4" />
+            <span>Desktop — Chrome or Edge</span>
+          </div>
+          <ol className="list-decimal ml-5 space-y-2 text-gray-700">
+            <li>Open Chrome or Edge and go to <strong>yfitai.com</strong></li>
+            <li>Look for the <strong>install icon</strong> (computer with down arrow) in the address bar</li>
+            <li>Click it and select <strong>"Install"</strong></li>
+            <li>YFIT AI opens in its own window and appears in your taskbar or apps list</li>
+          </ol>
+        </div>
+      )
+    },
+    {
+      id: 'login-help',
+      q: 'I cannot log in — what should I do?',
+      a: 'Make sure you are visiting yfitai.com and using the email you signed up with. If you forgot your password, tap "Forgot Password" on the sign-in screen and check your email (including spam). If you still cannot get in, email us at support@yfitai.com and we will help you within 24 hours.'
+    },
+    {
+      id: 'multi-device',
+      q: 'Can I use YFIT AI on multiple devices?',
+      a: 'Yes — because YFIT AI is web-based, you can log in from any phone, tablet, or computer using the same email and password. Your data syncs automatically across all devices.'
+    },
+    {
+      id: 'free-plan',
+      q: 'Is there a free version?',
+      a: 'Yes! The free Starter plan includes basic workout tracking, manual meal logging, and 3 saved routines. Upgrade to Pro anytime to unlock AI coaching, nutrition scanning, advanced analytics, and more.'
+    },
+    {
+      id: 'icon-blank',
+      q: 'I added it to my home screen but the icon looks like a blank page.',
+      a: 'This happens when the page was not fully loaded before you added it. Remove the icon, open yfitai.com again in your browser, wait for it to fully load, then follow the install steps again. On iPhone use Safari; on Android use Chrome.'
+    },
+  ]
+
+  return (
+    <div className="bg-white py-20">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <HelpCircle className="w-4 h-4" />
+            Frequently Asked Questions
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Got Questions? We Have Answers.</h2>
+          <p className="text-lg text-gray-600">Everything you need to know about getting started with YFIT AI.</p>
+        </div>
+
+        <div className="space-y-3">
+          {faqs.map((item) => (
+            <div key={item.id} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <button
+                onClick={() => toggle(item.id)}
+                className="w-full flex items-center justify-between px-6 py-5 text-left bg-white hover:bg-gray-50 transition-colors"
+              >
+                <span className="font-semibold text-gray-800 pr-4 text-base">{item.q}</span>
+                {openItem === item.id
+                  ? <ChevronUp className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                  : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />}
+              </button>
+              {openItem === item.id && (
+                <div className="px-6 pb-5 pt-2 bg-blue-50 text-gray-700 text-sm leading-relaxed border-t border-blue-100">
+                  {typeof item.a === 'string' ? <p>{item.a}</p> : item.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 p-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl border border-blue-100 text-center">
+          <p className="text-gray-700">
+            Still need help?{' '}
+            <a href="mailto:support@yfitai.com" className="text-blue-600 font-semibold underline hover:text-blue-800">
+              Email support@yfitai.com
+            </a>
+            {' '}— we respond within 24 hours.
+          </p>
+        </div>
       </div>
     </div>
   )
