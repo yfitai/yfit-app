@@ -245,6 +245,39 @@ function FAQSection() {
       q: 'I added it to my home screen but the icon looks like a blank page.',
       a: 'This happens when the page was not fully loaded before you added it. Remove the icon, open yfitai.com again in your browser, wait for it to fully load, then follow the install steps again. On iPhone use Safari; on Android use Chrome.'
     },
+    {
+      id: 'icon-square',
+      q: 'Why does the YFIT AI icon look square on my phone when other app icons are rounded?',
+      a: (
+        <div className="space-y-3 text-gray-700 text-sm leading-relaxed">
+          <p>
+            The shape of your home screen icons — round, square, or squircle — is controlled by your
+            phone's launcher, not by YFIT AI. Every app on your phone gets the same shape treatment,
+            including apps from the Play Store.
+          </p>
+          <p>
+            <strong>Samsung phones (Galaxy S, A, Z series):</strong> Samsung's One UI launcher uses
+            square icons by default. This is normal — all your apps will look square on Samsung unless
+            you change the launcher. There is no icon shape setting in Samsung's home screen options.
+            If you want rounded icons, you can install a third-party launcher from the Play Store
+            (such as Nova Launcher) and set the icon shape to rounded square or circle.
+          </p>
+          <p>
+            <strong>Google Pixel and stock Android phones:</strong> These phones apply a squircle
+            (rounded square) shape automatically, so YFIT AI will appear rounded on these devices.
+          </p>
+          <p>
+            <strong>In short:</strong> A square icon on Samsung is expected and normal — it does not
+            affect how the app works. YFIT AI is fully functional regardless of icon shape.
+          </p>
+        </div>
+      )
+    },
+    {
+      id: 'already-logged-in',
+      q: 'I uninstalled the app and typed yfitai.com but it went straight to my account — is that normal?',
+      a: 'Yes, this is normal and expected. Uninstalling the home screen shortcut only removes the icon — it does not log you out. Your browser remembers your login session, so visiting yfitai.com again takes you straight to your dashboard. To fully log out, open the app and tap your profile icon, then select Sign Out. To re-add the icon to your home screen, just follow the install steps above while you are already logged in — it works the same way.'
+    },
   ]
 
   return (
