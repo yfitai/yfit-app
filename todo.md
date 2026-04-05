@@ -641,3 +641,23 @@
 - [x] FAQ section: Technical Help (3 questions — app not loading, data not saving, contact support)
 - [ ] Test FAQ page on mobile — verify accordion expand/collapse works on touch
 - [ ] Test rounded icon appears correctly after PWA reinstall on Android and iPhone
+
+---
+## Session: Apr 5, 2026
+
+### Completed
+- [x] Rounded PWA icon with safe-zone padding (maskable icon for Android)
+- [x] Service worker bumped to v4, icons excluded from cache-first strategy
+- [x] Public landing page FAQ added (visible before login) with install steps, Samsung icon explanation, auto-login explanation
+- [x] App routing fixed — logged-out users see marketing landing page at yfitai.com; logged-in users go to dashboard
+- [x] Content Security Policy updated — removed stale yfit-deploy.vercel.app references
+- [x] manifest.json start_url changed to /dashboard to fix Samsung PWA spinning disk launch bug
+- [x] Android PWA now loads correctly from home screen icon
+
+### Next Session — User Flow Testing
+- [ ] Test scenario 1: New visitor types yfitai.com → sees landing page → clicks Get Started Free → sign-up flow
+- [ ] Test scenario 2: Existing user types yfitai.com → sees landing page → clicks Sign In → dashboard
+- [ ] Test scenario 3: Already logged in user types yfitai.com → goes straight to dashboard
+- [ ] Test scenario 4: Android new install — Chrome → Add to Home Screen → icon → dashboard
+- [ ] Test scenario 5: iPhone new install — Safari → Add to Home Screen → icon → dashboard
+- [ ] Review and confirm all FAQ entries are accurate after testing flows
