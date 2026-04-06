@@ -35,7 +35,7 @@ const WorkoutSessionTracker = lazy(() => import('./components/WorkoutSessionTrac
 const AICoachFAQ = lazy(() => import('./components/AICoachFAQ'))
 const PredictionsUnified = lazy(() => import('./components/PredictionsUnified'))
 const BodyRecomp = lazy(() => import('./components/BodyRecomp'))
-const LandingPage = lazy(() => import('./pages/LandingPage'))
+const LandingPage = lazy(() => import('./pages/LandingPage.tsx'))
 const Legal = lazy(() => import('./pages/Legal'))
 const ResetPassword = lazy(() => import('./components/ResetPassword'))
 const ManualCleanup = lazy(() => import('./pages/ManualCleanup'))

@@ -1,110 +1,234 @@
 /* ── Marketing Landing Page Theme ─────────────────────────────────────────────
    These styles apply ONLY to the marketing landing page (.landing-page wrapper).
    They do not affect the main app dashboard or any other pages.
+
+   IMPORTANT: yfit-app uses Tailwind 4 with @theme inline which maps:
+     --color-background → var(--background)
+     --color-primary    → var(--primary)
+     etc.
+   So we must override the underlying --background, --primary etc. variables,
+   NOT the --color-* aliases, within the .landing-page scope.
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* Import Space Grotesk font for headings */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
+/* ── Root-level overrides scoped to .landing-page ────────────────────────── */
 .landing-page {
-  --lp-background: oklch(0.95 0.01 200);
-  --lp-foreground: oklch(0.15 0.02 220);
-  --lp-card: oklch(0.98 0.005 200 / 0.8);
-  --lp-card-foreground: oklch(0.15 0.02 220);
-  --lp-primary: oklch(0.55 0.15 220);
-  --lp-primary-foreground: oklch(0.98 0 0);
-  --lp-secondary: oklch(0.85 0.05 200);
-  --lp-secondary-foreground: oklch(0.15 0.02 220);
-  --lp-muted: oklch(0.88 0.02 200);
-  --lp-muted-foreground: oklch(0.45 0.02 220);
-  --lp-accent: oklch(0.6 0.15 180);
-  --lp-accent-foreground: oklch(0.98 0 0);
-  --lp-border: oklch(0.85 0.03 200);
+  /* Override the underlying CSS variables that @theme inline references */
+  --background: oklch(0.95 0.01 200);
+  --foreground: oklch(0.15 0.02 220);
+  --card: oklch(0.98 0.005 200 / 0.8);
+  --card-foreground: oklch(0.15 0.02 220);
+  --popover: oklch(0.98 0.005 200);
+  --popover-foreground: oklch(0.15 0.02 220);
+  --primary: oklch(0.55 0.15 220);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.85 0.05 200);
+  --secondary-foreground: oklch(0.15 0.02 220);
+  --muted: oklch(0.88 0.02 200);
+  --muted-foreground: oklch(0.45 0.02 220);
+  --accent: oklch(0.6 0.15 180);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.85 0.03 200);
+  --input: oklch(0.85 0.03 200);
+  --ring: oklch(0.55 0.15 220);
+
+  /* Also override the --color-* aliases directly for any inline usage */
+  --color-background: oklch(0.95 0.01 200);
+  --color-foreground: oklch(0.15 0.02 220);
+  --color-card: oklch(0.98 0.005 200 / 0.8);
+  --color-card-foreground: oklch(0.15 0.02 220);
+  --color-primary: oklch(0.55 0.15 220);
+  --color-primary-foreground: oklch(0.98 0 0);
+  --color-secondary: oklch(0.85 0.05 200);
+  --color-secondary-foreground: oklch(0.15 0.02 220);
+  --color-muted: oklch(0.88 0.02 200);
+  --color-muted-foreground: oklch(0.45 0.02 220);
+  --color-accent: oklch(0.6 0.15 180);
+  --color-accent-foreground: oklch(0.98 0 0);
+  --color-border: oklch(0.85 0.03 200);
 
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, oklch(0.92 0.03 220) 0%, oklch(0.95 0.02 180) 100%);
+  background: linear-gradient(135deg, oklch(0.92 0.03 220) 0%, oklch(0.95 0.02 180) 100%) !important;
   background-attachment: fixed;
   min-height: 100vh;
-  color: var(--lp-foreground);
-
-  /* Override Tailwind theme tokens for this scope */
-  --color-background: var(--lp-background);
-  --color-foreground: var(--lp-foreground);
-  --color-card: var(--lp-card);
-  --color-card-foreground: var(--lp-card-foreground);
-  --color-primary: var(--lp-primary);
-  --color-primary-foreground: var(--lp-primary-foreground);
-  --color-secondary: var(--lp-secondary);
-  --color-secondary-foreground: var(--lp-secondary-foreground);
-  --color-muted: var(--lp-muted);
-  --color-muted-foreground: var(--lp-muted-foreground);
-  --color-accent: var(--lp-accent);
-  --color-accent-foreground: var(--lp-accent-foreground);
-  --color-border: var(--lp-border);
+  color: oklch(0.15 0.02 220);
 }
 
+/* ── Typography ──────────────────────────────────────────────────────────── */
 .landing-page h1,
 .landing-page h2,
 .landing-page h3,
 .landing-page h4,
 .landing-page h5,
 .landing-page h6 {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 700;
   letter-spacing: -0.025em;
+  color: oklch(0.15 0.02 220);
 }
 
+/* ── Utility classes ─────────────────────────────────────────────────────── */
 .landing-page .glass-card {
-  background: oklch(0.98 0.005 200 / 0.8);
+  background: oklch(0.98 0.005 200 / 0.8) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
   box-shadow: 0 4px 24px -4px oklch(0.55 0.15 220 / 0.12);
 }
 
 .landing-page .text-gradient {
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(135deg, oklch(0.55 0.15 220), oklch(0.6 0.15 180));
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  background-image: linear-gradient(135deg, oklch(0.55 0.15 220), oklch(0.6 0.15 180)) !important;
 }
 
 .landing-page .glow-effect {
   box-shadow: 0 4px 20px -2px oklch(0.55 0.15 220 / 0.3);
 }
 
-/* Ensure cards inside landing page use the marketing theme */
-.landing-page [class*="bg-card"] {
+/* ── shadcn/ui Card overrides ────────────────────────────────────────────── */
+/* Target the actual rendered Tailwind utility classes */
+.landing-page .bg-card,
+.landing-page [class~="bg-card"] {
   background-color: oklch(0.98 0.005 200 / 0.8) !important;
+}
+
+.landing-page .text-card-foreground,
+.landing-page [class~="text-card-foreground"] {
   color: oklch(0.15 0.02 220) !important;
 }
 
-.landing-page [class*="text-muted-foreground"] {
+/* ── Text color overrides ────────────────────────────────────────────────── */
+.landing-page .text-foreground,
+.landing-page [class~="text-foreground"] {
+  color: oklch(0.15 0.02 220) !important;
+}
+
+.landing-page .text-muted-foreground,
+.landing-page [class~="text-muted-foreground"] {
   color: oklch(0.45 0.02 220) !important;
 }
 
-.landing-page [class*="bg-background"] {
-  background-color: oklch(0.95 0.01 200) !important;
-}
-
-/* Primary button color override for landing page */
-.landing-page [class*="bg-primary"]:not([class*="bg-primary/"]) {
-  background-color: oklch(0.55 0.15 220) !important;
-}
-
-.landing-page [class*="text-primary"]:not([class*="text-primary/"]) {
+.landing-page .text-primary,
+.landing-page [class~="text-primary"] {
   color: oklch(0.55 0.15 220) !important;
 }
 
-.landing-page [class*="border-primary"]:not([class*="border-primary/"]) {
+.landing-page .text-accent,
+.landing-page [class~="text-accent"] {
+  color: oklch(0.6 0.15 180) !important;
+}
+
+/* ── Background overrides ────────────────────────────────────────────────── */
+.landing-page .bg-background,
+.landing-page [class~="bg-background"] {
+  background-color: oklch(0.95 0.01 200) !important;
+}
+
+.landing-page .bg-muted,
+.landing-page [class~="bg-muted"] {
+  background-color: oklch(0.88 0.02 200) !important;
+}
+
+/* Primary button */
+.landing-page .bg-primary,
+.landing-page [class~="bg-primary"] {
+  background-color: oklch(0.55 0.15 220) !important;
+  color: oklch(0.98 0 0) !important;
+}
+
+.landing-page .hover\:bg-primary\/90:hover {
+  background-color: oklch(0.55 0.15 220 / 0.9) !important;
+}
+
+/* Accent */
+.landing-page .bg-accent,
+.landing-page [class~="bg-accent"] {
+  background-color: oklch(0.6 0.15 180) !important;
+  color: oklch(0.98 0 0) !important;
+}
+
+/* ── Border overrides ────────────────────────────────────────────────────── */
+.landing-page .border-border,
+.landing-page [class~="border-border"] {
+  border-color: oklch(0.85 0.03 200) !important;
+}
+
+.landing-page .border-primary,
+.landing-page [class~="border-primary"] {
   border-color: oklch(0.55 0.15 220) !important;
 }
 
-/* Accent color overrides */
-.landing-page [class*="bg-accent"]:not([class*="bg-accent/"]) {
-  background-color: oklch(0.6 0.15 180) !important;
+/* ── Opacity variants ────────────────────────────────────────────────────── */
+.landing-page .bg-primary\/10 {
+  background-color: oklch(0.55 0.15 220 / 0.1) !important;
 }
 
-.landing-page [class*="text-accent"]:not([class*="text-accent/"]) {
-  color: oklch(0.6 0.15 180) !important;
+.landing-page .bg-primary\/20 {
+  background-color: oklch(0.55 0.15 220 / 0.2) !important;
+}
+
+.landing-page .border-primary\/20 {
+  border-color: oklch(0.55 0.15 220 / 0.2) !important;
+}
+
+.landing-page .border-primary\/50 {
+  border-color: oklch(0.55 0.15 220 / 0.5) !important;
+}
+
+.landing-page .bg-accent\/20 {
+  background-color: oklch(0.6 0.15 180 / 0.2) !important;
+}
+
+.landing-page .text-accent\/80 {
+  color: oklch(0.6 0.15 180 / 0.8) !important;
+}
+
+.landing-page .border-accent\/50 {
+  border-color: oklch(0.6 0.15 180 / 0.5) !important;
+}
+
+.landing-page .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.landing-page .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.landing-page .border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ── Section backgrounds ─────────────────────────────────────────────────── */
+.landing-page .bg-black\/20 {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.landing-page .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ── Outline button ──────────────────────────────────────────────────────── */
+.landing-page button[class*="variant-outline"],
+.landing-page [data-variant="outline"] {
+  border-color: oklch(0.85 0.03 200) !important;
+  color: oklch(0.15 0.02 220) !important;
+}
+
+/* ── Neon glow ───────────────────────────────────────────────────────────── */
+.landing-page .neon-glow {
+  box-shadow: 0 0 20px oklch(0.55 0.15 220 / 0.4), 0 4px 12px oklch(0.55 0.15 220 / 0.2);
+}
+
+/* ── Shadow overrides ────────────────────────────────────────────────────── */
+.landing-page .shadow-primary\/10 {
+  box-shadow: 0 4px 24px oklch(0.55 0.15 220 / 0.1) !important;
+}
+
+.landing-page .shadow-primary\/25 {
+  box-shadow: 0 4px 24px oklch(0.55 0.15 220 / 0.25) !important;
 }
