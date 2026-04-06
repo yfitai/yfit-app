@@ -154,16 +154,16 @@ const exercises = [
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw the pose skeleton
+    // Draw the pose skeleton — bones always green, joints always red
     drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {
-      color: '#00FF00',
-      lineWidth: 4
+      color: '#4ade80',   // green-400 — never changes
+      lineWidth: 5
     });
     
     drawLandmarks(ctx, results.poseLandmarks, {
-      color: '#FF0000',
+      color: '#ef4444',   // red-500 — never changes
       lineWidth: 2,
-      radius: 6
+      radius: 8
     });
 
     ctx.restore();

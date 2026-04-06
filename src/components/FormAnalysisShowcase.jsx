@@ -118,7 +118,13 @@ export default function FormAnalysisShowcase() {
 
   const exercise = ALL_EXERCISES[exerciseIdx];
 
-  const drawFrame = useCallback((canvas, joints, feedbackColor) => {
+  // Fixed skeleton colors — never change based on score
+  const BONE_COLOR = '#4ade80';   // green-400 — always for limbs
+  const JOINT_COLOR = '#ef4444';  // red-500 — always for joints
+  const HEAD_COLOR = '#ffffff';   // white head marker
+  const LARGE_JOINTS = new Set(['leftHip', 'rightHip', 'leftKnee', 'rightKnee', 'leftShoulder', 'rightShoulder']);
+
+  const drawFrame = useCallback((canvas, joints) => {
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
     const h = canvas.height;
@@ -138,47 +144,64 @@ export default function FormAnalysisShowcase() {
       ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke();
     }
 
-    // Draw connections
+    // Draw connections — always green with glow
     for (const [a, b] of CONNECTIONS) {
       if (!joints[a] || !joints[b]) continue;
       const ax = joints[a][0] * w;
       const ay = joints[a][1] * h;
       const bx = joints[b][0] * w;
       const by = joints[b][1] * h;
-
-      // Glow
-      ctx.shadowColor = feedbackColor;
-      ctx.shadowBlur = 8;
-      ctx.strokeStyle = feedbackColor + 'aa';
-      ctx.lineWidth = 3;
+      ctx.save();
+      ctx.shadowColor = BONE_COLOR;
+      ctx.shadowBlur = 15;
+      ctx.strokeStyle = BONE_COLOR + 'cc';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(ax, ay);
       ctx.lineTo(bx, by);
       ctx.stroke();
-      ctx.shadowBlur = 0;
+      ctx.restore();
     }
 
-    // Draw joints
+    // Draw joints — always red with glow, except head which is white
     for (const [name, pos] of Object.entries(joints)) {
       const x = pos[0] * w;
       const y = pos[1] * h;
       const isHead = name === 'head';
-      const r = isHead ? 10 : 5;
-
-      ctx.shadowColor = feedbackColor;
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = isHead ? '#ffffff' : feedbackColor;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Joint ring
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(x, y, r + 3, 0, Math.PI * 2);
-      ctx.stroke();
+      const isLarge = LARGE_JOINTS.has(name);
+      const r = isHead ? 11 : isLarge ? 8 : 6;
+      ctx.save();
+      if (isHead) {
+        // Distinctive head: white circle with green ring
+        ctx.shadowColor = HEAD_COLOR;
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = HEAD_COLOR;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = BONE_COLOR;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 4, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        // All other joints: red with glow
+        ctx.shadowColor = JOINT_COLOR;
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = JOINT_COLOR;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 3, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
     }
   }, []);
 
@@ -206,7 +229,7 @@ export default function FormAnalysisShowcase() {
 
       const joints = interpolateJoints(frames[state.frameIdx].joints, frames[nextIdx].joints, state.t);
       const fb = frames[state.frameIdx].feedback;
-      drawFrame(canvas, joints, fb.color);
+      drawFrame(canvas, joints);  // bones always green, joints always red
 
       setFeedback(fb);
 
