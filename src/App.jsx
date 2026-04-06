@@ -40,6 +40,8 @@ const Legal = lazy(() => import('./pages/Legal'))
 const ResetPassword = lazy(() => import('./components/ResetPassword'))
 const ManualCleanup = lazy(() => import('./pages/ManualCleanup'))
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
+const FAQ = lazy(() => import('./pages/FAQ.tsx'))
+const Contact = lazy(() => import('./pages/Contact.tsx'))
 
 // Minimal page-level loading spinner shown while lazy chunks download
 function PageLoader() {
@@ -192,6 +194,8 @@ function App() {
               <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/legal" element={<Legal />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
               {/* Any other path redirects to landing page for logged-out users */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -214,6 +218,8 @@ function App() {
                     <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/legal" element={<Legal />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/contact" element={<Contact />} />
 
                     {/* Free + Pro routes */}
                     <Route path="/dashboard" element={<Dashboard user={user} />} />

@@ -109,7 +109,7 @@ export default function Contact() {
                 <p className="text-muted-foreground mb-4">
                   Check out our FAQ for quick answers to common questions.
                 </p>
-                <a href="/faq" className="text-accent font-medium hover:underline cursor-pointer">
+                <a href="/faq" className="text-accent font-medium hover:underline cursor-pointer" onClick={(e) => { e.preventDefault(); window.location.href = '/faq'; }}>
                   View FAQ
                 </a>
               </CardContent>
@@ -144,7 +144,7 @@ export default function Contact() {
               {submitted && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
                   <p className="font-medium">✅ Message sent! Check your inbox for a confirmation.</p>
-                  <p className="text-sm">We typically respond within 4–6 hours. You can also <a href="https://app.yfitai.com/faq" target="_blank" rel="noopener noreferrer" className="underline font-medium">browse the FAQ</a> for quick answers.</p>
+                  <p className="text-sm">We typically respond within 4–6 hours. You can also <a href="/faq" className="underline font-medium">browse the FAQ</a> for quick answers.</p>
                 </div>
               )}
 

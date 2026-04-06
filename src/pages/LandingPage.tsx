@@ -48,7 +48,8 @@ export default function LandingPage() {
     setWaitlistSubmitted(true);
   };
 
-  const goToContact = () => { window.location.href = 'mailto:support@yfitai.com'; };
+  const goToContact = () => navigate('/contact');
+  const goToFAQ = () => navigate('/faq');
   const goToPrivacy = () => navigate('/legal');
   const goToTerms = () => navigate('/legal');
 
@@ -851,7 +852,7 @@ export default function LandingPage() {
               <h4 className="font-semibold mb-3 text-sm">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><button onClick={goToContact} className="hover:text-primary transition-colors">Contact Us</button></li>
-                <li><button onClick={goToContact} className="hover:text-primary transition-colors">Support Center</button></li>
+                <li><button onClick={goToFAQ} className="hover:text-primary transition-colors">Support Center</button></li>
                 <li><p className="text-xs">support@yfitai.com</p></li>
               </ul>
             </div>

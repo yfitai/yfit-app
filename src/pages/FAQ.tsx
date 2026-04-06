@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { ChevronDown, ChevronUp, Search, MessageCircle } from "lucide-react";
 
 const faqCategories = [
@@ -125,7 +125,7 @@ export default function FAQ() {
       {/* Navigation */}
       <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer">
+          <Link to="/" className="flex items-center gap-2 cursor-pointer">
             <img
               src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png"
               alt="YFIT AI"
@@ -133,7 +133,7 @@ export default function FAQ() {
             />
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Contact Support
             </Link>
             <a
@@ -265,7 +265,7 @@ export default function FAQ() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/contact"
+              to="/contact"
               className="inline-block bg-gradient-to-r from-primary to-accent text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
             >
               Contact Support →
@@ -285,9 +285,9 @@ export default function FAQ() {
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           <p>© 2026 YFIT AI. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-2">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
+            <Link to="/legal" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link to="/legal" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link>
           </div>
         </div>
       </footer>
