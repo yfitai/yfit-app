@@ -661,3 +661,37 @@
 - [ ] Test scenario 4: Android new install — Chrome → Add to Home Screen → icon → dashboard
 - [ ] Test scenario 5: iPhone new install — Safari → Add to Home Screen → icon → dashboard
 - [ ] Review and confirm all FAQ entries are accurate after testing flows
+
+---
+## Session: Apr 6, 2026 — Install Guide Onboarding
+
+- [ ] Build InstallGuide component with device detection (Android/iPhone/desktop)
+- [ ] Wire InstallGuide into onboarding flow — show once after new sign-up, before dashboard
+- [ ] Add pre-signup note on landing page CTA to set expectations about web app install
+- [ ] Test scenario 1: New visitor → landing page → Get Started Free → sign-up → install guide → dashboard
+- [ ] Test scenario 2: Existing user → landing page → Sign In → dashboard (no install guide)
+- [ ] Test scenario 3: Already logged in → yfitai.com → straight to dashboard
+- [ ] Test scenario 4: Android new install — Chrome → Add to Home Screen → icon → dashboard
+- [ ] Test scenario 5: iPhone new install — Safari → Add to Home Screen → icon → dashboard
+
+---
+## Session: Apr 6, 2026 — Install Guide Onboarding
+
+- [ ] Build InstallGuide component with device detection (Android/iPhone/desktop)
+- [ ] Wire InstallGuide into onboarding flow — show once after new sign-up, before dashboard
+- [ ] Add pre-signup note on landing page CTA to set expectations about web app install
+- [ ] Test scenario 1: New visitor → landing page → Get Started Free → sign-up → install guide → dashboard
+- [ ] Test scenario 2: Existing user → landing page → Sign In → dashboard (no install guide)
+- [ ] Test scenario 3: Already logged in → yfitai.com → straight to dashboard
+- [ ] Test scenario 4: Android new install — Chrome → Add to Home Screen → icon → dashboard
+- [ ] Test scenario 5: iPhone new install — Safari → Add to Home Screen → icon → dashboard
+
+---
+## Session: Apr 6, 2026 — Install Guide & Workflow
+- [x] Fix Android PWA spinning disk (auth timeout + start_url=/dashboard)
+- [x] Build InstallGuide component (device-aware: Android/iPhone/desktop)
+- [x] Wire InstallGuide into onboarding flow — shows once after signup
+- [x] Save install_guide_shown flag to user_profiles so it never repeats
+- [x] Add "No app store needed" note to landing page hero CTA
+- [ ] Test all 5 user flow scenarios (next session)
+- [ ] Add install_guide_shown column to Supabase user_profiles table (if not auto-created)
