@@ -169,6 +169,8 @@ export default function FormAnalysisShowcase() {
     for (let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
     ctx.strokeStyle = "rgba(34,197,94,0.3)"; ctx.lineWidth = 2;
     ctx.beginPath();ctx.moveTo(W*.1,H*.93);ctx.lineTo(W*.9,H*.93);ctx.stroke();
+    // Score ring — isolated in save/restore so its colors never bleed into skeleton
+    ctx.save();
     const score = feedback.score;
     const sc = score>=90?"#22c55e":score>=75?"#f59e0b":"#ef4444";
     ctx.strokeStyle="rgba(255,255,255,0.1)";ctx.lineWidth=8;
@@ -177,26 +179,41 @@ export default function FormAnalysisShowcase() {
     ctx.beginPath();ctx.arc(W*.85,H*.14,26,-Math.PI/2,-Math.PI/2+(Math.PI*2*score)/100);ctx.stroke();
     ctx.fillStyle="white";ctx.font="bold 13px system-ui,sans-serif";ctx.textAlign="center";
     ctx.fillText(`${score}`,W*.85,H*.14+5);
-    ctx.shadowColor="#22c55e";ctx.shadowBlur=10;ctx.strokeStyle="#4ade80";ctx.lineWidth=3;ctx.lineCap="round";
+    ctx.restore();
+
+    // Bones — always green, always isolated
+    ctx.save();
+    ctx.shadowColor="#22c55e";ctx.shadowBlur=10;
+    ctx.strokeStyle="#4ade80";ctx.lineWidth=3;ctx.lineCap="round";
     for (const [a,b] of BONES){
       const jA=joints[a];const jB=joints[b];if(!jA||!jB)continue;
       ctx.beginPath();ctx.moveTo(jA[0]*W,jA[1]*H);ctx.lineTo(jB[0]*W,jB[1]*H);ctx.stroke();
     }
-    ctx.shadowColor="transparent";ctx.shadowBlur=0;
+    ctx.restore();
+
+    // Joints — always red, always isolated
     for (const [key,pos] of Object.entries(joints)){
       const x=pos[0]*W;const y=pos[1]*H;
       const r=(key.includes("Knee")||key.includes("Hip")||key==="head")?7:5;
+      ctx.save();
       ctx.shadowColor="#ef4444";ctx.shadowBlur=14;ctx.fillStyle="#ef4444";
       ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
-      ctx.shadowColor="transparent";ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,0.95)";
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle="rgba(255,255,255,0.95)";
       ctx.beginPath();ctx.arc(x,y,r*.4,0,Math.PI*2);ctx.fill();
+      ctx.restore();
     }
+
+    // Feedback banner — drawn last, isolated
+    ctx.save();
     const pc=feedback.color;const pw=Math.min(W*.82,240);const ph=28;
     const px=(W-pw)/2;const py=H*.03;
     ctx.fillStyle=pc+"25";ctx.strokeStyle=pc+"99";ctx.lineWidth=1.5;
     ctx.beginPath();(ctx as CanvasRenderingContext2D).roundRect(px,py,pw,ph,14);ctx.fill();ctx.stroke();
     ctx.fillStyle=pc;ctx.font="bold 11px system-ui,sans-serif";ctx.textAlign="center";
     ctx.fillText(feedback.text,W/2,py+19);
+    ctx.restore();
   }, []);
 
   const startLoop = useCallback(() => {
