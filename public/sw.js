@@ -4,7 +4,7 @@
  */
 
 // Static cache name - old caches are cleared on activate
-const CACHE_NAME = 'yfit-cache-v4'; // bumped Apr 5 2026 - force clear for new maskable PWA icons
+const CACHE_NAME = 'yfit-cache-v5'; // bumped Apr 6 2026 - force clear for new marketing landing page integration
 
 // PWA icon filenames that must NEVER be cached (always fetch fresh so
 // the home-screen icon updates when the user re-installs the PWA)
