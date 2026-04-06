@@ -19,7 +19,7 @@ export default function LandingPage() {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const goToSignIn = () => navigate('/signin');
+  const goToSignIn = () => navigate('/login');
   const goToSignUp = () => navigate('/signup');
   const { startCheckout, isLoading: checkoutLoading } = useStripeCheckout();
   const [showWaitlist, setShowWaitlist] = useState(false);
@@ -48,9 +48,9 @@ export default function LandingPage() {
     setWaitlistSubmitted(true);
   };
 
-  const goToContact = () => navigate('/contact');
-  const goToPrivacy = () => navigate('/privacy');
-  const goToTerms = () => navigate('/terms');
+  const goToContact = () => { window.location.href = 'mailto:support@yfitai.com'; };
+  const goToPrivacy = () => navigate('/legal');
+  const goToTerms = () => navigate('/legal');
 
   // 8 Feature Cards - exact colors from the YFIT app
   const features = [

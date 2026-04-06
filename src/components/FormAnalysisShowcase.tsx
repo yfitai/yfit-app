@@ -182,14 +182,14 @@ export default function FormAnalysisShowcase() {
       const jA=joints[a];const jB=joints[b];if(!jA||!jB)continue;
       ctx.beginPath();ctx.moveTo(jA[0]*W,jA[1]*H);ctx.lineTo(jB[0]*W,jB[1]*H);ctx.stroke();
     }
-    ctx.shadowBlur=0;
+    ctx.shadowColor="transparent";ctx.shadowBlur=0;
     for (const [key,pos] of Object.entries(joints)){
       const x=pos[0]*W;const y=pos[1]*H;
       const r=(key.includes("Knee")||key.includes("Hip")||key==="head")?7:5;
-      ctx.shadowColor="#ef4444";ctx.shadowBlur=12;ctx.fillStyle="#ef4444";
+      ctx.shadowColor="#ef4444";ctx.shadowBlur=14;ctx.fillStyle="#ef4444";
       ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
-      ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,0.9)";
-      ctx.beginPath();ctx.arc(x,y,r*.38,0,Math.PI*2);ctx.fill();
+      ctx.shadowColor="transparent";ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,0.95)";
+      ctx.beginPath();ctx.arc(x,y,r*.4,0,Math.PI*2);ctx.fill();
     }
     const pc=feedback.color;const pw=Math.min(W*.82,240);const ph=28;
     const px=(W-pw)/2;const py=H*.03;
