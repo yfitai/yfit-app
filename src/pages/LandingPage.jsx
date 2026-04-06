@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import FormAnalysisShowcase from '../components/FormAnalysisShowcase';
+import MedicationShowcase from '../components/MedicationShowcase';
 import {
   Check, ArrowRight, Activity, Zap, Smartphone, BarChart3,
   Pill, Eye, Target, Dumbbell, Heart, TrendingUp, Apple,
@@ -137,6 +139,12 @@ const faqItems = [
   },
 ];
 
+const TESTIMONIALS = [
+  { quote: 'Finally an app that lets me track my blood pressure meds alongside my workouts. My doctor loves the reports it generates.', name: 'Sarah M.', role: 'Beta Tester · Vancouver, BC', avatar: 'S', color: 'bg-green-500' },
+  { quote: 'The AI form analysis caught my squat form issue that was causing knee pain. Three weeks in and the pain is gone.', name: 'James R.', role: 'Beta Tester · Toronto, ON', avatar: 'J', color: 'bg-blue-500' },
+  { quote: "I've tried MyFitnessPal, Noom, and five others. YFIT is the first one that actually connects everything — nutrition, meds, and workouts in one place.", name: 'Maria T.', role: 'Beta Tester · Calgary, AB', avatar: 'M', color: 'bg-violet-500' },
+];
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
@@ -156,11 +164,8 @@ export default function LandingPage() {
       {/* ── Navigation ── */}
       <nav className="sticky top-0 w-full z-50 border-b" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderColor: 'rgba(5,150,105,0.2)' }}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}>
-              <Activity className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">YFIT AI</span>
+          <div className="flex items-center">
+            <img src="/logo.png" alt="YFIT AI" className="h-10 w-auto" />
           </div>
           <div className="hidden md:flex items-center gap-8">
             <button onClick={() => scrollTo('goals')}    className="text-sm font-medium text-gray-500 hover:text-emerald-600 transition-colors">Features</button>
@@ -334,6 +339,37 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Form Analysis Demo ── */}
+      <FormAnalysisShowcase />
+
+      {/* ── Medication Showcase ── */}
+      <MedicationShowcase />
+
+      {/* ── Testimonials ── */}
+      <section className="py-20" style={{ background: 'linear-gradient(180deg, rgba(5,150,105,0.04), transparent)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-gray-900">What Beta Testers Are Saying</h2>
+            <p className="text-lg text-gray-500">Real feedback from the first users to try YFIT AI.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="rounded-2xl p-6 border flex flex-col gap-4" style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(8px)', borderColor: 'rgba(5,150,105,0.15)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <div className="flex gap-1">{[1,2,3,4,5].map(s => <span key={s} className="text-yellow-400 text-sm">★</span>)}</div>
+                <p className="text-sm text-gray-500 leading-relaxed italic">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center gap-3 mt-auto">
+                  <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>{t.avatar}</div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-400">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Pricing ── */}
       <section id="pricing" className="py-20">
         <div className="max-w-7xl mx-auto px-6">
@@ -478,11 +514,8 @@ export default function LandingPage() {
       <footer className="py-12 border-t" style={{ borderColor: 'rgba(5,150,105,0.15)', background: 'linear-gradient(180deg, transparent, rgba(5,150,105,0.04))' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}>
-                <Activity className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">YFIT AI</span>
+            <div className="flex items-center">
+              <img src="/logo.png" alt="YFIT AI" className="h-8 w-auto" />
             </div>
             <div className="text-sm text-gray-400">© 2025 YFIT AI. All rights reserved.</div>
             <div className="flex gap-6 text-sm">
