@@ -41,6 +41,12 @@ export default function LandingPage() {
                 Sign In
               </Link>
             </div>
+
+            {/* Web app note — sets expectations for new users */}
+            <p className="text-sm text-gray-400 mt-4">
+              📱 No app store needed — works on Android, iPhone &amp; desktop.
+              After signing up, we&apos;ll show you how to add it to your home screen in seconds.
+            </p>
           </div>
         </div>
       </div>

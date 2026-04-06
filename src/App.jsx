@@ -20,6 +20,7 @@ import ProRoute from './components/ProRoute'
 // Auth & onboarding loaded eagerly (needed before dashboard)
 import Auth from './components/Auth'
 import OnboardingWizard from './components/OnboardingWizard'
+import InstallGuide from './components/InstallGuide'
 
 // All page-level components lazy loaded — only downloaded when user navigates to that page
 const Dashboard = lazy(() => import('./components/Dashboard'))
@@ -56,6 +57,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
+  const [showInstallGuide, setShowInstallGuide] = useState(false)
 
   useEffect(() => {
     // Initialize LiveUpdate service for OTA updates (non-blocking)
@@ -129,13 +131,16 @@ function App() {
     try {
       const { data } = await supabase
         .from('user_profiles')
-        .select('onboarding_completed')
+        .select('onboarding_completed, install_guide_shown')
         .eq('user_id', userId)
         .maybeSingle()
       
       // Show onboarding if profile doesn't exist or onboarding not completed
       if (!data || !data.onboarding_completed) {
         setNeedsOnboarding(true)
+      } else if (!data.install_guide_shown) {
+        // Onboarding done but install guide not yet shown — show it now
+        setShowInstallGuide(true)
       }
     } catch {
       // If table doesn't exist yet, skip onboarding gracefully
@@ -145,6 +150,11 @@ function App() {
 
   const handleOnboardingComplete = () => {
     setNeedsOnboarding(false)
+    // After onboarding, show the install guide
+    setShowInstallGuide(true)
+  }
+  const handleInstallGuideComplete = () => {
+    setShowInstallGuide(false)
   }
 
   const handleAuthSuccess = (authenticatedUser) => {
@@ -170,6 +180,9 @@ function App() {
         {needsOnboarding && user ? (
           // New user onboarding — full-screen wizard, no nav
           <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
+        ) : showInstallGuide && user ? (
+          // Install guide — shown once after onboarding, before dashboard
+          <InstallGuide user={user} onComplete={handleInstallGuideComplete} />
         ) : !user ? (
           // Logged-out: show public routes only
           <Suspense fallback={<PageLoader />}>
