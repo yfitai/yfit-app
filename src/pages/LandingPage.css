@@ -1,0 +1,110 @@
+/* ── Marketing Landing Page Theme ─────────────────────────────────────────────
+   These styles apply ONLY to the marketing landing page (.landing-page wrapper).
+   They do not affect the main app dashboard or any other pages.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Import Space Grotesk font for headings */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+.landing-page {
+  --lp-background: oklch(0.95 0.01 200);
+  --lp-foreground: oklch(0.15 0.02 220);
+  --lp-card: oklch(0.98 0.005 200 / 0.8);
+  --lp-card-foreground: oklch(0.15 0.02 220);
+  --lp-primary: oklch(0.55 0.15 220);
+  --lp-primary-foreground: oklch(0.98 0 0);
+  --lp-secondary: oklch(0.85 0.05 200);
+  --lp-secondary-foreground: oklch(0.15 0.02 220);
+  --lp-muted: oklch(0.88 0.02 200);
+  --lp-muted-foreground: oklch(0.45 0.02 220);
+  --lp-accent: oklch(0.6 0.15 180);
+  --lp-accent-foreground: oklch(0.98 0 0);
+  --lp-border: oklch(0.85 0.03 200);
+
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, oklch(0.92 0.03 220) 0%, oklch(0.95 0.02 180) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--lp-foreground);
+
+  /* Override Tailwind theme tokens for this scope */
+  --color-background: var(--lp-background);
+  --color-foreground: var(--lp-foreground);
+  --color-card: var(--lp-card);
+  --color-card-foreground: var(--lp-card-foreground);
+  --color-primary: var(--lp-primary);
+  --color-primary-foreground: var(--lp-primary-foreground);
+  --color-secondary: var(--lp-secondary);
+  --color-secondary-foreground: var(--lp-secondary-foreground);
+  --color-muted: var(--lp-muted);
+  --color-muted-foreground: var(--lp-muted-foreground);
+  --color-accent: var(--lp-accent);
+  --color-accent-foreground: var(--lp-accent-foreground);
+  --color-border: var(--lp-border);
+}
+
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-page h4,
+.landing-page h5,
+.landing-page h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.landing-page .glass-card {
+  background: oklch(0.98 0.005 200 / 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 24px -4px oklch(0.55 0.15 220 / 0.12);
+}
+
+.landing-page .text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(135deg, oklch(0.55 0.15 220), oklch(0.6 0.15 180));
+}
+
+.landing-page .glow-effect {
+  box-shadow: 0 4px 20px -2px oklch(0.55 0.15 220 / 0.3);
+}
+
+/* Ensure cards inside landing page use the marketing theme */
+.landing-page [class*="bg-card"] {
+  background-color: oklch(0.98 0.005 200 / 0.8) !important;
+  color: oklch(0.15 0.02 220) !important;
+}
+
+.landing-page [class*="text-muted-foreground"] {
+  color: oklch(0.45 0.02 220) !important;
+}
+
+.landing-page [class*="bg-background"] {
+  background-color: oklch(0.95 0.01 200) !important;
+}
+
+/* Primary button color override for landing page */
+.landing-page [class*="bg-primary"]:not([class*="bg-primary/"]) {
+  background-color: oklch(0.55 0.15 220) !important;
+}
+
+.landing-page [class*="text-primary"]:not([class*="text-primary/"]) {
+  color: oklch(0.55 0.15 220) !important;
+}
+
+.landing-page [class*="border-primary"]:not([class*="border-primary/"]) {
+  border-color: oklch(0.55 0.15 220) !important;
+}
+
+/* Accent color overrides */
+.landing-page [class*="bg-accent"]:not([class*="bg-accent/"]) {
+  background-color: oklch(0.6 0.15 180) !important;
+}
+
+.landing-page [class*="text-accent"]:not([class*="text-accent/"]) {
+  color: oklch(0.6 0.15 180) !important;
+}
