@@ -4,7 +4,7 @@ import { Pose } from '@mediapipe/pose';
 import { Camera } from '@mediapipe/camera_utils';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS } from '@mediapipe/pose';
-import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle, History, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 
 const FormAnalysisLive = ({ preSelectedExerciseName }) => {
@@ -50,6 +50,9 @@ const FormAnalysisLive = ({ preSelectedExerciseName }) => {
   const feedbackEndRef = useRef(null); // For auto-scroll
   const [sessionStartTime, setSessionStartTime] = useState(null); // Track session start time
   const [user, setUser] = useState(null); // Current user
+  const [liveFormScore, setLiveFormScore] = useState(100); // Live form score (0-100)
+  const [sessionHistory, setSessionHistory] = useState([]); // Past sessions for selected exercise
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
 
 // Exercise options (10 total exercises)
@@ -631,27 +634,35 @@ const analyzeSquat = (landmarks) => {
     const rightElbow = landmarks[14];
     const rightWrist = landmarks[16];
 
-    // Use both arms
+    // Use wrist Y-position relative to shoulder to detect arm elevation
+    // In MediaPipe, Y increases downward. When arms are raised, wrist Y < shoulder Y.
+    // leftWristAbove = how far wrist is ABOVE shoulder (positive = raised)
+    const leftWristAbove = leftShoulder.y - leftWrist.y;
+    const rightWristAbove = rightShoulder.y - rightWrist.y;
+    // Use the arm that is raised more (max elevation)
+    const wristAboveShoulder = Math.max(leftWristAbove, rightWristAbove);
+    
+    // Also compute the hip-shoulder-elbow angle as secondary signal
     const leftArmAngle = calculateAngle(leftHip, leftShoulder, leftElbow);
     const rightArmAngle = calculateAngle(landmarks[24], rightShoulder, rightElbow);
     const armAngle = Math.max(leftArmAngle, rightArmAngle);
     
-    console.log('Lateral Raise - Arm angle:', armAngle.toFixed(1), '| State:', repStateRef.current);
+    console.log('Lateral Raise - wristAboveShoulder:', wristAboveShoulder.toFixed(3), '| armAngle:', armAngle.toFixed(1), '| State:', repStateRef.current);
+    
+    // Arm is raised when wrist is above shoulder level (wristAboveShoulder > 0.02)
+    // Arm is lowered when wrist is at or below shoulder level (wristAboveShoulder < -0.02)
+    const armRaised = wristAboveShoulder > 0.02;   // wrist clearly above shoulder
+    const armLowered = wristAboveShoulder < 0.0;   // wrist at or below shoulder
     
     // Track WORST form issue during raised position
-    if (repStateRef.current === 'down' && armAngle > 60) {
+    if (repStateRef.current === 'down' && armRaised) {
       let currentIssue = null;
       
-      // Check if too high (higher priority)
-      if (armAngle > 100) {
+      if (wristAboveShoulder > 0.15) {
         currentIssue = { type: 'warning', message: 'Don\'t raise too high - shoulder level', priority: 3 };
-      }
-      // Perfect range
-      else if (armAngle >= 80 && armAngle <= 100) {
+      } else if (wristAboveShoulder >= 0.05 && wristAboveShoulder <= 0.15) {
         currentIssue = { type: 'success', message: 'Perfect height!', priority: 1 };
-      }
-      // Too low
-      else if (armAngle >= 60 && armAngle < 80) {
+      } else if (wristAboveShoulder >= 0.02 && wristAboveShoulder < 0.05) {
         currentIssue = { type: 'warning', message: 'Raise higher - to shoulder level', priority: 2 };
       }
       
@@ -666,16 +677,17 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Lowered position - ready for next rep (arms at sides)
-    if (armAngle < 50 && repStateRef.current === 'up' && timeSinceLastRep > 500) {
+    // Lowered position - ready for next rep (NO time guard, mirrors bicep curl pattern)
+    if (armLowered && repStateRef.current === 'up') {
       repStateRef.current = 'down';
+      currentRepIssuesRef.current = [];
       console.log('✅ Lateral Raise - Arms lowered, ready for next rep');
     }
-    // Raised position - COUNT REP (arms raised to shoulder level)
-    else if (armAngle > 75 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    // Raised position - COUNT REP (wrist clearly above shoulder)
+    else if (armRaised && wristAboveShoulder > 0.04 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
-      console.log('🎯 LATERAL RAISE REP COUNTED!');
+      console.log('🎯 LATERAL RAISE REP COUNTED! wristAboveShoulder:', wristAboveShoulder.toFixed(3));
       
       setRepCount(prev => {
         const newRepCount = prev + 1;
@@ -698,10 +710,12 @@ const analyzeSquat = (landmarks) => {
     }
 
     // Real-time feedback
-    if (armAngle > 100) {
+    if (wristAboveShoulder > 0.15) {
       feedback.push({ type: 'warning', message: 'Don\'t raise too high - shoulder level is enough' });
-    } else if (armAngle >= 80 && armAngle <= 100) {
+    } else if (wristAboveShoulder >= 0.05 && wristAboveShoulder <= 0.15) {
       feedback.push({ type: 'success', message: 'Perfect height!' });
+    } else if (armRaised) {
+      feedback.push({ type: 'warning', message: 'Raise higher - aim for shoulder level' });
     }
 
     return feedback;
@@ -962,6 +976,7 @@ const analyzeBicepCurl = (landmarks) => {
     selectedExerciseRef.current = selectedExercise;
     setFormFeedback([]);
     setRepCount(0);
+    setLiveFormScore(100);
     
     // Set initial state based on exercise type
     // 'down' = resting/lowered position (ready to count when you perform the movement)
@@ -1046,6 +1061,15 @@ const analyzeBicepCurl = (landmarks) => {
         } else {
           console.log('✅ Form analysis session saved:', data);
           console.log('📊 Form score:', formScore, '| Reps:', repCount, '| Duration:', durationSeconds, 's');
+          // Refresh session history to show the new session
+          const { data: historyData } = await supabase
+            .from('form_analysis_sessions')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('exercise_name', exercise.name)
+            .order('created_at', { ascending: false })
+            .limit(8);
+          if (historyData) setSessionHistory(historyData);
         }
       } catch (err) {
         console.error('Error saving session:', err);
@@ -1064,8 +1088,50 @@ const analyzeBicepCurl = (landmarks) => {
     }
   };
 
+  // Load session history when user or selected exercise changes
+  React.useEffect(() => {
+    if (!user || !selectedExercise) {
+      setSessionHistory([]);
+      return;
+    }
+    const loadHistory = async () => {
+      setLoadingHistory(true);
+      try {
+        const { data, error } = await supabase
+          .from('form_analysis_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('exercise_name', selectedExercise.name)
+          .order('created_at', { ascending: false })
+          .limit(8);
+        if (!error) setSessionHistory(data || []);
+      } catch (e) {
+        console.error('Error loading session history:', e);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+    loadHistory();
+  }, [user, selectedExercise]);
+
+  // Recalculate live form score whenever feedback history changes
+  React.useEffect(() => {
+    if (feedbackHistory.length === 0) {
+      setLiveFormScore(100);
+      return;
+    }
+    let score = 100;
+    feedbackHistory.forEach(fb => {
+      if (fb.type === 'error') score -= 15;
+      else if (fb.type === 'warning') score -= 8;
+      else if (fb.type === 'success') score += 3;
+    });
+    setLiveFormScore(Math.max(0, Math.min(100, score)));
+  }, [feedbackHistory]);
+
   const clearFeedback = () => {
     setFeedbackHistory([]);
+    setLiveFormScore(100);
   };
 
 
@@ -1145,12 +1211,36 @@ return (
                 </div>
               )}
 
-              {/* Rep Count Overlay - Visible during analysis */}
+              {/* Rep Count + Form Score Overlay - Visible during analysis */}
               {isAnalyzing && (
-                <div className="absolute top-4 right-4 bg-black bg-opacity-75 rounded-lg px-6 py-3 border-2 border-green-500">
-                  <div className="text-center">
+                <div className="absolute top-4 right-4 flex flex-col gap-3">
+                  {/* Rep counter */}
+                  <div className="bg-black bg-opacity-75 rounded-lg px-5 py-3 border-2 border-green-500 text-center">
                     <div className="text-5xl font-bold text-green-400">{repCount}</div>
                     <div className="text-xs text-gray-300 mt-1">REPS</div>
+                  </div>
+                  {/* Form score ring */}
+                  <div className="bg-black bg-opacity-75 rounded-lg p-3 border-2 border-gray-600 flex flex-col items-center">
+                    <svg width="64" height="64" viewBox="0 0 64 64">
+                      {/* Background ring */}
+                      <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
+                      {/* Score arc */}
+                      <circle
+                        cx="32" cy="32" r="26"
+                        fill="none"
+                        stroke={liveFormScore >= 90 ? '#22c55e' : liveFormScore >= 75 ? '#f59e0b' : '#ef4444'}
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={`${(liveFormScore / 100) * 163.4} 163.4`}
+                        transform="rotate(-90 32 32)"
+                        style={{ transition: 'stroke-dasharray 0.5s ease, stroke 0.5s ease' }}
+                      />
+                      {/* Score text */}
+                      <text x="32" y="37" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+                        {liveFormScore}
+                      </text>
+                    </svg>
+                    <div className="text-xs text-gray-300 mt-1">FORM</div>
                   </div>
                 </div>
               )}
@@ -1277,6 +1367,75 @@ return (
               )}
             </div>
           </div>
+          {/* Session History */}
+          {selectedExercise && (
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <History className="w-5 h-5 text-gray-500" />
+                <h2 className="text-xl font-semibold text-gray-900">Session History</h2>
+                <span className="text-sm text-gray-400">— {selectedExercise.name}</span>
+              </div>
+              {loadingHistory ? (
+                <div className="text-center py-4 text-gray-400 text-sm">Loading history...</div>
+              ) : sessionHistory.length === 0 ? (
+                <div className="text-center py-6 text-gray-400">
+                  <History className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No past sessions yet</p>
+                  <p className="text-xs mt-1">Complete a session to start tracking</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {sessionHistory.map((session, idx) => {
+                    const prevScore = sessionHistory[idx + 1]?.average_form_score;
+                    const score = session.average_form_score ?? 100;
+                    const scoreColor = score >= 90 ? 'text-green-600' : score >= 75 ? 'text-amber-600' : 'text-red-500';
+                    const scoreBg = score >= 90 ? 'bg-green-50' : score >= 75 ? 'bg-amber-50' : 'bg-red-50';
+                    const trend = prevScore == null ? null : score > prevScore ? 'up' : score < prevScore ? 'down' : 'same';
+                    const date = new Date(session.created_at);
+                    const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div key={session.id} className={`flex items-center gap-3 p-3 rounded-lg border ${scoreBg} border-gray-100`}>
+                        {/* Score ring (small) */}
+                        <div className="flex-shrink-0">
+                          <svg width="44" height="44" viewBox="0 0 44 44">
+                            <circle cx="22" cy="22" r="17" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="4" />
+                            <circle
+                              cx="22" cy="22" r="17"
+                              fill="none"
+                              stroke={score >= 90 ? '#22c55e' : score >= 75 ? '#f59e0b' : '#ef4444'}
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                              strokeDasharray={`${(score / 100) * 106.8} 106.8`}
+                              transform="rotate(-90 22 22)"
+                            />
+                            <text x="22" y="26" textAnchor="middle" fill="#374151" fontSize="10" fontWeight="bold">{score}</text>
+                          </svg>
+                        </div>
+                        {/* Session details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-semibold text-gray-900">{session.total_reps ?? 0} reps</span>
+                            {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-green-500" />}
+                            {trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-red-400" />}
+                            {trend === 'same' && <Minus className="w-3.5 h-3.5 text-gray-400" />}
+                          </div>
+                          <div className="text-xs text-gray-500">{dateStr} · {timeStr}</div>
+                          {session.duration_seconds > 0 && (
+                            <div className="text-xs text-gray-400">{Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s</div>
+                          )}
+                        </div>
+                        {/* Score label */}
+                        <div className={`text-xs font-bold ${scoreColor} flex-shrink-0`}>
+                          {score >= 90 ? 'Excellent' : score >= 75 ? 'Good' : 'Needs Work'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
