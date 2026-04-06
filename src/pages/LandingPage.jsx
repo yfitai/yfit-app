@@ -165,6 +165,7 @@ function FAQSection() {
   const toggle = (id) => setOpenItem(openItem === id ? null : id)
 
   const faqs = [
+    // --- Getting Started ---
     {
       id: 'what-is',
       q: 'What is YFIT AI and how does it work?',
@@ -175,6 +176,7 @@ function FAQSection() {
       q: 'Is YFIT AI on the Google Play Store or Apple App Store?',
       a: 'YFIT AI is a Progressive Web App (PWA) — you use it through your browser, not the Play Store or App Store. The good news: you can add it to your home screen so it opens and feels exactly like a native app. See the install instructions below.'
     },
+    // --- Install instructions (most common new-user need — shown first) ---
     {
       id: 'android-install',
       q: 'How do I add YFIT AI to my Android home screen?',
@@ -182,34 +184,40 @@ function FAQSection() {
         <div>
           <div className="flex items-center gap-2 mb-3 text-blue-600 font-medium">
             <Smartphone className="w-4 h-4" />
-            <span>Android — Chrome browser</span>
+            <span>Android — Google Chrome browser</span>
           </div>
           <ol className="list-decimal ml-5 space-y-2 text-gray-700">
-            <li>Open <strong>Chrome</strong> and go to <strong>yfitai.com</strong></li>
-            <li>Tap the <strong>three-dot menu (⋮)</strong> in the top-right corner</li>
+            <li>Make sure you are using <strong>Google Chrome</strong> (not Samsung Internet or another browser)</li>
+            <li>Go to <strong>yfitai.com</strong> and wait for it to <strong>fully load</strong> — you should see your dashboard or the welcome screen</li>
+            <li>Tap the <strong>three-dot menu (⋮)</strong> in the top-right corner of Chrome</li>
             <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
-            <li>Tap <strong>"Add"</strong> to confirm</li>
-            <li>The YFIT AI icon appears on your home screen — tap it anytime to open!</li>
+            <li>Tap <strong>"Add"</strong> to confirm — the icon appears on your home screen immediately</li>
           </ol>
+          <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <strong>Samsung device?</strong> The icon may appear square — this is normal. Samsung's launcher applies square shapes to all app icons, including apps from the Play Store. It does not affect how the app works.
+          </p>
         </div>
       )
     },
     {
       id: 'iphone-install',
-      q: 'How do I add YFIT AI to my iPhone home screen?',
+      q: 'How do I add YFIT AI to my iPhone or iPad home screen?',
       a: (
         <div>
           <div className="flex items-center gap-2 mb-3 text-blue-600 font-medium">
             <Smartphone className="w-4 h-4" />
-            <span>iPhone — must use Safari (not Chrome)</span>
+            <span>iPhone / iPad — must use Safari</span>
           </div>
           <ol className="list-decimal ml-5 space-y-2 text-gray-700">
-            <li>Open <strong>Safari</strong> and go to <strong>yfitai.com</strong></li>
-            <li>Tap the <strong>Share button</strong> at the bottom (box with arrow pointing up)</li>
-            <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
-            <li>Tap <strong>"Add"</strong> in the top-right corner</li>
-            <li>The YFIT AI icon appears on your home screen — tap it anytime to open!</li>
+            <li>Open <strong>Safari</strong> and go to <strong>yfitai.com</strong> — this only works in Safari, not Chrome on iPhone</li>
+            <li>Wait for the page to <strong>fully load</strong></li>
+            <li>Tap the <strong>Share button</strong> at the bottom of the screen (box with an arrow pointing up ↑)</li>
+            <li>Scroll down in the share sheet and tap <strong>"Add to Home Screen"</strong></li>
+            <li>Tap <strong>"Add"</strong> in the top-right corner — the icon appears on your home screen</li>
           </ol>
+          <p className="mt-3 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+            <strong>Using Chrome on iPhone?</strong> Copy the URL from Chrome, open Safari, paste it in the address bar, then follow the steps above.
+          </p>
         </div>
       )
     },
@@ -223,14 +231,15 @@ function FAQSection() {
             <span>Desktop — Chrome or Edge</span>
           </div>
           <ol className="list-decimal ml-5 space-y-2 text-gray-700">
-            <li>Open Chrome or Edge and go to <strong>yfitai.com</strong></li>
-            <li>Look for the <strong>install icon</strong> (computer with down arrow) in the address bar</li>
-            <li>Click it and select <strong>"Install"</strong></li>
-            <li>YFIT AI opens in its own window and appears in your taskbar or apps list</li>
+            <li>Open <strong>Chrome</strong> or <strong>Edge</strong> and go to <strong>yfitai.com</strong></li>
+            <li>Look for a small <strong>install icon (⊕)</strong> in the address bar on the right side</li>
+            <li>Click it and then click <strong>"Install"</strong> in the popup</li>
+            <li>YFIT AI opens in its own window and is pinned to your taskbar or Start menu</li>
           </ol>
         </div>
       )
     },
+    // --- Account & login ---
     {
       id: 'login-help',
       q: 'I cannot log in — what should I do?',
@@ -246,10 +255,11 @@ function FAQSection() {
       q: 'Is there a free version?',
       a: 'Yes! The free Starter plan includes basic workout tracking, manual meal logging, and 3 saved routines. Upgrade to Pro anytime to unlock AI coaching, nutrition scanning, advanced analytics, and more.'
     },
+    // --- Troubleshooting ---
     {
       id: 'icon-blank',
-      q: 'I added it to my home screen but the icon looks like a blank page.',
-      a: 'This happens when the page was not fully loaded before you added it. Remove the icon, open yfitai.com again in your browser, wait for it to fully load, then follow the install steps again. On iPhone use Safari; on Android use Chrome.'
+      q: 'I added it to my home screen but the icon looks blank or shows a spinning disk.',
+      a: 'This happens when the page was not fully loaded before you added it. Remove the icon from your home screen, open yfitai.com again in your browser, wait until the page fully loads (you should see your dashboard or the welcome screen), then follow the install steps again. On iPhone use Safari; on Android use Chrome.'
     },
     {
       id: 'icon-square',
