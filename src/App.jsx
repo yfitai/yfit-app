@@ -63,9 +63,16 @@ function App() {
       console.error('Failed to initialize LiveUpdate:', err)
     })
 
+    // HARD TIMEOUT: if auth check hangs for any reason (common on Android PWA cold launch),
+    // force loading=false after 4 seconds so the app always renders instead of spinning forever
+    const authTimeout = setTimeout(() => {
+      setLoading(false)
+    }, 4000)
+
     // OPTIMISTIC AUTH: read cached session from localStorage instantly (no network needed)
     // This makes the app appear immediately on repeat opens
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(authTimeout)
       const cachedUser = session?.user ?? null
       if (cachedUser) {
         // Show app immediately with cached user - no spinner needed
@@ -80,6 +87,7 @@ function App() {
         setLoading(false)
       }
     }).catch(() => {
+      clearTimeout(authTimeout)
       // If localStorage read fails, fall back to network check
       getCurrentUser().then(async (currentUser) => {
         setUser(currentUser)
