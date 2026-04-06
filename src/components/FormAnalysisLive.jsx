@@ -280,21 +280,23 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    // Squatting position - must go below 120 degrees to register as "down"
-    else if (kneeAngle < 120 && repStateRef.current === 'up') {
+    // Squatting position - must go below 140 degrees to register as "down" (wider tolerance)
+    else if (kneeAngle < 140 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
-      console.log('Squat down detected');
+      console.log('Squat down detected, kneeAngle:', kneeAngle.toFixed(1));
     }
     
     // Real-time feedback
-    if (kneeAngle > 90 && kneeAngle < 160) {
-      feedback.push({ type: 'warning', message: 'Go deeper - aim for thighs parallel to ground' });
+    if (kneeAngle > 140 && kneeAngle < 160) {
+      feedback.push({ type: 'warning', message: 'Bend your knees more — start the descent' });
+    } else if (kneeAngle > 90 && kneeAngle < 140) {
+      feedback.push({ type: 'warning', message: 'Keep going — thighs parallel to floor is the target' });
     } else if (kneeAngle <= 90) {
-      feedback.push({ type: 'success', message: 'Good depth!' });
+      feedback.push({ type: 'success', message: 'Excellent depth — drive through your heels to stand!' });
     }
     if (leftKnee.x > leftAnkle.x + 0.1) {
-      feedback.push({ type: 'warning', message: 'Knees too far forward - push hips back' });
+      feedback.push({ type: 'warning', message: 'Knees caving forward — push them out over your toes' });
     }
 
     return feedback;
@@ -360,8 +362,8 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    // Down position
-    else if (elbowAngle < 120 && repStateRef.current === 'up') {
+    // Down position - widen threshold to 130, no time guard needed
+    else if (elbowAngle < 130 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
     }
@@ -389,9 +391,9 @@ const analyzeSquat = (landmarks) => {
     // Track form issues
     let currentIssue = null;
     
-    if (bodyAngle < 160) {
+    if (bodyAngle < 155) {
       currentIssue = { type: 'warning', message: 'Hips sagging - engage core', priority: 2 };
-    } else if (bodyAngle > 190) {
+    } else if (bodyAngle > 175) {
       currentIssue = { type: 'warning', message: 'Hips too high - lower down', priority: 2 };
     } else {
       currentIssue = { type: 'success', message: 'Perfect plank form!', priority: 1 };
@@ -405,9 +407,9 @@ const analyzeSquat = (landmarks) => {
     }
     
     // Real-time feedback
-    if (bodyAngle < 160) {
+    if (bodyAngle < 155) {
       feedback.push({ type: 'warning', message: 'Hips sagging - engage your core!' });
-    } else if (bodyAngle > 190) {
+    } else if (bodyAngle > 175) {
       feedback.push({ type: 'warning', message: 'Hips too high - lower them down' });
     } else {
       feedback.push({ type: 'success', message: 'Perfect form - hold steady!' });
@@ -424,13 +426,13 @@ const analyzeSquat = (landmarks) => {
 
     const torsoAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
     
-    // Track WORST form issue
-    if (repStateRef.current === 'up') {
+    // Track WORST form issue while rising (in 'down' state heading up)
+    if (repStateRef.current === 'down') {
       let currentIssue = null;
       
-      if (torsoAngle < 80) {
+      if (torsoAngle < 85) {
         currentIssue = { type: 'success', message: 'Full sit-up!', priority: 1 };
-      } else if (torsoAngle >= 80 && torsoAngle < 100) {
+      } else if (torsoAngle >= 85 && torsoAngle < 110) {
         currentIssue = { type: 'warning', message: 'Come up higher', priority: 2 };
       }
       
@@ -445,8 +447,8 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Up position (torso angle < 100)
-    if (torsoAngle < 100 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    // Up position - count rep when torso angle < 110 (wider tolerance)
+    if (torsoAngle < 110 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
       
@@ -468,8 +470,8 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    // Down position (torso angle > 140)
-    else if (torsoAngle > 140 && repStateRef.current === 'up') {
+    // Down position - reset when torso angle > 130 (wider tolerance, no time guard)
+    else if (torsoAngle > 130 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
     }
@@ -542,8 +544,8 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    // Lowered position - must go below 110 degrees to register as down
-    else if (hipAngle < 110 && repStateRef.current === 'up') {
+    // Lowered position - must go below 130 degrees to register as down (wider tolerance)
+    else if (hipAngle < 130 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
     }
@@ -609,8 +611,8 @@ const analyzeSquat = (landmarks) => {
         return newRepCount;
       });
     }
-    // Lowered position
-    else if (elbowAngle < 120 && repStateRef.current === 'up') {
+    // Lowered position - widen to 130, no time guard
+    else if (elbowAngle < 130 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
       currentRepIssuesRef.current = [];
     }
@@ -757,12 +759,13 @@ const analyzeSquat = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Extended position - ready for next rep
-    if (elbowAngle > 150 && repStateRef.current === 'up' && timeSinceLastRep > 500) {
+    // Extended position - ready for next rep (no time guard, mirrors bicep curl)
+    if (elbowAngle > 140 && repStateRef.current === 'up') {
       repStateRef.current = 'down';
+      currentRepIssuesRef.current = [];
     }
-    // Curled position - COUNT REP
-    else if (elbowAngle < 60 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    // Curled position - COUNT REP (widened from 60 to 75 for more tolerance)
+    else if (elbowAngle < 75 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
       
@@ -839,7 +842,8 @@ const analyzeBicepCurl = (landmarks) => {
     currentRepIssuesRef.current = [];
     console.log('Bicep curl extended - ready for next rep');
   }
-  else if (elbowAngle < 50 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+  // Curled position - COUNT REP (widened from 50 to 65 for more tolerance)
+  else if (elbowAngle < 65 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
     repStateRef.current = 'up';
     lastRepTimeRef.current = currentTime;
     
@@ -860,6 +864,7 @@ const analyzeBicepCurl = (landmarks) => {
       };
       
       setFeedbackHistory(prevFeedback => [repFeedbackItem, ...prevFeedback].slice(0, 50));
+      currentRepIssuesRef.current = []; // Reset form issues after counting
       return newRepCount;
     });
   }
@@ -883,23 +888,43 @@ const analyzeBicepCurl = (landmarks) => {
     const leftElbow = landmarks[13];
     const leftWrist = landmarks[15];
     const leftHip = landmarks[23];
+    const rightShoulder = landmarks[12];
+    const rightElbow = landmarks[14];
+    const rightWrist = landmarks[16];
+    const rightHip = landmarks[24];
 
-    const elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    // PRIMARY SIGNAL: elbow Y-position relative to hip
+    // In MediaPipe, Y increases downward. When rowing, elbows rise UP (smaller Y).
+    // elbowAboveHip = how far elbow is ABOVE hip (positive = elbow higher than hip)
+    const leftElbowAboveHip = leftHip.y - leftElbow.y;
+    const rightElbowAboveHip = rightHip.y - rightElbow.y;
+    const elbowAboveHip = Math.max(leftElbowAboveHip, rightElbowAboveHip);
+
+    // SECONDARY: elbow angle for form feedback (still useful even from front)
+    const leftElbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+    const rightElbowAngle = calculateAngle(rightShoulder, rightElbow, rightWrist);
+    const elbowAngle = Math.min(leftElbowAngle, rightElbowAngle);
+
+    // Torso angle for form check
     const torsoAngle = calculateAngle(leftShoulder, leftHip, landmarks[25]);
+
+    // Pulled = elbow clearly above hip level (elbowAboveHip > 0.05)
+    const elbowPulled = elbowAboveHip > 0.05;
+    // Extended = elbow at or below hip level (elbowAboveHip < 0.0)
+    const elbowExtended = elbowAboveHip < 0.0;
+
+    console.log('Bent Over Row - elbowAboveHip:', elbowAboveHip.toFixed(3), '| elbowAngle:', elbowAngle.toFixed(1), '| State:', repStateRef.current);
     
-    // Track WORST form issue
-    if (repStateRef.current === 'up') {
+    // Track WORST form issue during pull
+    if (repStateRef.current === 'down' && elbowPulled) {
       let currentIssue = null;
       
-      // Check torso position first (higher priority)
-      if (torsoAngle > 130) {
-        currentIssue = { type: 'warning', message: 'Bend forward more', priority: 3 };
-      }
-      // Then check row depth
-      else if (elbowAngle < 70) {
-        currentIssue = { type: 'success', message: 'Full row!', priority: 1 };
-      } else if (elbowAngle >= 70 && elbowAngle < 90) {
-        currentIssue = { type: 'warning', message: 'Pull higher', priority: 2 };
+      if (torsoAngle > 140) {
+        currentIssue = { type: 'warning', message: 'Bend forward more - torso parallel', priority: 3 };
+      } else if (elbowAboveHip > 0.12) {
+        currentIssue = { type: 'success', message: 'Full row - great pull!', priority: 1 };
+      } else if (elbowAboveHip >= 0.05 && elbowAboveHip <= 0.12) {
+        currentIssue = { type: 'warning', message: 'Pull higher - elbows past torso', priority: 2 };
       }
       
       if (currentIssue) {
@@ -913,10 +938,17 @@ const analyzeBicepCurl = (landmarks) => {
     const currentTime = Date.now();
     const timeSinceLastRep = currentTime - lastRepTimeRef.current;
     
-    // Pulled position
-    if (elbowAngle < 80 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
+    // Extended position - ready for next rep (no time guard)
+    if (elbowExtended && repStateRef.current === 'up') {
+      repStateRef.current = 'down';
+      currentRepIssuesRef.current = [];
+      console.log('✅ Bent Over Row - Arms extended, ready for next rep');
+    }
+    // Pulled position - COUNT REP
+    else if (elbowPulled && elbowAboveHip > 0.05 && repStateRef.current === 'down' && timeSinceLastRep > 500) {
       repStateRef.current = 'up';
       lastRepTimeRef.current = currentTime;
+      console.log('🎯 BENT OVER ROW REP COUNTED! elbowAboveHip:', elbowAboveHip.toFixed(3));
       
       setRepCount(prev => {
         const newRepCount = prev + 1;
@@ -936,17 +968,14 @@ const analyzeBicepCurl = (landmarks) => {
         return newRepCount;
       });
     }
-    // Extended position
-    else if (elbowAngle > 140 && repStateRef.current === 'up') {
-      repStateRef.current = 'down';
-      currentRepIssuesRef.current = [];
-    }
 
     // Real-time feedback
-    if (torsoAngle > 130) {
-      feedback.push({ type: 'warning', message: 'Bend forward more - torso near parallel' });
-    } else if (elbowAngle < 80) {
-      feedback.push({ type: 'success', message: 'Good pull!' });
+    if (torsoAngle > 140) {
+      feedback.push({ type: 'warning', message: 'Bend forward more - torso near parallel to floor' });
+    } else if (elbowAboveHip > 0.12) {
+      feedback.push({ type: 'success', message: 'Full row - squeeze shoulder blades!' });
+    } else if (elbowPulled) {
+      feedback.push({ type: 'warning', message: 'Pull higher - drive elbows past your torso' });
     }
 
     return feedback;
@@ -1068,7 +1097,7 @@ const analyzeBicepCurl = (landmarks) => {
             .eq('user_id', user.id)
             .eq('exercise_name', exercise.name)
             .order('created_at', { ascending: false })
-            .limit(8);
+            .limit(2);
           if (historyData) setSessionHistory(historyData);
         }
       } catch (err) {
@@ -1103,7 +1132,7 @@ const analyzeBicepCurl = (landmarks) => {
           .eq('user_id', user.id)
           .eq('exercise_name', selectedExercise.name)
           .order('created_at', { ascending: false })
-          .limit(8);
+          .limit(2);
         if (!error) setSessionHistory(data || []);
       } catch (e) {
         console.error('Error loading session history:', e);
