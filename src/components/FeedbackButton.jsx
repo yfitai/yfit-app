@@ -8,16 +8,26 @@ import { Label } from '@/components/ui/label.jsx'
 const SUPABASE_URL = 'https://mxggxpoxgqubojvumjlt.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMjI5NjYsImV4cCI6MjA3MjY5ODk2Nn0.EWlmoH-_kw1A_gbs1rECLWkC30X50IOGx3GDSDNSYE4'
 
+// DB constraint: type IN ('bug', 'feature_request', 'general', 'praise')
 const FEEDBACK_TYPES = [
-  { value: 'bug', label: 'Bug Report', icon: <Bug className="w-4 h-4" />, color: 'text-red-600 bg-red-50 border-red-200' },
-  { value: 'feature', label: 'Feature Request', icon: <Lightbulb className="w-4 h-4" />, color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
-  { value: 'feedback', label: 'General Feedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  { value: 'praise', label: 'Praise / Love It!', icon: <Heart className="w-4 h-4" />, color: 'text-pink-600 bg-pink-50 border-pink-200' },
+  { value: 'bug',             label: 'Bug Report',       icon: <Bug className="w-4 h-4" />,         color: 'text-red-600 bg-red-50 border-red-200' },
+  { value: 'feature_request', label: 'Feature Request',  icon: <Lightbulb className="w-4 h-4" />,   color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
+  { value: 'general',         label: 'General Feedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+  { value: 'praise',          label: 'Praise / Love It!', icon: <Heart className="w-4 h-4" />,      color: 'text-pink-600 bg-pink-50 border-pink-200' },
 ]
 
 const CATEGORIES = [
   'Nutrition', 'Fitness', 'Medications', 'Daily Tracker', 'Predictions', 'AI Coach', 'Account', 'Other'
 ]
+
+function resetForm() {
+  return {
+    feedbackType: 'bug',
+    category: '',
+    title: '',
+    description: '',
+  }
+}
 
 export default function FeedbackButton({ user }) {
   const [open, setOpen] = useState(false)
@@ -30,6 +40,17 @@ export default function FeedbackButton({ user }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
+  const handleClose = () => {
+    setOpen(false)
+    // Always clear inputs when closing so the form is fresh next time
+    setSubmitted(false)
+    setError('')
+    setFeedbackType('bug')
+    setCategory('')
+    setTitle('')
+    setDescription('')
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!title.trim() || !description.trim()) {
@@ -41,8 +62,8 @@ export default function FeedbackButton({ user }) {
     try {
       const { error: insertError } = await supabase.from('user_feedback').insert({
         user_id: user?.id || null,
-        type: feedbackType,
-        category: category || 'Other',
+        type: feedbackType,                    // matches DB CHECK constraint
+        category: category || 'other',
         title: title.trim(),
         description: description.trim(),
         page_url: window.location.href,
@@ -52,8 +73,10 @@ export default function FeedbackButton({ user }) {
 
       if (insertError) throw insertError
 
-      // Fire-and-forget: trigger auto-reply for feedback and praise types
-      if ((feedbackType === 'feedback' || feedbackType === 'praise') && user?.id) {
+      // Fire-and-forget: trigger auto-reply for general feedback and praise types
+      // Map DB type values back to what the Edge Function expects
+      const autoReplyType = feedbackType === 'general' ? 'feedback' : feedbackType
+      if ((feedbackType === 'general' || feedbackType === 'praise') && user?.id) {
         fetch(`${SUPABASE_URL}/functions/v1/feedback-auto-reply`, {
           method: 'POST',
           headers: {
@@ -63,25 +86,21 @@ export default function FeedbackButton({ user }) {
           body: JSON.stringify({
             user_id: user.id,
             userEmail: user.email || null,
-            type: feedbackType,
+            type: autoReplyType,
             title: title.trim(),
             description: description.trim(),
-            category: category || 'Other',
+            category: category || 'other',
           }),
         }).catch(err => console.warn('Auto-reply trigger failed (non-critical):', err))
       }
 
       setSubmitted(true)
-      // Auto-close after 3 seconds
+      // Auto-close after 3 seconds and clear the form
       setTimeout(() => {
-        setOpen(false)
-        setSubmitted(false)
-        setTitle('')
-        setDescription('')
-        setCategory('')
-        setFeedbackType('bug')
+        handleClose()
       }, 3000)
     } catch (err) {
+      console.error('Feedback submit error:', err)
       setError('Failed to submit feedback. Please try again.')
     }
     setSubmitting(false)
@@ -103,7 +122,7 @@ export default function FeedbackButton({ user }) {
       {open && (
         <div 
           className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
+          onClick={handleClose}
         />
       )}
 
@@ -117,7 +136,7 @@ export default function FeedbackButton({ user }) {
               <p className="text-blue-100 text-xs">Help us improve YFIT</p>
             </div>
             <button 
-              onClick={() => setOpen(false)}
+              onClick={handleClose}
               className="text-white/80 hover:text-white transition-colors"
             >
               <X className="w-5 h-5" />

@@ -30,7 +30,7 @@ interface AutoReplyRequest {
   feedback_id?: string;
   user_id: string;
   userEmail?: string;       // ← passed directly from FeedbackButton.jsx (primary source)
-  type: "bug" | "feature" | "feedback" | "praise";
+  type: "bug" | "feature_request" | "feedback" | "general" | "praise";
   title: string;
   description: string;
   category: string;
@@ -205,8 +205,10 @@ serve(async (req) => {
 
     console.log(`feedback-auto-reply: type=${type}, user_id=${user_id}, hasEmail=${!!userEmail}`);
 
-    // Only handle 'feedback' and 'praise' types
-    if (type !== "feedback" && type !== "praise") {
+    // Only handle 'feedback'/'general' and 'praise' types
+    // Note: DB stores 'general', FeedbackButton maps it to 'feedback' before calling this function
+    // Accept both for robustness
+    if (type !== "feedback" && type !== "general" && type !== "praise") {
       return new Response(
         JSON.stringify({ skipped: true, reason: "Not a feedback or praise type" }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -235,7 +237,7 @@ serve(async (req) => {
     const { email, firstName } = userInfo;
     console.log(`feedback-auto-reply: Sending ${type} email to ${email} (${firstName})`);
 
-    if (type === "feedback") {
+    if (type === "feedback" || type === "general") {
       // Generate personalised GPT-4 reply
       const replyText = await generateReply(firstName, title, description, category);
       await sendEmail(
