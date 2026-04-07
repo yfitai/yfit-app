@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.j
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.jsx'
 import { signIn, signUp, resendConfirmationEmail, resetPassword } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
-import { Mail, CheckCircle, Eye, EyeOff, Key } from 'lucide-react'
+import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 
 export default function Auth({ onAuthSuccess }) {
@@ -34,35 +34,6 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
   const [signupPassword, setSignupPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
-  const [inviteCodeValid, setInviteCodeValid] = useState(null) // null=unchecked, true=valid, false=invalid
-  const [checkingCode, setCheckingCode] = useState(false)
-
-  const validateInviteCode = async (code) => {
-    if (!code.trim()) {
-      setInviteCodeValid(null)
-      return
-    }
-    setCheckingCode(true)
-    try {
-      const { data, error } = await supabase
-        .from('beta_invites')
-        .select('id, max_uses, use_count, is_active')
-        .eq('code', code.trim().toUpperCase())
-        .eq('is_active', true)
-        .single()
-      if (error || !data) {
-        setInviteCodeValid(false)
-      } else if (data.use_count >= data.max_uses) {
-        setInviteCodeValid(false)
-      } else {
-        setInviteCodeValid(true)
-      }
-    } catch {
-      setInviteCodeValid(false)
-    }
-    setCheckingCode(false)
-  }
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -112,19 +83,9 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
       return
     }
 
-    // Validate invite code
-    if (!inviteCode.trim()) {
-      setError('A beta invite code is required to sign up during our beta period.')
-      return
-    }
-    if (inviteCodeValid !== true) {
-      setError('Invalid or expired invite code. Please check your code and try again.')
-      return
-    }
-    
     setIsLoading(true)
     
-    const { data, error, needsEmailConfirmation } = await signUp(signupEmail, signupPassword, firstName, lastName, inviteCode.trim().toUpperCase())
+    const { data, error, needsEmailConfirmation } = await signUp(signupEmail, signupPassword, firstName, lastName)
     
     if (error) {
       setError(error.message || 'Failed to create account. Please try again.')
@@ -604,38 +565,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
   <p className="text-xs text-gray-500">Minimum 6 characters</p>
 </div>
 
-                  {/* Beta Invite Code */}
-                  <div className="space-y-2">
-                    <Label htmlFor="invite-code" className="flex items-center gap-1">
-                      <Key size={14} /> Beta Invite Code *
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="invite-code"
-                        type="text"
-                        placeholder="YFIT-XXXX-XXXX"
-                        value={inviteCode}
-                        onChange={(e) => {
-                          const val = e.target.value.toUpperCase()
-                          setInviteCode(val)
-                          setInviteCodeValid(null)
-                          setError('')
-                        }}
-                        onBlur={() => validateInviteCode(inviteCode)}
-                        className={`pr-10 ${inviteCodeValid === true ? 'border-green-500 focus:ring-green-500' : inviteCodeValid === false ? 'border-red-500 focus:ring-red-500' : ''}`}
-                        required
-                        disabled={isLoading}
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {checkingCode && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />}
-                        {!checkingCode && inviteCodeValid === true && <CheckCircle size={16} className="text-green-500" />}
-                        {!checkingCode && inviteCodeValid === false && <span className="text-red-500 text-xs font-bold">✗</span>}
-                      </div>
-                    </div>
-                    {inviteCodeValid === true && <p className="text-xs text-green-600">✓ Valid invite code</p>}
-                    {inviteCodeValid === false && <p className="text-xs text-red-600">Invalid or expired code. Need an invite? Contact support@yfitai.com</p>}
-                    {inviteCodeValid === null && <p className="text-xs text-gray-500">YFIT is currently in beta — an invite code is required to sign up.</p>}
-                  </div>
+
 
                 </CardContent>
                 <CardFooter>
