@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 
+const SUPABASE_URL = 'https://mxggxpoxgqubojvumjlt.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMjI5NjYsImV4cCI6MjA3MjY5ODk2Nn0.EWlmoH-_kw1A_gbs1rECLWkC30X50IOGx3GDSDNSYE4'
+
 const FEEDBACK_TYPES = [
   { value: 'bug', label: 'Bug Report', icon: <Bug className="w-4 h-4" />, color: 'text-red-600 bg-red-50 border-red-200' },
-  { value: 'feature_request', label: 'Feature Request', icon: <Lightbulb className="w-4 h-4" />, color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
-  { value: 'general', label: 'General Feedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+  { value: 'feature', label: 'Feature Request', icon: <Lightbulb className="w-4 h-4" />, color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
+  { value: 'feedback', label: 'General Feedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
   { value: 'praise', label: 'Praise / Love It!', icon: <Heart className="w-4 h-4" />, color: 'text-pink-600 bg-pink-50 border-pink-200' },
 ]
 
@@ -36,7 +39,7 @@ export default function FeedbackButton({ user }) {
     setSubmitting(true)
     setError('')
     try {
-      await supabase.from('user_feedback').insert({
+      const { data: insertData, error: insertError } = await supabase.from('user_feedback').insert({
         user_id: user?.id || null,
         type: feedbackType,
         category: category || 'Other',
@@ -44,8 +47,30 @@ export default function FeedbackButton({ user }) {
         description: description.trim(),
         page_url: window.location.href,
         user_agent: navigator.userAgent,
-        app_version: import.meta.env.VITE_APP_VERSION || '1.0.0-beta',
-      })
+        app_version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+      }).select('id').single()
+
+      if (insertError) throw insertError
+
+      // Fire-and-forget: trigger auto-reply for feedback and praise types
+      if ((feedbackType === 'feedback' || feedbackType === 'praise') && user?.id && insertData?.id) {
+        fetch(`${SUPABASE_URL}/functions/v1/feedback-auto-reply`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            feedback_id: insertData.id,
+            user_id: user.id,
+            type: feedbackType,
+            title: title.trim(),
+            description: description.trim(),
+            category: category || 'Other',
+          }),
+        }).catch(err => console.warn('Auto-reply trigger failed (non-critical):', err))
+      }
+
       setSubmitted(true)
       // Auto-close after 3 seconds
       setTimeout(() => {
