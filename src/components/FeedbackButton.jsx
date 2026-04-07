@@ -39,7 +39,7 @@ export default function FeedbackButton({ user }) {
     setSubmitting(true)
     setError('')
     try {
-      const { data: insertData, error: insertError } = await supabase.from('user_feedback').insert({
+      const { error: insertError } = await supabase.from('user_feedback').insert({
         user_id: user?.id || null,
         type: feedbackType,
         category: category || 'Other',
@@ -48,12 +48,12 @@ export default function FeedbackButton({ user }) {
         page_url: window.location.href,
         user_agent: navigator.userAgent,
         app_version: import.meta.env.VITE_APP_VERSION || '1.0.0',
-      }).select('id').single()
+      })
 
       if (insertError) throw insertError
 
       // Fire-and-forget: trigger auto-reply for feedback and praise types
-      if ((feedbackType === 'feedback' || feedbackType === 'praise') && user?.id && insertData?.id) {
+      if ((feedbackType === 'feedback' || feedbackType === 'praise') && user?.id) {
         fetch(`${SUPABASE_URL}/functions/v1/feedback-auto-reply`, {
           method: 'POST',
           headers: {
@@ -61,7 +61,6 @@ export default function FeedbackButton({ user }) {
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
-            feedback_id: insertData.id,
             user_id: user.id,
             type: feedbackType,
             title: title.trim(),
