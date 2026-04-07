@@ -23,7 +23,7 @@ const REPORT_RECIPIENT = "support@yfitai.com";
 interface FeedbackRow {
   id: string;
   user_id: string | null;
-  type: "bug" | "feature" | "feedback" | "praise";
+  type: "bug" | "feature_request" | "general" | "praise";
   category: string;
   title: string;
   description: string;
@@ -215,8 +215,8 @@ serve(async (req) => {
 
     const feedback = (rows ?? []) as FeedbackRow[];
     const bugs = feedback.filter((r) => r.type === "bug");
-    const features = feedback.filter((r) => r.type === "feature");
-    const general = feedback.filter((r) => r.type === "feedback");
+    const features = feedback.filter((r) => r.type === "feature_request");
+    const general = feedback.filter((r) => r.type === "general");
     const praise = feedback.filter((r) => r.type === "praise");
 
     // If nothing to report, skip email
