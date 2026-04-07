@@ -4,7 +4,7 @@
  */
 
 // Static cache name - old caches are cleared on activate
-const CACHE_NAME = 'yfit-cache-v5'; // bumped Apr 6 2026 - force clear for new marketing landing page integration
+const CACHE_NAME = 'yfit-cache-v6'; // bumped Apr 7 2026 - force clear for feedback widget fix + exercise analysis updates
 
 // PWA icon filenames that must NEVER be cached (always fetch fresh so
 // the home-screen icon updates when the user re-installs the PWA)

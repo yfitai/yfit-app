@@ -62,6 +62,7 @@ export default function FeedbackButton({ user }) {
           },
           body: JSON.stringify({
             user_id: user.id,
+            userEmail: user.email || null,
             type: feedbackType,
             title: title.trim(),
             description: description.trim(),

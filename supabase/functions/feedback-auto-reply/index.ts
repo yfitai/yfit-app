@@ -7,6 +7,9 @@
 //   2. type === 'praise'    → sends a warm thank-you + marks testimonial_queued
 //
 // For bug and feature types: no email is sent (handled by weekly report).
+//
+// FIX: userEmail is now passed directly in the request body from FeedbackButton.jsx
+// to avoid RLS-blocked user_profiles lookups and service role key issues.
 // ============================================================
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -24,38 +27,62 @@ const corsHeaders = {
 };
 
 interface AutoReplyRequest {
-  feedback_id: string;
+  feedback_id?: string;
   user_id: string;
+  userEmail?: string;       // ← passed directly from FeedbackButton.jsx (primary source)
   type: "bug" | "feature" | "feedback" | "praise";
   title: string;
   description: string;
   category: string;
 }
 
-// ── Get user email from Supabase Auth ────────────────────────
-async function getUserEmail(
-  supabase: ReturnType<typeof createClient>,
-  userId: string
-): Promise<{ email: string; firstName: string } | null> {
-  // Try user_profiles first for first name
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("email, full_name")
-    .eq("user_id", userId)
-    .maybeSingle();
+// ── Derive first name from email address ─────────────────────
+function firstNameFromEmail(email: string): string {
+  const local = email.split("@")[0];
+  // Handle common patterns: john.doe, john_doe, johndoe123
+  const cleaned = local.replace(/[0-9_.\-]+/g, " ").trim();
+  const first = cleaned.split(" ")[0];
+  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+}
 
-  if (profile?.email) {
-    const firstName = profile.full_name?.split(" ")[0] ?? "there";
-    return { email: profile.email, firstName };
+// ── Resolve user email: payload first, then auth.admin fallback ──
+async function resolveUserInfo(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  payloadEmail?: string
+): Promise<{ email: string; firstName: string } | null> {
+  // PRIMARY: use email passed directly in the request body
+  if (payloadEmail && payloadEmail.includes("@")) {
+    // Try to get first name from user_profiles (best effort, non-blocking)
+    let firstName = firstNameFromEmail(payloadEmail);
+    try {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("full_name")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (profile?.full_name) {
+        firstName = profile.full_name.split(" ")[0] ?? firstName;
+      }
+    } catch {
+      // Ignore RLS errors — we already have the email, first name fallback is fine
+    }
+    return { email: payloadEmail, firstName };
   }
 
-  // Fallback: auth.users via service role
-  const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-  if (authUser?.user?.email) {
-    const firstName =
-      authUser.user.user_metadata?.first_name ??
-      authUser.user.email.split("@")[0];
-    return { email: authUser.user.email, firstName };
+  // FALLBACK: try auth.admin.getUserById (requires service role key)
+  try {
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+    if (authUser?.user?.email) {
+      const email = authUser.user.email;
+      const firstName =
+        authUser.user.user_metadata?.first_name ??
+        authUser.user.user_metadata?.full_name?.split(" ")[0] ??
+        firstNameFromEmail(email);
+      return { email, firstName };
+    }
+  } catch (err) {
+    console.warn("auth.admin.getUserById failed:", err);
   }
 
   return null;
@@ -174,7 +201,9 @@ serve(async (req) => {
 
   try {
     const body: AutoReplyRequest = await req.json();
-    const { feedback_id, user_id, type, title, description, category } = body;
+    const { feedback_id, user_id, userEmail, type, title, description, category } = body;
+
+    console.log(`feedback-auto-reply: type=${type}, user_id=${user_id}, hasEmail=${!!userEmail}`);
 
     // Only handle 'feedback' and 'praise' types
     if (type !== "feedback" && type !== "praise") {
@@ -193,9 +222,10 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const userInfo = await getUserEmail(supabase, user_id);
+    const userInfo = await resolveUserInfo(supabase, user_id, userEmail);
 
     if (!userInfo) {
+      console.error(`feedback-auto-reply: Could not resolve email for user_id=${user_id}`);
       return new Response(
         JSON.stringify({ skipped: true, reason: "Could not resolve user email" }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -203,6 +233,7 @@ serve(async (req) => {
     }
 
     const { email, firstName } = userInfo;
+    console.log(`feedback-auto-reply: Sending ${type} email to ${email} (${firstName})`);
 
     if (type === "feedback") {
       // Generate personalised GPT-4 reply
@@ -224,11 +255,29 @@ serve(async (req) => {
         firstName
       );
 
-      // Mark as testimonial queued
-      await supabase
-        .from("user_feedback")
-        .update({ testimonial_queued: true })
-        .eq("id", feedback_id);
+      // Mark as testimonial queued (best effort — feedback_id may be undefined)
+      if (feedback_id) {
+        await supabase
+          .from("user_feedback")
+          .update({ testimonial_queued: true })
+          .eq("id", feedback_id);
+      } else {
+        // Mark the most recent praise from this user as testimonial_queued
+        const { data: recent } = await supabase
+          .from("user_feedback")
+          .select("id")
+          .eq("user_id", user_id)
+          .eq("type", "praise")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (recent?.id) {
+          await supabase
+            .from("user_feedback")
+            .update({ testimonial_queued: true })
+            .eq("id", recent.id);
+        }
+      }
     }
 
     return new Response(
