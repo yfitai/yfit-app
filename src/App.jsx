@@ -137,22 +137,20 @@ function App() {
         .eq('user_id', userId)
         .maybeSingle()
       
-      // Show onboarding if profile doesn't exist or onboarding not completed
-      if (!data || !data.onboarding_completed) {
-        setNeedsOnboarding(true)
-      } else if (!data.install_guide_shown) {
-        // Onboarding done but install guide not yet shown — show it now
+      // Skip onboarding wizard — users set up their profile on the Goals page inside the app.
+      // Show install guide if it hasn't been shown yet (new users or profile doesn't exist yet).
+      if (!data || !data.install_guide_shown) {
         setShowInstallGuide(true)
       }
     } catch {
-      // If table doesn't exist yet, skip onboarding gracefully
+      // If table doesn't exist yet, skip gracefully
       setNeedsOnboarding(false)
     }
   }
 
   const handleOnboardingComplete = () => {
     setNeedsOnboarding(false)
-    // After onboarding, show the install guide
+    // After onboarding (if ever triggered), show the install guide
     setShowInstallGuide(true)
   }
   const handleInstallGuideComplete = () => {
