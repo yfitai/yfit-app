@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 /**
- * InstallGuide — shown once to new users after onboarding completes.
+ * InstallGuide — shown once to new users after signup.
  * Detects Android / iPhone / desktop and shows the correct
  * "Add to Home Screen" steps for that device.
+ * Ends with a clear call-to-action to go back and sign in.
  *
  * Props:
  *   user       — Supabase user object
@@ -41,8 +42,13 @@ const STEPS = {
     },
     {
       icon: '4️⃣',
-      title: 'Open from home screen',
+      title: 'Open from your home screen',
       detail: 'Find the YFIT AI icon on your home screen and tap it. The app opens full-screen, just like a native app.',
+    },
+    {
+      icon: '5️⃣',
+      title: 'Sign in to get started',
+      detail: 'Once the app opens, tap "Sign In", enter your email and password, and you\'re in!',
     },
   ],
   ios: [
@@ -63,8 +69,13 @@ const STEPS = {
     },
     {
       icon: '4️⃣',
-      title: 'Open from home screen',
+      title: 'Open from your home screen',
       detail: 'Find the YFIT AI icon on your home screen and tap it. The app opens full-screen without the Safari browser bar.',
+    },
+    {
+      icon: '5️⃣',
+      title: 'Sign in to get started',
+      detail: 'Once the app opens, tap "Sign In", enter your email and password, and you\'re in!',
     },
   ],
   desktop: [
@@ -82,6 +93,11 @@ const STEPS = {
       icon: '3️⃣',
       title: 'Find it in your taskbar',
       detail: 'The app is now pinned to your taskbar or Start menu. Open it any time without a browser.',
+    },
+    {
+      icon: '4️⃣',
+      title: 'Sign in to get started',
+      detail: 'When the app opens, click "Sign In", enter your email and password, and you\'re all set!',
     },
   ],
 }
@@ -149,11 +165,11 @@ export default function InstallGuide({ user, onComplete }) {
         {/* Steps */}
         <ol className="space-y-4 mb-6">
           {steps.map((step, i) => (
-            <li key={i} className="flex gap-3 items-start">
+            <li key={i} className={`flex gap-3 items-start ${i === steps.length - 1 ? 'bg-green-50 border border-green-200 rounded-xl p-3 -mx-1' : ''}`}>
               <span className="text-xl leading-none mt-0.5 flex-shrink-0">{step.icon}</span>
               <div>
-                <p className="font-semibold text-gray-800 text-sm">{step.title}</p>
-                <p className="text-gray-500 text-sm mt-0.5">{step.detail}</p>
+                <p className={`font-semibold text-sm ${i === steps.length - 1 ? 'text-green-800' : 'text-gray-800'}`}>{step.title}</p>
+                <p className={`text-sm mt-0.5 ${i === steps.length - 1 ? 'text-green-700' : 'text-gray-500'}`}>{step.detail}</p>
               </div>
             </li>
           ))}
@@ -180,7 +196,7 @@ export default function InstallGuide({ user, onComplete }) {
             disabled={saving}
             className="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-60"
           >
-            {saving ? 'Saving...' : "I've added it — take me to the app ✓"}
+            {saving ? 'Saving...' : "Got it — take me to sign in ✓"}
           </button>
           <button
             onClick={markShownAndComplete}
