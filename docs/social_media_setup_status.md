@@ -1,68 +1,49 @@
 # YFIT Social Media Setup — Current Status & Action Plan
-Last updated: Apr 4, 2026
+Last updated: Apr 9, 2026
 
-## Platform Status
+## Platform Status (Upload-Post YFIT Profile)
 
-| Platform | Account | Upload-Post | Notes |
-|----------|---------|-------------|-------|
-| YouTube | ✅ Done | ✅ Connected | Done |
-| Facebook | ✅ YFIT AI Page created (admin: Don Campbell) | ✅ Connected (purple) | Done |
-| Instagram | ❌ @yfitai permanently disabled by Meta | ❌ Not connected | Create fresh via phone app with personal Gmail |
-| LinkedIn | ✅ Account exists (support@yfitai.com) | ❌ Not connected | ID verification submitted — waiting for access restore |
-| Pinterest | ⚠️ Partially set up | ❌ Not connected | Need to log in and complete |
-| TikTok | ❌ Not started | ❌ Not connected | Requires phone app (Android/iOS) |
+| Platform | Account | Upload-Post | Video Support | Notes |
+|----------|---------|-------------|---------------|-------|
+| TikTok | ✅ "Smokey" account | ✅ Connected | ✅ Yes | Needs editing permissions — available Apr 15 |
+| Instagram | ✅ yfit.ai | ✅ Connected | ✅ Yes (Reels) | Ready |
+| LinkedIn | ✅ Don Camp... | ✅ Connected | ✅ Yes | Ready |
+| YouTube | ✅ YFIT AI | ✅ Connected | ✅ Yes | Ready |
+| Pinterest | ✅ yfitai | ✅ Connected | ✅ Yes (Video Pins) | Ready |
+| Facebook | ❌ Locked out | ❌ Not connected (greyed out) | ✅ Yes | Locked out — skip for now |
+| X (Twitter) | ❌ | ❌ Not connected (greyed out) | ⚠️ Limited | Not a priority |
+| Threads | ❌ | ❌ Not connected | ⚠️ Text-focused | Not a priority |
+| Bluesky | ❌ | ❌ Not connected | ⚠️ Text-focused | Not a priority |
+| Reddit | ❌ | ❌ Not connected | ⚠️ Niche | Not a priority |
+| Google Business | ❌ | ❌ Not connected | ⚠️ Limited | Not a priority |
 
-## Next Session Action Items
+## Active Platforms for Video Posting (n8n workflow)
 
-### Instagram (do on phone, NOT desktop)
-- [ ] Open Instagram app on Android
-- [ ] Create new account with **personal Gmail** (not support@yfitai.com — it's flagged by Meta)
-- [ ] Username: `yfitaiapp` (confirmed available)
-- [ ] Switch to Business account → link to YFIT AI Facebook Page
-- [ ] Connect to Upload-Post
+These 4 are ready to receive video posts right now:
+1. **Instagram** (Reels)
+2. **LinkedIn** (video posts)
+3. **YouTube** (Shorts)
+4. **Pinterest** (Video Pins)
 
-### LinkedIn
-- [ ] Wait for ID verification to complete (usually same day)
-- [ ] Log in to linkedin.com → confirm access restored
-- [ ] Create a **LinkedIn Company Page** for YFIT AI (separate from personal profile)
-- [ ] Go to Upload-Post → Users → YFIT row → click LinkedIn → authorize
+TikTok will be added **April 15** once editing permissions are resolved.
+Facebook is locked out — defer until access is recovered.
 
-### Pinterest
-- [ ] Go to pinterest.com → log in with support@yfitai.com
-- [ ] If locked out → Forgot Password → email reset
-- [ ] Switch to Business account
-- [ ] Create 5 boards: Nutrition Tips, Weight Loss, Workout Plans, Medication Guide, YFIT App Features
-- [ ] Connect to Upload-Post
+## Video Service (Railway v2.3.0 — live)
+- [x] YFIT logo watermark (top-left, 88% opacity)
+- [x] Caption cycling — all tips parsed correctly (numbered, bullets, prose)
+- [x] Proportional word-count timing for captions
+- [x] Font size 46px (reduced from 58px)
+- [x] Pexels portrait fitness backgrounds (6 clips per video)
+- [x] Uploads to Supabase yfit-videos bucket
 
-### TikTok
-- [ ] Download TikTok app on Android
-- [ ] Create account with support@yfitai.com or personal email
-- [ ] Username: yfitai or yfitaiapp
-- [ ] Switch to Business account → Health & Fitness
-- [ ] Connect to Upload-Post
-
-## Video Service Updates (done Apr 4)
-- [x] Upgraded to use real Pexels video backgrounds based on content angle
-- [x] PEXELS_API_KEY confirmed valid (5,592 portrait fitness videos available)
-- [ ] Add PEXELS_API_KEY to Railway environment variables: `gqY0X3U13VfUjejR1rvec2X6I1yuJpGWXrO4vQ4esOl4XDE8UXsoji0N`
-
-## n8n Workflow Fixes (done Apr 4)
-- [x] Fixed Upload-Post text endpoint: `v1.upload-post.com` → `api.upload-post.com/api/upload_text`
-- [x] Added explicit POST method to text node
-- [x] Both nodes confirmed using `user=YFIT` matching Upload-Post profile name
+## n8n Workflow Status
+- [ ] Set dry_run: false to go live
+- [ ] Confirm video_items platforms match connected accounts (instagram, linkedin, youtube, pinterest)
+- [ ] Add TikTok to video_items on April 15
+- [ ] Enable daily 6 AM CDT cron job
 
 ## API Keys (all confirmed valid)
 - [x] Pexels: `gqY0X3U13VfUjejR1rvec2X6I1yuJpGWXrO4vQ4esOl4XDE8UXsoji0N`
 - [x] ElevenLabs: `sk_c73588c45da807e6ba8119f20e1fe445fb496d336c837d11`
-- [x] Upload-Post JWT: already embedded in n8n workflow
-
-## Remaining Before Full Go-Live
-- [ ] Add PEXELS_API_KEY to Railway video service env vars
-- [ ] Complete Instagram account setup (phone, personal Gmail)
-- [ ] Restore LinkedIn access after ID verification + create Company Page
-- [ ] Complete Pinterest setup and connect to Upload-Post
-- [ ] Set up TikTok Business account and connect to Upload-Post
-- [ ] Run full n8n workflow dry-run test
-- [ ] Enable daily 6 AM CDT cron job
-- [ ] Add social media follow links to welcome email footer
-- [ ] Fix FormScoreGauge counter in main app (deferred)
+- [x] Upload-Post JWT: embedded in n8n workflow
+- [x] Supabase service key: in Railway env vars
