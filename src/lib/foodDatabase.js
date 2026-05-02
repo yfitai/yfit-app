@@ -96,24 +96,22 @@ export async function searchFoods(query, options = {}) {
  */
 async function searchUSDA(query, limit) {
   try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 12000)
+    // Use CapacitorHttp to bypass Android WebView CORS restrictions
+    // (same pattern as getFoodByBarcode — fetch() is blocked on native)
+    const apiUrl = `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
 
-    let response
-    try {
-      response = await fetch(
-        `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`,
-        { signal: controller.signal }
-      )
-    } finally {
-      clearTimeout(timeoutId)
-    }
+    const response = await CapacitorHttp.get({
+      url: apiUrl,
+      headers: { 'Accept': 'application/json' },
+      connectTimeout: 12000,
+      readTimeout: 12000
+    })
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(`USDA API error: ${response.status}`)
     }
 
-    const data = await response.json()
+    const data = response.data
 
     if (!data.foods || data.foods.length === 0) {
       return []
@@ -263,16 +261,21 @@ function transformUSDAFood(usdaFood, relevanceScore = 0) {
  */
 async function searchOpenFoodFacts(query, limit, language = 'en') {
   try {
-    // DO NOT add a timeout — OFF API can take 12-27s; a timeout kills all results
-    const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}&language=${encodeURIComponent(language)}`
-    )
+    // Use CapacitorHttp to bypass Android WebView CORS restrictions
+    const apiUrl = `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}&language=${encodeURIComponent(language)}`
 
-    if (!response.ok) {
+    const response = await CapacitorHttp.get({
+      url: apiUrl,
+      headers: { 'Accept': 'application/json' },
+      connectTimeout: 30000,
+      readTimeout: 30000
+    })
+
+    if (response.status !== 200) {
       throw new Error(`Open Food Facts API error: ${response.status}`)
     }
 
-    const data = await response.json()
+    const data = response.data
 
     if (!data.products || data.products.length === 0) {
       return []
