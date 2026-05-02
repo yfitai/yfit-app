@@ -1,56 +1,66 @@
 /**
  * YFIT Food Database API Integration
  * Handles food search, barcode lookup, and caching
- * Integrates with Open Food Facts and USDA FoodData Central
+ *
+ * Architecture (May 2026):
+ *   PRIMARY:  USDA FoodData Central — all 4 data types, English only, consistent nutrition data
+ *   FALLBACK: Open Food Facts — only used when userLanguage !== 'en', filtered to that language
+ *   CUSTOM:   Supabase custom_foods + favorite_foods (My Foods tab)
+ *
+ * This structure is intentional:
+ *   - USDA covers ~250K whole foods + major US brands in clean English
+ *   - OFF's world database is valuable for non-English users (Spanish, French, etc.)
+ *   - When multilingual support is added, pass userLanguage to searchFoods()
  */
 
 import { supabase } from './supabase'
 import { CapacitorHttp } from '@capacitor/core'
 
-
 // API Configuration
-const OPEN_FOOD_FACTS_API = 'https://us.openfoodfacts.org/api/v2' // Use US subdomain for English products
 const USDA_API_BASE = 'https://api.nal.usda.gov/fdc/v1'
 
 // Get USDA API key from environment variable
 const USDA_API_KEY = import.meta.env.VITE_USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m'
-console.log('🔑 USDA API Key loaded:', USDA_API_KEY ? (USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom key (length: ' + USDA_API_KEY.length + ' )') : 'NOT SET')
-
-// User-Agent for Open Food Facts (required)
-const USER_AGENT = 'YFIT/1.0 (contact@yfit.app)'
 
 /**
- * Search for foods across multiple databases
+ * Search for foods across databases
  * @param {string} query - Search query
- * @param {Object} options - Search options (limit, filters)
+ * @param {Object} options - Search options
+ * @param {number} options.limit - Max results (default 40)
+ * @param {string} options.source - 'all' | 'custom'
+ * @param {string} options.userLanguage - ISO 639-1 language code (default 'en')
+ *   When 'en': USDA only (clean, consistent English results)
+ *   When other: USDA + Open Food Facts filtered to that language
  * @returns {Promise<Array>} - Array of food results
  */
 export async function searchFoods(query, options = {}) {
-  const { limit = 20, source = 'all' } = options
-
+  const { limit = 40, source = 'all', userLanguage = 'en' } = options
 
   try {
     const results = []
 
-    // Search Open Food Facts (branded foods)
     if (source === 'all') {
-      const offResults = await searchOpenFoodFacts(query, limit)
-      results.push(...offResults)
-    }
-
-    // Search USDA (whole foods) - NOW ENABLED
-    if (source === 'all') {
-      console.log('🥗 Searching USDA...')
+      // Always search USDA — primary source for all languages
       try {
         const usdaResults = await searchUSDA(query, limit)
-        console.log('🥗 USDA found:', usdaResults.length, 'results')
         results.push(...usdaResults)
       } catch (error) {
         console.warn('USDA search failed:', error.message)
       }
+
+      // Open Food Facts fallback — only for non-English users
+      // When multilingual support is added, this activates automatically
+      if (userLanguage !== 'en') {
+        try {
+          const offResults = await searchOpenFoodFacts(query, limit, userLanguage)
+          results.push(...offResults)
+        } catch (error) {
+          console.warn('Open Food Facts search failed:', error.message)
+        }
+      }
     }
 
-    // Search Custom Foods (user-created)
+    // Search custom foods (user-created)
     if (source === 'custom') {
       try {
         const customResults = await searchCustomFoods(query, limit)
@@ -60,25 +70,19 @@ export async function searchFoods(query, options = {}) {
       }
     }
 
-        // Remove duplicates (by name and brand)
+    // Remove duplicates (by name and brand)
     const uniqueResults = deduplicateFoods(results)
 
-    // Interleave results by source for better variety
-    const branded = uniqueResults.filter(f => f.source === 'openfoodfacts')
-    const usda = uniqueResults.filter(f => f.source === 'usda')
-    const custom = uniqueResults.filter(f => f.source === 'custom')
+    // Sort: whole/foundation foods first, then branded, then survey items
+    const dataTypePriority = { 'Foundation': 0, 'SR Legacy': 1, 'Survey (FNDDS)': 2, 'Branded': 3 }
+    uniqueResults.sort((a, b) => {
+      const pa = dataTypePriority[a._dataType] ?? 4
+      const pb = dataTypePriority[b._dataType] ?? 4
+      if (pa !== pb) return pa - pb
+      return (b._relevanceScore || 0) - (a._relevanceScore || 0)
+    })
 
-    // Alternate between sources so USDA results appear throughout
-    const interleaved = []
-    const maxLength = Math.max(branded.length, usda.length, custom.length)
-    for (let i = 0; i < maxLength; i++) {
-      if (branded[i]) interleaved.push(branded[i])
-      if (usda[i]) interleaved.push(usda[i])
-      if (custom[i]) interleaved.push(custom[i])
-    }
-
-
-    return interleaved.slice(0, limit)
+    return uniqueResults.slice(0, limit)
   } catch (error) {
     console.error('Error searching foods:', error)
     return []
@@ -88,16 +92,12 @@ export async function searchFoods(query, options = {}) {
 
 /**
  * Search USDA FoodData Central API
+ * Uses the Vercel proxy to avoid CORS issues on Android WebView
  */
 async function searchUSDA(query, limit) {
   try {
-    console.log('🥗 Searching USDA API for:', query)
-    
-    // Use backend proxy to avoid CORS issues with remote loading
-    // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    // 10-second timeout prevents Android WebView from hanging indefinitely
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    const timeoutId = setTimeout(() => controller.abort(), 12000)
 
     let response
     try {
@@ -110,122 +110,92 @@ async function searchUSDA(query, limit) {
     }
 
     if (!response.ok) {
-      const errorText = await response.text()
-      if (response.status === 401) {
-        console.error('❌ USDA API: Invalid or missing API key')
-        console.error('Response:', errorText)
-      } else if (response.status === 429) {
-        console.error('❌ USDA API: Rate limit exceeded')
-      } else {
-        console.error(`❌ USDA API error ${response.status}:`, errorText)
-      }
       throw new Error(`USDA API error: ${response.status}`)
     }
 
     const data = await response.json()
-    
+
     if (!data.foods || data.foods.length === 0) {
-      console.log('🥗 USDA API returned 0 results')
       return []
     }
 
-    // Filter and rank results by relevance
+    // Score and rank results by relevance
     const queryLower = query.toLowerCase()
-    const queryWords = queryLower.split(' ')
-    
-    const results = data.foods
+    const queryWords = queryLower.split(/\s+/).filter(w => w.length > 1)
+
+    const scored = data.foods
       .map(food => {
         const nameLower = (food.description || '').toLowerCase()
-        
-        // Calculate relevance score
-        let relevanceScore = 0
-        
-        // Exact match gets highest score
-        if (nameLower === queryLower) relevanceScore += 100
-        
-        // Starts with query gets high score
-        if (nameLower.startsWith(queryLower)) relevanceScore += 50
-        
-        // Contains all query words
-        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
-        relevanceScore += (matchedWords / queryWords.length) * 30
-        
-        // Penalize only truly irrelevant items (not common foods)
-        const irrelevantKeywords = [
-          'frozen meal', 'tv dinner', 'baby food', 'infant formula',
-          'dietary supplement', 'protein powder', 'shake mix'
-        ]
-        
-        const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
-          nameLower.includes(keyword) && !queryLower.includes(keyword)
-        )
-        
-        if (hasIrrelevantKeyword) relevanceScore -= 30
-        
-        // Boost simple, whole foods
-        const isSimpleFood = nameLower.split(',').length === 1 && nameLower.split(' ').length <= 3
-        if (isSimpleFood) relevanceScore += 10
-        
-        // Penalize foods with too many descriptors (likely not what user wants)
-        const wordCount = nameLower.split(' ').length
-        if (wordCount > 8) relevanceScore -= 10
-        
-        return {
-          food,
-          relevanceScore
-        }
+        let score = 0
+
+        // Exact match
+        if (nameLower === queryLower) score += 100
+        // Starts with query
+        if (nameLower.startsWith(queryLower)) score += 50
+        // Contains full query phrase
+        if (nameLower.includes(queryLower)) score += 40
+        // All query words present
+        const matchedWords = queryWords.filter(w => nameLower.includes(w)).length
+        if (queryWords.length > 0) score += (matchedWords / queryWords.length) * 30
+
+        // Boost simple whole foods (short names, no brand clutter)
+        const wordCount = nameLower.split(/\s+/).length
+        if (wordCount <= 3) score += 15
+        if (wordCount > 8) score -= 10
+
+        // Penalize irrelevant categories when not explicitly searched
+        const irrelevant = ['baby food', 'infant formula', 'dietary supplement']
+        if (irrelevant.some(k => nameLower.includes(k) && !queryLower.includes(k))) score -= 30
+
+        return { food, score }
       })
-      .filter(item => item.relevanceScore > 0) // Accept anything with any relevance
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
       .slice(0, limit)
-      .map(item => transformUSDAFood(item.food))
-    
-    console.log('🥗 USDA API found:', results.length, 'results')
-    return results
+      .map(item => transformUSDAFood(item.food, item.score))
+
+    return scored
   } catch (error) {
-    console.error('Error searching USDA API:', error)
+    if (error.name === 'AbortError') {
+      console.warn('USDA search timed out after 12s')
+    } else {
+      console.error('Error searching USDA:', error)
+    }
     return []
   }
 }
 
 
-
 /**
  * Transform USDA food data to our standard format
  */
-function transformUSDAFood(usdaFood) {
-  console.log('🥗 Transforming USDA food:', usdaFood.description)
-  console.log('🥗 Raw nutrients:', usdaFood.foodNutrients)
-  
+function transformUSDAFood(usdaFood, relevanceScore = 0) {
   const nutrients = {}
-  
+
   if (usdaFood.foodNutrients) {
-    // Debug: log all nutrient names to help identify sugar fields
-    const nutrientNames = usdaFood.foodNutrients.map(n => n.nutrientName)
-    if (usdaFood.description?.toLowerCase().includes('sugar') || usdaFood.description?.toLowerCase().includes('cookie')) {
-      console.log('🍬 Food with sugar in name:', usdaFood.description)
-      console.log('🍬 Available nutrients:', nutrientNames)
-    }
-    
     usdaFood.foodNutrients.forEach(nutrient => {
-      const name = nutrient.nutrientName?.toLowerCase()
-      const exactName = nutrient.nutrientName // Keep original case for exact matching
+      const name = nutrient.nutrientName?.toLowerCase() || ''
+      const exactName = nutrient.nutrientName || ''
       const value = nutrient.value || 0
-      
-      if (name?.includes('protein')) nutrients.protein = value
-      else if (name?.includes('carbohydrate')) nutrients.carbs = value
-      else if (name?.includes('total lipid') || name?.includes('fat, total')) nutrients.fat = value
-      else if (name?.includes('energy') && nutrient.unitName === 'KCAL') nutrients.calories = value
-      else if (name?.includes('fiber')) nutrients.fiber = value
-      else if (exactName === 'Total Sugars' || name?.includes('sugars, total') || name?.includes('sugars, added') || name?.includes('sugar, total') || name?.includes('total sugars')) nutrients.sugar = value
-      else if (name?.includes('sodium')) nutrients.sodium = value
+
+      if (name.includes('protein')) nutrients.protein = value
+      else if (name.includes('carbohydrate')) nutrients.carbs = value
+      else if (name.includes('total lipid') || name.includes('fat, total')) nutrients.fat = value
+      else if (name.includes('energy') && nutrient.unitName === 'KCAL') nutrients.calories = value
+      else if (name.includes('fiber')) nutrients.fiber = value
+      else if (
+        exactName === 'Total Sugars' ||
+        name.includes('sugars, total') ||
+        name.includes('sugars, added') ||
+        name.includes('sugar, total') ||
+        name.includes('total sugars')
+      ) nutrients.sugar = value
+      else if (name.includes('sodium')) nutrients.sodium = value
     })
   }
 
-  console.log('🥗 Extracted nutrients:', nutrients)
-
-  // Detect if food is liquid
-  const nameLower = usdaFood.description.toLowerCase()
+  // Detect liquid foods
+  const nameLower = (usdaFood.description || '').toLowerCase()
   const isLiquid = (
     nameLower.includes('juice') ||
     nameLower.includes('drink') ||
@@ -241,9 +211,15 @@ function transformUSDAFood(usdaFood) {
     nameLower.includes('syrup')
   )
 
-  // Use real brand name from USDA data; fall back to 'Whole Food' for unbranded items
+  // Use real brand name from USDA; fall back to 'Whole Food' for unbranded items
   const brandName = usdaFood.brandName || usdaFood.brandOwner || null
-  const displayBrand = brandName ? brandName.charAt(0).toUpperCase() + brandName.slice(1).toLowerCase() : 'Whole Food'
+  const displayBrand = brandName
+    ? brandName.charAt(0).toUpperCase() + brandName.slice(1).toLowerCase()
+    : 'Whole Food'
+
+  // Use USDA's actual serving size if available (branded foods have this)
+  const labelServingGrams = usdaFood.servingSize || null
+  const labelServingText = usdaFood.householdServingFullText || null
 
   return {
     id: `usda-${usdaFood.fdcId}`,
@@ -257,23 +233,39 @@ function transformUSDAFood(usdaFood) {
     fiber: Math.round(nutrients.fiber || 0),
     sugar: Math.round(nutrients.sugar || 0),
     sodium: Math.round(nutrients.sodium || 0),
-    servingSize: 100,
+    // Serving size: use USDA label serving if available, else 100g default
+    servingSize: labelServingGrams || 100,
     servingUnit: isLiquid ? 'ml' : 'g',
-    serving_size: isLiquid ? '100ml' : '100g', // For display in search results
-    foodType: isLiquid ? 'liquid' : 'solid'
+    servingGrams: labelServingGrams || 100,
+    // Human-readable label for the serving dropdown (e.g. "1 CHICKEN BREAST (284g)")
+    serving_size_label: labelServingGrams && labelServingText
+      ? `${labelServingText} (${Math.round(labelServingGrams)}g)`
+      : labelServingGrams
+        ? `${Math.round(labelServingGrams)}${isLiquid ? 'ml' : 'g'}`
+        : (isLiquid ? '100ml' : '100g'),
+    serving_size: labelServingGrams
+      ? `${Math.round(labelServingGrams)}${isLiquid ? 'ml' : 'g'}`
+      : (isLiquid ? '100ml' : '100g'),
+    serving_unit: isLiquid ? 'ml' : 'g',
+    foodType: isLiquid ? 'liquid' : 'solid',
+    _dataType: usdaFood.dataType || 'Branded',
+    _relevanceScore: relevanceScore
   }
 }
 
+
 /**
  * Search Open Food Facts API
+ * Only used for non-English users — filtered to the user's language
+ * @param {string} query - Search query
+ * @param {number} limit - Max results
+ * @param {string} language - ISO 639-1 language code (e.g. 'es', 'fr', 'pt')
  */
-async function searchOpenFoodFacts(query, limit) {
+async function searchOpenFoodFacts(query, limit, language = 'en') {
   try {
-    // Use backend proxy to avoid CORS issues with remote loading
-    // Use absolute URL because Android WebView doesn't have proper window.location.origin
-    // DO NOT add a timeout here - OFF API takes 12-27s and a timeout kills all branded results
+    // DO NOT add a timeout — OFF API can take 12-27s; a timeout kills all results
     const response = await fetch(
-      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}`
+      `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}&language=${encodeURIComponent(language)}`
     )
 
     if (!response.ok) {
@@ -281,211 +273,172 @@ async function searchOpenFoodFacts(query, limit) {
     }
 
     const data = await response.json()
-    
+
     if (!data.products || data.products.length === 0) {
       return []
     }
 
-    // Filter and score products by relevance to search query
     const queryLower = query.toLowerCase()
-    const queryWords = queryLower.split(' ').filter(w => w.length > 2)
-    // Build stem variants for each query word (simple s/es/ies plural/singular)
+    const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2)
+
+    // Build stem variants for plural/singular matching
     const stemVariants = queryWords.flatMap(word => {
       const variants = [word]
-      if (word.endsWith('ies')) variants.push(word.slice(0, -3) + 'y')  // cookies->cookie? No, cookies->cookie
-      if (word.endsWith('es') && word.length > 4) variants.push(word.slice(0, -2)) // cookies->cooki (not ideal)
-      if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) variants.push(word.slice(0, -1)) // cookies->cookie
-      if (!word.endsWith('s')) variants.push(word + 's') // cookie->cookies
+      if (word.endsWith('ies')) variants.push(word.slice(0, -3) + 'y')
+      if (word.endsWith('es') && word.length > 4) variants.push(word.slice(0, -2))
+      if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) variants.push(word.slice(0, -1))
+      if (!word.endsWith('s')) variants.push(word + 's')
       return variants
     })
-    
-    const scoredProducts = data.products
+
+    const scored = data.products
       .map(product => {
         if (!product.product_name || !product.nutriments) return null
-        
+
         const name = product.product_name || ''
         const nameLower = name.toLowerCase()
         const brand = (product.brands || '').toLowerCase()
         const nutriments = product.nutriments
-        
-        // Filter out products with Chinese/Japanese/Korean/Arabic/Cyrillic characters
-        const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
-        if (hasNonLatinChars) return null
 
-        // Filter 4: require 'en' in language codes (removes products with no English labelling)
+        // Filter: must have the target language code
         const langCodes = Object.keys(product.languages_codes || {})
-        if (!langCodes.includes('en')) return null
+        if (!langCodes.includes(language)) return null
 
-        // Filter 4: block accented characters in product name (removes French/Spanish/German names)
-        const ACCENTED = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ]/
-        if (ACCENTED.test(name)) return null
-
-        // Filter 4: block accented characters in brand name (removes Gerblé, Cuétara, Schär etc.)
-        const brandRaw = product.brands || ''
-        if (ACCENTED.test(brandRaw)) return null
-
-        // Filter out specific non-English brands
-        const nonEnglishBrands = ['sidi ali', 'sidi-ali']
-        if (nonEnglishBrands.some(b => brand.includes(b))) return null
-        
-        // Filter out products without nutrition data
-        const hasNutrition = (nutriments.proteins_100g !== undefined) ||
-                            (nutriments.carbohydrates_100g !== undefined) ||
-                            (nutriments.fat_100g !== undefined) ||
-                            (nutriments['energy-kcal_100g'] !== undefined) ||
-                            (nutriments.energy_100g !== undefined)
+        // Filter: must have nutrition data
+        const hasNutrition = (
+          nutriments.proteins_100g !== undefined ||
+          nutriments.carbohydrates_100g !== undefined ||
+          nutriments.fat_100g !== undefined ||
+          nutriments['energy-kcal_100g'] !== undefined ||
+          nutriments.energy_100g !== undefined
+        )
         if (!hasNutrition) return null
-        
-        // Calculate relevance score
-        let relevanceScore = 0
-        
-        // Exact match gets highest score
-        if (nameLower === queryLower) relevanceScore += 100
-        
-        // Starts with query gets high score
-        if (nameLower.startsWith(queryLower)) relevanceScore += 50
-        
-        // Contains all query words (exact)
-        const matchedWords = queryWords.filter(word => nameLower.includes(word)).length
-        if (queryWords.length > 0) {
-          relevanceScore += (matchedWords / queryWords.length) * 40
+
+        // For English, apply strict non-Latin / accented character filters
+        if (language === 'en') {
+          const hasNonLatinChars = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(name)
+          if (hasNonLatinChars) return null
+          const ACCENTED = /[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ]/
+          if (ACCENTED.test(name)) return null
+          if (ACCENTED.test(product.brands || '')) return null
         }
-        
-        // Stem/plural match: 'cookies' query matches products with 'cookie' in name
-        const stemMatchedWords = stemVariants.filter(stem => nameLower.includes(stem)).length
-        if (stemMatchedWords > 0) {
-          relevanceScore += 25
-        }
-        
-        // Boost if query appears anywhere in name (for simple searches like "milk" or "soup")
-        if (nameLower.includes(queryLower)) {
-          relevanceScore += 30
-        }
-        
-        // Boost if brand matches query
-        if (brand && queryWords.some(word => brand.includes(word))) {
-          relevanceScore += 20
-        }
-        
-        // Penalize very long product names (likely not what user wants)
-        const wordCount = nameLower.split(' ').length
-        if (wordCount > 8) relevanceScore -= 10
-        
-        return {
-          product,
-          relevanceScore
-        }
+
+        // Relevance scoring
+        let score = 0
+        if (nameLower === queryLower) score += 100
+        if (nameLower.startsWith(queryLower)) score += 50
+        if (nameLower.includes(queryLower)) score += 30
+        const matchedWords = queryWords.filter(w => nameLower.includes(w)).length
+        if (queryWords.length > 0) score += (matchedWords / queryWords.length) * 40
+        const stemMatched = stemVariants.filter(s => nameLower.includes(s)).length
+        if (stemMatched > 0) score += 25
+        if (brand && queryWords.some(w => brand.includes(w))) score += 20
+        const wordCount = nameLower.split(/\s+/).length
+        if (wordCount > 8) score -= 10
+
+        return { product, score }
       })
-      .filter(item => item !== null && item.relevanceScore > 5) // Filter out low relevance (lowered from 15 to 5)
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .filter(item => item !== null && item.score > 5)
+      .sort((a, b) => b.score - a.score)
       .slice(0, limit)
-      .map(item => transformOpenFoodFactsProduct(item.product))
-    
-    return scoredProducts
+      .map(item => transformOpenFoodFactsProduct(item.product, item.score))
+
+    return scored
   } catch (error) {
     console.error('Error searching Open Food Facts:', error)
     return []
   }
 }
 
+
 /**
  * Transform Open Food Facts product to our standard format
  */
-function transformOpenFoodFactsProduct(product) {
+function transformOpenFoodFactsProduct(product, relevanceScore = 0) {
   const nutriments = product.nutriments || {}
   const categories = (product.categories_tags || []).join(' ').toLowerCase()
   const productName = (product.product_name || '').toLowerCase()
+
   const isLiquid = (
-    categories.includes('en:beverages') || 
-    categories.includes('en:drinks') || 
-    categories.includes('en:juices') || 
-    categories.includes('en:milks') || 
-    categories.includes('en:waters') || 
-    categories.includes('en:sodas') || 
-    categories.includes('en:honeys') ||
-    productName.includes('juice') || 
-    productName.includes('drink') || 
-    productName.includes('beverage') || 
-    (productName.includes('milk') && !productName.includes('cheese')) || 
-    productName.includes('water') || 
-    productName.includes('soda') || 
-    productName.includes('soup') || 
-    productName.includes('broth') || 
-    productName.includes('canneberge') || 
-    productName.includes('cranberry') ||
+    categories.includes('en:beverages') ||
+    categories.includes('en:drinks') ||
+    categories.includes('en:juices') ||
+    categories.includes('en:milks') ||
+    categories.includes('en:waters') ||
+    categories.includes('en:sodas') ||
+    productName.includes('juice') ||
+    productName.includes('drink') ||
+    productName.includes('beverage') ||
+    (productName.includes('milk') && !productName.includes('cheese')) ||
+    productName.includes('water') ||
+    productName.includes('soda') ||
+    productName.includes('soup') ||
+    productName.includes('broth') ||
     productName.includes('honey') ||
-    productName.includes('miel') ||
     productName.includes('cream') ||
-    productName.includes('crème') ||
     productName.includes('ketchup') ||
     productName.includes(' 2l') ||
     productName.includes(' 1l') ||
     productName.includes(' ml') ||
-    (product.serving_size && (product.serving_size.includes('ml') || product.serving_size.includes('mL') || product.serving_size.includes('fl oz')))
+    (product.serving_size && (
+      product.serving_size.includes('ml') ||
+      product.serving_size.includes('mL') ||
+      product.serving_size.includes('fl oz')
+    ))
   ) || false
 
-   // Validate data - check if values are suspiciously high (likely data entry error)
+  // Validate data — macros can't exceed 100g per 100g (allow 10% margin)
   const totalMacros = (nutriments.proteins_100g || 0) + (nutriments.carbohydrates_100g || 0) + (nutriments.fat_100g || 0)
-  const dataIsCorrupted = totalMacros > 110 // Macros can't exceed 100g per 100g (allow 10% margin)
-  const correctionFactor = dataIsCorrupted ? 10 : 1 // Divide by 10 if corrupted
-  
+  const dataIsCorrupted = totalMacros > 110
+  const correctionFactor = dataIsCorrupted ? 10 : 1
   if (dataIsCorrupted) {
-    console.warn('⚠️ Corrupted data detected for', product.product_name, '- applying 10x correction')
+    console.warn('⚠️ Corrupted OFF data for', product.product_name, '- applying 10x correction')
   }
 
-return {
-  id: `off-${product.code}`,
-  name: product.product_name,
-  brand: product.brands || 'Unknown',
-  source: 'openfoodfacts',
-  calories: Math.round((nutriments['energy-kcal_100g'] || nutriments.energy_100g / 4.184 || 0) / correctionFactor),
-  protein: Math.round((nutriments.proteins_100g || 0) / correctionFactor),
-  carbs: Math.round((nutriments.carbohydrates_100g || 0) / correctionFactor),
-  fat: Math.round((nutriments.fat_100g || 0) / correctionFactor),
-  fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
-  sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
-  sodium: Math.round(nutriments.sodium_100g * 1000 / correctionFactor || 0),
-  // Parse servingGrams from strings like "1 scoop (30g)", "3/4 cup (55g)", or plain "30g"
-  // Priority: (1) grams in parentheses e.g. "(30g)" or "(30 g)"
-  //           (2) plain numeric prefix e.g. "30g"
-  //           (3) fallback 100g
-  servingSize: (() => {
-    const raw = product.serving_size || '';
-    const inParens = raw.match(/\((\d+(?:\.\d+)?)\s*g\)/i);
-    if (inParens) return parseFloat(inParens[1]);
-    return parseFloat(raw) || 100;
-  })(),
-  servingUnit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',
-  servingGrams: (() => {
-    const raw = product.serving_size || '';
-    const inParens = raw.match(/\((\d+(?:\.\d+)?)\s*g\)/i);
-    if (inParens) return parseFloat(inParens[1]);
-    return parseFloat(raw) || 100;
-  })(),
-  // Keep the raw label string for display in the serving dropdown
-  serving_size_label: product.serving_size || null,
-  serving_size: product.serving_size || '100g',
-  serving_unit: product.serving_size?.match(/[a-z]+/i)?.[0] || 'g',  
-  foodType: isLiquid ? 'liquid' : 'solid'
-}
+  // Parse serving grams from strings like "1 scoop (30g)", "3/4 cup (55g)", or "30g"
+  const parseServingGrams = (raw) => {
+    if (!raw) return 100
+    const inParens = raw.match(/\((\d+(?:\.\d+)?)\s*g\)/i)
+    if (inParens) return parseFloat(inParens[1])
+    return parseFloat(raw) || 100
+  }
+
+  const servingGrams = parseServingGrams(product.serving_size)
+
+  return {
+    id: `off-${product.code}`,
+    name: product.product_name,
+    brand: product.brands || 'Unknown',
+    source: 'openfoodfacts',
+    calories: Math.round((nutriments['energy-kcal_100g'] || (nutriments.energy_100g || 0) / 4.184 || 0) / correctionFactor),
+    protein: Math.round((nutriments.proteins_100g || 0) / correctionFactor),
+    carbs: Math.round((nutriments.carbohydrates_100g || 0) / correctionFactor),
+    fat: Math.round((nutriments.fat_100g || 0) / correctionFactor),
+    fiber: Math.round((nutriments.fiber_100g || 0) / correctionFactor),
+    sugar: Math.round((nutriments.sugars_100g || 0) / correctionFactor),
+    sodium: Math.round((nutriments.sodium_100g || 0) * 1000 / correctionFactor),
+    servingSize: servingGrams,
+    servingUnit: isLiquid ? 'ml' : 'g',
+    servingGrams,
+    serving_size_label: product.serving_size || null,
+    serving_size: product.serving_size || (isLiquid ? '100ml' : '100g'),
+    serving_unit: product.serving_size?.match(/[a-z]+/i)?.[0] || (isLiquid ? 'ml' : 'g'),
+    foodType: isLiquid ? 'liquid' : 'solid',
+    _dataType: 'Branded',
+    _relevanceScore: relevanceScore
+  }
 }
 
-
- 
 
 /**
  * Search custom foods created by user
- * Note: Favorited foods are NOT included in search results - they only appear in "My Foods" section
+ * Note: Favorited foods are NOT included in search results — they appear in "My Foods" section only
  */
 async function searchCustomFoods(query, limit) {
   try {
-    // Get user ID from current session
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
 
-    const results = []
-
-    // Search custom foods only (favorites are shown separately in My Foods section)
     const { data: customData, error: customError } = await supabase
       .from('custom_foods')
       .select('*')
@@ -494,45 +447,42 @@ async function searchCustomFoods(query, limit) {
       .limit(limit)
 
     if (!customError && customData) {
-      results.push(...customData.map(food => ({
+      return customData.map(food => ({
         ...food,
         source: 'custom',
         id: `custom-${food.id}`
-      })))
+      }))
     }
 
-    return results
+    return []
   } catch (error) {
     console.error('Error searching custom foods:', error)
     return []
   }
 }
 
+
 /**
  * Get food by barcode
+ * Uses CapacitorHttp to bypass WebView CORS restrictions
  */
 export async function getFoodByBarcode(barcode) {
   try {
-    // Call OpenFoodFacts API directly using CapacitorHttp (bypasses WebView restrictions)
     const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
-    
+
     const response = await CapacitorHttp.get({
       url: apiUrl,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': USER_AGENT
+        'User-Agent': 'YFIT/1.0 (contact@yfit.app)'
       }
     })
-    
-    if (response.status !== 200) {
-      return null
-    }
-    
+
+    if (response.status !== 200) return null
+
     const data = response.data
-    
     if (data.status === 1 && data.product) {
-      const transformed = transformOpenFoodFactsProduct(data.product)
-      return transformed
+      return transformOpenFoodFactsProduct(data.product)
     }
 
     return null
@@ -541,6 +491,7 @@ export async function getFoodByBarcode(barcode) {
     return null
   }
 }
+
 
 /**
  * Get recent foods for a user
@@ -552,21 +503,18 @@ export async function getRecentFoods(userId, limit = 10) {
       .select('food_id, food_name, brand, calories, protein_g, carbs_g, fat_g, fiber, sugar, sodium, serving_quantity, serving_unit')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(limit * 3) // Get more to account for duplicates
+      .limit(limit * 3)
 
     if (error) throw error
 
-    // Extract unique foods by food_name + brand
     const seen = new Set()
     const uniqueFoods = []
 
     for (const meal of data || []) {
       const key = `${meal.food_name}-${meal.brand || ''}`
-      
+
       if (!seen.has(key)) {
         seen.add(key)
-        
-        // Reconstruct food object from meal data
         uniqueFoods.push({
           id: meal.food_id || `meal-${meal.food_name}`,
           name: meal.food_name,
@@ -584,21 +532,19 @@ export async function getRecentFoods(userId, limit = 10) {
           serving_size: '100g',
           foodType: 'solid'
         })
-        
+
         if (uniqueFoods.length >= limit) break
       }
     }
 
     return uniqueFoods
   } catch (error) {
-    // Silently ignore if table doesn't exist yet
-    if (error.code === 'PGRST205') {
-      return []
-    }
+    if (error.code === 'PGRST205') return []
     console.error('Error getting recent foods:', error)
     return []
   }
 }
+
 
 /**
  * Get favorite foods for a user
@@ -613,13 +559,13 @@ export async function getFavoriteFoods(userId) {
 
     if (error) throw error
 
-    // Attach the favorite_foods row id so delete can use it directly
     return (data || []).map(entry => ({ ...entry.food_data, _favoriteRowId: entry.id }))
   } catch (error) {
     console.error('Error getting favorite foods:', error)
     return []
   }
 }
+
 
 /**
  * Add food to favorites
@@ -628,10 +574,7 @@ export async function addFavoriteFood(userId, foodData) {
   try {
     const { error } = await supabase
       .from('favorite_foods')
-      .insert({
-        user_id: userId,
-        food_data: foodData
-      })
+      .insert({ user_id: userId, food_data: foodData })
 
     if (error) throw error
     return true
@@ -641,37 +584,36 @@ export async function addFavoriteFood(userId, foodData) {
   }
 }
 
+
 /**
  * Remove food from favorites
  */
 export async function removeFavoriteFood(userId, foodId, favoriteRowId) {
   try {
-    // If we have the direct row id (from _favoriteRowId), use it — no extra query needed
     if (favoriteRowId) {
       const { error } = await supabase
         .from('favorite_foods')
         .delete()
         .eq('id', favoriteRowId)
-        .eq('user_id', userId) // Safety check
+        .eq('user_id', userId)
       if (error) throw error
       return true
     }
 
-    // Fallback: find by food_data.id (for backwards compatibility)
+    // Fallback: find by food_data.id (backwards compatibility)
     const { data: favorites, error: fetchError } = await supabase
       .from('favorite_foods')
       .select('id, food_data')
       .eq('user_id', userId)
-    
+
     if (fetchError) throw fetchError
-    
+
     const favoriteToDelete = favorites?.find(fav => fav.food_data?.id === foodId)
-    
     if (!favoriteToDelete) {
       console.warn('Favorite food not found:', foodId)
       return false
     }
-    
+
     const { error } = await supabase
       .from('favorite_foods')
       .delete()
@@ -685,6 +627,7 @@ export async function removeFavoriteFood(userId, foodId, favoriteRowId) {
   }
 }
 
+
 /**
  * Deduplicate foods by name and brand
  */
@@ -693,7 +636,7 @@ function deduplicateFoods(foods) {
   const unique = []
 
   for (const food of foods) {
-    const key = `${food.name.toLowerCase()}-${food.brand?.toLowerCase() || ''}`
+    const key = `${(food.name || '').toLowerCase()}-${(food.brand || '').toLowerCase()}`
     if (!seen.has(key)) {
       seen.set(key, true)
       unique.push(food)
@@ -702,6 +645,8 @@ function deduplicateFoods(foods) {
 
   return unique
 }
+
+
 /**
  * Add custom food created by user
  */
@@ -734,11 +679,10 @@ export async function addCustomFood(userId, foodData) {
   }
 }
 
+
 /**
- * Update recent food (for backward compatibility)
+ * Update recent food (kept for backward compatibility)
  */
 export async function updateRecentFood(userId, foodData) {
-  // This function is kept for backward compatibility
-  // Recent foods are now tracked automatically via food_log
   return true
 }
