@@ -1,3 +1,4 @@
+import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import { Activity, Target, TrendingUp, Zap, Flame, Scale, Heart } from 'lucide-react'
 
 /**
@@ -7,6 +8,8 @@ import { Activity, Target, TrendingUp, Zap, Flame, Scale, Heart } from 'lucide-r
  */
 export default function GoalsResults({ metrics, firstName }) {
   if (!metrics) return null
+
+  const { isMetric } = useUnitPreference()
 
   const {
     bmi,
@@ -22,6 +25,13 @@ export default function GoalsResults({ metrics, firstName }) {
     bodyTypeConfidence,
     bodyTypeInfo
   } = metrics
+
+  // Convert lean body mass to display unit
+  const leanMassDisplay = leanBodyMass != null
+    ? isMetric
+      ? `${leanBodyMass.toFixed(1)} kg`
+      : `${(leanBodyMass * 2.20462).toFixed(1)} lbs`
+    : '—'
 
   // Macro split based on adjusted calories (40/30/30 protein/carbs/fat)
   const proteinCals = Math.round((adjustedCalories || tdee) * 0.30)
@@ -110,7 +120,7 @@ export default function GoalsResults({ metrics, firstName }) {
           </div>
           <div className="bg-green-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-green-600">
-              {leanBodyMass != null ? `${leanBodyMass.toFixed(1)} kg` : '—'}
+              {leanMassDisplay}
             </div>
             <div className="text-xs text-gray-500 mt-1">Lean Mass</div>
             <div className="text-xs text-gray-400 mt-1">Muscle + bone + water</div>
