@@ -423,8 +423,11 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showD
             </span>
           )}
           {food.source === 'usda' && (
-            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-              USDA
+            <span
+              className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded cursor-help"
+              title="Values may vary by brand. Scan barcode for exact label data."
+            >
+              USDA ℹ️
             </span>
           )}
           {food.source === 'custom' && (
