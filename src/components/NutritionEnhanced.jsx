@@ -1123,6 +1123,11 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
               </button>
             </div>
             
+            {/* Accuracy note */}
+            <p className="text-center text-xs text-gray-400 mt-1">
+              📷 Scan barcode for exact label data &bull; Search values may vary by brand
+            </p>
+
             {/* Save as Template Button (only show if there are meals) */}
             {meals.length > 0 && (
               <button
