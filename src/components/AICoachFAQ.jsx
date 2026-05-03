@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Card } from './ui/card'
 import AICoach from './AICoach'
@@ -6,6 +7,7 @@ import FAQBrowser from './FAQBrowser'
 import { MessageCircle, BookOpen } from 'lucide-react'
 
 export default function AICoachFAQ({ userId }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('ai-coach')
 
   const handleAskAICoach = () => {
@@ -16,10 +18,10 @@ export default function AICoachFAQ({ userId }) {
     <div className="container mx-auto p-4 min-h-screen flex flex-col">
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          AI Coach & FAQ
+          {t('aiCoach.title')} & FAQ
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Get instant answers to your fitness and nutrition questions
+          {t('aiCoach.askCoach')}
         </p>
       </div>
 
@@ -31,7 +33,7 @@ export default function AICoachFAQ({ userId }) {
               className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all"
             >
               <MessageCircle className="h-4 w-4" />
-              AI Coach
+              {t('aiCoach.title')}
             </TabsTrigger>
             <TabsTrigger 
               value="faq" 

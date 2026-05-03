@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Lightbulb, ChevronDown, ChevronUp, X, ExternalLink, BookOpen } from 'lucide-react'
 
@@ -33,6 +34,7 @@ const FALLBACK_INSIGHTS = [
 ]
 
 export default function DailyInsight({ variant = 'strip', className = '' }) {
+  const { t } = useTranslation()
   const [article, setArticle] = useState(null)
   const [expanded, setExpanded] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -129,11 +131,11 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      nutrition: 'Nutrition',
-      fitness: 'Fitness',
-      recovery: 'Recovery',
-      mental_health: 'Mental Health',
-      wellness: 'Wellness',
+      nutrition: t('dailyTracker.categoryNutrition'),
+      fitness: t('dailyTracker.categoryFitness'),
+      recovery: t('dailyTracker.categoryRecovery'),
+      mental_health: t('dailyTracker.categoryMentalHealth'),
+      wellness: t('dailyTracker.categoryWellness'),
     }
     return labels[category] || 'Health'
   }
@@ -150,7 +152,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
           <div className="flex items-center gap-2 py-2 min-h-[40px]">
             <Lightbulb className="h-4 w-4 text-green-600 flex-shrink-0" />
             <span className="text-xs font-semibold text-green-700 flex-shrink-0 hidden sm:inline">
-              Daily Insight
+              {t('dailyTracker.dailyInsight')}
             </span>
             {article.category && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${getCategoryColor(article.category)}`}>
@@ -167,7 +169,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
                 aria-label={expanded ? 'Collapse insight' : 'Read more'}
               >
                 <BookOpen className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">{expanded ? 'Less' : 'Read'}</span>
+                <span className="hidden sm:inline">{expanded ? t('dailyTracker.showLess') : t('dailyTracker.readMore')}</span>
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               </button>
               <button
@@ -188,7 +190,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
               </p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xs text-gray-500">
-                  Source: {article.source_name || 'YFIT Health Library'}
+                  {t('dailyTracker.source')}: {article.source_name || 'YFIT Health Library'}
                 </span>
                 {article.url && !article.url.includes('yfitai.com/library') && (
                   <a
@@ -197,7 +199,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    Full Article <ExternalLink className="h-3 w-3" />
+                    {t('dailyTracker.fullArticle')} <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
               </div>
@@ -220,7 +222,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-bold text-green-700 uppercase tracking-wide">
-                  Daily Insight
+                  {t('dailyTracker.dailyInsight')}
                 </span>
                 {article.category && (
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getCategoryColor(article.category)}`}>
@@ -248,7 +250,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
           className="mt-3 flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
         >
           <BookOpen className="h-4 w-4" />
-          {expanded ? 'Show less' : 'Read the research'}
+          {expanded ? t('dailyTracker.showLessResearch') : t('dailyTracker.readTheResearch')}
           {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
 
@@ -260,7 +262,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
             </p>
             <div className="flex items-center justify-between mt-3">
               <span className="text-xs text-gray-500">
-                Source: {article.source_name || 'YFIT Health Library'}
+                {t('dailyTracker.source')}: {article.source_name || 'YFIT Health Library'}
               </span>
               {article.url && !article.url.includes('yfitai.com/library') && (
                 <a
@@ -269,7 +271,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  Full Article <ExternalLink className="h-3 w-3" />
+                  {t('dailyTracker.fullArticle')} <ExternalLink className="h-4 w-4" />
                 </a>
               )}
             </div>
