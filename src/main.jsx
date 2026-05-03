@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './lib/i18n' // Initialize i18n — must be imported before App
 import App from './App.jsx'
 
 // Register service worker for cache management

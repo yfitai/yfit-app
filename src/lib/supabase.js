@@ -164,3 +164,18 @@ export const resendConfirmationEmail = async (email) => {
   
   return { error: null }
 }
+
+// Update user profile fields (e.g., preferred_language, units, etc.)
+export const updateUserProfile = async (userId, updates) => {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update(updates)
+    .eq('user_id', userId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating user profile:', error)
+  }
+  return { data, error }
+}

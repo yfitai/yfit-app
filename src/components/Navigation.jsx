@@ -1,6 +1,7 @@
 import { Home, Target, Utensils, Calendar, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut, Ruler } from 'lucide-react'
 import { signOut } from '../lib/supabase'
 import { NavLink } from 'react-router-dom'
+import LanguageSwitcher from './LanguageSwitcher'
 export default function Navigation({ user }) {
   const handleSignOut = async () => {
     await signOut()
@@ -48,6 +49,21 @@ export default function Navigation({ user }) {
                 <span className="text-[10px] sm:text-xs mt-0.5">{item.label}</span>
               </NavLink>
             ))}
+          </div>
+
+          {/* Right side: Language switcher + Sign out */}
+          <div className="flex items-center gap-2 flex-shrink-0 mt-2 sm:mt-0">
+            <LanguageSwitcher compact={true} className="text-gray-600" />
+            {user && (
+              <button
+                onClick={handleSignOut}
+                className="flex flex-col items-center justify-center px-1 py-1 sm:px-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-all"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-[10px] sm:text-xs mt-0.5">Sign Out</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
