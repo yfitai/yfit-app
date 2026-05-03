@@ -7,7 +7,6 @@ import {
   ResponsiveContainer, ReferenceLine
 } from 'recharts'
 import { TrendingDown, TrendingUp, Minus, Target, Activity, ChevronDown, ChevronUp } from 'lucide-react'
-import { useTranslation } from 'react-i18next';
 
 // Measurements that should DECREASE toward goal (fat loss areas)
 const REDUCING_MEASUREMENTS = ['waist', 'hips']
@@ -43,7 +42,6 @@ function unitLabel(unitSystem) {
 }
 
 export default function BodyRecomp({ user }) {
-  const { t } = useTranslation();
   const { unitSystem } = useUnitPreference()
   const location = useLocation()
   const [loading, setLoading] = useState(true)
@@ -344,7 +342,7 @@ export default function BodyRecomp({ user }) {
                       {progress !== null && (
                         <div className="mb-2">
                           <div className="flex justify-between text-xs text-gray-500 mb-1">
-                            <span>{t('nav.progress')}</span>
+                            <span>Progress</span>
                             <span>{progress}%</span>
                           </div>
                           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -433,7 +431,7 @@ export default function BodyRecomp({ user }) {
       {!hasGoals && !hasHistory && (
         <div className="text-center py-16 text-gray-400">
           <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-lg font-medium">{t('common.noData')}</p>
+          <p className="text-lg font-medium">No data yet</p>
           <p className="text-sm mt-1">Set goals in the Goals page and log measurements in the Daily Tracker</p>
         </div>
       )}

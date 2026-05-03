@@ -8,12 +8,10 @@ import { supabase, signOut, getUserProfile } from '../lib/supabase'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.jsx'
-import { useTranslation } from 'react-i18next'
 // Logo is loaded from public/assets/yfit-logo.png
 
 export default function Dashboard({ user }) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [greeting, setGreeting] = useState('')
@@ -43,26 +41,26 @@ export default function Dashboard({ user }) {
 
   // Motivational quotes database
   const morningQuotes = [
-    t('dashboard.motivationalMorning1'),
-    t('dashboard.motivationalMorning2'),
-    t('dashboard.motivationalMorning3'),
-    t('dashboard.motivationalMorning4'),
-    t('dashboard.motivationalMorning5')
+    "Every morning is a new opportunity to become stronger!",
+    "Today is your day to shine and make healthy choices!",
+    "Rise and shine! Your body will thank you for the effort!",
+    "Start your day with intention and watch your health transform!",
+    "Good morning! Small steps today lead to big changes tomorrow!"
   ]
 
   const eveningQuotes = [
-    t('dashboard.motivationalEvening1'),
-    t('dashboard.motivationalEvening2'),
-    t('dashboard.motivationalEvening3'),
-    t('dashboard.motivationalEvening4'),
-    t('dashboard.motivationalEvening5')
+    "Great job today! Every healthy choice counts!",
+    "You're making progress! Keep up the amazing work!",
+    "End your day knowing you're one step closer to your goals!",
+    "Reflect on today's wins and prepare for tomorrow's success!",
+    "You showed up today, and that's what matters most!"
   ]
 
   const didYouKnowFacts = [
-    t('dashboard.didYouKnow1'),
-    t('dashboard.didYouKnow2'),
-    t('dashboard.didYouKnow3'),
-    t('dashboard.didYouKnow4'),
+    "Did you know? Drinking water before meals can help with weight management!",
+    "Did you know? Just 30 minutes of daily exercise can significantly improve your mood!",
+    "Did you know? Getting 7-9 hours of sleep is crucial for muscle recovery!",
+    "Did you know? Protein helps build and repair muscles after workouts!",
     "Did you know? Consistency is more important than perfection in fitness!"
   ]
 
@@ -246,11 +244,11 @@ export default function Dashboard({ user }) {
     
     // Set greeting
     if (hour < 12) {
-      setGreeting(t('dashboard.greeting'))
+      setGreeting('Good Morning')
     } else if (hour < 17) {
-      setGreeting(t('dashboard.greetingAfternoon'))
+      setGreeting('Good Afternoon')
     } else {
-      setGreeting(t('dashboard.greetingEvening'))
+      setGreeting('Good Evening')
     }
 
     // Set motivational quote
@@ -271,12 +269,12 @@ export default function Dashboard({ user }) {
     
     // Validation
     if (newPassword.length < 6) {
-      setPasswordError(t('auth.passwordMinLength'))
+      setPasswordError('New password must be at least 6 characters')
       return
     }
     
     if (newPassword !== confirmNewPassword) {
-      setPasswordError(t('auth.passwordNoMatch'))
+      setPasswordError('New passwords do not match')
       return
     }
     
@@ -289,7 +287,7 @@ export default function Dashboard({ user }) {
     })
     
     if (signInError) {
-      setPasswordError(t('auth.passwordIncorrect'))
+      setPasswordError('Current password is incorrect')
       setIsChangingPassword(false)
       return
     }
@@ -305,7 +303,7 @@ export default function Dashboard({ user }) {
       return
     }
     
-    setPasswordSuccess(t('common.success'))
+    setPasswordSuccess('Password changed successfully!')
     setIsChangingPassword(false)
     
     // Clear form and close modal after 2 seconds
@@ -325,7 +323,7 @@ export default function Dashboard({ user }) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
+          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -350,7 +348,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <Lock className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('auth.resetPassword')}</span>
+                <span className="hidden sm:inline">Change Password</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -358,7 +356,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('nav.signOut')}</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
           </div>
@@ -383,52 +381,52 @@ export default function Dashboard({ user }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.steps')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">Steps Today</CardTitle>
               <Activity className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{stepsToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">{t('goals.goal')}: {stepsGoal.toLocaleString()} {t('dashboard.steps')}</p>
+              <p className="text-xs text-teal-600">Goal: {stepsGoal.toLocaleString()} steps</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.calories')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">Calories</CardTitle>
               <Apple className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{caloriesToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal {t('goals.goal')}</p>
+              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal goal</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">{t('fitness.workout')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">Workouts</CardTitle>
               <Dumbbell className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{workoutsThisWeek}</div>
               <p className="text-xs text-teal-600">
-                {new Date().getDay() === 0 ? t('dashboard.newWeekReset') : t('dashboard.thisWeek')}
+                {new Date().getDay() === 0 ? 'New week — reset today' : 'This week'}
               </p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.streakDays')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">Day Streak</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? t('dailyTracker.streakDays').split(' ')[0] : t('dailyTracker.streakDays').split(' ')[0] + 's'}` : '--'}
+                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? 'day' : 'days'}` : '--'}
               </div>
               <p className="text-xs text-teal-600">
                 {streakDays !== null
-                  ? streakDays >= 7 ? t('dashboard.streakOnFire') : streakDays >= 3 ? t('dashboard.streakKeepItUp') : streakDays > 0 ? t('dashboard.streakGoodStart') : t('dashboard.streakLogToday')
-                  : t('common.loading')
+                  ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
+                  : 'Loading...'
                 }
               </p>
             </CardContent>
@@ -440,7 +438,7 @@ export default function Dashboard({ user }) {
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6" />
-              <h3 className="text-lg font-bold">{t('dashboard.lastWeekSummary')}</h3>
+              <h3 className="text-lg font-bold">Last Week Summary 📊</h3>
             </div>
             {lastWeekWorkouts === 0 && (lastWeekStreak === null || lastWeekStreak === 0) ? (
               // First full week — no prior week data yet
@@ -465,7 +463,7 @@ export default function Dashboard({ user }) {
                       {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
                     </div>
                     <div className="text-sm opacity-90">
-                      {lastWeekWorkouts >= 5 ? t('dashboard.lastWeekOnFire') : lastWeekWorkouts >= 3 ? t('dashboard.lastWeekSolid') : lastWeekWorkouts >= 1 ? t('dashboard.streakGoodStart') : t('dashboard.lastWeekRestWeek')}
+                      {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
                     </div>
                   </div>
                 </div>
@@ -481,8 +479,8 @@ export default function Dashboard({ user }) {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('dashboard.quickActions')}</CardTitle>
-            <CardDescription>{t('dashboard.getStartedHealth')}</CardDescription>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Get started with your health journey</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -491,7 +489,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm"
               >
                 <Target className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.goals')}</span>
+                <span>Goals</span>
               </Button>
 
               <Button 
@@ -499,7 +497,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm"
               >
                 <Apple className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.nutrition')}</span>
+                <span>Nutrition</span>
               </Button>
 
               <Button 
@@ -507,7 +505,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-xs sm:text-sm"
               >
                 <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.fitness')}</span>
+                <span>Fitness</span>
               </Button>
 
               <Button 
@@ -515,7 +513,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-xs sm:text-sm"
               >
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.dailyTracker')}</span>
+                <span>Daily Tracker</span>
               </Button>
 
               <Button 
@@ -523,7 +521,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-xs sm:text-sm"
               >
                 <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.medications')}</span>
+                <span>Medications</span>
               </Button>
 
               <Button 
@@ -531,7 +529,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-xs sm:text-sm"
               >
                 <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.progress')}</span>
+                <span>Progress</span>
               </Button>
 
               <Button 
@@ -539,7 +537,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-xs sm:text-sm"
               >
                 <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.predictions')}</span>
+                <span>Predictions</span>
               </Button>
 
               <Button 
@@ -547,7 +545,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-xs sm:text-sm"
               >
                 <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>{t('nav.aiCoach')}</span>
+                <span>AI Coach</span>
               </Button>
             </div>
           </CardContent>
@@ -563,7 +561,7 @@ export default function Dashboard({ user }) {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Lock className="h-5 w-5" />
-                <span>{t('auth.resetPassword')}</span>
+                <span>Change Password</span>
               </CardTitle>
               <CardDescription>
                 Enter your current password and choose a new one
@@ -589,7 +587,7 @@ export default function Dashboard({ user }) {
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">{t('auth.currentPassword')}</Label>
+                  <Label htmlFor="current-password">Current Password</Label>
                   <div className="relative">
                     <Input
                       id="current-password"
@@ -614,7 +612,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">{t('auth.newPassword')}</Label>
+                  <Label htmlFor="new-password">New Password</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -641,7 +639,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-new-password">{t('auth.confirmNewPassword')}</Label>
+                  <Label htmlFor="confirm-new-password">Confirm New Password</Label>
                   <div className="relative">
                     <Input
                       id="confirm-new-password"
@@ -673,7 +671,7 @@ export default function Dashboard({ user }) {
                   className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                   disabled={isChangingPassword}
                 >
-                  {isChangingPassword ? t('auth.changing') : t('auth.resetPassword')}
+                  {isChangingPassword ? 'Changing...' : 'Change Password'}
                 </Button>
                 <Button 
                   type="button"
@@ -688,7 +686,7 @@ export default function Dashboard({ user }) {
                   }}
                   disabled={isChangingPassword}
                 >
-                  {t('common.cancel')}
+                  Cancel
                 </Button>
               </div>
             </form>

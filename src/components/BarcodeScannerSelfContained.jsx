@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Camera } from '@capacitor/camera'
 import { getFoodByBarcode } from '../lib/foodDatabase'
-import { useTranslation } from 'react-i18next'
 
 export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, mealType, user }) {
-  const { t } = useTranslation()
   const [scanning, setScanning] = useState(true)
   const [loading, setLoading] = useState(false)
   const [food, setFood] = useState(null)
@@ -37,7 +35,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
         if (permission.camera === 'denied') {
           const requestResult = await Camera.requestPermissions({ permissions: ['camera'] })
           if (requestResult.camera !== 'granted') {
-            setError(t('common.error'))
+            setError('Camera permission denied')
             return
           }
         }
@@ -93,7 +91,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
       )
     } catch (err) {
       console.error('Scan error:', err)
-      setError(t('common.error'))
+      setError('Scanner error: ' + err.message)
       setScanning(false)
     }
   }
@@ -148,17 +146,17 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
     // Calculate nutrition
     const isLiquid = food.foodType === 'liquid'
     const units = isLiquid ? [
-      { value: 'ml', label: t('nutrition.milliliters') + ' (ml)', toGrams: 1 },
+      { value: 'ml', label: 'Milliliters (ml)', toGrams: 1 },
       { value: 'fl_oz', label: 'Fluid Ounces (fl oz)', toGrams: 29.57 },
-      { value: 'cup', label: t('nutrition.cups'), toGrams: 240 },
+      { value: 'cup', label: 'Cups', toGrams: 240 },
       { value: 'tbsp', label: 'Tablespoons (tbsp)', toGrams: 15 },
       { value: 'tsp', label: 'Teaspoons (tsp)', toGrams: 5 },
-      { value: 'serving', label: t('nutrition.serving'), toGrams: food.servingGrams || 100 }
+      { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
     ] : [
-      { value: 'g', label: t('nutrition.grams') + ' (g)', toGrams: 1 },
-      { value: 'oz', label: t('nutrition.ounces') + ' (oz)', toGrams: 28.35 },
-      { value: 'lb', label: t('nutrition.pounds') + ' (lb)', toGrams: 453.59 },
-      { value: 'serving', label: t('nutrition.serving'), toGrams: food.servingGrams || 100 }
+      { value: 'g', label: 'Grams (g)', toGrams: 1 },
+      { value: 'oz', label: 'Ounces (oz)', toGrams: 28.35 },
+      { value: 'lb', label: 'Pounds (lb)', toGrams: 453.59 },
+      { value: 'serving', label: 'Serving', toGrams: food.servingGrams || 100 }
     ]
     
     // Build the full unit lookup including label_serving so calories are correct when saving
@@ -217,7 +215,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
             }}
             className="px-6 py-3 bg-white text-gray-800 rounded-full hover:bg-gray-100 transition-colors font-medium shadow-lg"
           >
-            {t('common.cancel')}
+            Cancel
           </button>
         </div>
       </div>
@@ -250,7 +248,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
             >
-              {t('common.cancel')}
+              Cancel
             </button>
             <button
               onClick={() => {
@@ -260,7 +258,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
               }}
               className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
             >
-              {t('common.tryAgain')}
+              Try Again
             </button>
           </div>
         </div>
@@ -280,19 +278,19 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
     
     const units = isLiquid ? [
       ...labelServingOption,
-      { value: 'ml', label: t('nutrition.milliliters') + ' (ml)' },
+      { value: 'ml', label: 'Milliliters (ml)' },
       { value: 'fl_oz', label: 'Fluid Ounces (fl oz)' },
-      { value: 'cup', label: t('nutrition.cups') },
+      { value: 'cup', label: 'Cups' },
       { value: 'tbsp', label: 'Tablespoons (tbsp)' },
       { value: 'tsp', label: 'Teaspoons (tsp)' },
-      { value: 'g', label: t('nutrition.grams') + ' (g)' },
-      { value: 'serving', label: t('nutrition.serving') + ' (100g)' }
+      { value: 'g', label: 'Grams (g)' },
+      { value: 'serving', label: 'Serving (100g)' }
     ] : [
       ...labelServingOption,
-      { value: 'g', label: t('nutrition.grams') + ' (g)' },
-      { value: 'oz', label: t('nutrition.ounces') + ' (oz)' },
-      { value: 'lb', label: t('nutrition.pounds') + ' (lb)' },
-      { value: 'serving', label: t('nutrition.serving') + ' (100g)' }
+      { value: 'g', label: 'Grams (g)' },
+      { value: 'oz', label: 'Ounces (oz)' },
+      { value: 'lb', label: 'Pounds (lb)' },
+      { value: 'serving', label: 'Serving (100g)' }
     ]
     
     // Calculate nutrition based on current serving size
@@ -328,7 +326,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.confirmServingSize')}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Confirm Serving Size</h2>
             <p className="text-sm text-gray-600 mt-1">{food.name}</p>
             {food.brand && (
               <p className="text-xs text-gray-500">{food.brand}</p>
@@ -340,7 +338,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
             {/* Quantity and Unit */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('nutrition.quantityAndUnit')}
+                Quantity & Unit
               </label>
               <div className="flex gap-2">
                 <input
@@ -376,22 +374,22 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
 
             {/* Nutrition Summary */}
             <div className="bg-blue-50 rounded-lg p-4 mb-4">
-              <h3 className="font-semibold text-gray-800 mb-2">{t('nutrition.nutritionFacts')}</h3>
+              <h3 className="font-semibold text-gray-800 mb-2">Nutrition Facts</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-600">{t('nutrition.calories')}:</span>
+                  <span className="text-gray-600">Calories:</span>
                   <span className="font-semibold text-gray-900 ml-2">{displayCalories} kcal</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('nutrition.protein')}:</span>
+                  <span className="text-gray-600">Protein:</span>
                   <span className="font-semibold text-blue-600 ml-2">{displayProtein}g</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('nutrition.carbs')}:</span>
+                  <span className="text-gray-600">Carbs:</span>
                   <span className="font-semibold text-orange-600 ml-2">{displayCarbs}g</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('nutrition.fat')}:</span>
+                  <span className="text-gray-600">Fat:</span>
                   <span className="font-semibold text-purple-600 ml-2">{displayFat}g</span>
                 </div>
               </div>
@@ -405,13 +403,13 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
                   onClick={onClose}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                 >
-                  {t('common.cancel')}
+                  Cancel
                 </button>
                 <button
                   onClick={handleConfirm}
                   className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
                 >
-                  {t('nutrition.logFood')}
+                  Log Food
                 </button>
               </div>
 
@@ -425,7 +423,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
                     }}
                     className="flex-1 px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors font-medium text-sm"
                   >
-                    ⭐ {t('nutrition.saveToMyFoods')}
+                    ⭐ Save to My Foods
                   </button>
                   <button
                     onClick={async () => {
@@ -434,7 +432,7 @@ export default function BarcodeScannerSelfContained({ onFoodConfirmed, onClose, 
                     }}
                     className="flex-1 px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 rounded-lg hover:bg-purple-200 transition-colors font-medium text-sm"
                   >
-                    ⭐ {t('nutrition.logAndSave')}
+                    ⭐ Log & Save
                   </button>
                 </div>
               )}

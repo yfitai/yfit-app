@@ -3,14 +3,12 @@ import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, TrendingDown, Target, Calendar, Activity, AlertTriangle,
   Heart, Pill, Apple, Dumbbell, Scale, Flame, Brain, Award, Clock, RefreshCw
 } from 'lucide-react';
 
 export default function PredictionsUnified({ user }) {
-  const { t } = useTranslation()
   const navigate = useNavigate();
   const { unitSystem } = useUnitPreference();
   const { isPro, isTrialing, trialDaysRemaining } = useSubscription();
@@ -1492,7 +1490,7 @@ export default function PredictionsUnified({ user }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">{t('goals.currentWeight')}</div>
+                <div className="text-sm opacity-90 mb-1">Current Weight</div>
                 <div className="text-3xl font-bold">{predictions.weightLoss.currentWeight} lbs</div>
               </div>
               <div>
@@ -1500,14 +1498,14 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-3xl font-bold">{predictions.weightLoss.goalWeight} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">{t('progress.weeklyChange')}</div>
+                <div className="text-sm opacity-90 mb-1">Weekly Change</div>
                 <div className="text-3xl font-bold flex items-center">
                   {predictions.weightLoss.weeklyChange > 0 ? <TrendingUp className="w-6 h-6 mr-1" /> : <TrendingDown className="w-6 h-6 mr-1" />}
                   {Math.abs(predictions.weightLoss.weeklyChange)} lbs
                 </div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">{t('predictions.goalDate')}</div>
+                <div className="text-sm opacity-90 mb-1">Estimated Goal Date</div>
                 <div className="text-2xl font-bold">{predictions.weightLoss.goalDate}</div>
                 <div className="text-sm opacity-75">{predictions.weightLoss.weeksToGoal} weeks</div>
               </div>
@@ -1557,7 +1555,7 @@ export default function PredictionsUnified({ user }) {
                 </div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">{t('goals.activityLevel')}</div>
+                <div className="text-sm opacity-90 mb-1">Activity Level</div>
                 <div className="text-2xl font-bold capitalize">{predictions.tdee.activityLevel}</div>
                 <div className="text-sm opacity-75">{predictions.tdee.workoutsPerWeek}x/week</div>
               </div>
@@ -1843,7 +1841,7 @@ export default function PredictionsUnified({ user }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">{t('goals.currentWeight')}</div>
+                <div className="text-sm opacity-90 mb-1">Current Weight</div>
                 <div className="text-3xl font-bold">{predictions.bodyRecomp.currentWeight} lbs</div>
               </div>
               <div>

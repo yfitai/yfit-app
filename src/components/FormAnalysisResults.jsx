@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle, Info, Award, TrendingUp, Clock, Target, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useTranslation } from 'react-i18next';
 
 const FormAnalysisResults = ({ videoId, exerciseName }) => {
-  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [video, setVideo] = useState(null);
   const [results, setResults] = useState(null);
@@ -304,3 +302,4 @@ const FormAnalysisResults = ({ videoId, exerciseName }) => {
 };
 
 export default FormAnalysisResults;
+

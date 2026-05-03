@@ -1,28 +1,23 @@
 import { Home, Target, Utensils, Calendar, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut, Ruler } from 'lucide-react'
 import { signOut } from '../lib/supabase'
 import { NavLink } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import LanguageSwitcher from './LanguageSwitcher'
-
 export default function Navigation({ user }) {
-  const { t } = useTranslation()
-
   const handleSignOut = async () => {
     await signOut()
     window.location.href = '/'
   }
 
   const navItems = [
-    { path: '/', label: t('nav.dashboard'), icon: Home },
-    { path: '/goals', label: t('nav.goals'), icon: Target },
-    { path: '/nutrition', label: t('nav.nutrition'), icon: Utensils },
-    { path: '/daily-tracker', label: t('nav.dailyTracker'), icon: Calendar },
-    { path: '/fitness', label: t('nav.fitness'), icon: Dumbbell },
-    { path: '/medications', label: t('nav.medications'), icon: Pill },
-    { path: '/progress', label: t('nav.progress'), icon: TrendingUp },
-    { path: '/predictions', label: t('nav.predictions'), icon: Sparkles },
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/goals', label: 'Goals', icon: Target },
+    { path: '/nutrition', label: 'Nutrition', icon: Utensils },
+    { path: '/daily-tracker', label: 'Tracker', icon: Calendar },
+    { path: '/fitness', label: 'Fitness', icon: Dumbbell },
+    { path: '/medications', label: 'Meds', icon: Pill },
+    { path: '/progress', label: 'Progress', icon: TrendingUp },
+    { path: '/predictions', label: 'Predict', icon: Sparkles },
     { path: '/body-recomp', label: 'Recomp', icon: Ruler },
-    { path: '/ai-coach-faq', label: t('nav.aiCoach'), icon: MessageCircle },
+    { path: '/ai-coach-faq', label: 'AI Coach', icon: MessageCircle },
   ]
 
   return (
@@ -31,7 +26,7 @@ export default function Navigation({ user }) {
         <div className="flex flex-col sm:flex-row items-center justify-between py-2 sm:h-16">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 mb-2 sm:mb-0">
-            <img src="./assets/yfit-logo.png" alt="YFIT AI" className="h-8 sm:h-10" />
+            <img src="./assets/yfit-logo.png" alt="YFIT" className="h-8 sm:h-10" />
           </div>
 
           {/* Navigation Links - 2 rows on mobile, 1 row on desktop */}
@@ -53,21 +48,6 @@ export default function Navigation({ user }) {
                 <span className="text-[10px] sm:text-xs mt-0.5">{item.label}</span>
               </NavLink>
             ))}
-          </div>
-
-          {/* Right side: Language switcher + Sign out */}
-          <div className="flex items-center gap-2 flex-shrink-0 mt-2 sm:mt-0">
-            <LanguageSwitcher compact={true} className="text-gray-600" />
-            {user && (
-              <button
-                onClick={handleSignOut}
-                className="flex flex-col items-center justify-center px-1 py-1 sm:px-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-all"
-                title={t('nav.signOut')}
-              >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-[10px] sm:text-xs mt-0.5">{t('nav.signOut')}</span>
-              </button>
-            )}
           </div>
         </div>
       </div>

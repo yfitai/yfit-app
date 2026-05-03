@@ -3,10 +3,8 @@ import { supabase } from '../lib/supabase'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles, RefreshCw } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 export default function AICoach({ userId }) {
-  const { t } = useTranslation()
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -59,7 +57,7 @@ export default function AICoach({ userId }) {
         // Add welcome message
         const welcomeMessage = {
           role: 'assistant',
-          content: t('aiCoach.welcomeMessage')
+          content: "Hi there! I'm your YFIT AI Coach. I'm here to help you with your fitness and nutrition questions. How can I assist you today?"
         }
         setMessages([welcomeMessage])
       }
@@ -218,10 +216,10 @@ export default function AICoach({ userId }) {
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-500" />
-              {t('aiCoach.title')}
+              AI Coach
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {t('aiCoach.askCoach')}
+              Ask me anything about fitness, nutrition, or using YFIT
             </p>
           </div>
           <Button
@@ -231,7 +229,7 @@ export default function AICoach({ userId }) {
             className="gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            {t('aiCoach.clearChat')}
+            New Conversation
           </Button>
         </div>
       </div>
@@ -308,7 +306,7 @@ export default function AICoach({ userId }) {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={t('aiCoach.placeholder')}
+              placeholder="Ask me anything..."
               disabled={isLoading}
               className="flex-1"
             />
@@ -325,10 +323,11 @@ export default function AICoach({ userId }) {
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            {t('aiCoach.disclaimer')}
+            The AI Coach provides general information and is not a substitute for professional medical advice.
           </p>
         </div>
       </div>
     </div>
   )
 }
+

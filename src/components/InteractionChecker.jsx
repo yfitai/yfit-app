@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { AlertTriangle, CheckCircle, Shield } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+
 
 
 export default function InteractionChecker({ user }) {
-  const { t } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [safetyAlerts, setSafetyAlerts] = useState([])
@@ -282,7 +281,7 @@ export default function InteractionChecker({ user }) {
       {/* Current Medications List */}
       {medications.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('medications.myMedications')}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Medications</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {medications.map((med) => (
               <div
@@ -309,7 +308,7 @@ export default function InteractionChecker({ user }) {
       {/* Current Supplements List */}
       {supplements.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('medications.supplements')}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Supplements</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {supplements.map((supp) => (
               <div

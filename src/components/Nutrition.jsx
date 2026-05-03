@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser, getUserProfile } from '../lib/supabase'
 import UnitToggle from './UnitToggle'
 import { Target, Plus, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 export default function Nutrition({ user: propUser }) {
-  const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
   const [userProfile, setUserProfile] = useState(null)
@@ -183,7 +181,7 @@ export default function Nutrition({ user: propUser }) {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('common.loading')}</p>
+          <p className="text-gray-600">Loading nutrition data...</p>
         </div>
       </div>
     )
@@ -199,7 +197,7 @@ export default function Nutrition({ user: propUser }) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              {t('nutrition.title')}
+              Nutrition Tracking
             </h1>
             <p className="text-gray-600 mt-1">Track your daily meals and calories</p>
           </div>
@@ -212,7 +210,7 @@ export default function Nutrition({ user: propUser }) {
             <div className="flex items-center gap-3 mb-4">
               <Target className="w-8 h-8" />
               <div>
-                <h2 className="text-2xl font-bold">{t('goals.dailyCalorieTarget')}</h2>
+                <h2 className="text-2xl font-bold">Your Daily Calorie Target</h2>
                 <p className="text-blue-100 text-sm">
                   Hey {userProfile?.first_name || 'there'}, this is your personalized goal!
                 </p>
@@ -221,28 +219,28 @@ export default function Nutrition({ user: propUser }) {
             
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-sm text-blue-100 mb-1">{t('goals.dailyCalorieTarget')}</div>
+                <div className="text-sm text-blue-100 mb-1">Target</div>
                 <div className="text-3xl font-bold">{adjustedCalories}</div>
-                <div className="text-sm text-blue-100">{t('nutrition.calories')}/day</div>
+                <div className="text-sm text-blue-100">calories/day</div>
               </div>
               <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-sm text-blue-100 mb-1">{t('nutrition.consumed')}</div>
+                <div className="text-sm text-blue-100 mb-1">Consumed</div>
                 <div className="text-3xl font-bold">{totalCalories}</div>
-                <div className="text-sm text-blue-100">{t('nutrition.calories')} {t('common.today')}</div>
+                <div className="text-sm text-blue-100">calories today</div>
               </div>
               <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-sm text-blue-100 mb-1">{t('nutrition.remaining')}</div>
+                <div className="text-sm text-blue-100 mb-1">Remaining</div>
                 <div className={`text-3xl font-bold ${remainingCalories < 0 ? 'text-red-200' : ''}`}>
                   {remainingCalories}
                 </div>
-                <div className="text-sm text-blue-100">{t('nutrition.calories')} {t('nutrition.remaining')}</div>
+                <div className="text-sm text-blue-100">calories left</div>
               </div>
             </div>
 
             {/* Progress Bar */}
             <div className="mt-4">
               <div className="flex justify-between text-sm text-blue-100 mb-2">
-                <span>{t('nav.progress')}</span>
+                <span>Progress</span>
                 <span>{Math.round(percentConsumed)}%</span>
               </div>
               <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
@@ -257,7 +255,7 @@ export default function Nutrition({ user: propUser }) {
 
             {tdee && (
               <div className="mt-4 text-sm text-blue-100">
-                <strong>TDEE/Maintenance:</strong> {tdee} {t('nutrition.calories')}/day
+                <strong>TDEE/Maintenance:</strong> {tdee} calories/day
               </div>
             )}
           </div>
@@ -283,41 +281,41 @@ export default function Nutrition({ user: propUser }) {
 
         {/* Add Meal Button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">{t('nutrition.logMeal')}</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Today's Meals</h2>
           <button
             onClick={() => setShowAddMeal(!showAddMeal)}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:shadow-lg transition-all"
           >
             <Plus className="w-5 h-5" />
-            {t('nutrition.addFood')}
+            Add Meal
           </button>
         </div>
 
         {/* Add Meal Form */}
         {showAddMeal && (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('nutrition.logMeal')}</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Log a Meal</h3>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.logMeal')} Type *
+                  Meal Type *
                 </label>
                 <select
                   value={mealType}
                   onChange={(e) => setMealType(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="breakfast">{t('nutrition.breakfast')}</option>
-                  <option value="lunch">{t('nutrition.lunch')}</option>
-                  <option value="dinner">{t('nutrition.dinner')}</option>
-                  <option value="snack">{t('nutrition.snacks')}</option>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snack">Snack</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.searchFood')} *
+                  Food Name *
                 </label>
                 <input
                   type="text"
@@ -330,7 +328,7 @@ export default function Nutrition({ user: propUser }) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.calories')} *
+                  Calories *
                 </label>
                 <input
                   type="number"
@@ -343,7 +341,7 @@ export default function Nutrition({ user: propUser }) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.protein')} (g)
+                  Protein (g)
                 </label>
                 <input
                   type="number"
@@ -357,7 +355,7 @@ export default function Nutrition({ user: propUser }) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.carbs')} (g)
+                  Carbs (g)
                 </label>
                 <input
                   type="number"
@@ -371,7 +369,7 @@ export default function Nutrition({ user: propUser }) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.fat')} (g)
+                  Fat (g)
                 </label>
                 <input
                   type="number"
@@ -389,13 +387,13 @@ export default function Nutrition({ user: propUser }) {
                 onClick={handleAddMeal}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
               >
-                {t('nutrition.addFood')}
+                Add Meal
               </button>
               <button
                 onClick={() => setShowAddMeal(false)}
                 className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
               >
-                {t('common.cancel')}
+                Cancel
               </button>
             </div>
           </div>
@@ -406,8 +404,8 @@ export default function Nutrition({ user: propUser }) {
           {todaysMeals.length === 0 ? (
             <div className="bg-white rounded-xl shadow-lg p-8 text-center">
               <Utensils className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">{t('common.noData')}</p>
-              <p className="text-gray-400 text-sm mt-2">Click "{t('nutrition.addFood')}" to start tracking</p>
+              <p className="text-gray-500 text-lg">No meals logged yet today</p>
+              <p className="text-gray-400 text-sm mt-2">Click "Add Meal" to start tracking</p>
             </div>
           ) : (
             todaysMeals.map((meal) => (
@@ -421,14 +419,14 @@ export default function Nutrition({ user: propUser }) {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-bold text-gray-800">{meal.food_name}</h3>
                         <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">
-                          {t(`nutrition.${meal.meal_type}`)}
+                          {meal.meal_type}
                         </span>
                       </div>
                       <div className="flex gap-4 text-sm text-gray-600">
-                        <span className="font-semibold text-blue-600">{meal.calories} {t('nutrition.calories')}</span>
-                        {meal.protein_g && <span>{t('nutrition.protein')}: {meal.protein_g}g</span>}
-                        {meal.carbs_g && <span>{t('nutrition.carbs')}: {meal.carbs_g}g</span>}
-                        {meal.fat_g && <span>{t('nutrition.fat')}: {meal.fat_g}g</span>}
+                        <span className="font-semibold text-blue-600">{meal.calories} cal</span>
+                        {meal.protein_g && <span>Protein: {meal.protein_g}g</span>}
+                        {meal.carbs_g && <span>Carbs: {meal.carbs_g}g</span>}
+                        {meal.fat_g && <span>Fat: {meal.fat_g}g</span>}
                       </div>
                     </div>
                   </div>
@@ -436,7 +434,7 @@ export default function Nutrition({ user: propUser }) {
                     onClick={() => handleDeleteMeal(meal.id)}
                     className="text-red-500 hover:text-red-700 text-sm font-medium"
                   >
-                    {t('common.delete')}
+                    Delete
                   </button>
                 </div>
               </div>

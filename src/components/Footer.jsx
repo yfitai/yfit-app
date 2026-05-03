@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FileText, Mail, Heart } from 'lucide-react'
 import ContactSupportModal from './ContactSupportModal'
-import { useTranslation } from 'react-i18next'
 
 export default function Footer() {
-  const { t } = useTranslation()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   return (

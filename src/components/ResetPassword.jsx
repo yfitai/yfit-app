@@ -8,10 +8,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.jsx'
 import { supabase } from '../lib/supabase'
 import { CheckCircle, Eye, EyeOff, Lock } from 'lucide-react'
 import logo from '../assets/logo.png'
-import { useTranslation } from 'react-i18next'
 
 export default function ResetPassword() {
-  const { t } = useTranslation()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -90,7 +88,7 @@ export default function ResetPassword() {
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
               </div>
-              <CardTitle className="text-center">{t('auth.resetPasswordSent')}</CardTitle>
+              <CardTitle className="text-center">Password Reset Successful!</CardTitle>
               <CardDescription className="text-center">
                 Your password has been updated
               </CardDescription>
@@ -109,7 +107,7 @@ export default function ResetPassword() {
                 onClick={() => navigate('/')}
                 className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
               >
-                {t('auth.signIn')}
+                Go to Sign In
               </Button>
             </CardFooter>
           </Card>
@@ -135,7 +133,7 @@ export default function ResetPassword() {
                 <Lock className="h-8 w-8 text-blue-600" />
               </div>
             </div>
-            <CardTitle className="text-center">{t('auth.resetPassword')}</CardTitle>
+            <CardTitle className="text-center">Set New Password</CardTitle>
             <CardDescription className="text-center">
               Enter your new password below
             </CardDescription>
@@ -217,7 +215,7 @@ export default function ResetPassword() {
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? t('common.loading') : t('auth.resetPassword')}
+                    {isLoading ? 'Resetting...' : 'Reset Password'}
                   </Button>
                   <Button 
                     type="button"
@@ -225,7 +223,7 @@ export default function ResetPassword() {
                     className="w-full"
                     onClick={() => navigate('/')}
                   >
-                    {t('auth.signIn')}
+                    Back to Sign In
                   </Button>
                 </>
               ) : (
@@ -234,7 +232,7 @@ export default function ResetPassword() {
                   className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                   onClick={() => navigate('/')}
                 >
-                  {t('auth.signIn')}
+                  Go to Sign In
                 </Button>
               )}
             </CardFooter>

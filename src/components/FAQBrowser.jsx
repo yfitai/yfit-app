@@ -13,10 +13,8 @@ import {
   BookOpen,
   Sparkles
 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 export default function FAQBrowser({ userId, onAskAICoach }) {
-  const { t } = useTranslation()
   const [categories, setCategories] = useState([])
   const [articles, setArticles] = useState([])
   const [filteredArticles, setFilteredArticles] = useState([])
@@ -220,7 +218,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       <div className="flex-1 overflow-y-auto p-4 pb-4">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
-            {t('common.loading')}
+            Loading FAQ articles...
           </div>
         ) : filteredArticles.length === 0 ? (
           <div className="text-center py-8">
@@ -236,7 +234,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
               className="gap-2"
             >
               <Sparkles className="h-4 w-4" />
-              {t('aiCoach.askCoach')}
+              Ask AI Coach Instead
             </Button>
           </div>
         ) : (
@@ -322,9 +320,10 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
           className="w-full gap-2"
         >
           <Sparkles className="h-4 w-4" />
-          {t('aiCoach.askCoach')}
+          Ask AI Coach
         </Button>
       </div>
     </div>
   )
 }
+

@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { TrendingUp, Activity, Target, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 
 export default function ProgressSimple({ user }) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('progress.myProgress')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
         <p className="text-gray-600">Track your journey and see how far you've come</p>
       </div>
 
@@ -23,7 +21,7 @@ export default function ProgressSimple({ user }) {
               <TrendingUp className="w-10 h-10 text-blue-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('progress.title')}
+              Start Tracking Your Progress
             </h2>
             <p className="text-gray-600 mb-8">
               Begin logging your data to see your progress over time. Track weight, body measurements, 
@@ -38,7 +36,7 @@ export default function ProgressSimple({ user }) {
               className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg hover:shadow-md transition-all text-left"
             >
               <Target className="w-8 h-8 text-blue-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-1">{t('goals.setGoals')}</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Set Goals</h3>
               <p className="text-sm text-gray-600">Define your fitness targets</p>
             </button>
 
@@ -47,7 +45,7 @@ export default function ProgressSimple({ user }) {
               className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg hover:shadow-md transition-all text-left"
             >
               <Activity className="w-8 h-8 text-green-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-1">{t('nutrition.logMeal')}</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Log Meals</h3>
               <p className="text-sm text-gray-600">Track your nutrition</p>
             </button>
 
@@ -56,7 +54,7 @@ export default function ProgressSimple({ user }) {
               className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg hover:shadow-md transition-all text-left"
             >
               <Plus className="w-8 h-8 text-purple-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-1">{t('fitness.logWorkout')}</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Log Workouts</h3>
               <p className="text-sm text-gray-600">Record your exercises</p>
             </button>
           </div>
@@ -65,7 +63,7 @@ export default function ProgressSimple({ user }) {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
             <h4 className="font-semibold text-blue-900 mb-2">📊 What you'll see here:</h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• {t('progress.weight')} and body composition trends</li>
+              <li>• Weight and body composition trends</li>
               <li>• Body measurements over time</li>
               <li>• Workout frequency and performance</li>
               <li>• Nutrition compliance and macros</li>
@@ -77,3 +75,4 @@ export default function ProgressSimple({ user }) {
     </div>
   )
 }
+

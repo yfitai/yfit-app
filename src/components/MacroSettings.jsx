@@ -5,7 +5,6 @@ import {
   calculateMacrosFromPercentages,
   getRecommendedFatPercentage
 } from '../lib/macroCalculations'
-import { useTranslation } from 'react-i18next'
 
 /**
  * MacroSettings
@@ -19,7 +18,6 @@ import { useTranslation } from 'react-i18next'
  * adjustment while scrolling. Tap the Edit button to unlock, tap Done to save and re-lock.
  */
 export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories, goalType, onMacrosUpdated }) {
-  const { t } = useTranslation()
   const [useCustomMacros, setUseCustomMacros] = useState(false)
   const [proteinGrams, setProteinGrams] = useState(150)
   const [carbGrams, setCarbGrams]       = useState(200)
@@ -242,7 +240,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
   // ─── render ─────────────────────────────────────────────────────────────────
 
   if (!macros) {
-    return <div className="text-center py-4">{t('common.loading')}</div>
+    return <div className="text-center py-4">Calculating macros...</div>
   }
 
   const goal    = Math.round(adjustedCalories || 0)
@@ -251,7 +249,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 {t('nutrition.macroBreakdown')}</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Macro Targets</h3>
 
       {/* Toggle */}
       <div className="flex items-center justify-between mb-4 p-4 bg-gray-50 rounded-lg">
@@ -260,7 +258,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
           <p className="text-sm text-gray-600">
             {useCustomMacros
               ? 'Moving one slider auto-adjusts the others to stay at your calorie goal'
-              : `Using LBM-based calculation (1g ${t('nutrition.protein')} per lb lean mass)`}
+              : 'Using LBM-based calculation (1g protein per lb lean mass)'}
           </p>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
@@ -278,17 +276,17 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="text-center p-4 bg-blue-50 rounded-lg">
           <p className="text-xl font-bold text-blue-600">{macros.protein.grams}g</p>
-          <p className="text-sm text-gray-600">{t('nutrition.protein')}</p>
+          <p className="text-sm text-gray-600">Protein</p>
           <p className="text-xs text-gray-500">{macros.protein.percentage}%</p>
         </div>
         <div className="text-center p-4 bg-orange-50 rounded-lg">
           <p className="text-xl font-bold text-orange-600">{macros.carbs.grams}g</p>
-          <p className="text-sm text-gray-600">{t('nutrition.carbs')}</p>
+          <p className="text-sm text-gray-600">Carbs</p>
           <p className="text-xs text-gray-500">{macros.carbs.percentage}%</p>
         </div>
         <div className="text-center p-4 bg-purple-50 rounded-lg">
           <p className="text-xl font-bold text-purple-600">{macros.fat.grams}g</p>
-          <p className="text-sm text-gray-600">{t('nutrition.fat')}</p>
+          <p className="text-sm text-gray-600">Fat</p>
           <p className="text-xs text-gray-500">{macros.fat.percentage}%</p>
         </div>
       </div>
@@ -309,14 +307,14 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
                 onClick={() => setSlidersLocked(false)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
               >
-                ✏️ {t('common.edit')}
+                ✏️ Edit
               </button>
             ) : (
               <button
                 onClick={handleDone}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
               >
-                ✓ {t('common.done')}
+                ✓ Done
               </button>
             )}
           </div>
@@ -324,7 +322,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
           {/* Protein */}
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-sm font-medium text-gray-700">{t('nutrition.protein')}</label>
+              <label className="text-sm font-medium text-gray-700">Protein</label>
               <span className="text-sm text-blue-600 font-medium">
                 {proteinGrams}g &nbsp;
                 <span className="text-gray-400">({macros.protein.percentage}%)</span>
@@ -351,7 +349,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
           {/* Carbs */}
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-sm font-medium text-gray-700">{t('nutrition.carbs')}</label>
+              <label className="text-sm font-medium text-gray-700">Carbs</label>
               <span className="text-sm text-orange-600 font-medium">
                 {carbGrams}g &nbsp;
                 <span className="text-gray-400">({macros.carbs.percentage}%)</span>
@@ -378,7 +376,7 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
           {/* Fat */}
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-sm font-medium text-gray-700">{t('nutrition.fat')}</label>
+              <label className="text-sm font-medium text-gray-700">Fat</label>
               <span className="text-sm text-purple-600 font-medium">
                 {fatGrams}g &nbsp;
                 <span className="text-gray-400">({macros.fat.percentage}%)</span>
@@ -425,9 +423,9 @@ export default function MacroSettings({ user, leanBodyMassLbs, adjustedCalories,
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-700">
             <strong>LBM-Based Calculation:</strong><br />
-            • {t('nutrition.protein')}: 1g per lb of lean body mass ({Math.round(leanBodyMassLbs || 0)} lbs = {macros.protein.grams}g)<br />
-            • {t('nutrition.fat')}: {macros.fat.percentage}% for hormone health<br />
-            • {t('nutrition.carbs')}: Remaining calories for energy
+            • Protein: 1g per lb of lean body mass ({Math.round(leanBodyMassLbs || 0)} lbs = {macros.protein.grams}g)<br />
+            • Fat: {macros.fat.percentage}% for hormone health<br />
+            • Carbs: Remaining calories for energy
           </p>
         </div>
       )}

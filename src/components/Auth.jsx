@@ -9,28 +9,26 @@ import { signIn, signUp, resendConfirmationEmail, resetPassword } from '../lib/s
 import { supabase } from '../lib/supabase'
 import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
-import { useTranslation } from 'react-i18next'
 
 export default function Auth({ onAuthSuccess }) {
-  const { t } = useTranslation()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showLoginPassword, setShowLoginPassword] = useState(false)
-  const [showSignupPassword, setShowSignupPassword] = useState(false)
+const [isLoading, setIsLoading] = useState(false)
+const [showLoginPassword, setShowLoginPassword] = useState(false)
+const [showSignupPassword, setShowSignupPassword] = useState(false)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
   const [pendingEmail, setPendingEmail] = useState('')
-
+  
   // Forgot Password state
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
   const [resetEmailSent, setResetEmailSent] = useState(false)
-
+  
   // Login state
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
-
+  
   // Signup state
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
@@ -42,25 +40,25 @@ export default function Auth({ onAuthSuccess }) {
     setError('')
     setSuccess('')
     setIsLoading(true)
-
+    
     const { data, error } = await signIn(loginEmail, loginPassword)
-
+    
     if (error) {
       if (error.message?.includes('Email not confirmed')) {
         setError('Please confirm your email address before signing in. Check your inbox for the confirmation link.')
         setPendingEmail(loginEmail)
         setShowEmailConfirmation(true)
       } else {
-        setError(error.message || t('common.error'))
+        setError(error.message || 'Failed to sign in. Please check your credentials.')
       }
       setIsLoading(false)
       return
     }
-
+    
     if (data.user) {
       onAuthSuccess(data.user)
     }
-
+    
     setIsLoading(false)
   }
 
@@ -68,33 +66,33 @@ export default function Auth({ onAuthSuccess }) {
     e.preventDefault()
     setError('')
     setSuccess('')
-
+    
     // Validation
     if (!firstName.trim() || !lastName.trim()) {
       setError('Please enter your first and last name')
       return
     }
-
+    
     if (!signupEmail.trim() || !signupPassword.trim()) {
       setError('Please enter your email and password')
       return
     }
-
+    
     if (signupPassword.length < 6) {
       setError('Password must be at least 6 characters')
       return
     }
 
     setIsLoading(true)
-
+    
     const { data, error, needsEmailConfirmation } = await signUp(signupEmail, signupPassword, firstName, lastName)
-
+    
     if (error) {
-      setError(error.message || t('common.error'))
+      setError(error.message || 'Failed to create account. Please try again.')
       setIsLoading(false)
       return
     }
-
+    
     // If email confirmation is required
     if (needsEmailConfirmation) {
       setPendingEmail(signupEmail)
@@ -103,12 +101,12 @@ export default function Auth({ onAuthSuccess }) {
       setIsLoading(false)
       return
     }
-
+    
     // If no confirmation needed, log them in directly
     if (data.user && data.session) {
       onAuthSuccess(data.user)
     }
-
+    
     setIsLoading(false)
   }
 
@@ -116,15 +114,15 @@ export default function Auth({ onAuthSuccess }) {
     setIsLoading(true)
     setError('')
     setSuccess('')
-
+    
     const { error } = await resendConfirmationEmail(pendingEmail)
-
+    
     if (error) {
       setError('Failed to resend confirmation email. Please try again.')
     } else {
       setSuccess('Confirmation email sent! Please check your inbox.')
     }
-
+    
     setIsLoading(false)
   }
 
@@ -133,17 +131,17 @@ export default function Auth({ onAuthSuccess }) {
     setIsLoading(true)
     setError('')
     setSuccess('')
-
+    
     const { error } = await resetPassword(forgotPasswordEmail)
-
+    
     if (error) {
       setError('Failed to send password reset email. Please try again.')
       setIsLoading(false)
       return
     }
-
+    
     setResetEmailSent(true)
-    setSuccess(t('auth.resetPasswordSent'))
+    setSuccess('Password reset email sent! Please check your inbox.')
     setIsLoading(false)
   }
 
@@ -161,15 +159,15 @@ export default function Auth({ onAuthSuccess }) {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('auth.resetPassword')}</CardTitle>
+              <CardTitle>Reset Your Password</CardTitle>
               <CardDescription>
-                {resetEmailSent
-                  ? t('auth.resetPasswordSent')
+                {resetEmailSent 
+                  ? 'Check your email for the reset link'
                   : 'Enter your email address and we\'ll send you a password reset link'
                 }
               </CardDescription>
             </CardHeader>
-
+            
             {!resetEmailSent ? (
               <form onSubmit={handleForgotPassword}>
                 <CardContent className="space-y-4">
@@ -180,9 +178,9 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="forgot-email">{t('auth.email')}</Label>
+                    <Label htmlFor="forgot-email">Email</Label>
                     <Input
                       id="forgot-email"
                       type="email"
@@ -198,16 +196,16 @@ export default function Auth({ onAuthSuccess }) {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2">
-                  <Button
-                    type="submit"
+                  <Button 
+                    type="submit" 
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? t('common.loading') : 'Send Reset Link'}
+                    {isLoading ? 'Sending...' : 'Send Reset Link'}
                   </Button>
-                  <Button
+                  <Button 
                     type="button"
-                    variant="ghost"
+                    variant="ghost" 
                     className="w-full"
                     onClick={() => {
                       setShowForgotPassword(false)
@@ -217,7 +215,7 @@ export default function Auth({ onAuthSuccess }) {
                       setForgotPasswordEmail('')
                     }}
                   >
-                    {t('common.back')} {t('auth.signIn')}
+                    Back to Sign In
                   </Button>
                 </CardFooter>
               </form>
@@ -233,7 +231,7 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-gray-700">
                       <strong>Next steps:</strong>
@@ -247,8 +245,8 @@ export default function Auth({ onAuthSuccess }) {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    variant="ghost"
+                  <Button 
+                    variant="ghost" 
                     className="w-full"
                     onClick={() => {
                       setShowForgotPassword(false)
@@ -258,7 +256,7 @@ export default function Auth({ onAuthSuccess }) {
                       setForgotPasswordEmail('')
                     }}
                   >
-                    {t('common.back')} {t('auth.signIn')}
+                    Back to Sign In
                   </Button>
                 </CardFooter>
               </>
@@ -295,7 +293,7 @@ export default function Auth({ onAuthSuccess }) {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-center font-medium text-gray-900">{pendingEmail}</p>
-
+              
               {success && (
                 <Alert className="bg-green-50 border-green-200">
                   <CheckCircle className="h-4 w-4 text-green-600" />
@@ -305,7 +303,7 @@ export default function Auth({ onAuthSuccess }) {
                   </AlertDescription>
                 </Alert>
               )}
-
+              
               {error && (
                 <Alert className="bg-red-50 border-red-200">
                   <AlertTitle className="text-red-800">Error</AlertTitle>
@@ -327,16 +325,16 @@ export default function Auth({ onAuthSuccess }) {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 className="w-full"
                 onClick={handleResendConfirmation}
                 disabled={isLoading}
               >
-                {isLoading ? t('common.loading') : 'Resend Confirmation Email'}
+                {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
               </Button>
-              <Button
-                variant="ghost"
+              <Button 
+                variant="ghost" 
                 className="w-full"
                 onClick={() => {
                   setShowEmailConfirmation(false)
@@ -344,7 +342,7 @@ export default function Auth({ onAuthSuccess }) {
                   setSuccess('')
                 }}
               >
-                {t('common.back')} {t('auth.signIn')}
+                Back to Sign In
               </Button>
             </CardFooter>
           </Card>
@@ -357,7 +355,7 @@ export default function Auth({ onAuthSuccess }) {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8 animate-fade-in">
+           <div className="text-center mb-8 animate-fade-in">
           <img src="/assets/yfit-logo.png" alt="YFIT AI" className="h-24 mx-auto mb-4" />
           <p className="text-gray-600 mt-2">Your Intelligent Health Companion</p>
         </div>
@@ -366,15 +364,15 @@ export default function Auth({ onAuthSuccess }) {
         {/* Auth Tabs */}
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">{t('auth.signIn')}</TabsTrigger>
-            <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
+            <TabsTrigger value="login">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
 
           {/* Login Tab */}
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>{t('auth.welcomeBack')}</CardTitle>
+                <CardTitle>Welcome Back!</CardTitle>
                 <CardDescription>
                   Sign in to continue your health journey
                 </CardDescription>
@@ -388,7 +386,7 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   {success && (
                     <Alert className="bg-green-50 border-green-200">
                       <AlertDescription className="text-green-700 text-sm">
@@ -396,9 +394,9 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">{t('auth.email')}</Label>
+                    <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
                       type="email"
@@ -413,51 +411,52 @@ export default function Auth({ onAuthSuccess }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">{t('auth.password')}</Label>
-                    <div className="relative">
-                      <Input
-                        id="login-password"
-                        type={showLoginPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={loginPassword}
-                        onChange={(e) => {
-                          setLoginPassword(e.target.value)
-                          setError('')
-                        }}
-                        required
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    <div className="text-right">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowForgotPassword(true)
-                          setForgotPasswordEmail(loginEmail)
-                          setError('')
-                        }}
-                        className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
-                      >
-                        {t('auth.forgotPassword')}
-                      </button>
-                    </div>
-                  </div>
+  <Label htmlFor="login-password">Password</Label>
+  <div className="relative">
+    <Input
+      id="login-password"
+      type={showLoginPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={loginPassword}
+      onChange={(e) => {
+        setLoginPassword(e.target.value)
+        setError('')
+      }}
+      required
+      disabled={isLoading}
+    />
+    <button
+      type="button"
+      onClick={() => setShowLoginPassword(!showLoginPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+      {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+  <div className="text-right">
+    <button
+      type="button"
+      onClick={() => {
+        setShowForgotPassword(true)
+        setForgotPasswordEmail(loginEmail)
+        setError('')
+      }}
+      className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+    >
+      Forgot Password?
+    </button>
+  </div>
+</div>
 
+               
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    type="submit"
+                  <Button 
+                    type="submit" 
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? t('common.loading') : t('auth.signIn')}
+                    {isLoading ? 'Signing in...' : 'Sign In'}
                   </Button>
                 </CardFooter>
               </form>
@@ -468,7 +467,7 @@ export default function Auth({ onAuthSuccess }) {
           <TabsContent value="signup">
             <Card>
               <CardHeader>
-                <CardTitle>{t('auth.createAccount')}</CardTitle>
+                <CardTitle>Create Account</CardTitle>
                 <CardDescription>
                   Start your personalized health journey today
                 </CardDescription>
@@ -482,7 +481,7 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   {success && (
                     <Alert className="bg-green-50 border-green-200">
                       <AlertDescription className="text-green-700 text-sm">
@@ -490,43 +489,43 @@ export default function Auth({ onAuthSuccess }) {
                       </AlertDescription>
                     </Alert>
                   )}
-
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first-name">{t('auth.firstName')} *</Label>
+                      <Label htmlFor="first-name">First Name *</Label>
                       <Input
                         id="first-name"
                         type="text"
                         placeholder="John"
                         value={firstName}
                         onChange={(e) => {
-                          setFirstName(e.target.value)
-                          setError('')
-                        }}
+                        setFirstName(e.target.value)
+                        setError('')
+                      }}
                         required
                         disabled={isLoading}
                       />
                     </div>
-
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">{t('auth.lastName')} *</Label>
+                      <Label htmlFor="last-name">Last Name *</Label>
                       <Input
                         id="last-name"
                         type="text"
                         placeholder="Doe"
                         value={lastName}
                         onChange={(e) => {
-                          setLastName(e.target.value)
-                          setError('')
-                        }}
+                        setLastName(e.target.value)
+                        setError('')
+                      }}
                         required
                         disabled={isLoading}
                       />
                     </div>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">{t('auth.email')} *</Label>
+                    <Label htmlFor="signup-email">Email *</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -541,41 +540,41 @@ export default function Auth({ onAuthSuccess }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">{t('auth.password')} *</Label>
-                    <div className="relative">
-                      <Input
-                        id="signup-password"
-                        type={showSignupPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={signupPassword}
-                        onChange={(e) => {
-                          setSignupPassword(e.target.value)
-                          setError('')
-                        }}
-                        required
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowSignupPassword(!showSignupPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500">Minimum 6 characters</p>
-                  </div>
+  <Label htmlFor="signup-password">Password *</Label>
+  <div className="relative">
+    <Input
+      id="signup-password"
+      type={showSignupPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={signupPassword}
+      onChange={(e) => {
+        setSignupPassword(e.target.value)
+        setError('')
+      }}
+      required
+      disabled={isLoading}
+    />
+    <button
+      type="button"
+      onClick={() => setShowSignupPassword(!showSignupPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+      {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+       </button>
+  </div>
+  <p className="text-xs text-gray-500">Minimum 6 characters</p>
+</div>
 
 
 
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    type="submit"
+                  <Button 
+                    type="submit" 
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? t('common.loading') : t('auth.createAccount')}
+                    {isLoading ? 'Creating account...' : 'Create Account'}
                   </Button>
                 </CardFooter>
               </form>

@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { X, Plus, Trash2, Star, Search } from 'lucide-react'
 import { searchFoods } from '../../lib/foodDatabase'
-import { useTranslation } from 'react-i18next'
 
 export default function CreateTemplateModal({ onSave, onClose }) {
-  const { t } = useTranslation()
   const [templateName, setTemplateName] = useState('')
   const [mealType, setMealType] = useState('breakfast')
   const [description, setDescription] = useState('')
@@ -143,7 +141,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                         {/* Template Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.templateName')} <span className="text-red-500">*</span>
+                  Template Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -163,10 +161,10 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                        {/* Meal Type */}
               <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('nutrition.mealType')} <span className="text-red-500">*</span>
+                  Meal Type <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
-                  {['breakfast', 'lunch', 'dinner', 'snacks'].map((type) => (
+                  {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
                     <button
                       key={type}
                       onClick={() => setMealType(type)}
@@ -176,12 +174,12 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                           : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                       }`}
                     >
-                      {t(`nutrition.${type}`)}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
                     </button>
                   ))}
                 </div>
                 <p className="text-xs text-blue-700 mt-2">
-                  ℹ️ {t('common.selected')}: <strong>{t(`nutrition.${mealType}`)}</strong>
+                  ℹ️ Selected: <strong>{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</strong>
                 </p>
               </div>
    
@@ -189,7 +187,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.description')} (optional)
+                  Description (optional)
                 </label>
                 <textarea
                   value={description}
@@ -225,7 +223,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                 
                 {foods.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <p className="text-sm">{t('common.noData')}</p>
+                    <p className="text-sm">No foods added yet</p>
                     <p className="text-xs mt-1">Search and add foods on the right →</p>
                   </div>
                 ) : (
@@ -241,7 +239,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                             <div className="text-xs text-gray-500">{food.brand}</div>
                           )}
                           <div className="text-xs text-gray-600 mt-1">
-                            {food.serving_quantity} {food.serving_unit} • {food.calories} {t('nutrition.calories')}
+                            {food.serving_quantity} {food.serving_unit} • {food.calories} cal
                           </div>
                         </div>
                         <button
@@ -259,29 +257,29 @@ export default function CreateTemplateModal({ onSave, onClose }) {
               {/* Nutrition Summary */}
               {foods.length > 0 && (
                 <div className="bg-blue-50 rounded-lg p-3">
-                  <div className="text-sm font-medium text-gray-700 mb-2">{t('nutrition.nutritionSummary')}</div>
+                  <div className="text-sm font-medium text-gray-700 mb-2">Total Nutrition</div>
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
                       <div className="text-lg font-bold text-gray-900">{totalCalories}</div>
-                      <div className="text-xs text-gray-600">{t('nutrition.calories')}</div>
+                      <div className="text-xs text-gray-600">Calories</div>
                     </div>
                     <div>
                       <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalProtein * 10) / 10}g
                       </div>
-                      <div className="text-xs text-gray-600">{t('nutrition.protein')}</div>
+                      <div className="text-xs text-gray-600">Protein</div>
                     </div>
                     <div>
                       <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalCarbs * 10) / 10}g
                       </div>
-                      <div className="text-xs text-gray-600">{t('nutrition.carbs')}</div>
+                      <div className="text-xs text-gray-600">Carbs</div>
                     </div>
                     <div>
                       <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalFat * 10) / 10}g
                       </div>
-                      <div className="text-xs text-gray-600">{t('nutrition.fat')}</div>
+                      <div className="text-xs text-gray-600">Fat</div>
                     </div>
                   </div>
                 </div>
@@ -292,7 +290,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
             <div className="space-y-4 overflow-y-auto pl-2 flex flex-col">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.searchFood')}
+                  Search Foods
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -300,7 +298,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    placeholder={t('nutrition.searchFoodPlaceholder')}
+                    placeholder="Search for foods..."
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -312,11 +310,11 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                   {searching ? (
                     <div className="p-4 text-center text-gray-500">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="mt-2 text-sm">{t('common.searching')}</p>
+                      <p className="mt-2 text-sm">Searching...</p>
                     </div>
                   ) : searchResults.length === 0 ? (
                     <div className="p-4 text-center text-gray-500">
-                      <p className="text-sm">{t('common.noFoodsFound')}</p>
+                      <p className="text-sm">No foods found</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-200">
@@ -333,7 +331,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
                             <div className="text-xs text-gray-500">{food.brand}</div>
                           )}
                           <div className="text-xs text-gray-600 mt-1">
-                            {food.calories} {t('nutrition.calories')} • P: {food.protein}g C: {food.carbs}g F: {food.fat}g
+                            {food.calories} cal • P: {food.protein}g C: {food.carbs}g F: {food.fat}g
                           </div>
                         </button>
                       ))}
@@ -350,7 +348,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
     </div>
     
     <div className="mb-3">
-      <label className="block text-sm text-gray-700 mb-1">{t('nutrition.quantityUnit')}:</label>
+      <label className="block text-sm text-gray-700 mb-1">Quantity & Unit:</label>
       <div className="flex gap-2">
         <input
           type="number"
@@ -372,21 +370,21 @@ export default function CreateTemplateModal({ onSave, onClose }) {
           onChange={(e) => setServingUnit(e.target.value)}
           className="flex-1 px-2 py-1 border border-gray-300 rounded bg-white text-sm"
         >
-          <option value="g">{t('nutrition.grams')}</option>
-          <option value="oz">{t('nutrition.ounces')}</option>
-          <option value="lb">{t('nutrition.pounds')}</option>
-          <option value="ml">{t('nutrition.milliliters')}</option>
-          <option value="fl_oz">{t('nutrition.fluidOunces')}</option>
-          <option value="cup">{t('nutrition.cups')}</option>
-          <option value="tbsp">{t('nutrition.tablespoons')}</option>
-          <option value="tsp">{t('nutrition.teaspoons')}</option>
-          <option value="serving">{t('nutrition.serving')}</option>
+          <option value="g">Grams (g)</option>
+          <option value="oz">Ounces (oz)</option>
+          <option value="lb">Pounds (lb)</option>
+          <option value="ml">Milliliters (ml)</option>
+          <option value="fl_oz">Fluid Ounces (fl oz)</option>
+          <option value="cup">Cups</option>
+          <option value="tbsp">Tablespoons (tbsp)</option>
+          <option value="tsp">Teaspoons (tsp)</option>
+          <option value="serving">Serving</option>
         </select>
       </div>
     </div>
 
     <div className="text-xs text-gray-600 mb-3">
-      {Math.round(selectedFood.calories * (servingQuantity || 0))} {t('nutrition.calories')} •
+      {Math.round(selectedFood.calories * (servingQuantity || 0))} cal •
       P: {Math.round(selectedFood.protein * (servingQuantity || 0) * 10) / 10}g •
       C: {Math.round(selectedFood.carbs * (servingQuantity || 0) * 10) / 10}g •
       F: {Math.round(selectedFood.fat * (servingQuantity || 0) * 10) / 10}g
@@ -397,7 +395,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
       className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
     >
       <Plus className="w-4 h-4" />
-      {t('nutrition.addFood')}
+      Add to Template
     </button>
   </div>
 )}
@@ -412,7 +410,7 @@ export default function CreateTemplateModal({ onSave, onClose }) {
             onClick={onClose}
             className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            {t('common.cancel')}
+            Cancel
           </button>
           <button
             onClick={handleSave}
@@ -431,3 +429,5 @@ export default function CreateTemplateModal({ onSave, onClose }) {
     </div>
   )
 }
+ 
+

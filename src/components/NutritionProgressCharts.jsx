@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { ChartNoAxesCombined } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 
 /**
@@ -10,7 +9,6 @@ import { useTranslation } from 'react-i18next'
  * Displays a COMBINED chart for Fiber, Sugar, and Sodium intake (like Protein/Carbs/Fat)
  */
 export default function NutritionProgressCharts({ user, timeRange = '30' }) {
-  const { t } = useTranslation()
   const [nutritionData, setNutritionData] = useState([])
   const [goals, setGoals] = useState({
     fiber: 25,
@@ -185,7 +183,7 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
             </>
           ) : (
             <>
-              <p className="text-gray-600">{t('common.noData')}</p>
+              <p className="text-gray-600">No nutrition data for this period</p>
               <p className="text-sm text-gray-500 mt-2">Start logging meals to see your micronutrient progress.</p>
             </>
           )}
@@ -275,3 +273,4 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
     </div>
   )
 }
+

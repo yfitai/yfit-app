@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import DayColumn from './DayColumn'
-import { useTranslation } from 'react-i18next'
 
 export default function WeeklyGrid({ weekStart, mealPlanItems, onAddMeal, onRemoveMeal, onUpdateMeal, onSaveAsTemplate, user }) {
-  const { t } = useTranslation()
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack']
   
@@ -63,7 +61,7 @@ export default function WeeklyGrid({ weekStart, mealPlanItems, onAddMeal, onRemo
               {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
             {isToday && (
-              <div className="text-xs text-blue-600 font-medium mt-1">{t('common.today')}</div>
+              <div className="text-xs text-blue-600 font-medium mt-1">Today</div>
             )}
           </div>
           
@@ -93,7 +91,7 @@ export default function WeeklyGrid({ weekStart, mealPlanItems, onAddMeal, onRemo
 
         {/* Total calories for selected day */}
         <div className="mt-3 text-center">
-          <span className="text-sm text-gray-600">{t('nutrition.consumed')}: </span>
+          <span className="text-sm text-gray-600">Total: </span>
           <span className="text-lg font-semibold text-gray-900">
             {getDayTotalCalories(selectedDayIndex)} cal
           </span>

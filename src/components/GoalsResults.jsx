@@ -1,6 +1,5 @@
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import { Activity, Target, TrendingUp, Zap, Flame, Scale, Heart } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 /**
  * GoalsResults — display-only component.
@@ -8,7 +7,6 @@ import { useTranslation } from 'react-i18next'
  * Does NOT load or save any data.
  */
 export default function GoalsResults({ metrics, firstName }) {
-  const { t } = useTranslation()
   if (!metrics) return null
 
   const { isMetric } = useUnitPreference()
@@ -60,7 +58,7 @@ export default function GoalsResults({ metrics, firstName }) {
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-green-500 rounded-xl p-6 text-white text-center">
         <h2 className="text-2xl font-bold mb-1">
-          {firstName ? `Great work, ${firstName}!` : t('goals.myGoals')}
+          {firstName ? `Great work, ${firstName}!` : 'Your Results'}
         </h2>
         <p className="text-blue-100 text-sm">Here are your personalised health metrics</p>
       </div>
@@ -87,7 +85,7 @@ export default function GoalsResults({ metrics, firstName }) {
         <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl shadow p-4 text-center border border-blue-200">
           <Target className="w-6 h-6 text-blue-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-blue-700">{Math.round(adjustedCalories || tdee)}</div>
-          <div className="text-xs text-blue-600 mt-1 font-medium">{t('goals.dailyCalorieTarget')}</div>
+          <div className="text-xs text-blue-600 mt-1 font-medium">Target (cal/day)</div>
           <div className="text-xs text-gray-400 truncate">{goalDescription}</div>
         </div>
 
@@ -95,7 +93,7 @@ export default function GoalsResults({ metrics, firstName }) {
         <div className="bg-white rounded-xl shadow p-4 text-center border border-gray-100">
           <Scale className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-800">{bmi?.toFixed(1)}</div>
-          <div className="text-xs text-gray-500 mt-1">{t('goals.bmi')}</div>
+          <div className="text-xs text-gray-500 mt-1">BMI</div>
           <div className={`text-xs font-medium mt-1 ${bmiCategory?.color || 'text-gray-500'}`}>
             {bmiCategory?.category}
           </div>
@@ -113,7 +111,7 @@ export default function GoalsResults({ metrics, firstName }) {
             <div className="text-xl font-bold text-red-600">
               {bodyFatPercentage != null ? `${bodyFatPercentage.toFixed(1)}%` : '—'}
             </div>
-            <div className="text-xs text-gray-500 mt-1">{t('goals.bodyFat')}</div>
+            <div className="text-xs text-gray-500 mt-1">Body Fat</div>
             {bodyFatCategory && (
               <div className={`text-xs font-medium mt-1 ${bodyFatCategory.color}`}>
                 {bodyFatCategory.category}
@@ -139,17 +137,17 @@ export default function GoalsResults({ metrics, firstName }) {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-blue-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-blue-600">{proteinG}g</div>
-            <div className="text-xs text-gray-500 mt-1">{t('nutrition.protein')}</div>
+            <div className="text-xs text-gray-500 mt-1">Protein</div>
             <div className="text-xs text-blue-400">{proteinCals} cal · 30%</div>
           </div>
           <div className="bg-amber-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-amber-600">{carbsG}g</div>
-            <div className="text-xs text-gray-500 mt-1">{t('nutrition.carbs')}</div>
+            <div className="text-xs text-gray-500 mt-1">Carbs</div>
             <div className="text-xs text-amber-400">{carbCals} cal · 40%</div>
           </div>
           <div className="bg-pink-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-pink-600">{fatG}g</div>
-            <div className="text-xs text-gray-500 mt-1">{t('nutrition.fat')}</div>
+            <div className="text-xs text-gray-500 mt-1">Fat</div>
             <div className="text-xs text-pink-400">{fatCals} cal · 30%</div>
           </div>
         </div>

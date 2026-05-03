@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 export default function ApplyTemplateModal({ template, onApply, onClose }) {
-  const { t } = useTranslation()
   const [selectedDay, setSelectedDay] = useState(0) // 0 = Sunday
   const [selectedMealType, setSelectedMealType] = useState('breakfast')
 
@@ -38,7 +36,7 @@ export default function ApplyTemplateModal({ template, onApply, onClose }) {
               <p className="text-sm text-gray-600 mb-3">{template.description}</p>
             )}
             <div className="flex gap-3 text-sm text-gray-600">
-              <span>{template.total_calories} {t('nutrition.calories')}</span>
+              <span>{template.total_calories} cal</span>
               <span>P: {template.total_protein}g</span>
               <span>C: {template.total_carbs}g</span>
               <span>F: {template.total_fat}g</span>
@@ -79,7 +77,7 @@ export default function ApplyTemplateModal({ template, onApply, onClose }) {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {t(`nutrition.${type}`)}
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
                 </button>
               ))}
             </div>
@@ -92,7 +90,7 @@ export default function ApplyTemplateModal({ template, onApply, onClose }) {
             onClick={onClose}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            {t('common.cancel')}
+            Cancel
           </button>
           <button
             onClick={handleApply}

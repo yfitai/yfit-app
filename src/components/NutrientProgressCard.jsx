@@ -1,6 +1,5 @@
 import React from 'react'
 import { TrendingUp, TrendingDown, CheckCircle, AlertCircle } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 /**
  * NutrientProgressCard Component
@@ -14,7 +13,6 @@ export default function NutrientProgressCard({
   type = 'target', // 'target' (reach goal) or 'limit' (stay under goal)
   color = 'blue'
 }) {
-  const { t } = useTranslation()
   const percentage = goal > 0 ? Math.min((current / goal) * 100, 100) : 0
   const isOverLimit = type === 'limit' && current > goal
   const isUnderTarget = type === 'target' && current < goal
@@ -75,11 +73,11 @@ export default function NutrientProgressCard({
   
   const getStatusText = () => {
     if (isOnTrack) {
-      return type === 'target' ? t('goals.goalMet') : t('goals.withinLimit')
+      return type === 'target' ? 'Goal Met!' : 'Within Limit'
     } else if (isOverLimit) {
-      return t('goals.overLimit', { amount: Math.round(current - goal), unit })
+      return `${Math.round(current - goal)}${unit} over limit`
     } else if (isUnderTarget) {
-      return t('goals.toGo', { amount: Math.round(goal - current), unit })
+      return `${Math.round(goal - current)}${unit} to go`
     }
     return ''
   }
@@ -124,3 +122,4 @@ export default function NutrientProgressCard({
     </div>
   )
 }
+

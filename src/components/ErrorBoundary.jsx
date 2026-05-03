@@ -1,6 +1,5 @@
 import { Component } from 'react'
 import { supabase } from '../lib/supabase'
-import { useTranslation } from 'react-i18next'
 
 // Log errors to Supabase error_logs table
 async function logErrorToSupabase(error, componentStack, userId = null) {
@@ -66,7 +65,6 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    const { t } = useTranslation()
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 flex items-center justify-center p-4">
@@ -74,7 +72,7 @@ class ErrorBoundary extends Component {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚠️</span>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('common.error')}</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h2>
             <p className="text-gray-500 text-sm mb-6">
               An unexpected error occurred. This has been automatically reported to our team. 
               We apologize for the inconvenience.

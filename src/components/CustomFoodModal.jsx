@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 export default function CustomFoodModal({ user, onSave, onClose }) {
-  const { t } = useTranslation()
   const [form, setForm] = useState({
     name: '',
     brand: '',
@@ -58,7 +56,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.customFood')}</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Create Custom Food</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -73,7 +71,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             {/* Food Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('nutrition.foodName')} <span className="text-red-500">*</span>
+                Food Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -89,7 +87,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             {/* Brand (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('nutrition.brandOptional')}
+                Brand (Optional)
               </label>
               <input
                 type="text"
@@ -105,7 +103,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.serving')}
+                  Serving Size
                 </label>
                 <input
                   type="number"
@@ -134,7 +132,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
                   <option value="cup">Cup</option>
                   <option value="tbsp">Tablespoon</option>
                   <option value="tsp">Teaspoon</option>
-                  <option value="serving">{t('nutrition.serving')}</option>
+                  <option value="serving">Serving</option>
                 </select>
               </div>
             </div>
@@ -143,7 +141,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.calories')} <span className="text-red-500">*</span>
+                  Calories <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -158,7 +156,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.protein')} (g)
+                  Protein (g)
                 </label>
                 <input
                   type="number"
@@ -175,7 +173,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.carbs')} (g)
+                  Carbs (g)
                 </label>
                 <input
                   type="number"
@@ -189,7 +187,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('nutrition.fat')} (g)
+                  Fat (g)
                 </label>
                 <input
                   type="number"
@@ -209,7 +207,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    {t('nutrition.fiber')} (g)
+                    Fiber (g)
                   </label>
                   <input
                     type="number"
@@ -223,7 +221,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    {t('nutrition.sugar')} (g)
+                    Sugar (g)
                   </label>
                   <input
                     type="number"
@@ -237,7 +235,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    {t('nutrition.sodium')} (mg)
+                    Sodium (mg)
                   </label>
                   <input
                     type="number"
@@ -261,14 +259,14 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             onClick={onClose}
             className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
-            {t('common.cancel')}
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={saving}
             className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? t('common.loading') : t('nutrition.addFood')}
+            {saving ? 'Saving...' : 'Save Custom Food'}
           </button>
         </div>
       </div>
