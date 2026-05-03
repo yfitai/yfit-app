@@ -587,7 +587,7 @@ export default function Dashboard({ user }) {
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">{t('dashboard.currentPassword')}</Label>
+                  <Label htmlFor="current-password">{t('auth.currentPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="current-password"
@@ -612,7 +612,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">{t('dashboard.newPassword')}</Label>
+                  <Label htmlFor="new-password">{t('auth.newPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -635,11 +635,11 @@ export default function Dashboard({ user }) {
                       {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500">{t('dashboard.passwordMinLength')}</p>
+                  <p className="text-xs text-gray-500">{t('auth.passwordMinLength')}</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-new-password">{t('dashboard.confirmNewPassword')}</Label>
+                  <Label htmlFor="confirm-new-password">{t('auth.confirmNewPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirm-new-password"
