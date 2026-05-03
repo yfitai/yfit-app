@@ -686,7 +686,7 @@ export default function Dashboard({ user }) {
                   }}
                   disabled={isChangingPassword}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </div>
             </form>
