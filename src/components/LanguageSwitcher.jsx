@@ -43,30 +43,11 @@ export default function LanguageSwitcher({ updateProfile = null, compact = false
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Change language"
         aria-expanded={isOpen}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          padding: "6px 10px",
-          borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.15)",
-          background: "rgba(255,255,255,0.08)",
-          color: "inherit",
-          cursor: "pointer",
-          fontSize: "13px",
-          fontWeight: 500,
-          transition: "background 0.15s",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+        className="flex flex-col items-center justify-center px-1 py-1 sm:px-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-all"
+        title="Change language"
       >
-        <span style={{ fontSize: "16px" }}>{currentLang.flag}</span>
-        {!compact && (
-          <span style={{ display: "none", "@media (min-width: 640px)": { display: "inline" } }}>
-            {currentLang.nativeName}
-          </span>
-        )}
-        <span style={{ fontSize: "10px", opacity: 0.6 }}>▼</span>
+        <span style={{ fontSize: "16px", lineHeight: 1 }}>{currentLang.flag}</span>
+        <span className="text-[10px] mt-0.5">Lang</span>
       </button>
 
       {/* Dropdown */}
@@ -77,10 +58,10 @@ export default function LanguageSwitcher({ updateProfile = null, compact = false
             right: 0,
             top: "calc(100% + 4px)",
             width: "180px",
-            background: "var(--bg-card, #1e1e2e)",
-            border: "1px solid rgba(255,255,255,0.12)",
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
             borderRadius: "12px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
             zIndex: 9999,
             overflow: "hidden",
             padding: "4px 0",
@@ -102,9 +83,9 @@ export default function LanguageSwitcher({ updateProfile = null, compact = false
                 padding: "9px 14px",
                 background:
                   lang.code === i18n.language
-                    ? "rgba(99,102,241,0.2)"
+                    ? "rgba(59,130,246,0.1)"
                     : "transparent",
-                color: lang.code === i18n.language ? "#818cf8" : "inherit",
+                color: lang.code === i18n.language ? "#2563eb" : "#374151",
                 border: "none",
                 cursor: "pointer",
                 fontSize: "13px",
@@ -114,7 +95,7 @@ export default function LanguageSwitcher({ updateProfile = null, compact = false
               }}
               onMouseEnter={(e) => {
                 if (lang.code !== i18n.language)
-                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.background = "#f3f4f6";
               }}
               onMouseLeave={(e) => {
                 if (lang.code !== i18n.language)

@@ -28,14 +28,15 @@ export default function Navigation({ user }) {
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-40">
       <div className="w-full px-2 sm:px-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between py-2 sm:h-16">
+        {/* Top bar: Logo + Language switcher + Sign out (always visible) */}
+        <div className="flex items-center justify-between h-12 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center flex-shrink-0 mb-2 sm:mb-0">
+          <div className="flex items-center flex-shrink-0">
             <img src="./assets/yfit-logo.png" alt="YFIT AI" className="h-8 sm:h-10" />
           </div>
 
-          {/* Navigation Links - 2 rows on mobile, 1 row on desktop */}
-          <div className="grid grid-cols-5 sm:flex sm:flex-row gap-1 w-full sm:w-auto sm:flex-1 sm:mx-2">
+          {/* Desktop nav links (hidden on mobile) */}
+          <div className="hidden sm:flex sm:flex-row gap-1 flex-1 mx-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -55,9 +56,9 @@ export default function Navigation({ user }) {
             ))}
           </div>
 
-          {/* Right side: Language switcher + Sign out */}
-          <div className="flex items-center gap-2 flex-shrink-0 mt-2 sm:mt-0">
-            <LanguageSwitcher compact={true} className="text-gray-600" />
+          {/* Right side: Language switcher + Sign out (always visible) */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <LanguageSwitcher compact={true} className="text-gray-700" />
             {user && (
               <button
                 onClick={handleSignOut}
@@ -65,10 +66,31 @@ export default function Navigation({ user }) {
                 title={t('nav.signOut')}
               >
                 <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-[10px] sm:text-xs mt-0.5">{t('nav.signOut')}</span>
+                <span className="text-[10px] sm:text-xs mt-0.5 hidden sm:block">{t('nav.signOut')}</span>
               </button>
             )}
           </div>
+        </div>
+
+        {/* Mobile nav links (2 rows of 5, shown below top bar on mobile only) */}
+        <div className="grid grid-cols-5 gap-1 pb-2 sm:hidden">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center px-1 py-1 rounded-lg transition-all whitespace-nowrap ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
+              <item.icon className="w-4 h-4" />
+              <span className="text-[10px] mt-0.5">{item.label}</span>
+            </NavLink>
+          ))}
         </div>
       </div>
     </nav>
