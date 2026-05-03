@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { supabase } from '../lib/supabase';
@@ -10,6 +11,7 @@ import {
 
 export default function PredictionsUnified({ user }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { unitSystem } = useUnitPreference();
   const { isPro, isTrialing, trialDaysRemaining } = useSubscription();
   // Read glucose unit preference from localStorage (set in DailyTracker)
@@ -1334,7 +1336,7 @@ export default function PredictionsUnified({ user }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading predictions...</p>
+          <p className="mt-4 text-gray-600">{t('predictions.loadingPredictions')}</p>
         </div>
       </div>
     );
@@ -1352,10 +1354,10 @@ export default function PredictionsUnified({ user }) {
             onClick={fetchAllData}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
-            title="Refresh predictions with latest data"
+            title={t('predictions.refresh')}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('predictions.refresh')}
           </button>
         </div>
 
@@ -1391,16 +1393,16 @@ export default function PredictionsUnified({ user }) {
               <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-6 text-white">
                 <div className="flex items-center gap-3 mb-3">
                   <Award className="w-7 h-7" />
-                  <h3 className="text-xl font-bold">Last Week Recap 🎉</h3>
+                  <h3 className="text-xl font-bold">{t('predictions.lastWeekRecap')} 🎉</h3>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-3xl font-bold">{lastWeekWorkouts.length}</div>
-                    <div className="text-sm opacity-90">Workouts</div>
+                    <div className="text-sm opacity-90">{t('nav.fitness')}</div>
                   </div>
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-3xl font-bold">{avgCals > 0 ? avgCals.toLocaleString() : '—'}</div>
-                    <div className="text-sm opacity-90">Avg Cal/Day</div>
+                    <div className="text-sm opacity-90">{t('predictions.avgCalories')}/{t('common.day')}</div>
                   </div>
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-3xl font-bold">{lastWeekWorkouts.length >= 4 ? '🔥' : lastWeekWorkouts.length >= 2 ? '👍' : '💪'}</div>
@@ -1417,7 +1419,7 @@ export default function PredictionsUnified({ user }) {
               <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 mb-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Weekly Reset Day — Finish Strong!</h3>
+                  <h3 className="text-lg font-bold">{t('predictions.weeklyResetDay')}</h3>
                 </div>
                 <p className="text-sm opacity-90 mb-4">Predictions reset each Sunday. Log a workout today to close out the week strong — it counts toward your streak and weekly total!</p>
                 <div className="flex flex-wrap gap-3">
@@ -1426,14 +1428,14 @@ export default function PredictionsUnified({ user }) {
                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
                   >
                     <Dumbbell className="w-4 h-4" />
-                    Log Today's Workout
+                    {t('predictions.logTodaysWorkout')}
                   </button>
                   <button
                     onClick={() => navigate('/nutrition')}
                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
                   >
                     <Apple className="w-4 h-4" />
-                    Log a Meal
+                    {t('predictions.logAMeal')}
                   </button>
                 </div>
               </div>
@@ -1448,17 +1450,17 @@ export default function PredictionsUnified({ user }) {
           {!isPro && (
             <div className="absolute inset-0 z-10 backdrop-blur-md bg-white/30 rounded-xl flex flex-col items-center justify-center text-center p-8" style={{minHeight: '400px'}}>
               <Brain className="w-16 h-16 text-purple-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Predictions — Pro Feature</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('predictions.aiPredictionsProFeature')}</h2>
               <p className="text-gray-600 max-w-sm mb-6">
-                Your 30-day free trial has ended. Upgrade to Pro to unlock your full health forecasts.
+                {t('predictions.trialEnded')}
               </p>
               <button
                 onClick={() => navigate('/subscription')}
                 className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity shadow-lg"
               >
-                Upgrade to Pro — $12.99/mo
+                {t('predictions.upgradePro')}
               </button>
-              <p className="text-sm text-gray-500 mt-3">First month FREE · Cancel anytime</p>
+              <p className="text-sm text-gray-500 mt-3">{t('predictions.firstMonthFree')}</p>
             </div>
           )}
 
@@ -1486,28 +1488,28 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <Scale className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Weight Loss Prediction</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.weightLossPrediction')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Weight</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.currentWeight')}</div>
                 <div className="text-3xl font-bold">{predictions.weightLoss.currentWeight} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Goal Weight</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.goalWeight')}</div>
                 <div className="text-3xl font-bold">{predictions.weightLoss.goalWeight} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Weekly Change</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.weeklyChange')}</div>
                 <div className="text-3xl font-bold flex items-center">
                   {predictions.weightLoss.weeklyChange > 0 ? <TrendingUp className="w-6 h-6 mr-1" /> : <TrendingDown className="w-6 h-6 mr-1" />}
                   {Math.abs(predictions.weightLoss.weeklyChange)} lbs
                 </div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Estimated Goal Date</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.estimatedGoalDate')}</div>
                 <div className="text-2xl font-bold">{predictions.weightLoss.goalDate}</div>
-                <div className="text-sm opacity-75">{predictions.weightLoss.weeksToGoal} weeks</div>
+                <div className="text-sm opacity-75">{predictions.weightLoss.weeksToGoal} {t('predictions.weeks')}</div>
               </div>
             </div>
             {predictions.weightLoss.isLowDataWarning && (
@@ -1516,14 +1518,14 @@ export default function PredictionsUnified({ user }) {
               </div>
             )}
             <div className="bg-white/10 rounded-lg p-3 text-sm">
-              <strong>Confidence:</strong> {predictions.weightLoss.confidence}% • 
-              <strong className="ml-2">Trend:</strong> {predictions.weightLoss.trend}
+              <strong>{t('predictions.confidence')}:</strong> {predictions.weightLoss.confidence}% • 
+              <strong className="ml-2">{t('predictions.trend')}:</strong> {predictions.weightLoss.trend}
             </div>
           </div>
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Scale className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Weight Loss Prediction</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.weightLossPrediction')}</h3>
             <p className="text-teal-700">Log weight on 2+ different days to see predictions</p>
           </div>
         )}
@@ -1533,17 +1535,17 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <Flame className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Calorie Needs (TDEE)</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.calorieNeedsTDEE')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Your TDEE</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.yourTDEE')}</div>
                 <div className="text-4xl font-bold">{predictions.tdee.tdee}</div>
-                <div className="text-sm opacity-75">calories/day</div>
+                <div className="text-sm opacity-75">{t('predictions.caloriesDay')}</div>
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">
-                  {predictions.tdee.todayCalories > 0 ? "Today's Intake" : "Avg Daily Intake"}
+                  {predictions.tdee.todayCalories > 0 ? t('predictions.todaysIntake') : t('predictions.avgDailyIntake')}
                 </div>
                 <div className="text-4xl font-bold">
                   {predictions.tdee.todayCalories > 0 ? predictions.tdee.todayCalories : predictions.tdee.avgCalories}
@@ -1555,24 +1557,24 @@ export default function PredictionsUnified({ user }) {
                 </div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Activity Level</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.activityLevel')}</div>
                 <div className="text-2xl font-bold capitalize">{predictions.tdee.activityLevel}</div>
                 <div className="text-sm opacity-75">{predictions.tdee.workoutsPerWeek}x/week</div>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/10 rounded-lg p-3">
-                <div className="font-semibold mb-2">Weight Loss</div>
+                <div className="font-semibold mb-2">{t('predictions.weightLoss')}</div>
                 <div className="text-sm">Mild: {predictions.tdee.deficit.mild} cal</div>
                 <div className="text-sm">Moderate: {predictions.tdee.deficit.moderate} cal</div>
                 <div className="text-sm">Aggressive: {predictions.tdee.deficit.aggressive} cal</div>
               </div>
               <div className="bg-white/10 rounded-lg p-3">
-                <div className="font-semibold mb-2">Maintenance</div>
+                <div className="font-semibold mb-2">{t('predictions.maintenance')}</div>
                 <div className="text-sm">{predictions.tdee.maintenanceRange.min} - {predictions.tdee.maintenanceRange.max} cal</div>
               </div>
               <div className="bg-white/10 rounded-lg p-3">
-                <div className="font-semibold mb-2">Muscle Gain</div>
+                <div className="font-semibold mb-2">{t('predictions.muscleGain')}</div>
                 <div className="text-sm">Lean: {predictions.tdee.surplus.lean} cal</div>
                 <div className="text-sm">Bulk: {predictions.tdee.surplus.bulk} cal</div>
               </div>
@@ -1581,7 +1583,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Flame className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Calorie Needs (TDEE)</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.calorieNeedsTDEE')}</h3>
             <p className="text-teal-700">Log 7+ days of weight and nutrition to calculate TDEE</p>
           </div>
         )}
@@ -1595,28 +1597,28 @@ export default function PredictionsUnified({ user }) {
           } rounded-lg p-6 text-white mb-6`}>
             <div className="flex items-center mb-4">
               <AlertTriangle className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Injury Risk Assessment</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.injuryRiskAssessment')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Risk Level</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.riskLevel')}</div>
                 <div className="text-4xl font-bold capitalize">{predictions.injuryRisk.riskLevel}</div>
                 <div className="text-sm opacity-75">Score: {predictions.injuryRisk.riskScore}/100</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Volume Change</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.volumeChange')}</div>
                 <div className="text-4xl font-bold">{predictions.injuryRisk.volumeIncrease > 0 ? '+' : ''}{predictions.injuryRisk.volumeIncrease}%</div>
-                <div className="text-sm opacity-75">Last 7 days vs previous</div>
+                <div className="text-sm opacity-75">{t('common.last7Days', 'Last 7 days vs previous')}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Training Frequency</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.trainingFrequency')}</div>
                 <div className="text-4xl font-bold">{predictions.injuryRisk.frequency}x</div>
-                <div className="text-sm opacity-75">per week</div>
+                <div className="text-sm opacity-75">{t('predictions.perWeek')}</div>
               </div>
             </div>
             {predictions.injuryRisk.riskFactors.length > 0 && (
               <div className="bg-white/10 rounded-lg p-4 mb-4">
-                <div className="font-semibold mb-2">Risk Factors:</div>
+                <div className="font-semibold mb-2">{t('predictions.riskFactors')}:</div>
                 <ul className="space-y-1 text-sm">
                   {predictions.injuryRisk.riskFactors.map((factor, i) => (
                     <li key={i}>• {factor}</li>
@@ -1625,9 +1627,9 @@ export default function PredictionsUnified({ user }) {
               </div>
             )}
             <div className="bg-white/10 rounded-lg p-4">
-              <div className="font-semibold mb-2">Recommendations:</div>
-              <ul className="space-y-1 text-sm">
-                {predictions.injuryRisk.recommendations.map((rec, i) => (
+                <div className="font-semibold mb-2">{t('predictions.recommendations')}:</div>
+                <ul className="space-y-1 text-sm">
+                  {predictions.injuryRisk.recommendations.map((rec, i) => (
                   <li key={i}>• {rec}</li>
                 ))}
               </ul>
@@ -1636,7 +1638,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <AlertTriangle className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Injury Risk Assessment</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.injuryRiskAssessment')}</h3>
             <p className="text-teal-700">Log 3+ strength workouts to assess injury risk</p>
           </div>
         )}
@@ -1648,7 +1650,7 @@ export default function PredictionsUnified({ user }) {
           } rounded-lg p-6 text-white mb-6`}>
             <div className="flex items-center mb-4">
               <Activity className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Deload Week Predictor</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.deloadWeekPredictor')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
@@ -1656,25 +1658,25 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-3xl font-bold">{predictions.deloadWeek.needsDeload ? '⚠️ Deload Needed' : '✅ On Track'}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Fatigue Score</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.fatigueScore')}</div>
                 <div className="text-4xl font-bold">{predictions.deloadWeek.fatigueScore}</div>
                 <div className="text-sm opacity-75">avg sets/week</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Recommended Timing</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.recommendedTiming')}</div>
                 <div className="text-2xl font-bold">{predictions.deloadWeek.recommendedTiming}</div>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="font-semibold mb-2">Deload Protocol:</div>
+                <div className="font-semibold mb-2">{t('predictions.deloadProtocol')}:</div>
                 <div className="text-sm">Volume: Reduce by {predictions.deloadWeek.deloadProtocol.volumeReduction}</div>
                 <div className="text-sm">Intensity: Reduce by {predictions.deloadWeek.deloadProtocol.intensityReduction}</div>
                 <div className="text-sm">Duration: {predictions.deloadWeek.deloadProtocol.duration}</div>
                 <div className="text-sm mt-2 italic">{predictions.deloadWeek.deloadProtocol.focus}</div>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="font-semibold mb-2">Benefits:</div>
+                <div className="font-semibold mb-2">{t('predictions.benefits')}:</div>
                 <ul className="space-y-1 text-sm">
                   {predictions.deloadWeek.benefits.map((benefit, i) => (
                     <li key={i}>• {benefit}</li>
@@ -1689,7 +1691,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Deload Week Predictor</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.deloadWeekPredictor')}</h3>
             <p className="text-teal-700">Log 8+ workouts across 3+ weeks to predict deload timing</p>
           </div>
         )}
@@ -1704,27 +1706,27 @@ export default function PredictionsUnified({ user }) {
           } rounded-lg p-6 text-white mb-6`}>
             <div className="flex items-center mb-4">
               <Pill className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Medication Adherence</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.medicationAdherence')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Adherence Rate</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.adherenceRate')}</div>
                 <div className="text-4xl font-bold">{predictions.medicationAdherence.adherenceRate}%</div>
                 <div className="text-sm opacity-75 capitalize">{predictions.medicationAdherence.status}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Doses Taken</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.dosesTaken')}</div>
                 <div className="text-4xl font-bold">{predictions.medicationAdherence.taken}/{predictions.medicationAdherence.total}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Worst Day</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.worstDay')}</div>
                 <div className="text-2xl font-bold">{predictions.medicationAdherence.worstDay.day}</div>
                 <div className="text-sm opacity-75">{predictions.medicationAdherence.worstDay.rate}% adherence</div>
               </div>
             </div>
             {predictions.medicationAdherence.recommendations.length > 0 && (
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="font-semibold mb-2">Recommendations:</div>
+                <div className="font-semibold mb-2">{t('predictions.recommendations')}:</div>
                 <ul className="space-y-1 text-sm">
                   {predictions.medicationAdherence.recommendations.map((rec, i) => (
                     <li key={i}>• {rec}</li>
@@ -1736,7 +1738,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Pill className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Medication Adherence</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.medicationAdherence')}</h3>
             <p className="text-teal-700">Log 14+ medication doses to analyze adherence</p>
           </div>
         )}
@@ -1746,11 +1748,11 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <Apple className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Nutrition Pattern Analysis</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.nutritionPatternAnalysis')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Avg Calories</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.avgCalories')}</div>
                 <div className="text-3xl font-bold">{predictions.nutritionPatterns.avgMacros.calories}</div>
               </div>
               <div>
@@ -1770,13 +1772,13 @@ export default function PredictionsUnified({ user }) {
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 mb-4">
-              <div className="font-semibold mb-2">Day-to-Day Consistency: {predictions.nutritionPatterns.consistency}%</div>
-              <div className="text-sm">Highest: {predictions.nutritionPatterns.highestDay.day} ({predictions.nutritionPatterns.highestDay.calories} cal)</div>
-              <div className="text-sm">Lowest: {predictions.nutritionPatterns.lowestDay.day} ({predictions.nutritionPatterns.lowestDay.calories} cal)</div>
+              <div className="font-semibold mb-2">{t('predictions.consistency')}: {predictions.nutritionPatterns.consistency}%</div>
+              <div className="text-sm">{t('predictions.highest')}: {predictions.nutritionPatterns.highestDay.day} ({predictions.nutritionPatterns.highestDay.calories} cal)</div>
+              <div className="text-sm">{t('predictions.lowest')}: {predictions.nutritionPatterns.lowestDay.day} ({predictions.nutritionPatterns.lowestDay.calories} cal)</div>
             </div>
             {predictions.nutritionPatterns.insights.length > 0 && (
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="font-semibold mb-2">Insights:</div>
+                <div className="font-semibold mb-2">{t('predictions.insights')}:</div>
                 <ul className="space-y-1 text-sm">
                   {predictions.nutritionPatterns.insights.map((insight, i) => (
                     <li key={i}>• {insight}</li>
@@ -1788,7 +1790,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Apple className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Nutrition Pattern Analysis</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.nutritionPatternAnalysis')}</h3>
             <p className="text-teal-700">Log 7+ days of nutrition to analyze patterns</p>
           </div>
         )}
@@ -1800,34 +1802,34 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <Clock className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">⏰ Optimal Training Time</h2>
+              <h2 className="text-2xl font-semibold">⏰ {t('predictions.optimalTrainingTime')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Best Time</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.bestTime')}</div>
                 <div className="text-3xl font-bold">{predictions.optimalTime.bestTime}</div>
                 <div className="text-sm opacity-75">Avg volume: {predictions.optimalTime.bestAvgVolume}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Worst Time</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.worstTime')}</div>
                 <div className="text-2xl font-bold">{predictions.optimalTime.worstTime}</div>
                 <div className="text-sm opacity-75">Avg volume: {predictions.optimalTime.worstAvgVolume}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Performance Difference</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.performanceDiff')}</div>
                 <div className="text-3xl font-bold">{predictions.optimalTime.performanceDiff}%</div>
-                <div className="text-sm opacity-75">better at peak time</div>
+                <div className="text-sm opacity-75">{t('predictions.betterAtPeakTime')}</div>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4">
-              <div className="font-semibold mb-2">Recommendation:</div>
+                <div className="font-semibold mb-2">{t('predictions.recommendation')}:</div>
               <p>{predictions.optimalTime.recommendation}</p>
             </div>
           </div>
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Clock className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Optimal Training Time</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.optimalTrainingTime')}</h3>
             <p className="text-teal-700">Log 10+ workouts at different times to find your peak performance window</p>
           </div>
         )}
@@ -1837,23 +1839,23 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <TrendingUp className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">💪 Body Recomposition Forecast</h2>
+              <h2 className="text-2xl font-semibold">💪 {t('predictions.bodyRecompForecast')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Weight</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.currentWeight')}</div>
                 <div className="text-3xl font-bold">{predictions.bodyRecomp.currentWeight} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">12-Week Projection</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.twelveWeekProjection')}</div>
                 <div className="text-3xl font-bold">{predictions.bodyRecomp.projectedWeight} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Est. Muscle Gain</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.estMuscleGain')}</div>
                 <div className="text-3xl font-bold text-green-200">+{predictions.bodyRecomp.estimatedMuscleGain} lbs</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Est. Fat Loss</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.estFatLoss')}</div>
                 <div className="text-3xl font-bold text-red-200">-{predictions.bodyRecomp.estimatedFatLoss} lbs</div>
               </div>
             </div>
@@ -1864,20 +1866,20 @@ export default function PredictionsUnified({ user }) {
                   <div className="text-xl font-bold">{predictions.bodyRecomp.isRecomping ? '🔥 Recomping' : 'Standard Progress'}</div>
                 </div>
                 <div>
-                  <div className="text-sm opacity-90">Volume Trend</div>
+                  <div className="text-sm opacity-90">{t('predictions.volumeTrend')}</div>
                   <div className="text-xl font-bold capitalize">{predictions.bodyRecomp.volumeTrend}</div>
                 </div>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4">
-              <div className="font-semibold mb-2">Recommendation:</div>
+                <div className="font-semibold mb-2">{t('predictions.recommendation')}:</div>
               <p>{predictions.bodyRecomp.recommendation}</p>
             </div>
           </div>
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Body Recomposition Forecast</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.bodyRecompForecast')}</h3>
             <p className="text-teal-700">Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition</p>
           </div>
         )}
@@ -1887,37 +1889,37 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-pink-600 to-rose-600 rounded-lg p-6 text-white mb-6">
             <div className="flex items-center mb-4">
               <Flame className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">🔥 Habit Streak Predictions</h2>
+              <h2 className="text-2xl font-semibold">🔥 {t('predictions.habitStreakPredictions')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Streak</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.currentStreak')}</div>
                 <div className="text-4xl font-bold">{predictions.habitStreak.currentStreak}</div>
                 <div className="text-sm opacity-75">days</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Longest Streak</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.longestStreak')}</div>
                 <div className="text-4xl font-bold">{predictions.habitStreak.longestStreak}</div>
                 <div className="text-sm opacity-75">days</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Consistency Rate</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.consistencyRate')}</div>
                 <div className="text-4xl font-bold">{predictions.habitStreak.consistencyRate}%</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Streak Probability</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.streakProbability')}</div>
                 <div className="text-4xl font-bold">{predictions.habitStreak.streakProbability}%</div>
-                <div className="text-sm opacity-75">next 7 days</div>
+                <div className="text-sm opacity-75">{t('common.next7Days', 'next 7 days')}</div>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm opacity-90">Total Workouts</div>
+                  <div className="text-sm opacity-90">{t('predictions.totalWorkouts')}</div>
                   <div className="text-2xl font-bold">{predictions.habitStreak.totalWorkouts}</div>
                 </div>
                 <div>
-                  <div className="text-sm opacity-90">Avg Per Week</div>
+                  <div className="text-sm opacity-90">{t('predictions.avgPerWeek')}</div>
                   <div className="text-2xl font-bold">{predictions.habitStreak.avgWorkoutsPerWeek}x</div>
                 </div>
               </div>
@@ -1930,7 +1932,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Flame className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Habit Streak Predictions</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.habitStreakPredictions')}</h3>
             <p className="text-teal-700">Building this week's data — log workouts to see streak predictions</p>
           </div>
         )}
@@ -1945,21 +1947,21 @@ export default function PredictionsUnified({ user }) {
           } rounded-lg p-6 text-white mb-6`}>
             <div className="flex items-center mb-4">
               <Activity className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Blood Pressure Goal Tracking</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.bpGoalTracking')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Average</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.currentAverage')}</div>
                 <div className="text-4xl font-bold">{predictions.bpGoal.avgSystolic}/{predictions.bpGoal.avgDiastolic}</div>
                 <div className="text-sm opacity-75">mmHg</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Status</div>
-                <div className="text-4xl font-bold capitalize">{predictions.bpGoal.status}</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.status')}</div>
+                <div className="text-4xl font-bold capitalize">{predictions.deload.status}</div>
                 <div className="text-sm opacity-75">Trend: {predictions.bpGoal.trend}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Goal</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.goal')}</div>
                 <div className="text-4xl font-bold">{predictions.bpGoal.goalSystolic}/{predictions.bpGoal.goalDiastolic}</div>
                 <div className="text-sm opacity-75">mmHg (optimal)</div>
               </div>
@@ -1967,24 +1969,24 @@ export default function PredictionsUnified({ user }) {
             <div className="bg-white/10 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm opacity-90">Systolic Change</div>
+                  <div className="text-sm opacity-90">{t('predictions.systolicChange')}</div>
                   <div className="text-2xl font-bold">{predictions.bpGoal.systolicChange > 0 ? '+' : ''}{predictions.bpGoal.systolicChange} mmHg</div>
                 </div>
                 <div>
-                  <div className="text-sm opacity-90">Diastolic Change</div>
+                  <div className="text-sm opacity-90">{t('predictions.diastolicChange')}</div>
                   <div className="text-2xl font-bold">{predictions.bpGoal.diastolicChange > 0 ? '+' : ''}{predictions.bpGoal.diastolicChange} mmHg</div>
                 </div>
               </div>
             </div>
             {predictions.bpGoal.weeksToGoal && (
               <div className="bg-white/10 rounded-lg p-4 mb-4">
-                <div className="font-semibold mb-2">🎯 Estimated Time to Goal</div>
+                <div className="font-semibold mb-2">🎯 {t('predictions.estimatedTimeToGoal')}</div>
                 <div className="text-3xl font-bold">{predictions.bpGoal.weeksToGoal} weeks</div>
                 <div className="text-sm opacity-75 mt-1">Based on current improvement rate</div>
               </div>
             )}
             <div className="bg-white/10 rounded-lg p-4">
-              <div className="font-semibold mb-2">💡 Recommendation</div>
+                <div className="font-semibold mb-2">💡 {t('predictions.recommendation')}</div>
               <p>{predictions.bpGoal.recommendation}</p>
               <div className="text-sm opacity-75 mt-2">Based on {predictions.bpGoal.logsCount} BP readings</div>
             </div>
@@ -1992,7 +1994,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Blood Pressure Goal Tracking</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.bpGoalTracking')}</h3>
             <p className="text-teal-700">Log 7+ blood pressure readings in Daily Tracker to track progress</p>
           </div>
         )}
@@ -2007,11 +2009,11 @@ export default function PredictionsUnified({ user }) {
           } rounded-lg p-6 text-white mb-6`}>
             <div className="flex items-center mb-4">
               <TrendingUp className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-semibold">Blood Glucose Goal Tracking</h2>
+              <h2 className="text-2xl font-semibold">{t('predictions.glucoseGoalTracking')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
               <div>
-                <div className="text-sm opacity-90 mb-1">Current Average</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.currentAverage')}</div>
                 <div className="text-4xl font-bold">
                   {glucoseUnit === 'mmol/l'
                     ? (predictions.glucoseGoal.avgGlucose / 18.0182).toFixed(1)
@@ -2020,20 +2022,20 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-sm opacity-75">{glucoseUnit === 'mmol/l' ? 'mmol/L' : 'mg/dL'}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Status</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.status')}</div>
                 <div className="text-4xl font-bold capitalize">{predictions.glucoseGoal.status}</div>
                 <div className="text-sm opacity-75">Trend: {predictions.glucoseGoal.trend}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Estimated A1C</div>
+                <div className="text-sm opacity-90 mb-1">{t('predictions.estimatedA1C')}</div>
                 <div className="text-4xl font-bold">{predictions.glucoseGoal.estimatedA1C}%</div>
-                <div className="text-sm opacity-75">Based on avg glucose</div>
+                <div className="text-sm opacity-75 mt-1">{t('predictions.basedOnAvgGlucose')}</div>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm opacity-90">Recent Change</div>
+                  <div className="text-sm opacity-90">{t('predictions.recentChange')}</div>
                   <div className="text-2xl font-bold">
                     {predictions.glucoseGoal.glucoseChange > 0 ? '+' : ''}
                     {glucoseUnit === 'mmol/l'
@@ -2043,7 +2045,7 @@ export default function PredictionsUnified({ user }) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm opacity-90">Goal</div>
+                  <div className="text-sm opacity-90">{t('predictions.goal')}</div>
                   <div className="text-2xl font-bold">
                     &lt;{glucoseUnit === 'mmol/l'
                       ? (predictions.glucoseGoal.goal / 18.0182).toFixed(1)
@@ -2055,13 +2057,13 @@ export default function PredictionsUnified({ user }) {
             </div>
             {predictions.glucoseGoal.weeksToGoal && (
               <div className="bg-white/10 rounded-lg p-4 mb-4">
-                <div className="font-semibold mb-2">🎯 Estimated Time to Goal</div>
+                <div className="font-semibold mb-2">🎯 {t('predictions.estimatedTimeToGoal')}</div>
                 <div className="text-3xl font-bold">{predictions.glucoseGoal.weeksToGoal} weeks</div>
                 <div className="text-sm opacity-75 mt-1">Based on current improvement rate</div>
               </div>
             )}
             <div className="bg-white/10 rounded-lg p-4">
-              <div className="font-semibold mb-2">💡 Recommendation</div>
+                <div className="font-semibold mb-2">💡 {t('predictions.recommendation')}</div>
               <p>{predictions.glucoseGoal.recommendation}</p>
               <div className="text-sm opacity-75 mt-2">Based on {predictions.glucoseGoal.logsCount} glucose readings</div>
             </div>
@@ -2069,7 +2071,7 @@ export default function PredictionsUnified({ user }) {
         ) : (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Blood Glucose Goal Tracking</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.glucoseGoalTracking')}</h3>
             <p className="text-teal-700">Log 7+ blood glucose readings in Daily Tracker to track progress</p>
           </div>
         )}
@@ -2080,9 +2082,9 @@ export default function PredictionsUnified({ user }) {
         {isTrialing ? (
           <div className="bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg p-6 text-center text-white">
             <Brain className="w-12 h-12 mx-auto mb-3 opacity-90" />
-            <h3 className="text-lg font-semibold mb-2">🎉 You're on your free Pro trial</h3>
+            <h3 className="text-lg font-semibold mb-2">🎉 {t('predictions.onFreeTrial')}</h3>
             <p className="opacity-90 mb-1">
-              Full AI Predictions are included during your trial.
+              {t('predictions.fullAIPredictionsIncluded')}
             </p>
             <p className="text-sm opacity-75">
               {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining — upgrade anytime to keep access.
@@ -2091,38 +2093,37 @@ export default function PredictionsUnified({ user }) {
               onClick={() => navigate('/subscription')}
               className="mt-4 px-6 py-2 bg-white text-teal-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
-              View Plans
+              {t('predictions.viewAllPlans')}
             </button>
           </div>
         ) : isPro ? (
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-6 text-center">
             <Brain className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Predictions — Pro Feature</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('predictions.aiPredictionsProFeature')}</h3>
             <p className="text-gray-600">
-              Powered by statistical analysis and machine learning algorithms.
-              Predictions become more accurate as you log more data.
+              {t('predictions.poweredByML')}
             </p>
           </div>
         ) : (
           /* Free tier — upgrade CTA */
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-8 text-center text-white shadow-xl">
             <Brain className="w-14 h-14 mx-auto mb-4 opacity-90" />
-            <h3 className="text-2xl font-bold mb-2">Unlock Full AI Predictions</h3>
+            <h3 className="text-2xl font-bold mb-2">{t('predictions.unlockFullAIPredictions')}</h3>
             <p className="opacity-90 mb-4 max-w-md mx-auto">
-              Your free trial has ended. Upgrade to Pro to see your complete forecasts — weight loss timeline, injury risk, habit streaks, and more.
+              {t('predictions.trialEndedUpgrade')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => navigate('/subscription')}
                 className="px-8 py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-md"
               >
-                Upgrade to Pro — $12.99/mo
+                {t('predictions.upgradePro')}
               </button>
               <button
                 onClick={() => navigate('/subscription')}
                 className="px-8 py-3 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-colors border border-white/40"
               >
-                View All Plans
+                {t('predictions.viewAllPlans')}
               </button>
             </div>
             <p className="text-sm opacity-75 mt-3">First month FREE · Cancel anytime · No hidden fees</p>
