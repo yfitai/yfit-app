@@ -59,7 +59,7 @@ export default function AICoach({ userId }) {
         // Add welcome message
         const welcomeMessage = {
           role: 'assistant',
-          content: "Hi there! I'm your YFIT AI Coach. I'm here to help you with your fitness and nutrition questions. How can I assist you today?"
+          content: t('aiCoach.welcomeMessage')
         }
         setMessages([welcomeMessage])
       }
@@ -325,7 +325,7 @@ export default function AICoach({ userId }) {
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            The AI Coach provides general information and is not a substitute for professional medical advice.
+            {t('aiCoach.disclaimer')}
           </p>
         </div>
       </div>

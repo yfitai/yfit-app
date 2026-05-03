@@ -242,7 +242,7 @@ export default function Nutrition({ user: propUser }) {
             {/* Progress Bar */}
             <div className="mt-4">
               <div className="flex justify-between text-sm text-blue-100 mb-2">
-                <span>Progress</span>
+                <span>{t('nav.progress')}</span>
                 <span>{Math.round(percentConsumed)}%</span>
               </div>
               <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">

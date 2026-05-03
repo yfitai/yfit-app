@@ -43,26 +43,26 @@ export default function Dashboard({ user }) {
 
   // Motivational quotes database
   const morningQuotes = [
-    "Every morning is a new opportunity to become stronger!",
-    "Today is your day to shine and make healthy choices!",
-    "Rise and shine! Your body will thank you for the effort!",
-    "Start your day with intention and watch your health transform!",
-    "Good morning! Small steps today lead to big changes tomorrow!"
+    t('dashboard.motivationalMorning1'),
+    t('dashboard.motivationalMorning2'),
+    t('dashboard.motivationalMorning3'),
+    t('dashboard.motivationalMorning4'),
+    t('dashboard.motivationalMorning5')
   ]
 
   const eveningQuotes = [
-    "Great job today! Every healthy choice counts!",
-    "You're making progress! Keep up the amazing work!",
-    "End your day knowing you're one step closer to your goals!",
-    "Reflect on today's wins and prepare for tomorrow's success!",
-    "You showed up today, and that's what matters most!"
+    t('dashboard.motivationalEvening1'),
+    t('dashboard.motivationalEvening2'),
+    t('dashboard.motivationalEvening3'),
+    t('dashboard.motivationalEvening4'),
+    t('dashboard.motivationalEvening5')
   ]
 
   const didYouKnowFacts = [
-    "Did you know? Drinking water before meals can help with weight management!",
-    "Did you know? Just 30 minutes of daily exercise can significantly improve your mood!",
-    "Did you know? Getting 7-9 hours of sleep is crucial for muscle recovery!",
-    "Did you know? Protein helps build and repair muscles after workouts!",
+    t('dashboard.didYouKnow1'),
+    t('dashboard.didYouKnow2'),
+    t('dashboard.didYouKnow3'),
+    t('dashboard.didYouKnow4'),
     "Did you know? Consistency is more important than perfection in fitness!"
   ]
 
@@ -271,12 +271,12 @@ export default function Dashboard({ user }) {
     
     // Validation
     if (newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters')
+      setPasswordError(t('auth.passwordMinLength'))
       return
     }
     
     if (newPassword !== confirmNewPassword) {
-      setPasswordError('New passwords do not match')
+      setPasswordError(t('auth.passwordNoMatch'))
       return
     }
     
@@ -289,7 +289,7 @@ export default function Dashboard({ user }) {
     })
     
     if (signInError) {
-      setPasswordError('Current password is incorrect')
+      setPasswordError(t('auth.passwordIncorrect'))
       setIsChangingPassword(false)
       return
     }
@@ -411,7 +411,7 @@ export default function Dashboard({ user }) {
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{workoutsThisWeek}</div>
               <p className="text-xs text-teal-600">
-                {new Date().getDay() === 0 ? 'New week — reset today' : 'This week'}
+                {new Date().getDay() === 0 ? t('dashboard.newWeekReset') : t('dashboard.thisWeek')}
               </p>
             </CardContent>
           </Card>
@@ -427,7 +427,7 @@ export default function Dashboard({ user }) {
               </div>
               <p className="text-xs text-teal-600">
                 {streakDays !== null
-                  ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
+                  ? streakDays >= 7 ? t('dashboard.streakOnFire') : streakDays >= 3 ? t('dashboard.streakKeepItUp') : streakDays > 0 ? t('dashboard.streakGoodStart') : t('dashboard.streakLogToday')
                   : t('common.loading')
                 }
               </p>
@@ -440,7 +440,7 @@ export default function Dashboard({ user }) {
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6" />
-              <h3 className="text-lg font-bold">Last Week Summary 📊</h3>
+              <h3 className="text-lg font-bold">{t('dashboard.lastWeekSummary')}</h3>
             </div>
             {lastWeekWorkouts === 0 && (lastWeekStreak === null || lastWeekStreak === 0) ? (
               // First full week — no prior week data yet
@@ -465,7 +465,7 @@ export default function Dashboard({ user }) {
                       {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
                     </div>
                     <div className="text-sm opacity-90">
-                      {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
+                      {lastWeekWorkouts >= 5 ? t('dashboard.lastWeekOnFire') : lastWeekWorkouts >= 3 ? t('dashboard.lastWeekSolid') : lastWeekWorkouts >= 1 ? t('dashboard.streakGoodStart') : t('dashboard.lastWeekRestWeek')}
                     </div>
                   </div>
                 </div>
@@ -481,8 +481,8 @@ export default function Dashboard({ user }) {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Get started with your health journey</CardDescription>
+            <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+            <CardDescription>{t('dashboard.getStartedHealth')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -589,7 +589,7 @@ export default function Dashboard({ user }) {
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
+                  <Label htmlFor="current-password">{t('auth.currentPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="current-password"
@@ -614,7 +614,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
+                  <Label htmlFor="new-password">{t('auth.newPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -641,7 +641,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                  <Label htmlFor="confirm-new-password">{t('auth.confirmNewPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirm-new-password"
@@ -673,7 +673,7 @@ export default function Dashboard({ user }) {
                   className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                   disabled={isChangingPassword}
                 >
-                  {isChangingPassword ? 'Changing...' : t('auth.resetPassword')}
+                  {isChangingPassword ? t('auth.changing') : t('auth.resetPassword')}
                 </Button>
                 <Button 
                   type="button"
