@@ -483,9 +483,9 @@ export default function DailyTracker({ user }) {
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {formData.bp_systolic || '--'}/{formData.bp_diastolic || '--'}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.bpSystolic}/{goals.bpDiastolic}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('dailyTracker.bloodPressureGoal')}: {goals.bpSystolic}/{goals.bpDiastolic}</div>
             <div className="text-xs text-gray-500">
-              {formData.bp_systolic && formData.bp_systolic <= goals.bpSystolic ? '✓ Good' : 'Monitor'}
+              {formData.bp_systolic && formData.bp_systolic <= goals.bpSystolic ? `✓ ${t('dailyTracker.good')}` : t('dailyTracker.monitor')}
             </div>
           </div>
 
@@ -512,9 +512,9 @@ export default function DailyTracker({ user }) {
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {getGlucoseDisplayValue() || '--'}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {getGlucoseGoalDisplay()} {glucoseUnit}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('dailyTracker.bloodGlucoseGoal')}: {getGlucoseGoalDisplay()} {glucoseUnit}</div>
             <div className="text-xs text-gray-500">
-              {formData.glucose_mg_dl && formData.glucose_mg_dl <= goals.glucose ? '✓ Good' : 'Monitor'}
+              {formData.glucose_mg_dl && formData.glucose_mg_dl <= goals.glucose ? `✓ ${t('dailyTracker.good')}` : t('dailyTracker.monitor')}
             </div>
           </div>
         </div>
@@ -793,7 +793,7 @@ export default function DailyTracker({ user }) {
               onClick={() => setShowMeasurements(!showMeasurements)}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
             >
-              {showMeasurements ? 'Hide' : 'Update Measurements'}
+              {showMeasurements ? t('dailyTracker.hideMeasurements') : t('dailyTracker.updateMeasurements')}
             </button>
           </div>
 
@@ -870,7 +870,7 @@ export default function DailyTracker({ user }) {
 
               {/* Arms */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Arms</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('progress.arms') || 'Arms'}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Biceps ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
