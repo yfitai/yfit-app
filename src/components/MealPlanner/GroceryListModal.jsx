@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { X, Printer, Copy, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function GroceryListModal({ mealPlanItems, weekStart, onClose }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   // Generate grocery list from meal plan items
@@ -155,7 +157,7 @@ export default function GroceryListModal({ mealPlanItems, weekStart, onClose }) 
             onClick={onClose}
             className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>
@@ -241,7 +243,7 @@ export default function GroceryListModal({ mealPlanItems, weekStart, onClose }) 
             onClick={onClose}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            Done
+            {t('common.done')}
           </button>
         </div>
       </div>

@@ -6,8 +6,10 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS } from '@mediapipe/pose';
 import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle, History, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 const FormAnalysisLive = ({ preSelectedExerciseName }) => {
+  const { t } = useTranslation();
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);

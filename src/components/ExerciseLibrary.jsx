@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import { Search, Filter, X, ChevronRight, Dumbbell, Target, Zap, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // List of exercises with implemented form analysis
   const implementedFormAnalysis = [
@@ -56,7 +58,7 @@ const ExerciseLibrary = () => {
     { name: 'Adductors', value: 'adductors' },
     { name: 'Biceps', value: 'biceps' },
     { name: 'Calves', value: 'calves' },
-    { name: 'Chest', value: 'chest' },
+    { name: t('fitness.chest'), value: 'chest' },
     { name: 'Forearms', value: 'forearms' },
     { name: 'Glutes', value: 'glutes' },
     { name: 'Hamstrings', value: 'hamstrings' },
@@ -65,7 +67,7 @@ const ExerciseLibrary = () => {
     { name: 'Middle Back', value: 'middle back' },
     { name: 'Neck', value: 'neck' },
     { name: 'Quads', value: 'quadriceps' },
-    { name: 'Shoulders', value: 'shoulders' },
+    { name: t('fitness.shoulders'), value: 'shoulders' },
     { name: 'Traps', value: 'traps' },
     { name: 'Triceps', value: 'triceps' }
   ];
@@ -76,7 +78,7 @@ const ExerciseLibrary = () => {
     { name: 'Barbell', value: 'barbell' },
     { name: 'Body Weight', value: 'bodyweight' },
     { name: 'Cable', value: 'cable' },
-    { name: 'Dumbbell', value: 'dumbbell' },
+    { name: t('fitness.dumbbell'), value: 'dumbbell' },
     { name: 'Exercise Ball', value: 'exercise_ball' },
     { name: 'EZ Bar', value: 'ez_bar' },
     { name: 'Foam Roller', value: 'foam_roller' },
@@ -204,7 +206,7 @@ const ExerciseLibrary = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading exercises from database...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -215,7 +217,7 @@ const ExerciseLibrary = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Exercise Library</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('fitness.exercises')}</h2>
           <p className="text-gray-600 mt-1">
             {filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''} available
           </p>
@@ -269,7 +271,7 @@ const ExerciseLibrary = () => {
 {/* Body Part Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Body Part
+                  {t('fitness.muscleGroup')}
                 </label>
                 <select
                   value={selectedBodyPart}
@@ -301,7 +303,7 @@ const ExerciseLibrary = () => {
               {/* Difficulty Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Difficulty
+                  {t('goals.activityLevel')}
                 </label>
                 <select
                   value={selectedDifficulty}
@@ -462,7 +464,7 @@ const ExerciseLibrary = () => {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                     <Target className="w-5 h-5 text-blue-600" />
-                    Target Muscles
+                    {t('fitness.muscleGroup')}
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedExercise.target_muscles?.map((muscle, idx) => (
@@ -512,7 +514,7 @@ const ExerciseLibrary = () => {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                     <Zap className="w-5 h-5 text-blue-600" />
-                    Difficulty
+                    {t('goals.activityLevel')}
                   </h4>
                   <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm capitalize">
                     {selectedExercise.difficulty}
@@ -545,4 +547,3 @@ const ExerciseLibrary = () => {
 };
 
 export default ExerciseLibrary;
-

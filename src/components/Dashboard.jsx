@@ -8,10 +8,12 @@ import { supabase, signOut, getUserProfile } from '../lib/supabase'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.jsx'
+import { useTranslation } from 'react-i18next'
 // Logo is loaded from public/assets/yfit-logo.png
 
 export default function Dashboard({ user }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [greeting, setGreeting] = useState('')
@@ -244,11 +246,11 @@ export default function Dashboard({ user }) {
     
     // Set greeting
     if (hour < 12) {
-      setGreeting('Good Morning')
+      setGreeting(t('dashboard.greeting'))
     } else if (hour < 17) {
-      setGreeting('Good Afternoon')
+      setGreeting(t('dashboard.greetingAfternoon'))
     } else {
-      setGreeting('Good Evening')
+      setGreeting(t('dashboard.greetingEvening'))
     }
 
     // Set motivational quote
@@ -303,7 +305,7 @@ export default function Dashboard({ user }) {
       return
     }
     
-    setPasswordSuccess('Password changed successfully!')
+    setPasswordSuccess(t('common.success'))
     setIsChangingPassword(false)
     
     // Clear form and close modal after 2 seconds
@@ -323,7 +325,7 @@ export default function Dashboard({ user }) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -348,7 +350,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <Lock className="h-4 w-4" />
-                <span className="hidden sm:inline">Change Password</span>
+                <span className="hidden sm:inline">{t('auth.resetPassword')}</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -356,7 +358,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <span className="hidden sm:inline">{t('nav.signOut')}</span>
               </Button>
             </div>
           </div>
@@ -381,29 +383,29 @@ export default function Dashboard({ user }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Steps Today</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.steps')}</CardTitle>
               <Activity className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{stepsToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">Goal: {stepsGoal.toLocaleString()} steps</p>
+              <p className="text-xs text-teal-600">{t('goals.goal')}: {stepsGoal.toLocaleString()} {t('dashboard.steps')}</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Calories</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.calories')}</CardTitle>
               <Apple className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{caloriesToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal goal</p>
+              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal {t('goals.goal')}</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Workouts</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('fitness.workout')}</CardTitle>
               <Dumbbell className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
@@ -416,17 +418,17 @@ export default function Dashboard({ user }) {
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Day Streak</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.streakDays')}</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? 'day' : 'days'}` : '--'}
+                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? t('dailyTracker.streakDays').split(' ')[0] : t('dailyTracker.streakDays').split(' ')[0] + 's'}` : '--'}
               </div>
               <p className="text-xs text-teal-600">
                 {streakDays !== null
                   ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
-                  : 'Loading...'
+                  : t('common.loading')
                 }
               </p>
             </CardContent>
@@ -489,7 +491,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm"
               >
                 <Target className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Goals</span>
+                <span>{t('nav.goals')}</span>
               </Button>
 
               <Button 
@@ -497,7 +499,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm"
               >
                 <Apple className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Nutrition</span>
+                <span>{t('nav.nutrition')}</span>
               </Button>
 
               <Button 
@@ -505,7 +507,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-xs sm:text-sm"
               >
                 <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Fitness</span>
+                <span>{t('nav.fitness')}</span>
               </Button>
 
               <Button 
@@ -513,7 +515,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-xs sm:text-sm"
               >
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Daily Tracker</span>
+                <span>{t('nav.dailyTracker')}</span>
               </Button>
 
               <Button 
@@ -521,7 +523,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-xs sm:text-sm"
               >
                 <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Medications</span>
+                <span>{t('nav.medications')}</span>
               </Button>
 
               <Button 
@@ -529,7 +531,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-xs sm:text-sm"
               >
                 <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Progress</span>
+                <span>{t('nav.progress')}</span>
               </Button>
 
               <Button 
@@ -537,7 +539,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-xs sm:text-sm"
               >
                 <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Predictions</span>
+                <span>{t('nav.predictions')}</span>
               </Button>
 
               <Button 
@@ -545,7 +547,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-xs sm:text-sm"
               >
                 <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>AI Coach</span>
+                <span>{t('nav.aiCoach')}</span>
               </Button>
             </div>
           </CardContent>
@@ -561,7 +563,7 @@ export default function Dashboard({ user }) {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Lock className="h-5 w-5" />
-                <span>Change Password</span>
+                <span>{t('auth.resetPassword')}</span>
               </CardTitle>
               <CardDescription>
                 Enter your current password and choose a new one
@@ -671,7 +673,7 @@ export default function Dashboard({ user }) {
                   className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                   disabled={isChangingPassword}
                 >
-                  {isChangingPassword ? 'Changing...' : 'Change Password'}
+                  {isChangingPassword ? 'Changing...' : t('auth.resetPassword')}
                 </Button>
                 <Button 
                   type="button"
@@ -686,7 +688,7 @@ export default function Dashboard({ user }) {
                   }}
                   disabled={isChangingPassword}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </div>
             </form>

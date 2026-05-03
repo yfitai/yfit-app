@@ -1,21 +1,6 @@
-/**
- * UpgradeModal
- * 
- * Soft paywall shown when a free user tries to access a Pro feature.
- * Shows what they are missing, the pricing options, and a CTA to upgrade.
- * 
- * Usage:
- *   <UpgradeModal
- *     isOpen={showUpgrade}
- *     onClose={() => setShowUpgrade(false)}
- *     feature="barcode_scanner"
- *     featureLabel="Barcode Scanner"
- *     featureDescription="Instantly log any food by scanning its barcode with your camera."
- *   />
- */
-
 import { useState } from 'react'
 import { X, Zap, Check, Star, Crown, ArrowRight, Lock } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // Stripe Checkout URLs
 const STRIPE_LINKS = {
@@ -88,6 +73,7 @@ export default function UpgradeModal({
   featureDescription,
   usageInfo = null,  // { used, limit } for rate-limited features
 }) {
+  const { t } = useTranslation()
   const [selectedPlan, setSelectedPlan] = useState('pro_yearly')
 
   if (!isOpen) return null
@@ -120,8 +106,8 @@ export default function UpgradeModal({
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm text-white/80 font-medium">Pro Feature</p>
-              <h2 className="text-xl font-bold">{featureLabel || 'Upgrade to Pro'}</h2>
+              <p className="text-sm text-white/80 font-medium">{t('common.proFeature')}</p>
+              <h2 className="text-xl font-bold">{featureLabel || t('common.upgrade')}</h2>
             </div>
           </div>
 
@@ -211,7 +197,7 @@ export default function UpgradeModal({
             onClick={handleUpgrade}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-base shadow-lg shadow-blue-500/25"
           >
-            Upgrade to Pro
+            {t('common.upgrade')}
             <ArrowRight className="w-5 h-5" />
           </button>
           <p className="text-center text-xs text-gray-400 mt-3">

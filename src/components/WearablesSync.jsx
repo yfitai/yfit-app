@@ -3,8 +3,10 @@ import { Capacitor } from '@capacitor/core'
 import { syncGoogleFitData, initiateGoogleFitAuth } from '../lib/googleFit'
 import { supabase } from '../lib/supabase'
 import './WearablesSync.css'
+import { useTranslation } from 'react-i18next'
 
 const WearablesSync = ({ onDataSynced }) => {
+  const { t } = useTranslation()
   const [platform, setPlatform] = useState(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
@@ -206,7 +208,7 @@ const WearablesSync = ({ onDataSynced }) => {
         <div className="sync-connect">
           <p>Connect your {getPlatformName()} to automatically sync:</p>
           <ul>
-            <li>📊 Daily steps</li>
+            <li>📊 {t('dashboard.steps')}</li>
             <li>❤️ Heart rate</li>
             <li>😴 Sleep hours</li>
           </ul>
@@ -228,7 +230,7 @@ const WearablesSync = ({ onDataSynced }) => {
           {healthData && (
             <div className="health-data-preview">
               <div className="data-item">
-                <span className="data-label">Steps</span>
+                <span className="data-label">{t('dashboard.steps')}</span>
                 <span className="data-value">{healthData.steps?.toLocaleString() || '—'}</span>
               </div>
               <div className="data-item">
@@ -236,7 +238,7 @@ const WearablesSync = ({ onDataSynced }) => {
                 <span className="data-value">{healthData.heartRate ? `${healthData.heartRate} bpm` : '—'}</span>
               </div>
               <div className="data-item">
-                <span className="data-label">Sleep</span>
+                <span className="data-label">{t('dailyTracker.sleep')}</span>
                 <span className="data-value">{healthData.sleep ? `${healthData.sleep} hrs` : '—'}</span>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import MealSlot from './MealSlot'
 
 export default function DayColumn({
@@ -13,6 +14,7 @@ export default function DayColumn({
   onSaveAsTemplate,
   user
 }) {
+  const { t } = useTranslation()
   const isToday = date.toDateString() === new Date().toDateString()
 
   // Get emoji for meal type
@@ -28,7 +30,7 @@ export default function DayColumn({
 
   // Get label for meal type
   function getMealLabel(mealType) {
-    return mealType.charAt(0).toUpperCase() + mealType.slice(1)
+    return t(`nutrition.${mealType}`)
   }
 
   return (

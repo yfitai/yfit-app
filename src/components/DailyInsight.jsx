@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Lightbulb, ChevronDown, ChevronUp, X, ExternalLink, BookOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * DailyInsight — Persistent daily health headline strip
@@ -33,6 +34,7 @@ const FALLBACK_INSIGHTS = [
 ]
 
 export default function DailyInsight({ variant = 'strip', className = '' }) {
+  const { t } = useTranslation()
   const [article, setArticle] = useState(null)
   const [expanded, setExpanded] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -129,8 +131,8 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      nutrition: 'Nutrition',
-      fitness: 'Fitness',
+      nutrition: t('nutrition.title'),
+      fitness: t('fitness.title'),
       recovery: 'Recovery',
       mental_health: 'Mental Health',
       wellness: 'Wellness',

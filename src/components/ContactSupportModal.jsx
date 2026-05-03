@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { X, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useTranslation } from 'react-i18next'
 
 export default function ContactSupportModal({ isOpen, onClose }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -185,7 +187,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
               disabled={status === 'loading'}
               className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"

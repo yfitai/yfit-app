@@ -3,6 +3,7 @@ import MealCard from './MealCard'
 import AddMealModal from './AddMealModal'
 import SaveTemplateModal from './SaveTemplateModal'
 import { Plus, Save } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function MealSlot({
   dayOfWeek,
@@ -16,6 +17,7 @@ export default function MealSlot({
   onSaveAsTemplate,
   user
 }) {
+  const { t } = useTranslation()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false)
 
@@ -54,7 +56,7 @@ export default function MealSlot({
           className="mt-2 w-full py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
         >
           <Save className="w-3.5 h-3.5" />
-          Save as Template
+          {t('nutrition.saveTemplate')}
         </button>
       )}
 
@@ -64,7 +66,7 @@ export default function MealSlot({
         className="mt-2 w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
       >
         <Plus className="w-4 h-4" />
-        <span className="text-sm">Add meal</span>
+        <span className="text-sm">{t('nutrition.addFood')}</span>
       </button>
 
       {/* Add Meal Modal */}

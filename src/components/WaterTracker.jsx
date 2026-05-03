@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser } from '../lib/supabase'
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import { mlToOz, ozToMl } from '../lib/unitConversions'
+import { useTranslation } from 'react-i18next'
 
 export default function WaterTracker({ user }) {
+  const { t } = useTranslation()
   const { unitSystem } = useUnitPreference()
   const [waterIntake, setWaterIntake] = useState(0) // in ml
   const [goal, setGoal] = useState(2000) // default 2000ml (64oz)
@@ -126,20 +128,20 @@ export default function WaterTracker({ user }) {
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          💧 Water Intake
+          💧 {t('dailyTracker.water')}
         </h3>
         <button
           onClick={() => setShowGoalEdit(!showGoalEdit)}
           className="text-sm text-blue-600 hover:text-blue-700"
         >
-          {showGoalEdit ? 'Cancel' : 'Edit Goal'}
+          {showGoalEdit ? t('common.cancel') : t('common.edit')} Goal
         </button>
       </div>
 
       {showGoalEdit ? (
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Daily Water Goal
+            {t('goals.dailyCalorieTarget')} {t('dailyTracker.water')} Goal
           </label>
           <div className="flex gap-2">
             <input
@@ -192,7 +194,7 @@ export default function WaterTracker({ user }) {
             }
           </span>
           <span>
-            Goal: {unitSystem === 'imperial' 
+            {t('goals.goal')}: {unitSystem === 'imperial' 
               ? `${Math.round(mlToOz(goal))} oz`
               : `${goal} ml`
             }

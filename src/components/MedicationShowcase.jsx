@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const MEDICATIONS = [
   { name: 'Metformin', dosage: '500mg', frequency: 'Twice daily', purpose: 'Type 2 Diabetes', startDate: 'Jan 15, 2024', status: 'active', interaction: null },
@@ -28,6 +29,7 @@ function severityColor(s) {
 }
 
 export default function MedicationShowcase() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('medications');
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
@@ -103,7 +105,7 @@ export default function MedicationShowcase() {
             <div className="bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-white font-bold text-lg">Medications</h3>
+                  <h3 className="text-white font-bold text-lg">{t('medications.title')}</h3>
                   <p className="text-pink-100 text-xs">4 active medications</p>
                 </div>
                 <button
@@ -111,24 +113,24 @@ export default function MedicationShowcase() {
                   disabled={generating}
                   className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-lg border border-white/30 transition-colors disabled:opacity-50"
                 >
-                  {generating ? '⏳ Generating…' : generated ? '✅ PDF Ready!' : '📄 Generate Report'}
+                  {generating ? '⏳ Generating…' : generated ? '✅ PDF Ready!' : t('medications.generateReport')}
                 </button>
               </div>
             </div>
 
             {/* Tabs */}
             <div className="flex border-b border-gray-100">
-              {['medications', 'interactions'].map((t) => (
+              {['medications', 'interactions'].map((tName) => (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
+                  key={tName}
+                  onClick={() => setTab(tName)}
                   className={`flex-1 py-3 text-sm font-medium capitalize transition-colors ${
-                    tab === t
+                    tab === tName
                       ? 'text-pink-600 border-b-2 border-pink-600 bg-pink-50/50'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  {t === 'medications' ? '💊 Medications' : '⚠️ Interactions'}
+                  {tName === 'medications' ? `💊 ${t('medications.title')}` : '⚠️ Interactions'}
                 </button>
               ))}
             </div>
@@ -180,7 +182,7 @@ export default function MedicationShowcase() {
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 bg-pink-500 rounded flex items-center justify-center text-xs">Y</div>
                   <div>
-                    <div className="text-xs font-bold">YFIT AI — Provider Report</div>
+                    <div className="text-xs font-bold">YFIT AI — {t('medications.providerReport')}</div>
                     <div className="text-xs text-gray-400">Generated {new Date().toLocaleDateString()}</div>
                   </div>
                   <div className="ml-auto">

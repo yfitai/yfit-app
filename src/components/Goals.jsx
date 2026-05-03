@@ -19,8 +19,10 @@ import { calculateAllMetrics } from '../lib/calculations'
 import GoalsResults from './GoalsResults'
 import GoalsEnhancement from './GoalsEnhancement'
 import { getUserProfile } from '../lib/supabase'
+import { useTranslation } from 'react-i18next';
 
 export default function Goals({ user: propUser }) {
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const { unitSystem, isMetric } = useUnitPreference()
   const [loading, setLoading] = useState(false)

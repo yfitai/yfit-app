@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useTranslation } from 'react-i18next'
 
 /**
  * InstallGuide — shown once to new users after signup.
@@ -103,6 +104,7 @@ const STEPS = {
 }
 
 export default function InstallGuide({ user, onComplete }) {
+  const { t } = useTranslation()
   const { isIOS, isAndroid, isStandalone } = detectDevice()
   const [dismissed, setDismissed] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -196,14 +198,14 @@ export default function InstallGuide({ user, onComplete }) {
             disabled={saving}
             className="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-60"
           >
-            {saving ? 'Saving...' : "Got it — take me to sign in ✓"}
+            {saving ? t('common.loading') : "Got it — take me to sign in ✓"}
           </button>
           <button
             onClick={markShownAndComplete}
             disabled={saving}
             className="w-full text-gray-400 text-sm py-2 hover:text-gray-600 transition-colors"
           >
-            Skip for now
+            {t('onboarding.skip')}
           </button>
         </div>
       </div>

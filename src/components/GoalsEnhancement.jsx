@@ -8,6 +8,7 @@ import {
   mlToOz,
   ozToMl
 } from '../lib/unitConversions'
+import { useTranslation } from 'react-i18next'
 
 
 /**
@@ -23,6 +24,7 @@ export default function GoalsEnhancement({
   initialData,
   onGoalsChange 
 }) {
+  const { t } = useTranslation()
   const { unitSystem, isMetric } = useUnitPreference()
   
   // Starting Point (auto-filled from current values)
@@ -217,16 +219,16 @@ export default function GoalsEnhancement({
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
           <Award className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Starting Point</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('goals.startingPoint')}</h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          Record your current measurements as your starting point
+          {t('goals.recordCurrentMeasurements')}
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Starting Weight ({weightUnit})
+              {t('goals.startingWeight')} ({weightUnit})
             </label>
             <input
               type="number"
@@ -237,18 +239,18 @@ export default function GoalsEnhancement({
                 setManuallyEditedWeight(true)
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder={`Enter weight in ${weightUnit}`}
+              placeholder={t('goals.enterWeightInUnit', { unit: weightUnit })}
             />
             {!manuallyEditedWeight && (
               <p className="text-xs text-gray-500 mt-1">
-                Auto-synced from Basic Info
+                {t('goals.autoSyncedFromBasicInfo')}
               </p>
             )}
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Starting Body Fat (%)
+              {t('goals.startingBodyFat')} (%)
             </label>
             <input
               type="number"
@@ -256,7 +258,7 @@ export default function GoalsEnhancement({
               value={startingBodyFat}
               onChange={(e) => setStartingBodyFat(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter body fat %"
+              placeholder={t('goals.enterBodyFat')}
             />
           </div>
         </div>
@@ -266,16 +268,16 @@ export default function GoalsEnhancement({
       <div className="bg-green-50 border border-green-200 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Your Targets</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('goals.yourTargets')}</h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          Set your goal targets and timeline
+          {t('goals.setGoalTargetsAndTimeline')}
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Target Weight ({weightUnit})
+              {t('goals.targetWeight')} ({weightUnit})
             </label>
             <input
               type="number"
@@ -283,13 +285,13 @@ export default function GoalsEnhancement({
               value={targetWeight}
               onChange={(e) => setTargetWeight(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder={`Enter target weight in ${weightUnit}`}
+              placeholder={t('goals.enterTargetWeightInUnit', { unit: weightUnit })}
             />
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Target Body Fat (%)
+              {t('goals.targetBodyFat')} (%)
             </label>
             <input
               type="number"
@@ -297,13 +299,13 @@ export default function GoalsEnhancement({
               value={targetBodyFat}
               onChange={(e) => setTargetBodyFat(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder="Enter target body fat %"
+              placeholder={t('goals.enterTargetBodyFat')}
             />
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Weekly Goal ({weightUnit}/week)
+              {t('goals.weeklyGoal')} ({weightUnit}/week)
             </label>
             <select
               value={weeklyGoal}
@@ -314,7 +316,7 @@ export default function GoalsEnhancement({
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="">Select rate...</option>
+              <option value="">{t('goals.selectRate')}</option>
               <option value="0.5">0.5 {weightUnit}/week</option>
               <option value="1">1 {weightUnit}/week</option>
               <option value="1.5">1.5 {weightUnit}/week</option>
@@ -322,14 +324,14 @@ export default function GoalsEnhancement({
             </select>
             {!manuallyEditedGoal && (
               <p className="text-xs text-gray-500 mt-1">
-                Auto-synced from Basic Info
+                {t('goals.autoSyncedFromBasicInfo')}
               </p>
             )}
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Target Date
+              {t('goals.targetDate')}
             </label>
             <input
               type="date"
@@ -348,13 +350,13 @@ export default function GoalsEnhancement({
               <Calendar className="w-4 h-4 text-green-600" />
               <div className="text-gray-700">
                 <div>
-                  <strong>Timeline:</strong> {estimatedDate.days} days ({Math.ceil(estimatedDate.days / 7)} weeks)
+                  <strong>{t('goals.timeline')}:</strong> {estimatedDate.days} {t('common.days')} ({Math.ceil(estimatedDate.days / 7)} {t('common.weeks')})
                 </div>
                 <div className="mt-1">
-                  <strong>Target Date:</strong> {new Date(estimatedDate.date).toLocaleDateString()}
+                  <strong>{t('goals.targetDate')}:</strong> {new Date(estimatedDate.date).toLocaleDateString()}
                   {targetDate && targetDate !== estimatedDate.date && (
                     <span className="ml-2 text-orange-600">
-                      (Manual override: {new Date(targetDate).toLocaleDateString()})
+                      ({t('goals.manualOverride')}: {new Date(targetDate).toLocaleDateString()})
                     </span>
                   )}
                 </div>
@@ -368,88 +370,88 @@ export default function GoalsEnhancement({
       <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Daily Goals</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('goals.dailyGoals')}</h3>
         </div>
         <p className="text-sm text-gray-600 mb-4">
-          Set your daily nutrition and activity targets
+          {t('goals.setDailyNutritionActivityTargets')}
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fiber Goal (g/day)
+              {t('goals.fiberGoal')} (g/day)
             </label>
             <input
               type="number"
               value={fiberGoal}
               onChange={(e) => setFiberGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="25-30g recommended"
+              placeholder={t('goals.fiberRecommended')}
             />
-            <p className="text-xs text-gray-500 mt-1">Recommended: 25-30g</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.fiberRecommended')}</p>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sugar Limit (g/day)
+              {t('goals.sugarLimit')} (g/day)
             </label>
             <input
               type="number"
               value={sugarGoal}
               onChange={(e) => setSugarGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="<50g recommended"
+              placeholder={t('goals.sugarRecommended')}
             />
-            <p className="text-xs text-gray-500 mt-1">WHO recommends &lt;50g</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.sugarRecommended')}</p>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sodium Limit (mg/day)
+              {t('goals.sodiumLimit')} (mg/day)
             </label>
             <input
               type="number"
               value={sodiumGoal}
               onChange={(e) => setSodiumGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="<2300mg recommended"
+              placeholder={t('goals.sodiumRecommended')}
             />
-            <p className="text-xs text-gray-500 mt-1">FDA recommends &lt;2300mg</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.sodiumRecommended')}</p>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Water Goal ({isMetric ? 'ml' : 'oz'}/day)
+              {t('dailyTracker.water')} {t('goals.goal')} ({isMetric ? 'ml' : 'oz'}/day)
             </label>
             <input
               type="number"
               value={waterGoal}
               onChange={(e) => setWaterGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-           placeholder={isMetric ? "2000ml recommended" : "68oz recommended"}
+           placeholder={isMetric ? t('goals.waterMlRecommended') : t('goals.waterOzRecommended')}
 
             />
-     <p className="text-xs text-gray-500 mt-1">{isMetric ? '~8 glasses (2L)' : '~8 glasses (68oz)'}</p>
+     <p className="text-xs text-gray-500 mt-1">{isMetric ? t('goals.waterMlDescription') : t('goals.waterOzDescription')}</p>
 
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Steps Goal (steps/day)
+              {t('dailyTracker.steps')} {t('goals.goal')} (steps/day)
             </label>
             <input
               type="number"
               value={stepsGoal}
               onChange={(e) => setStepsGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="10000 recommended"
+              placeholder={t('goals.stepsRecommended')}
             />
-            <p className="text-xs text-gray-500 mt-1">10,000 steps recommended</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.stepsRecommended')}</p>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sleep Goal (hours/night)
+              {t('dailyTracker.sleep')} {t('goals.goal')} (hours/night)
             </label>
             <input
               type="number"
@@ -457,14 +459,14 @@ export default function GoalsEnhancement({
               value={sleepGoal}
               onChange={(e) => setSleepGoal(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="8 hours recommended"
+              placeholder={t('goals.sleepRecommended')}
             />
-            <p className="text-xs text-gray-500 mt-1">7-9 hours recommended</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.sleepHoursRecommended')}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Blood Pressure Goal (systolic mmHg)
+              {t('goals.bloodPressureGoal')} (systolic mmHg)
             </label>
             <input
               type="number"
@@ -473,12 +475,12 @@ export default function GoalsEnhancement({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="120"
             />
-            <p className="text-xs text-gray-500 mt-1">Normal: &lt;120 mmHg systolic</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.bpSystolicNormal')}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Blood Pressure Goal (diastolic mmHg)
+              {t('goals.bloodPressureGoal')} (diastolic mmHg)
             </label>
             <input
               type="number"
@@ -487,12 +489,12 @@ export default function GoalsEnhancement({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="80"
             />
-            <p className="text-xs text-gray-500 mt-1">Normal: &lt;80 mmHg diastolic</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.bpDiastolicNormal')}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fasting Glucose Goal (mg/dL)
+              {t('goals.fastingGlucoseGoal')} (mg/dL)
             </label>
             <input
               type="number"
@@ -501,7 +503,7 @@ export default function GoalsEnhancement({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="100"
             />
-            <p className="text-xs text-gray-500 mt-1">Normal fasting: &lt;100 mg/dL</p>
+            <p className="text-xs text-gray-500 mt-1">{t('goals.glucoseNormal')}</p>
           </div>
         </div>
       </div>
@@ -509,38 +511,38 @@ export default function GoalsEnhancement({
       {/* Progress Summary (if targets are set) */}
       {startingWeight && targetWeight && (
         <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Goal Summary</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('goals.goalSummary')}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
-              <p className="text-sm text-gray-600 mb-1">Weight Change</p>
+              <p className="text-sm text-gray-600 mb-1">{t('goals.weightChange')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {Math.abs(parseFloat(targetWeight) - parseFloat(startingWeight)).toFixed(1)} {weightUnit}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {parseFloat(targetWeight) < parseFloat(startingWeight) ? 'To Lose' : 'To Gain'}
+                {parseFloat(targetWeight) < parseFloat(startingWeight) ? t('goals.toLose') : t('goals.toGain')}
               </p>
             </div>
             
             {startingBodyFat && targetBodyFat && (
               <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
-                <p className="text-sm text-gray-600 mb-1">Body Fat Change</p>
+                <p className="text-sm text-gray-600 mb-1">{t('goals.bodyFatChange')}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {Math.abs(parseFloat(targetBodyFat) - parseFloat(startingBodyFat)).toFixed(1)}%
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {parseFloat(targetBodyFat) < parseFloat(startingBodyFat) ? 'To Reduce' : 'To Gain'}
+                  {parseFloat(targetBodyFat) < parseFloat(startingBodyFat) ? t('goals.toReduce') : t('goals.toGain')}
                 </p>
               </div>
             )}
             
             {estimatedDate && (
               <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-md border border-teal-100">
-                <p className="text-sm text-gray-600 mb-1">Timeline</p>
+                <p className="text-sm text-gray-600 mb-1">{t('goals.timeline')}</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {estimatedDate.days} days
+                  {estimatedDate.days} {t('common.days')}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Estimated duration</p>
+                <p className="text-xs text-gray-500 mt-1">{t('goals.estimatedDuration')}</p>
               </div>
             )}
           </div>

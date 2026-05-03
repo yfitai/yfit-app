@@ -3,8 +3,10 @@ import { supabase } from '../lib/supabase'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles, RefreshCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function AICoach({ userId }) {
+  const { t } = useTranslation()
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -216,10 +218,10 @@ export default function AICoach({ userId }) {
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-500" />
-              AI Coach
+              {t('aiCoach.title')}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Ask me anything about fitness, nutrition, or using YFIT
+              {t('aiCoach.askCoach')}
             </p>
           </div>
           <Button
@@ -229,7 +231,7 @@ export default function AICoach({ userId }) {
             className="gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            New Conversation
+            {t('aiCoach.clearChat')}
           </Button>
         </div>
       </div>
@@ -306,7 +308,7 @@ export default function AICoach({ userId }) {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything..."
+              placeholder={t('aiCoach.placeholder')}
               disabled={isLoading}
               className="flex-1"
             />
@@ -330,4 +332,3 @@ export default function AICoach({ userId }) {
     </div>
   )
 }
-

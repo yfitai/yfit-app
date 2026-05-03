@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { X, Search, Star } from 'lucide-react'
 import { searchFoods } from '../../lib/foodDatabase'
+import { useTranslation } from 'react-i18next'
 
 export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user }) {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
@@ -14,7 +16,7 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
   
   // Available serving units
   const servingUnits = [
-    { value: 'serving', label: 'Serving', gramsPerUnit: null }, // Will use food's default
+    { value: 'serving', label: t('nutrition.serving'), gramsPerUnit: null }, // Will use food's default
     { value: 'container', label: 'Container', gramsPerUnit: null }, // Will use food's default
     { value: 'gram', label: 'Gram (g)', gramsPerUnit: 1 },
     { value: 'ounce', label: 'Ounce (oz)', gramsPerUnit: 28.35 },
@@ -152,7 +154,7 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            Add {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+            {t('nutrition.addFood')} {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
           </h3>
           <button
             onClick={onClose}
@@ -221,10 +223,10 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
                           <div className="text-xs text-gray-600 mt-1">{template.description}</div>
                         )}
                         <div className="flex gap-3 text-xs text-gray-600 mt-1">
-                          <span>{template.total_calories} cal</span>
-                          <span>P: {template.total_protein}g</span>
-                          <span>C: {template.total_carbs}g</span>
-                          <span>F: {template.total_fat}g</span>
+                          <span>{template.total_calories} {t('nutrition.calories')}</span>
+                          <span>{t('nutrition.protein')}: {template.total_protein}g</span>
+                          <span>{t('nutrition.carbs')}: {template.total_carbs}g</span>
+                          <span>{t('nutrition.fat')}: {template.total_fat}g</span>
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
                           {template.meals?.length || 0} items
@@ -251,7 +253,7 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
                   setSearchQuery(e.target.value)
                   handleSearch(e.target.value)
                 }}
-                placeholder="Search for foods..."
+                placeholder={t('nutrition.searchFood')}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -277,10 +279,10 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
                     <div className="text-sm text-gray-500">{food.brand}</div>
                   )}
                   <div className="flex gap-4 mt-1 text-sm text-gray-600">
-                    <span>{food.calories} cal</span>
-                    <span>P: {food.protein}g</span>
-                    <span>C: {food.carbs}g</span>
-                    <span>F: {food.fat}g</span>
+                    <span>{food.calories} {t('nutrition.calories')}</span>
+                    <span>{t('nutrition.protein')}: {food.protein}g</span>
+                    <span>{t('nutrition.carbs')}: {food.carbs}g</span>
+                    <span>{t('nutrition.fat')}: {food.fat}g</span>
                   </div>
                 </button>
               ))}
@@ -301,14 +303,14 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
                   onClick={() => setSelectedFood(null)}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  Change
+                  {t('common.edit')}
                 </button>
               </div>
 
               {/* Serving Size Selection */}
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Serving Size
+                  {t('nutrition.serving')} {t('common.size')}
                 </label>
                 <div className="flex gap-2">
                   {/* Quantity Input */}
@@ -338,7 +340,7 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
                       }}
                       step="0.1"
                       min="0.1"
-                      placeholder="Quantity"
+                      placeholder={t('nutrition.serving')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -365,31 +367,31 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
 
               {/* Nutrition Preview */}
               <div className="bg-white rounded-lg p-3">
-                <div className="text-sm font-medium text-gray-700 mb-2">Nutrition</div>
+                <div className="text-sm font-medium text-gray-700 mb-2">{t('nutrition.nutritionSummary')}</div>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   <div>
                     <div className="text-lg font-bold text-gray-900">
                       {calculateNutrition()?.calories || 0}
                     </div>
-                    <div className="text-xs text-gray-600">Calories</div>
+                    <div className="text-xs text-gray-600">{t('nutrition.calories')}</div>
                   </div>
                   <div>
                     <div className="text-lg font-bold text-gray-900">
                       {calculateNutrition()?.protein || 0}g
                     </div>
-                    <div className="text-xs text-gray-600">Protein</div>
+                    <div className="text-xs text-gray-600">{t('nutrition.protein')}</div>
                   </div>
                   <div>
                     <div className="text-lg font-bold text-gray-900">
                       {calculateNutrition()?.carbs || 0}g
                     </div>
-                    <div className="text-xs text-gray-600">Carbs</div>
+                    <div className="text-xs text-gray-600">{t('nutrition.carbs')}</div>
                   </div>
                   <div>
                     <div className="text-lg font-bold text-gray-900">
                       {calculateNutrition()?.fat || 0}g
                     </div>
-                    <div className="text-xs text-gray-600">Fat</div>
+                    <div className="text-xs text-gray-600">{t('nutrition.fat')}</div>
                   </div>
                 </div>
               </div>
@@ -403,21 +405,21 @@ export default function AddMealModal({ dayOfWeek, mealType, onAdd, onClose, user
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleAdd}
             disabled={!selectedFood}
             className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Add Another
+            {t('common.add')} Another
           </button>
           <button
             onClick={handleAddAndClose}
             disabled={!selectedFood}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Add & Done
+            {t('common.add')} & {t('common.done')}
           </button>
         </div>
       </div>

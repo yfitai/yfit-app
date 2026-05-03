@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Star, Plus, Trash2 } from 'lucide-react'
 import CreateTemplateModal from './CreateTemplateModal'
+import { useTranslation } from 'react-i18next'
 
 export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, onDeleteTemplate }) {
+  const { t } = useTranslation()
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, breakfast, lunch, dinner, snack, favorites
@@ -87,7 +89,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
               }`}
             >
               {filterOption === 'favorites' && <Star className="w-3 h-3 inline mr-1" />}
-              {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+              {filterOption === 'all' ? 'All' : t(`nutrition.${filterOption}`)}
             </button>
           ))}
         </div>
@@ -97,7 +99,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
       <div className="p-4 space-y-3 max-h-[600px] overflow-y-auto">
         {filteredTemplates.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p className="mb-2">No templates yet</p>
+            <p className="mb-2">{t('common.noData')}</p>
             <p className="text-sm">Save your favorite meals to reuse them quickly!</p>
           </div>
         ) : (
@@ -122,10 +124,10 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
                 )}
                 
                 <div className="flex gap-3 text-sm text-gray-600">
-                  <span>{template.total_calories} cal</span>
-                  <span>P: {template.total_protein}g</span>
-                  <span>C: {template.total_carbs}g</span>
-                  <span>F: {template.total_fat}g</span>
+                  <span>{template.total_calories} {t('nutrition.calories')}</span>
+                  <span>{t('nutrition.protein')}: {template.total_protein}g</span>
+                  <span>{t('nutrition.carbs')}: {template.total_carbs}g</span>
+                  <span>{t('nutrition.fat')}: {template.total_fat}g</span>
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-500">
@@ -140,7 +142,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
                   onDeleteTemplate(template.id)
                 }}
                 className="absolute top-2 right-2 p-1.5 bg-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-600"
-                title="Delete template"
+                title={t('common.delete')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>

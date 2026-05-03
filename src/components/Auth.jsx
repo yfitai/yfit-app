@@ -9,26 +9,28 @@ import { signIn, signUp, resendConfirmationEmail, resetPassword } from '../lib/s
 import { supabase } from '../lib/supabase'
 import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
+import { useTranslation } from 'react-i18next'
 
 export default function Auth({ onAuthSuccess }) {
-const [isLoading, setIsLoading] = useState(false)
-const [showLoginPassword, setShowLoginPassword] = useState(false)
-const [showSignupPassword, setShowSignupPassword] = useState(false)
+  const { t } = useTranslation()
+  const [isLoading, setIsLoading] = useState(false)
+  const [showLoginPassword, setShowLoginPassword] = useState(false)
+  const [showSignupPassword, setShowSignupPassword] = useState(false)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
   const [pendingEmail, setPendingEmail] = useState('')
-  
+
   // Forgot Password state
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
   const [resetEmailSent, setResetEmailSent] = useState(false)
-  
+
   // Login state
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
-  
+
   // Signup state
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
@@ -40,25 +42,25 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     setError('')
     setSuccess('')
     setIsLoading(true)
-    
+
     const { data, error } = await signIn(loginEmail, loginPassword)
-    
+
     if (error) {
       if (error.message?.includes('Email not confirmed')) {
         setError('Please confirm your email address before signing in. Check your inbox for the confirmation link.')
         setPendingEmail(loginEmail)
         setShowEmailConfirmation(true)
       } else {
-        setError(error.message || 'Failed to sign in. Please check your credentials.')
+        setError(error.message || t('common.error'))
       }
       setIsLoading(false)
       return
     }
-    
+
     if (data.user) {
       onAuthSuccess(data.user)
     }
-    
+
     setIsLoading(false)
   }
 
@@ -66,33 +68,33 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     e.preventDefault()
     setError('')
     setSuccess('')
-    
+
     // Validation
     if (!firstName.trim() || !lastName.trim()) {
       setError('Please enter your first and last name')
       return
     }
-    
+
     if (!signupEmail.trim() || !signupPassword.trim()) {
       setError('Please enter your email and password')
       return
     }
-    
+
     if (signupPassword.length < 6) {
       setError('Password must be at least 6 characters')
       return
     }
 
     setIsLoading(true)
-    
+
     const { data, error, needsEmailConfirmation } = await signUp(signupEmail, signupPassword, firstName, lastName)
-    
+
     if (error) {
-      setError(error.message || 'Failed to create account. Please try again.')
+      setError(error.message || t('common.error'))
       setIsLoading(false)
       return
     }
-    
+
     // If email confirmation is required
     if (needsEmailConfirmation) {
       setPendingEmail(signupEmail)
@@ -101,12 +103,12 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
       setIsLoading(false)
       return
     }
-    
+
     // If no confirmation needed, log them in directly
     if (data.user && data.session) {
       onAuthSuccess(data.user)
     }
-    
+
     setIsLoading(false)
   }
 
@@ -114,15 +116,15 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     setIsLoading(true)
     setError('')
     setSuccess('')
-    
+
     const { error } = await resendConfirmationEmail(pendingEmail)
-    
+
     if (error) {
       setError('Failed to resend confirmation email. Please try again.')
     } else {
       setSuccess('Confirmation email sent! Please check your inbox.')
     }
-    
+
     setIsLoading(false)
   }
 
@@ -131,17 +133,17 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     setIsLoading(true)
     setError('')
     setSuccess('')
-    
+
     const { error } = await resetPassword(forgotPasswordEmail)
-    
+
     if (error) {
       setError('Failed to send password reset email. Please try again.')
       setIsLoading(false)
       return
     }
-    
+
     setResetEmailSent(true)
-    setSuccess('Password reset email sent! Please check your inbox.')
+    setSuccess(t('auth.resetPasswordSent'))
     setIsLoading(false)
   }
 
@@ -159,15 +161,15 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
 
           <Card>
             <CardHeader>
-              <CardTitle>Reset Your Password</CardTitle>
+              <CardTitle>{t('auth.resetPassword')}</CardTitle>
               <CardDescription>
-                {resetEmailSent 
-                  ? 'Check your email for the reset link'
+                {resetEmailSent
+                  ? t('auth.resetPasswordSent')
                   : 'Enter your email address and we\'ll send you a password reset link'
                 }
               </CardDescription>
             </CardHeader>
-            
+
             {!resetEmailSent ? (
               <form onSubmit={handleForgotPassword}>
                 <CardContent className="space-y-4">
@@ -178,9 +180,9 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="forgot-email">Email</Label>
+                    <Label htmlFor="forgot-email">{t('auth.email')}</Label>
                     <Input
                       id="forgot-email"
                       type="email"
@@ -196,16 +198,16 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Sending...' : 'Send Reset Link'}
+                    {isLoading ? t('common.loading') : 'Send Reset Link'}
                   </Button>
-                  <Button 
+                  <Button
                     type="button"
-                    variant="ghost" 
+                    variant="ghost"
                     className="w-full"
                     onClick={() => {
                       setShowForgotPassword(false)
@@ -215,7 +217,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       setForgotPasswordEmail('')
                     }}
                   >
-                    Back to Sign In
+                    {t('common.back')} {t('auth.signIn')}
                   </Button>
                 </CardFooter>
               </form>
@@ -231,7 +233,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-gray-700">
                       <strong>Next steps:</strong>
@@ -245,8 +247,8 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="w-full"
                     onClick={() => {
                       setShowForgotPassword(false)
@@ -256,7 +258,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       setForgotPasswordEmail('')
                     }}
                   >
-                    Back to Sign In
+                    {t('common.back')} {t('auth.signIn')}
                   </Button>
                 </CardFooter>
               </>
@@ -293,7 +295,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-center font-medium text-gray-900">{pendingEmail}</p>
-              
+
               {success && (
                 <Alert className="bg-green-50 border-green-200">
                   <CheckCircle className="h-4 w-4 text-green-600" />
@@ -303,7 +305,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   </AlertDescription>
                 </Alert>
               )}
-              
+
               {error && (
                 <Alert className="bg-red-50 border-red-200">
                   <AlertTitle className="text-red-800">Error</AlertTitle>
@@ -325,16 +327,16 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={handleResendConfirmation}
                 disabled={isLoading}
               >
-                {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
+                {isLoading ? t('common.loading') : 'Resend Confirmation Email'}
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="w-full"
                 onClick={() => {
                   setShowEmailConfirmation(false)
@@ -342,7 +344,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   setSuccess('')
                 }}
               >
-                Back to Sign In
+                {t('common.back')} {t('auth.signIn')}
               </Button>
             </CardFooter>
           </Card>
@@ -355,7 +357,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-           <div className="text-center mb-8 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <img src="/assets/yfit-logo.png" alt="YFIT AI" className="h-24 mx-auto mb-4" />
           <p className="text-gray-600 mt-2">Your Intelligent Health Companion</p>
         </div>
@@ -364,15 +366,15 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
         {/* Auth Tabs */}
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="login">{t('auth.signIn')}</TabsTrigger>
+            <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
           </TabsList>
 
           {/* Login Tab */}
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>Welcome Back!</CardTitle>
+                <CardTitle>{t('auth.welcomeBack')}</CardTitle>
                 <CardDescription>
                   Sign in to continue your health journey
                 </CardDescription>
@@ -386,7 +388,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   {success && (
                     <Alert className="bg-green-50 border-green-200">
                       <AlertDescription className="text-green-700 text-sm">
@@ -394,9 +396,9 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">{t('auth.email')}</Label>
                     <Input
                       id="login-email"
                       type="email"
@@ -411,52 +413,51 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     />
                   </div>
                   <div className="space-y-2">
-  <Label htmlFor="login-password">Password</Label>
-  <div className="relative">
-    <Input
-      id="login-password"
-      type={showLoginPassword ? "text" : "password"}
-      placeholder="••••••••"
-      value={loginPassword}
-      onChange={(e) => {
-        setLoginPassword(e.target.value)
-        setError('')
-      }}
-      required
-      disabled={isLoading}
-    />
-    <button
-      type="button"
-      onClick={() => setShowLoginPassword(!showLoginPassword)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-    >
-      {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-    </button>
-  </div>
-  <div className="text-right">
-    <button
-      type="button"
-      onClick={() => {
-        setShowForgotPassword(true)
-        setForgotPasswordEmail(loginEmail)
-        setError('')
-      }}
-      className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
-    >
-      Forgot Password?
-    </button>
-  </div>
-</div>
+                    <Label htmlFor="login-password">{t('auth.password')}</Label>
+                    <div className="relative">
+                      <Input
+                        id="login-password"
+                        type={showLoginPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={loginPassword}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value)
+                          setError('')
+                        }}
+                        required
+                        disabled={isLoading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(true)
+                          setForgotPasswordEmail(loginEmail)
+                          setError('')
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                      >
+                        {t('auth.forgotPassword')}
+                      </button>
+                    </div>
+                  </div>
 
-               
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    {isLoading ? t('common.loading') : t('auth.signIn')}
                   </Button>
                 </CardFooter>
               </form>
@@ -467,7 +468,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
           <TabsContent value="signup">
             <Card>
               <CardHeader>
-                <CardTitle>Create Account</CardTitle>
+                <CardTitle>{t('auth.createAccount')}</CardTitle>
                 <CardDescription>
                   Start your personalized health journey today
                 </CardDescription>
@@ -481,7 +482,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   {success && (
                     <Alert className="bg-green-50 border-green-200">
                       <AlertDescription className="text-green-700 text-sm">
@@ -489,43 +490,43 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name *</Label>
+                      <Label htmlFor="first-name">{t('auth.firstName')} *</Label>
                       <Input
                         id="first-name"
                         type="text"
                         placeholder="John"
                         value={firstName}
                         onChange={(e) => {
-                        setFirstName(e.target.value)
-                        setError('')
-                      }}
+                          setFirstName(e.target.value)
+                          setError('')
+                        }}
                         required
                         disabled={isLoading}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name *</Label>
+                      <Label htmlFor="last-name">{t('auth.lastName')} *</Label>
                       <Input
                         id="last-name"
                         type="text"
                         placeholder="Doe"
                         value={lastName}
                         onChange={(e) => {
-                        setLastName(e.target.value)
-                        setError('')
-                      }}
+                          setLastName(e.target.value)
+                          setError('')
+                        }}
                         required
                         disabled={isLoading}
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email *</Label>
+                    <Label htmlFor="signup-email">{t('auth.email')} *</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -540,41 +541,41 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     />
                   </div>
                   <div className="space-y-2">
-  <Label htmlFor="signup-password">Password *</Label>
-  <div className="relative">
-    <Input
-      id="signup-password"
-      type={showSignupPassword ? "text" : "password"}
-      placeholder="••••••••"
-      value={signupPassword}
-      onChange={(e) => {
-        setSignupPassword(e.target.value)
-        setError('')
-      }}
-      required
-      disabled={isLoading}
-    />
-    <button
-      type="button"
-      onClick={() => setShowSignupPassword(!showSignupPassword)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-    >
-      {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-       </button>
-  </div>
-  <p className="text-xs text-gray-500">Minimum 6 characters</p>
-</div>
+                    <Label htmlFor="signup-password">{t('auth.password')} *</Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        type={showSignupPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={signupPassword}
+                        onChange={(e) => {
+                          setSignupPassword(e.target.value)
+                          setError('')
+                        }}
+                        required
+                        disabled={isLoading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignupPassword(!showSignupPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500">Minimum 6 characters</p>
+                  </div>
 
 
 
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Creating account...' : 'Create Account'}
+                    {isLoading ? t('common.loading') : t('auth.createAccount')}
                   </Button>
                 </CardFooter>
               </form>

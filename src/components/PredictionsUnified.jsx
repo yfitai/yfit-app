@@ -3,12 +3,14 @@ import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, TrendingDown, Target, Calendar, Activity, AlertTriangle,
   Heart, Pill, Apple, Dumbbell, Scale, Flame, Brain, Award, Clock, RefreshCw
 } from 'lucide-react';
 
 export default function PredictionsUnified({ user }) {
+  const { t } = useTranslation()
   const navigate = useNavigate();
   const { unitSystem } = useUnitPreference();
   const { isPro, isTrialing, trialDaysRemaining } = useSubscription();

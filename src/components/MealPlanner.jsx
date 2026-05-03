@@ -5,8 +5,10 @@ import MealTemplates from './MealPlanner/MealTemplates'
 import ApplyTemplateModal from './MealPlanner/ApplyTemplateModal'
 import GroceryListModal from './MealPlanner/GroceryListModal'
 import { ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function MealPlanner({ user }) {
+  const { t } = useTranslation()
   const [currentWeekStart, setCurrentWeekStart] = useState(getWeekStart(new Date()))
   const [mealPlan, setMealPlan] = useState(null)
   const [mealPlanItems, setMealPlanItems] = useState([])
@@ -243,13 +245,13 @@ export default function MealPlanner({ user }) {
 
       if (itemsError) throw itemsError
 
-      alert(`Template "${templateData.template_name}" saved successfully!`)
+      alert(t('nutrition.templateSaved', { templateName: templateData.template_name }))
       
       // Trigger reload
       window.dispatchEvent(new Event('yfit-templates-updated'))
     } catch (error) {
       console.error('Error saving template:', error)
-      alert('Failed to save template. Please try again.')
+      alert(t('nutrition.templateSaveError'))
     }
   }
 
@@ -294,7 +296,7 @@ export default function MealPlanner({ user }) {
           fiber: meal.fiber || 0,
           sugar: meal.sugar || 0,
           sodium: meal.sodium || 0,
-          notes: meal.notes || `From template: ${template.template_name}`
+          notes: meal.notes || t('nutrition.fromTemplate', { templateName: template.template_name })
         }
         
         await addMealToPlan(dayOfWeek, mealType, mealData)
@@ -306,16 +308,16 @@ export default function MealPlanner({ user }) {
         .update({ use_count: (template.use_count || 0) + 1 })
         .eq('id', template.id)
       
-      alert(`Template "${template.template_name}" applied successfully!`)
+      alert(t('nutrition.templateApplied', { templateName: template.template_name }))
     } catch (error) {
       console.error('[MealPlanner] Error applying template:', error)
-      alert('Failed to apply template. Please try again.')
+      alert(t('nutrition.templateApplyError'))
     }
   }
 
   // Delete template
   async function deleteTemplate(templateId) {
-    if (!confirm('Are you sure you want to delete this template?')) {
+    if (!confirm(t('nutrition.confirmDeleteTemplate'))) {
       return
     }
 
@@ -342,10 +344,10 @@ export default function MealPlanner({ user }) {
 
       // Trigger reload
       window.dispatchEvent(new Event('yfit-templates-updated'))
-      alert('Template deleted successfully!')
+      alert(t('nutrition.templateDeleted'))
     } catch (error) {
       console.error('[MealPlanner] Error deleting template:', error)
-      alert('Failed to delete template. Please try again.')
+      alert(t('nutrition.templateDeleteError'))
     }
   }
 
@@ -361,8 +363,8 @@ export default function MealPlanner({ user }) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Meal Planner</h1>
-        <p className="text-gray-600">Plan your meals for the week ahead</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('nutrition.mealPlan')}</h1>
+        <p className="text-gray-600">{t('nutrition.planMealsForWeek')}</p>
       </div>
 
       {/* Week Navigation */}
@@ -384,7 +386,7 @@ export default function MealPlanner({ user }) {
               onClick={goToCurrentWeek}
               className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
             >
-              This Week
+              {t('common.thisWeek')}
             </button>
           </div>
           
@@ -404,14 +406,14 @@ export default function MealPlanner({ user }) {
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          {showTemplates ? 'Hide Templates' : 'Show Templates'}
+          {showTemplates ? t('nutrition.hideTemplates') : t('nutrition.showTemplates')}
         </button>
         
         <button
           onClick={() => setShowGroceryList(true)}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
-          Generate Grocery List
+          {t('nutrition.generateGroceryList')}
         </button>
       </div>
 

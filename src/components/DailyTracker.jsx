@@ -5,8 +5,10 @@ import {
   TrendingUp, Calendar, Plus, Check, X 
 } from 'lucide-react';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
+import { useTranslation } from 'react-i18next';
 
 export default function DailyTracker({ user }) {
+  const { t } = useTranslation();
   const { unitSystem } = useUnitPreference();
   const [loading, setLoading] = useState(true);
   const [todayLog, setTodayLog] = useState(null);
@@ -224,7 +226,7 @@ export default function DailyTracker({ user }) {
         console.error('[DailyTracker] Save failures:', failures);
         alert(`❌ Failed to save: ${failedTypes}\nError: ${firstError.message || firstError.code || JSON.stringify(firstError)}`);
       } else if (saved.length === 0) {
-        alert('⚠️ No measurements to save — please enter at least one value.');
+        alert(t('common.noData'));
       } else {
         setLastMeasurementDate(new Date().toLocaleDateString());
         setShowMeasurements(false);
@@ -386,7 +388,7 @@ export default function DailyTracker({ user }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+        <div className="text-xl">{t('common.loading')}</div>
       </div>
     );
   }
@@ -395,7 +397,7 @@ export default function DailyTracker({ user }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-2 sm:p-6 overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Daily Tracker</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 {t('dailyTracker.title')}</h1>
           <p className="text-gray-600">Track your daily health metrics and habits</p>
         </div>
 
@@ -407,12 +409,12 @@ export default function DailyTracker({ user }) {
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center mb-2">
               <Moon className="w-5 h-5 text-indigo-600 mr-2" />
-              <span className="font-semibold text-gray-900">Sleep</span>
+              <span className="font-semibold text-gray-900">{t('dailyTracker.sleep')}</span>
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {formData.sleep_hours || 0}h
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.sleep}h</div>
+            <div className="text-sm text-gray-600 mb-2">{t('goals.goal')}: {goals.sleep}h</div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className={`h-2 rounded-full ${getProgressColor(calculateProgress(formData.sleep_hours, goals.sleep))}`}
@@ -426,7 +428,7 @@ export default function DailyTracker({ user }) {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <Droplets className="w-5 h-5 text-blue-600 mr-2" />
-                <span className="font-semibold text-gray-900">Water</span>
+                <span className="font-semibold text-gray-900">{t('dailyTracker.water')}</span>
               </div>
               <select
                 value={waterUnit}
@@ -445,7 +447,7 @@ export default function DailyTracker({ user }) {
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {getWaterDisplayValue()} {waterUnit}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {getWaterGoalDisplay()} {waterUnit}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('goals.goal')}: {getWaterGoalDisplay()} {waterUnit}</div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className={`h-2 rounded-full ${getProgressColor(calculateProgress(formData.water_ml, goals.water))}`}
@@ -458,12 +460,12 @@ export default function DailyTracker({ user }) {
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-4">
             <div className="flex items-center mb-2">
               <Footprints className="w-5 h-5 text-green-600 mr-2" />
-              <span className="font-semibold text-gray-900">Steps</span>
+              <span className="font-semibold text-gray-900">{t('dailyTracker.steps')}</span>
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {formData.steps || 0}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.steps}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('goals.goal')}: {goals.steps}</div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className={`h-2 rounded-full ${getProgressColor(calculateProgress(formData.steps, goals.steps))}`}
@@ -481,7 +483,7 @@ export default function DailyTracker({ user }) {
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {formData.bp_systolic || '--'}/{formData.bp_diastolic || '--'}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {goals.bpSystolic}/{goals.bpDiastolic}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('goals.goal')}: {goals.bpSystolic}/{goals.bpDiastolic}</div>
             <div className="text-xs text-gray-500">
               {formData.bp_systolic && formData.bp_systolic <= goals.bpSystolic ? '✓ Good' : 'Monitor'}
             </div>
@@ -492,7 +494,7 @@ export default function DailyTracker({ user }) {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <Activity className="w-5 h-5 text-purple-600 mr-2" />
-                <span className="font-semibold text-gray-900">Glucose</span>
+                <span className="font-semibold text-gray-900">{t('medications.glucose')}</span>
               </div>
               <select
                 value={glucoseUnit}
@@ -510,7 +512,7 @@ export default function DailyTracker({ user }) {
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {getGlucoseDisplayValue() || '--'}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Goal: {getGlucoseGoalDisplay()} {glucoseUnit}</div>
+            <div className="text-sm text-gray-600 mb-2">{t('goals.goal')}: {getGlucoseGoalDisplay()} {glucoseUnit}</div>
             <div className="text-xs text-gray-500">
               {formData.glucose_mg_dl && formData.glucose_mg_dl <= goals.glucose ? '✓ Good' : 'Monitor'}
             </div>
@@ -520,7 +522,7 @@ export default function DailyTracker({ user }) {
         {/* Logging Form */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {todayLog ? '📝 Update Today\'s Log' : '➕ Log Today\'s Metrics'}
+            {todayLog ? t('dailyTracker.logToday') : t('dailyTracker.logToday')}
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -528,7 +530,7 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  😴 Sleep Hours
+                  😴 {t('dailyTracker.sleepHours')}
                 </label>
                 <input
                   type="number"
@@ -543,17 +545,17 @@ export default function DailyTracker({ user }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sleep Quality
+                  {t('dailyTracker.sleep')} Quality
                 </label>
                 <select
                   value={formData.sleep_quality}
                   onChange={(e) => setFormData({...formData, sleep_quality: e.target.value})}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="poor">Poor</option>
-                  <option value="fair">Fair</option>
-                  <option value="good">Good</option>
-                  <option value="excellent">Excellent</option>
+                  <option value="poor">{t('dailyTracker.poor')}</option>
+                  <option value="fair">{t('dailyTracker.fair')}</option>
+                  <option value="good">{t('dailyTracker.good')}</option>
+                  <option value="excellent">{t('dailyTracker.excellent')}</option>
                 </select>
               </div>
             </div>
@@ -562,7 +564,7 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  💧 Water - Add Throughout Day ({waterUnit})
+                  💧 {t('dailyTracker.water')} - Add Throughout Day ({waterUnit})
                 </label>
                 <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="text-sm text-gray-600 mb-1">Current Total:</div>
@@ -596,7 +598,7 @@ export default function DailyTracker({ user }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  🚶 Steps
+                  🚶 {t('dailyTracker.steps')}
                 </label>
                 <input
                   type="number"
@@ -644,7 +646,7 @@ export default function DailyTracker({ user }) {
             {/* Blood Glucose */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                🩸 Blood Glucose ({glucoseUnit})
+                🩸 {t('medications.glucose')} ({glucoseUnit})
               </label>
               <input
                 type="number"
@@ -664,7 +666,7 @@ export default function DailyTracker({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ⚖️ Weight ({unitSystem === 'imperial' ? 'lbs' : 'kg'})
+                  ⚖️ {t('progress.weight')} ({unitSystem === 'imperial' ? 'lbs' : 'kg'})
                 </label>
                 <input
                   type="number"
@@ -693,7 +695,7 @@ export default function DailyTracker({ user }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  💪 Body Fat (%)
+                  💪 {t('progress.bodyFat')} (%)
                 </label>
                 <input
                   type="number"
@@ -711,7 +713,7 @@ export default function DailyTracker({ user }) {
             {/* Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                📝 Notes (optional)
+                📝 {t('dailyTracker.notes')} (optional)
               </label>
               <textarea
                 value={formData.notes}
@@ -729,7 +731,7 @@ export default function DailyTracker({ user }) {
                 disabled={loading || isDoneForDay}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
               >
-                {loading ? 'Saving...' : (todayLog ? '✓ Update Log' : '+ Save Log')}
+                {loading ? t('common.loading') : (todayLog ? t('common.save') : t('common.save'))}
               </button>
               <button
                 type="button"
@@ -781,7 +783,7 @@ export default function DailyTracker({ user }) {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">📏 Weekly Body Measurements</h2>
+              <h2 className="text-2xl font-bold text-gray-900">📏 {t('progress.addMeasurement')}</h2>
               {lastMeasurementDate && (
                 <p className="text-sm text-gray-600 mt-1">Last measured: {lastMeasurementDate}</p>
               )}
@@ -791,7 +793,7 @@ export default function DailyTracker({ user }) {
               onClick={() => setShowMeasurements(!showMeasurements)}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
             >
-              {showMeasurements ? 'Hide' : 'Update Measurements'}
+              {showMeasurements ? t('common.close') : t('progress.addMeasurement')}
             </button>
           </div>
 
@@ -802,7 +804,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Torso</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Neck ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('progress.chest')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -813,7 +815,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Shoulders ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.shoulders')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -824,7 +826,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Chest ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('progress.chest')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -842,7 +844,7 @@ export default function DailyTracker({ user }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Core</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Waist ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('progress.waist')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -853,7 +855,7 @@ export default function DailyTracker({ user }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Hips ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('progress.hips')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -868,10 +870,10 @@ export default function DailyTracker({ user }) {
 
               {/* Arms */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Arms</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('fitness.arms')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Biceps ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.arms')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -897,10 +899,10 @@ export default function DailyTracker({ user }) {
 
               {/* Legs */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Legs</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('fitness.legs')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Thighs ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('progress.thighs')} ({unitSystem === 'imperial' ? 'in' : 'cm'})</label>
                     <input
                       type="number"
                       step="0.1"
@@ -931,7 +933,7 @@ export default function DailyTracker({ user }) {
                 disabled={savingMeasurements}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
               >
-                {savingMeasurements ? 'Saving...' : '💾 Save Measurements'}
+                {savingMeasurements ? t('common.loading') : t('common.save')}
               </button>
             </div>
           )}
@@ -944,13 +946,13 @@ export default function DailyTracker({ user }) {
             <p className="text-xs text-gray-500 -mt-3 mb-4">Rolling average — today minus 7 days</p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
-                <div className="text-sm text-gray-600 mb-1">Avg Sleep</div>
+                <div className="text-sm text-gray-600 mb-1">Avg {t('dailyTracker.sleep')}</div>
                 <div className="text-2xl font-bold text-indigo-600">
                   {(weeklyData.reduce((sum, d) => sum + (d.sleep_hours || 0), 0) / weeklyData.length).toFixed(1)}h
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-gray-600 mb-1">Avg Water</div>
+                <div className="text-sm text-gray-600 mb-1">Avg {t('dailyTracker.water')}</div>
                 <div className="text-2xl font-bold text-blue-600">
                   {(() => {
                     const avgMl = weeklyData.reduce((sum, d) => sum + (d.water_ml || 0), 0) / weeklyData.length;
@@ -960,7 +962,7 @@ export default function DailyTracker({ user }) {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-gray-600 mb-1">Avg Steps</div>
+                <div className="text-sm text-gray-600 mb-1">Avg {t('dailyTracker.steps')}</div>
                 <div className="text-2xl font-bold text-green-600">
                   {Math.round(weeklyData.reduce((sum, d) => sum + (d.steps || 0), 0) / weeklyData.length)}
                 </div>
@@ -973,7 +975,7 @@ export default function DailyTracker({ user }) {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-gray-600 mb-1">Avg Glucose</div>
+                <div className="text-sm text-gray-600 mb-1">Avg {t('medications.glucose')}</div>
                 <div className="text-2xl font-bold text-purple-600">
                   {(() => {
                     const filteredData = weeklyData.filter(d => d.glucose_mg_dl);

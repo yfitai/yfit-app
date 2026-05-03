@@ -1,6 +1,8 @@
 import { Trash2, Edit2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function MealCard({ meal, onRemove, onUpdate }) {
+  const { t } = useTranslation()
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-2 hover:shadow-md transition-shadow">
       {/* Food Name */}
@@ -23,12 +25,12 @@ export default function MealCard({ meal, onRemove, onUpdate }) {
       {/* Macros */}
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm font-semibold text-gray-900">
-          {meal.calories} cal
+          {meal.calories} {t('nutrition.calories').toLowerCase()}
         </div>
         <div className="flex gap-2 text-xs text-gray-600">
-          <span>P: {meal.protein}g</span>
-          <span>C: {meal.carbs}g</span>
-          <span>F: {meal.fat}g</span>
+          <span>{t('nutrition.protein').charAt(0)}: {meal.protein}g</span>
+          <span>{t('nutrition.carbs').charAt(0)}: {meal.carbs}g</span>
+          <span>{t('nutrition.fat').charAt(0)}: {meal.fat}g</span>
         </div>
       </div>
 
@@ -39,7 +41,7 @@ export default function MealCard({ meal, onRemove, onUpdate }) {
           className="flex-1 py-1 px-2 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
         >
           <Trash2 className="w-3 h-3" />
-          Remove
+          {t('common.delete')}
         </button>
       </div>
     </div>

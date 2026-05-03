@@ -8,8 +8,10 @@ import FormAnalysisHistory from './FormAnalysisHistory'
 import NutritionProgressCharts from './NutritionProgressCharts'
 import ChartSettings from './ChartSettings'
 import DailyMacrosChart from './DailyMacrosChart'
+import { useTranslation } from 'react-i18next'
 
 export default function Progress({ user: propUser }) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(propUser || null)
   const [timeRange, setTimeRange] = useState('30') // 7, 30, 90, 365 days
@@ -297,7 +299,7 @@ export default function Progress({ user: propUser }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your progress...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -307,7 +309,7 @@ export default function Progress({ user: propUser }) {
     <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-8 overflow-x-hidden w-full">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('progress.title')}</h1>
         <p className="text-gray-600">Track your journey and see how far you've come</p>
         
         {/* Time Range Selector & Settings */}
@@ -323,7 +325,7 @@ export default function Progress({ user: propUser }) {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {days === '7' ? '1 Week' : days === '30' ? '1 Month' : days === '90' ? '3 Months' : '1 Year'}
+                {days === '7' ? t('common.thisWeek') : days === '30' ? t('common.thisMonth') : days === '90' ? '3 Months' : '1 Year'}
               </button>
             ))}
           </div>
@@ -335,7 +337,7 @@ export default function Progress({ user: propUser }) {
       {currentMetrics && goalMetrics && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <OverviewCard
-            title="Weight"
+            title={t('progress.weight')}
             current={currentMetrics.weight}
             goal={goalMetrics.weight}
             starting={startingMetrics?.weight}
@@ -344,7 +346,7 @@ export default function Progress({ user: propUser }) {
             color="blue"
           />
           <OverviewCard
-            title="Body Fat"
+            title={t('progress.bodyFat')}
             current={currentMetrics.bodyFat}
             goal={goalMetrics.bodyFat}
             starting={startingMetrics?.bodyFat}
@@ -353,7 +355,7 @@ export default function Progress({ user: propUser }) {
             color="green"
           />
           <OverviewCard
-            title="BMI"
+            title={t('goals.bmi')}
             current={currentMetrics.bmi}
             goal={goalMetrics.bmi}
             starting={startingMetrics?.bmi}
@@ -371,12 +373,10 @@ export default function Progress({ user: propUser }) {
             <Zap className={`w-8 h-8 ${predictions.onTrack ? 'text-green-600' : 'text-yellow-600'}`} />
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-2">
-                {predictions.onTrack ? '🎯 You\'re On Track!' : '⚠️ Adjust Your Pace'}
+                {predictions.onTrack ? t('predictions.onTrack') : t('predictions.adjustPlan')}
               </h3>
               <p className="text-gray-700 mb-2">
-                At your current pace of <strong>{Math.abs(parseFloat(predictions.weeklyRate))} lbs/week</strong>, 
-                you'll reach your goal weight in approximately <strong>{predictions.weeksToGoal} weeks</strong> 
-                (by <strong>{predictions.projectedDate}</strong>).
+                {t('predictions.currentTrend', { rate: Math.abs(parseFloat(predictions.weeklyRate)), weeks: predictions.weeksToGoal, date: predictions.projectedDate })}
               </p>
               {!predictions.onTrack && (
                 <p className="text-sm text-gray-600">
@@ -390,7 +390,7 @@ export default function Progress({ user: propUser }) {
 
       {/* Weight Progress Chart */}
       {weightData.length > 0 && (
-        <ChartCard title="Weight Progress" icon={<TrendingDown className="w-5 h-5" />}>
+        <ChartCard title={t('progress.weight')} icon={<TrendingDown className="w-5 h-5" />}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={weightData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -398,7 +398,7 @@ export default function Progress({ user: propUser }) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} name="Weight (lbs)" />
+              <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} name={t('progress.weight') + ' (lbs)'} />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -406,7 +406,7 @@ export default function Progress({ user: propUser }) {
 
       {/* Body Composition Chart */}
       {bodyFatData.length > 0 && (
-        <ChartCard title="Body Composition" icon={<Target className="w-5 h-5" />}>
+        <ChartCard title={t('progress.bodyFat')} icon={<Target className="w-5 h-5" />}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={bodyFatData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -415,8 +415,8 @@ export default function Progress({ user: propUser }) {
               <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="bodyFat" stroke="#10b981" strokeWidth={2} name="Body Fat %" />
-              <Line yAxisId="right" type="monotone" dataKey="bmi" stroke="#8b5cf6" strokeWidth={2} name="BMI" />
+              <Line yAxisId="left" type="monotone" dataKey="bodyFat" stroke="#10b981" strokeWidth={2} name={t('progress.bodyFat')} />
+              <Line yAxisId="right" type="monotone" dataKey="bmi" stroke="#8b5cf6" strokeWidth={2} name={t('goals.bmi')} />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -425,10 +425,10 @@ export default function Progress({ user: propUser }) {
       {/* Body Measurements */}
       {measurementsData.length > 0 && (() => {
         const categories = {
-          torso: { label: 'Torso', measurements: ['Neck', 'Shoulders', 'Chest'] },
-          arms: { label: 'Arms', measurements: ['Biceps', 'Forearms'] },
-          core: { label: 'Core', measurements: ['Waist', 'Hips'] },
-          lower: { label: 'Lower Body', measurements: ['Thighs', 'Calves', 'Ankles'] }
+          torso: { label: 'Torso', measurements: ['Neck', t('progress.chest'), 'Shoulders'] },
+          arms: { label: t('progress.arms'), measurements: ['Biceps', 'Forearms'] },
+          core: { label: 'Core', measurements: [t('progress.waist'), t('progress.hips')] },
+          lower: { label: 'Lower Body', measurements: [t('progress.thighs'), 'Calves', 'Ankles'] }
         }
         
         const filteredData = measurementsData.filter(m => 
@@ -436,7 +436,7 @@ export default function Progress({ user: propUser }) {
         )
         
         return (
-          <ChartCard title="Body Measurements" icon={<Activity className="w-5 h-5" />}>
+          <ChartCard title={t('progress.addMeasurement')} icon={<Activity className="w-5 h-5" />}>
             {/* Category Tabs */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {Object.entries(categories).map(([key, { label }]) => (
@@ -513,7 +513,7 @@ export default function Progress({ user: propUser }) {
           </ChartCard>
 
           {/* Sleep */}
-          <ChartCard title="Sleep" icon={<Moon className="w-5 h-5 text-indigo-500" />}>
+          <ChartCard title={t('dailyTracker.sleep')} icon={<Moon className="w-5 h-5 text-indigo-500" />}>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={healthMetricsData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -522,14 +522,14 @@ export default function Progress({ user: propUser }) {
                 <Tooltip />
                 <Legend />
                 <Line type="monotone" dataKey="sleep" stroke="#6366f1" strokeWidth={2}
-                  name="Hours of Sleep" dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  name={t('dailyTracker.sleepHours')} dot={{ r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
 
           {/* Water Intake */}
           {healthMetricsData.some(d => d.water != null) && (
-            <ChartCard title="Water Intake" icon={<Droplet className="w-5 h-5 text-cyan-500" />}>
+            <ChartCard title={t('dailyTracker.water')} icon={<Droplet className="w-5 h-5 text-cyan-500" />}>
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={healthMetricsData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -538,7 +538,7 @@ export default function Progress({ user: propUser }) {
                   <Tooltip />
                   <Legend />
                   <Line type="monotone" dataKey="water" stroke="#06b6d4" strokeWidth={2}
-                    name={`Water (${waterUnit === 'oz' ? 'oz' : waterUnit === 'cups' ? 'cups' : 'L'})`}
+                    name={`${t('dailyTracker.water')} (${waterUnit === 'oz' ? 'oz' : waterUnit === 'cups' ? 'cups' : 'L'})`}
                     dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -547,7 +547,7 @@ export default function Progress({ user: propUser }) {
 
           {/* Nutrition Compliance */}
           {nutritionComplianceData.length > 0 && (
-            <ChartCard title="Nutrition Compliance" icon={<Apple className="w-5 h-5 text-green-500" />}>
+            <ChartCard title={t('nutrition.nutritionSummary')} icon={<Apple className="w-5 h-5 text-green-500" />}>
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={nutritionComplianceData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -555,9 +555,9 @@ export default function Progress({ user: propUser }) {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="protein" stroke="#10b981" strokeWidth={2} name="Protein (g)" />
-                  <Line type="monotone" dataKey="carbs" stroke="#f59e0b" strokeWidth={2} name="Carbs (g)" />
-                  <Line type="monotone" dataKey="fat" stroke="#ef4444" strokeWidth={2} name="Fat (g)" />
+                  <Line type="monotone" dataKey="protein" stroke="#10b981" strokeWidth={2} name={t('nutrition.protein') + ' (g)'} />
+                  <Line type="monotone" dataKey="carbs" stroke="#f59e0b" strokeWidth={2} name={t('nutrition.carbs') + ' (g)'} />
+                  <Line type="monotone" dataKey="fat" stroke="#ef4444" strokeWidth={2} name={t('nutrition.fat') + ' (g)'} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -575,7 +575,7 @@ export default function Progress({ user: propUser }) {
       
       {/* Nutrition Progress Section */}
       <div className="mt-8 space-y-6">
-        <h2 className="text-2xl font-bold text-gray-900">Nutrition Progress</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('nutrition.title')}</h2>
         
         {/* Daily Macros Chart */}
         {user && <DailyMacrosChart userId={user.id} timeRange={timeRange} />}
@@ -590,7 +590,7 @@ export default function Progress({ user: propUser }) {
       {/* Upgrade CTA — gentle nudge for free/trial users */}
       <div className="mt-8 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-700 p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <p className="font-bold text-lg">Unlock Advanced Analytics</p>
+          <p className="font-bold text-lg">{t('common.upgrade')}</p>
           <p className="text-white/80 text-sm mt-0.5">AI Predictions, injury risk forecasts, and deep performance insights — all in Pro.</p>
         </div>
         <a
@@ -606,6 +606,7 @@ export default function Progress({ user: propUser }) {
 
 // Overview Card Component
 function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
+  const { t } = useTranslation()
   // Journey progress: 0% at start, 100% when goal is reached
   const journeyTotal = starting != null && goal != null ? Math.abs(starting - goal) : null
   const journeyMade  = starting != null && current != null ? Math.abs(starting - current) : null
@@ -639,7 +640,7 @@ function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
             {current != null ? current.toFixed(1) : '--'}<span className="text-lg text-gray-600">{unit}</span>
           </div>
           <div className="text-sm text-gray-600">
-            Goal: {goal != null ? goal.toFixed(1) : '--'}{unit}
+            {t('goals.goal')}: {goal != null ? goal.toFixed(1) : '--'}{unit}
           </div>
         </div>
         
@@ -651,7 +652,7 @@ function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
         </div>
         
         <div className="text-sm font-medium text-gray-700">
-          {remaining != null ? remaining.toFixed(1) : '--'}{unit} to go
+          {remaining != null ? remaining.toFixed(1) : '--'}{unit} {t('nutrition.remaining')}
         </div>
       </div>
     </div>

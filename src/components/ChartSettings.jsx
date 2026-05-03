@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Settings, Calendar, Save, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 export default function ChartSettings({ userId, onUpdate }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [chartStartDate, setChartStartDate] = useState('');
   const [saving, setSaving] = useState(false);
@@ -66,7 +68,7 @@ export default function ChartSettings({ userId, onUpdate }) {
         if (error) throw error;
       }
 
-      setMessage({ type: 'success', text: 'Chart settings saved successfully!' });
+      setMessage({ type: 'success', text: t('common.success') });
       
       // Notify parent component to refresh charts
       if (onUpdate) {
@@ -80,7 +82,7 @@ export default function ChartSettings({ userId, onUpdate }) {
       }, 1500);
     } catch (error) {
       console.error('Error saving chart settings:', error);
-      setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' });
+      setMessage({ type: 'error', text: t('common.error') });
     } finally {
       setSaving(false);
     }
@@ -165,7 +167,7 @@ export default function ChartSettings({ userId, onUpdate }) {
                 onClick={() => setIsOpen(false)}
                 className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSave}
@@ -175,12 +177,12 @@ export default function ChartSettings({ userId, onUpdate }) {
                 {saving ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Saving...
+                    {t('common.save')}...
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    Save Settings
+                    {t('common.save')} Settings
                   </>
                 )}
               </button>

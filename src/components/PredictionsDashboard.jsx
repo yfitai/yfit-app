@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { TrendingUp, Target, Calendar, Sparkles, AlertCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function PredictionsDashboard({ user }) {
+  const { t } = useTranslation()
   const [predictions, setPredictions] = useState([])
   const [insights, setInsights] = useState([])
   const [loading, setLoading] = useState(true)
@@ -62,13 +64,13 @@ export default function PredictionsDashboard({ user }) {
   const getPredictionTitle = (type) => {
     switch (type) {
       case 'weight_loss':
-        return 'Weight Loss Prediction'
+        return t('predictions.weightForecast')
       case 'strength_gain':
-        return 'Strength Gain Prediction'
+        return t('predictions.strengthPrediction')
       case 'goal_achievement':
-        return 'Goal Achievement'
+        return t('goals.goal')
       default:
-        return 'Prediction'
+        return t('predictions.title')
     }
   }
 
@@ -102,7 +104,7 @@ export default function PredictionsDashboard({ user }) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading predictions...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -114,7 +116,7 @@ export default function PredictionsDashboard({ user }) {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <Sparkles className="w-8 h-8 text-blue-600" />
-          Your Predictions
+          {t('predictions.aiPredictions')}
         </h1>
         <p className="mt-2 text-gray-600">
           AI-powered insights into your fitness journey
@@ -149,21 +151,21 @@ export default function PredictionsDashboard({ user }) {
                     prediction.confidence_score
                   )}`}
                 >
-                  {prediction.confidence_score}% confident
+                  {prediction.confidence_score}% {t('predictions.onTrack')}
                 </span>
               </div>
 
               {/* Current vs Predicted */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 mb-1">Current</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('goals.currentWeight')}</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {prediction.current_value}
                     {prediction.prediction_type === 'weight_loss' ? ' kg' : ' kg'}
                   </p>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-sm text-blue-600 mb-1">Predicted</p>
+                  <p className="text-sm text-blue-600 mb-1">{t('predictions.projectedWeight')}</p>
                   <p className="text-2xl font-bold text-blue-600">
                     {prediction.predicted_value}
                     {prediction.prediction_type === 'weight_loss' ? ' kg' : ' kg'}
@@ -175,7 +177,7 @@ export default function PredictionsDashboard({ user }) {
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Calendar className="w-4 h-4" />
                 <span>
-                  Predicted by: <strong>{formatDate(prediction.predicted_date)}</strong>
+                  {t('predictions.estimatedGoalDate')}: <strong>{formatDate(prediction.predicted_date)}</strong>
                 </span>
               </div>
 
@@ -183,7 +185,7 @@ export default function PredictionsDashboard({ user }) {
               {prediction.target_date && (
                 <div className="mt-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Progress to goal</span>
+                    <span>{t('goals.goalProgress')}</span>
                     <span>
                       {Math.round(
                         ((prediction.current_value - prediction.predicted_value) /
@@ -217,7 +219,7 @@ export default function PredictionsDashboard({ user }) {
         <div className="bg-white rounded-xl shadow-lg p-12 text-center mb-8">
           <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No Predictions Yet
+            {t('common.noData')}
           </h3>
           <p className="text-gray-600 mb-4">
             Start tracking your progress to get AI-powered predictions!
@@ -233,7 +235,7 @@ export default function PredictionsDashboard({ user }) {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-yellow-500" />
-            AI Insights & Recommendations
+            {t('predictions.insights')} & Recommendations
           </h2>
           <div className="space-y-4">
             {insights.map((insight) => (

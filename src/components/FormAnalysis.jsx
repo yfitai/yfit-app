@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, getCurrentUser } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 import { 
   Camera, Video, Square, Play, AlertTriangle, CheckCircle, 
   TrendingUp, Award, BarChart3, X, Info
@@ -9,6 +10,7 @@ import {
 // Consistent color-coded circular gauge with letter grade used in both the
 // live overlay and the post-session results summary.
 function FormScoreGauge({ score, size = 'md', showLabel = true }) {
+  const { t } = useTranslation();
   const s = Math.max(0, Math.min(100, Math.round(score)))
   const grade = s >= 90 ? 'A' : s >= 80 ? 'B' : s >= 70 ? 'C' : s >= 60 ? 'D' : 'F'
   const color = s >= 85 ? '#22c55e' : s >= 75 ? '#eab308' : s >= 60 ? '#f97316' : '#ef4444'

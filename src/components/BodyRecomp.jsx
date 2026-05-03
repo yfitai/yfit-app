@@ -7,6 +7,7 @@ import {
   ResponsiveContainer, ReferenceLine
 } from 'recharts'
 import { TrendingDown, TrendingUp, Minus, Target, Activity, ChevronDown, ChevronUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next';
 
 // Measurements that should DECREASE toward goal (fat loss areas)
 const REDUCING_MEASUREMENTS = ['waist', 'hips']
@@ -42,6 +43,7 @@ function unitLabel(unitSystem) {
 }
 
 export default function BodyRecomp({ user }) {
+  const { t } = useTranslation();
   const { unitSystem } = useUnitPreference()
   const location = useLocation()
   const [loading, setLoading] = useState(true)

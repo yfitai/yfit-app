@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, TrendingUp, Award, Calendar, Clock, Filter } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 const FormAnalysisHistory = ({ user: propUser }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(propUser || null);
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -121,7 +123,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Activity className="text-purple-600" size={28} />
-            Form Analysis History
+            {t('fitness.formAnalysis')} History
           </h2>
           <p className="text-gray-600 mt-1">
             Track your form improvement over time with live analysis sessions

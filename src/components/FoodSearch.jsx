@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { searchFoods, getRecentFoods, getFavoriteFoods, addCustomFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
 import CustomFoodModal from './CustomFoodModal'
 
 export default function FoodSearch({ user, onSelectFood, onClose, initialQuery = '' }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState([])
   const [recentFoods, setRecentFoods] = useState([])
@@ -171,7 +173,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-semibold text-gray-800">Search Foods</h2>
+            <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.searchFood')}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -186,7 +188,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               type="text"
               value={query}
               onChange={handleSearchChange}
-              placeholder="Search for food..."
+              placeholder={t('nutrition.searchFood') + '...'}
               className={`w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${query ? 'pr-10' : ''}`}
               autoFocus
             />
@@ -243,7 +245,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               className="ml-auto px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-1"
             >
               <span>➕</span>
-              <span>Create Custom Food</span>
+              <span>{t('nutrition.customFood')}</span>
             </button>
           </div>
         </div>
@@ -336,7 +338,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
             onClick={onClose}
             className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>
@@ -355,6 +357,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
 
 // Food Result Item Component
 function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showDelete }) {
+  const { t } = useTranslation()
   // Check if this food is favorited
   const isFavorited = favoriteFoods?.some(fav => fav.id === food.id) || false
   const displayCalories = food.calories ? Math.round(food.calories) : '—'
@@ -403,10 +406,10 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showD
             <p className="text-sm text-gray-600 truncate">{food.brand}</p>
           )}
           <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-            <span className="font-medium">{displayCalories} cal</span>
-            <span>P: {displayProtein}g</span>
-            <span>C: {displayCarbs}g</span>
-            <span>F: {displayFat}g</span>
+            <span className="font-medium">{displayCalories} {t('nutrition.calories')}</span>
+            <span>{t('nutrition.protein')}: {displayProtein}g</span>
+            <span>{t('nutrition.carbs')}: {displayCarbs}g</span>
+            <span>{t('nutrition.fat')}: {displayFat}g</span>
           </div>
           {food.serving_size && (
             <p className="text-xs text-gray-500 mt-1">
@@ -432,7 +435,7 @@ function FoodResultItem({ food, onSelect, onToggleFavorite, favoriteFoods, showD
           )}
           {food.source === 'custom' && (
             <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
-              ✏️ Custom
+              ✏️ {t('nutrition.customFood')}
             </span>
           )}
         </div>

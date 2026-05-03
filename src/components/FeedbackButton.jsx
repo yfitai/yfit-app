@@ -4,6 +4,7 @@ import { MessageSquarePlus, X, Bug, Lightbulb, Heart, MessageCircle, Send, Check
 import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
+import { useTranslation } from 'react-i18next'
 
 const SUPABASE_URL = 'https://mxggxpoxgqubojvumjlt.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMjI5NjYsImV4cCI6MjA3MjY5ODk2Nn0.EWlmoH-_kw1A_gbs1rECLWkC30X50IOGx3GDSDNSYE4'
@@ -30,6 +31,7 @@ function resetForm() {
 }
 
 export default function FeedbackButton({ user }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
