@@ -1,6 +1,7 @@
 // Force rebuild - v1.0.4
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import { supabase, getCurrentUser } from '../lib/supabase'
 import UnitToggle from './UnitToggle'
@@ -22,6 +23,7 @@ import { getUserProfile } from '../lib/supabase'
 
 export default function Goals({ user: propUser }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { unitSystem, isMetric } = useUnitPreference()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -697,7 +699,7 @@ export default function Goals({ user: propUser }) {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your goals...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -710,9 +712,9 @@ export default function Goals({ user: propUser }) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Your Goals
+              {t('goals.title')}
             </h1>
-            <p className="text-gray-600 mt-1">Set your health and fitness targets</p>
+            <p className="text-gray-600 mt-1">{t('goals.setGoalTargetsAndTimeline')}</p>
           </div>
           <UnitToggle />
         </div>
@@ -794,13 +796,13 @@ export default function Goals({ user: propUser }) {
 
         {/* Basic Information Form */}
           <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Basic Information</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('goals.startingPoint')}</h2>
           
           <div className="grid md:grid-cols-2 gap-6">
             {/* Age */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Age *
+                {t('goals.age')} *
               </label>
               <input
                 type="number"
@@ -816,15 +818,15 @@ export default function Goals({ user: propUser }) {
             {/* Gender */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Gender *
+                {t('goals.gender')} *
               </label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="male">{t('goals.gender')} M</option>
+                <option value="female">{t('goals.gender')} F</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -833,7 +835,7 @@ export default function Goals({ user: propUser }) {
             {isMetric ? (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Height (cm) *
+                  {t('goals.height')} (cm) *
                 </label>
                 <input
                   type="number"
@@ -847,7 +849,7 @@ export default function Goals({ user: propUser }) {
             ) : (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Height *
+                  {t('goals.height')} *
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -875,7 +877,7 @@ export default function Goals({ user: propUser }) {
             {/* Weight */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Weight ({getWeightUnit(unitSystem)}) *
+                {t('goals.currentWeight')} ({getWeightUnit(unitSystem)}) *
               </label>
               <input
                 type="number"
@@ -890,35 +892,35 @@ export default function Goals({ user: propUser }) {
             {/* Activity Level */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Activity Level *
+                {t('goals.activityLevel')} *
               </label>
               <select
                 value={activityLevel}
                 onChange={(e) => setActivityLevel(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="sedentary">Sedentary (little or no exercise)</option>
-                <option value="light">Light (exercise 1-3 days/week)</option>
-                <option value="moderate">Moderate (exercise 3-5 days/week)</option>
-                <option value="active">Active (exercise 6-7 days/week)</option>
-                <option value="very_active">Very Active (intense exercise daily)</option>
+                <option value="sedentary">{t('goals.sedentary')}</option>
+                <option value="light">{t('goals.lightlyActive')}</option>
+                <option value="moderate">{t('goals.moderatelyActive')}</option>
+                <option value="active">{t('goals.veryActive')}</option>
+                <option value="very_active">{t('goals.extraActive')}</option>
               </select>
             </div>
 
             {/* Goal Type */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Primary Goal *
+                {t('goals.goal')} *
               </label>
               <select
                 value={goalType}
                 onChange={(e) => setGoalType(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="lose_weight">Lose Weight</option>
-                <option value="maintain">Maintain Weight</option>
-                <option value="gain_weight">Gain Weight</option>
-                <option value="build_strength">Build Strength</option>
+                <option value="lose_weight">{t('goals.loseWeight')}</option>
+                <option value="maintain">{t('goals.maintain')}</option>
+                <option value="gain_weight">{t('goals.gainMuscle')}</option>
+                <option value="build_strength">{t('goals.improveHealth')}</option>
               </select>
             </div>
 
@@ -926,7 +928,7 @@ export default function Goals({ user: propUser }) {
             {(goalType === 'lose_weight' || goalType === 'gain_weight' || goalType === 'build_strength') && (
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {goalType === 'lose_weight' ? 'Weight Loss Rate *' : 'Weight Gain Rate *'}
+                  {goalType === 'lose_weight' ? t('goals.weeklyGoal') : t('goals.weeklyGoal')}
                 </label>
                 <select
                   value={weightChangeRate}
@@ -950,7 +952,7 @@ export default function Goals({ user: propUser }) {
 
         {/* Body Measurements Form */}
           <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Body Measurements</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('goals.recordCurrentMeasurements')}</h2>
           <p className="text-gray-600 mb-6">
             Enter all 10 measurements for accurate body composition analysis. Measure at the widest/narrowest point of each area.
           </p>
@@ -1380,7 +1382,7 @@ export default function Goals({ user: propUser }) {
     disabled={saving}
     className="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
   >
-    {saving ? 'Saving...' : 'Save Goals & Calculate Metrics'}
+    {saving ? t('common.loading') : t('goals.updateGoals')}
   </button>
 
   {/* Start Fresh Button */}
@@ -1407,7 +1409,7 @@ export default function Goals({ user: propUser }) {
                 onClick={() => navigate('/nutrition')}
                 className="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                Save & Proceed to Nutrition →
+                {t('common.save')} & {t('nav.nutrition')} →
               </button>
             </div>
           </div>
@@ -1436,14 +1438,14 @@ export default function Goals({ user: propUser }) {
                   onClick={() => setShowResetModal(false)}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleStartFresh}
                   disabled={resetting}
                   className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50"
                 >
-                  {resetting ? 'Resetting...' : 'Start Fresh'}
+                  {resetting ? t('common.loading') : t('goals.setGoals')}
                 </button>
               </div>
             </div>
