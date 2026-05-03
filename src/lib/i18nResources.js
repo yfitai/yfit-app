@@ -47,7 +47,8 @@ const resources = {
         "selected": "Selected",
         "size": "Size",
         "tryAgain": "Try Again",
-        "weeks": "weeks"
+        "weeks": "weeks",
+        "over": "Over"
       },
       "auth": {
         "signIn": "Sign In",
@@ -469,7 +470,8 @@ const resources = {
         "selected": "Sélectionné",
         "size": "Taille",
         "tryAgain": "Réessayer",
-        "weeks": "semaines"
+        "weeks": "semaines",
+        "over": "Dépassé"
       },
       "auth": {
         "signIn": "Se connecter",
@@ -891,10 +893,11 @@ const resources = {
         "selected": "Seleccionado",
         "size": "Tamaño",
         "tryAgain": "Intentar de nuevo",
-        "weeks": "semanas"
+        "weeks": "semanas",
+        "over": "Excedido"
       },
       "auth": {
-        "signIn": "Iniciar Sesión",
+        "signIn": "Iniciar sesión",
         "signUp": "Registrarse",
         "signOut": "Cerrar Sesión",
         "email": "Correo Electrónico",
@@ -1313,7 +1316,8 @@ const resources = {
         "selected": "Selecionado",
         "size": "Tamanho",
         "tryAgain": "Tentar novamente",
-        "weeks": "semanas"
+        "weeks": "semanas",
+        "over": "Excedido"
       },
       "auth": {
         "signIn": "Entrar",
@@ -1735,7 +1739,8 @@ const resources = {
         "selected": "已选择",
         "size": "大小",
         "tryAgain": "重试",
-        "weeks": "周"
+        "weeks": "周",
+        "over": "超出"
       },
       "auth": {
         "signIn": "登录",
@@ -2157,7 +2162,8 @@ const resources = {
         "selected": "चुना गया",
         "size": "आकार",
         "tryAgain": "पुनः प्रयास करें",
-        "weeks": "सप्ताह"
+        "weeks": "सप्ताह",
+        "over": "अधिक"
       },
       "auth": {
         "signIn": "साइन इन करें",
@@ -2579,7 +2585,8 @@ const resources = {
         "selected": "Ausgewählt",
         "size": "Größe",
         "tryAgain": "Erneut versuchen",
-        "weeks": "Wochen"
+        "weeks": "Wochen",
+        "over": "Überschritten"
       },
       "auth": {
         "signIn": "Anmelden",
@@ -3001,7 +3008,8 @@ const resources = {
         "selected": "選択済み",
         "size": "サイズ",
         "tryAgain": "もう一度試す",
-        "weeks": "週"
+        "weeks": "週",
+        "over": "超過"
       },
       "auth": {
         "signIn": "サインイン",

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase, getCurrentUser, getUserProfile } from '../lib/supabase'
 import { updateRecentFood, addFavoriteFood, removeFavoriteFood, getFoodByBarcode } from '../lib/foodDatabase'
 import UnitToggle from './UnitToggle'
@@ -13,6 +14,7 @@ import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, St
 import NutrientProgressCard from './NutrientProgressCard'
 
 export default function NutritionEnhanced({ user: propUser }) {
+  const { t } = useTranslation()
   // Helper function to ensure date is properly formatted (YYYY-MM-DD with zero padding)
   const formatDateString = (date) => {
     const d = new Date(date)
@@ -635,10 +637,10 @@ const handleBarcodeScanned = async (barcode) => {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Nutrition Tracking
+              {t('nutrition.title')}
             </h1>
             <p className="text-gray-600 mt-1">
-              Track your meals and macros
+              {t('nutrition.nutritionSummary')}
             </p>
           </div>
           <UnitToggle />
@@ -713,7 +715,7 @@ const handleBarcodeScanned = async (barcode) => {
         <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-800">
-              {selectedDate === formatDateString(new Date()) ? "Today's Summary" : "Daily Summary"}
+              {selectedDate === formatDateString(new Date()) ? t('nutrition.nutritionSummary') : t('nutrition.nutritionSummary')}
             </h2>
             <Target className="w-6 h-6 text-blue-500" />
           </div>
@@ -721,7 +723,7 @@ const handleBarcodeScanned = async (barcode) => {
           {/* Calorie Progress */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Daily Calorie Goal</span>
+              <span className="text-sm font-medium text-gray-700">{t('nutrition.dailyGoal')}</span>
               <span className="text-sm font-semibold text-gray-900">
                 {Math.round(totalCalories)} / {Math.round(targetCalories)} kcal
               </span>
@@ -735,9 +737,9 @@ const handleBarcodeScanned = async (barcode) => {
               />
             </div>
             <div className="flex items-center justify-between mt-2 text-sm">
-              <span className="text-gray-600">Consumed: {Math.round(totalCalories)} kcal</span>
+              <span className="text-gray-600">{t('nutrition.consumed')}: {Math.round(totalCalories)} kcal</span>
               <span className={remainingCalories >= 0 ? 'text-green-600' : 'text-red-600'}>
-                {remainingCalories >= 0 ? 'Remaining' : 'Over'}: {Math.abs(Math.round(remainingCalories))} kcal
+                {remainingCalories >= 0 ? t('nutrition.remaining') : t('common.over')}: {Math.abs(Math.round(remainingCalories))} kcal
               </span>
             </div>
           </div>
@@ -747,7 +749,7 @@ const handleBarcodeScanned = async (barcode) => {
             {/* Protein */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-700">Protein</span>
+                <span className="text-sm font-medium text-gray-700">{t('nutrition.protein')}</span>
                 <span className="text-sm font-semibold text-blue-600">
                   {Math.round(totalProtein)}g / {Math.round(proteinGoal)}g ({Math.round(proteinProgress)}%)
                 </span>
@@ -763,7 +765,7 @@ const handleBarcodeScanned = async (barcode) => {
             {/* Carbs */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-700">Carbs</span>
+                <span className="text-sm font-medium text-gray-700">{t('nutrition.carbs')}</span>
                 <span className="text-sm font-semibold text-orange-600">
                   {Math.round(totalCarbs)}g / {Math.round(carbsGoal)}g ({Math.round(carbsProgress)}%)
                 </span>
@@ -779,7 +781,7 @@ const handleBarcodeScanned = async (barcode) => {
             {/* Fat */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-700">Fat</span>
+                <span className="text-sm font-medium text-gray-700">{t('nutrition.fat')}</span>
                 <span className="text-sm font-semibold text-purple-600">
                   {Math.round(totalFat)}g / {Math.round(fatGoal)}g ({Math.round(fatProgress)}%)
                 </span>
@@ -795,11 +797,11 @@ const handleBarcodeScanned = async (barcode) => {
 
           {/* Micronutrients with Progress Tracking */}
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Daily Nutrition Goals</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('nutrition.macroBreakdown')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Fiber */}
               <NutrientProgressCard
-                name="Fiber"
+                name={t('nutrition.fiber')}
                 current={totalFiber}
                 goal={fiberGoal}
                 unit="g"
@@ -809,7 +811,7 @@ const handleBarcodeScanned = async (barcode) => {
 
               {/* Sugar */}
               <NutrientProgressCard
-                name="Sugar"
+                name={t('nutrition.sugar')}
                 current={totalSugar}
                 goal={sugarGoal}
                 unit="g"
@@ -819,7 +821,7 @@ const handleBarcodeScanned = async (barcode) => {
 
               {/* Sodium */}
               <NutrientProgressCard
-                name="Sodium"
+                name={t('nutrition.sodium')}
                 current={totalSodium}
                 goal={sodiumGoal}
                 unit="mg"
@@ -1010,6 +1012,7 @@ const handleBarcodeScanned = async (barcode) => {
 }
 // Meal Type Section Component
 function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onEditMeal, onUseTemplate, onSaveAsTemplate }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(true)
 
   const mealTypeIcons = {
@@ -1020,10 +1023,10 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
   }
 
   const mealTypeLabels = {
-    breakfast: 'Breakfast',
-    lunch: 'Lunch',
-    dinner: 'Dinner',
-    snack: 'Snacks'
+    breakfast: t('nutrition.breakfast'),
+    lunch: t('nutrition.lunch'),
+    dinner: t('nutrition.dinner'),
+    snack: t('nutrition.snacks')
   }
 
   const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0)
@@ -1111,7 +1114,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                 className="flex-1 flex items-center justify-center gap-1 px-2 py-2 sm:px-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all font-medium text-xs sm:text-sm"
               >
                 <Scan className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Scan</span>
+                <span>{t('nutrition.scanBarcode')}</span>
               </button>
               <button
                 onClick={onUseTemplate}
@@ -1119,7 +1122,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                 title="Use Template"
               >
                 <Utensils className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Template</span>
+                <span>{t('nutrition.mealPlan')}</span>
               </button>
             </div>
             
@@ -1135,7 +1138,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all font-medium text-sm"
               >
                 <BookmarkPlus className="w-4 h-4" />
-                Save as Template
+                {t('nutrition.saveTemplate')}
               </button>
             )}
           </div>
@@ -1147,6 +1150,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
 
 // Serving Size Selector Component
 function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onConfirm, onCancel, user, onSaveToMyFoods }) {
+  const { t } = useTranslation()
 
   // Available units - show different options based on food type
   const isLiquid = food.foodType === 'liquid'
@@ -1193,7 +1197,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Confirm Serving Size</h2>
+          <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.confirmServingSize')}</h2>
           <p className="text-sm text-gray-600 mt-1">{food.name}</p>
           {food.brand && (
             <p className="text-xs text-gray-500">{food.brand}</p>
@@ -1205,7 +1209,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
           {/* Quantity and Unit */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Quantity & Unit
+              {t('nutrition.quantityAndUnit')}
             </label>
             <div className="flex gap-2">
               {/* Quantity Input */}
@@ -1253,22 +1257,22 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
 
           {/* Nutrition Summary */}
           <div className="bg-blue-50 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-gray-800 mb-2">Nutrition Facts</h3>
+            <h3 className="font-semibold text-gray-800 mb-2">{t('nutrition.nutritionFacts')}</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="text-gray-600">Calories:</span>
+                <span className="text-gray-600">{t('nutrition.calories')}:</span>
                 <span className="font-semibold text-gray-900 ml-2">{displayCalories} kcal</span>
               </div>
               <div>
-                <span className="text-gray-600">Protein:</span>
+                <span className="text-gray-600">{t('nutrition.protein')}:</span>
                 <span className="font-semibold text-blue-600 ml-2">{displayProtein}g</span>
               </div>
               <div>
-                <span className="text-gray-600">Carbs:</span>
+                <span className="text-gray-600">{t('nutrition.carbs')}:</span>
                 <span className="font-semibold text-orange-600 ml-2">{displayCarbs}g</span>
               </div>
               <div>
-                <span className="text-gray-600">Fat:</span>
+                <span className="text-gray-600">{t('nutrition.fat')}:</span>
                 <span className="font-semibold text-purple-600 ml-2">{displayFat}g</span>
               </div>
             </div>
@@ -1282,13 +1286,13 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
                 onClick={onCancel}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onConfirm}
                 className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
               >
-                Log Food
+                {t('nutrition.logFood')}
               </button>
             </div>
             
@@ -1299,13 +1303,13 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
                   onClick={() => onSaveToMyFoods(false)}
                   className="flex-1 px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors font-medium text-sm"
                 >
-                  ⭐ Save to My Foods
+                  ⭐ {t('nutrition.saveToMyFoods')}
                 </button>
                 <button
                   onClick={() => onSaveToMyFoods(true)}
                   className="flex-1 px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 rounded-lg hover:bg-purple-200 transition-colors font-medium text-sm"
                 >
-                  ⭐ Log & Save
+                  ⭐ {t('nutrition.logAndSave')}
                 </button>
               </div>
             )}
@@ -1318,6 +1322,7 @@ function ServingSizeSelector({ food, servingQuantity, setServingQuantity, servin
 
 // Edit Meal Modal Component
 function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit, setServingUnit, onSave, onCancel }) {
+  const { t } = useTranslation()
   // Available units (same as ServingSizeSelector)
   const units = [
     { value: 'label_serving', label: 'Label Serving', toGrams: meal.serving_grams_per_unit || 100 },
@@ -1358,7 +1363,7 @@ function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit,
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Edit Serving Size</h2>
+          <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.serving')}</h2>
           <p className="text-sm text-gray-600 mt-1">{meal.food_name}</p>
         </div>
 
@@ -1367,7 +1372,7 @@ function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit,
           {/* Quantity and Unit */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Quantity &amp; Unit
+              {t('nutrition.quantityUnit')}
             </label>
             <div className="flex gap-2">
               <input
@@ -1405,22 +1410,22 @@ function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit,
 
           {/* Nutrition Preview */}
           <div className="bg-blue-50 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-gray-800 mb-2">Updated Nutrition</h3>
+            <h3 className="font-semibold text-gray-800 mb-2">{t('nutrition.nutritionFacts')}</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="text-gray-600">Calories:</span>
+                <span className="text-gray-600">{t('nutrition.calories')}:</span>
                 <span className="font-semibold text-gray-900 ml-2">{previewCalories} kcal</span>
               </div>
               <div>
-                <span className="text-gray-600">Protein:</span>
+                <span className="text-gray-600">{t('nutrition.protein')}:</span>
                 <span className="font-semibold text-blue-600 ml-2">{previewProtein}g</span>
               </div>
               <div>
-                <span className="text-gray-600">Carbs:</span>
+                <span className="text-gray-600">{t('nutrition.carbs')}:</span>
                 <span className="font-semibold text-orange-600 ml-2">{previewCarbs}g</span>
               </div>
               <div>
-                <span className="text-gray-600">Fat:</span>
+                <span className="text-gray-600">{t('nutrition.fat')}:</span>
                 <span className="font-semibold text-purple-600 ml-2">{previewFat}g</span>
               </div>
             </div>
@@ -1432,13 +1437,13 @@ function EditMealModal({ meal, servingQuantity, setServingQuantity, servingUnit,
               onClick={onCancel}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={onSave}
               className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:from-blue-600 hover:to-green-600 transition-all font-medium"
             >
-              Save Changes
+              {t('common.save')}
             </button>
           </div>
         </div>
