@@ -348,7 +348,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <Lock className="h-4 w-4" />
-                <span className="hidden sm:inline">Change Password</span>
+                <span className="hidden sm:inline">{t('auth.resetPassword')}</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -356,7 +356,7 @@ export default function Dashboard({ user }) {
                 className="flex items-center space-x-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <span className="hidden sm:inline">{t('auth.signOut')}</span>
               </Button>
             </div>
           </div>
@@ -381,42 +381,42 @@ export default function Dashboard({ user }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Steps Today</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.steps')}</CardTitle>
               <Activity className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{stepsToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">Goal: {stepsGoal.toLocaleString()} steps</p>
+              <p className="text-xs text-teal-600">{t('goals.goal')}: {stepsGoal.toLocaleString()}</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Calories</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.calories')}</CardTitle>
               <Apple className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{caloriesToday.toLocaleString()}</div>
-              <p className="text-xs text-teal-600">of {caloriesGoal.toLocaleString()} kcal goal</p>
+              <p className="text-xs text-teal-600">{t('goals.goal')}: {caloriesGoal.toLocaleString()} kcal</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Workouts</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('nav.fitness')}</CardTitle>
               <Dumbbell className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{workoutsThisWeek}</div>
               <p className="text-xs text-teal-600">
-                {new Date().getDay() === 0 ? 'New week — reset today' : 'This week'}
+                {new Date().getDay() === 0 ? t('dashboard.newWeekReset') : t('dashboard.thisWeek')}
               </p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-teal-800">Day Streak</CardTitle>
+              <CardTitle className="text-sm font-medium text-teal-800">{t('dashboard.streakDays')}</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
@@ -425,8 +425,8 @@ export default function Dashboard({ user }) {
               </div>
               <p className="text-xs text-teal-600">
                 {streakDays !== null
-                  ? streakDays >= 7 ? '🔥 On fire!' : streakDays >= 3 ? 'Keep it up!' : streakDays > 0 ? 'Good start!' : 'Log today to start'
-                  : 'Loading...'
+                  ? streakDays >= 7 ? t('dashboard.streakOnFire') : streakDays >= 3 ? t('dashboard.streakKeepItUp') : streakDays > 0 ? t('dashboard.streakGoodStart') : t('dashboard.streakLogToday')
+                  : t('common.loading')
                 }
               </p>
             </CardContent>
@@ -438,7 +438,7 @@ export default function Dashboard({ user }) {
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-8 text-white">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6" />
-              <h3 className="text-lg font-bold">Last Week Summary 📊</h3>
+              <h3 className="text-lg font-bold">{t('dashboard.lastWeekSummary')} 📊</h3>
             </div>
             {lastWeekWorkouts === 0 && (lastWeekStreak === null || lastWeekStreak === 0) ? (
               // First full week — no prior week data yet
@@ -452,22 +452,22 @@ export default function Dashboard({ user }) {
                 <div className="grid grid-cols-3 gap-3 mb-3">
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-2xl font-bold">{lastWeekWorkouts}</div>
-                    <div className="text-sm opacity-90">Workouts last week</div>
+                    <div className="text-sm opacity-90">{t('nav.fitness')}</div>
                   </div>
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-2xl font-bold">{lastWeekStreak !== null ? lastWeekStreak : '--'}</div>
-                    <div className="text-sm opacity-90">Active days</div>
+                    <div className="text-sm opacity-90">{t('dashboard.weeklyProgress')}</div>
                   </div>
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-2xl font-bold">
                       {lastWeekWorkouts >= 5 ? '🔥' : lastWeekWorkouts >= 3 ? '💪' : lastWeekWorkouts >= 1 ? '👍' : '😴'}
                     </div>
                     <div className="text-sm opacity-90">
-                      {lastWeekWorkouts >= 5 ? 'On fire!' : lastWeekWorkouts >= 3 ? 'Solid week!' : lastWeekWorkouts >= 1 ? 'Good start!' : 'Rest week'}
+                      {lastWeekWorkouts >= 5 ? t('dashboard.lastWeekOnFire') : lastWeekWorkouts >= 3 ? t('dashboard.lastWeekSolid') : lastWeekWorkouts >= 1 ? t('dashboard.lastWeekGoodStart') : t('dashboard.lastWeekRestWeek')}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm opacity-80">Head to Predictions for your full weekly analysis and upcoming forecasts.</p>
+                <p className="text-sm opacity-80">{t('dashboard.goalProgress')}</p>
               </>
             )}
           </div>
@@ -479,8 +479,8 @@ export default function Dashboard({ user }) {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Get started with your health journey</CardDescription>
+            <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+            <CardDescription>{t('dashboard.getStartedHealth')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -489,7 +489,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm"
               >
                 <Target className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Goals</span>
+                <span>{t('nav.goals')}</span>
               </Button>
 
               <Button 
@@ -497,7 +497,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm"
               >
                 <Apple className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Nutrition</span>
+                <span>{t('nav.nutrition')}</span>
               </Button>
 
               <Button 
@@ -505,7 +505,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-xs sm:text-sm"
               >
                 <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Fitness</span>
+                <span>{t('nav.fitness')}</span>
               </Button>
 
               <Button 
@@ -513,7 +513,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-xs sm:text-sm"
               >
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Daily Tracker</span>
+                <span>{t('nav.dailyTracker')}</span>
               </Button>
 
               <Button 
@@ -521,7 +521,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-xs sm:text-sm"
               >
                 <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Medications</span>
+                <span>{t('nav.medications')}</span>
               </Button>
 
               <Button 
@@ -529,7 +529,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-xs sm:text-sm"
               >
                 <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Progress</span>
+                <span>{t('nav.progress')}</span>
               </Button>
 
               <Button 
@@ -537,7 +537,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-xs sm:text-sm"
               >
                 <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>Predictions</span>
+                <span>{t('nav.predictions')}</span>
               </Button>
 
               <Button 
@@ -545,7 +545,7 @@ export default function Dashboard({ user }) {
                 className="h-auto py-4 flex flex-col items-center space-y-2 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-xs sm:text-sm"
               >
                 <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>AI Coach</span>
+                <span>{t('nav.aiCoach')}</span>
               </Button>
             </div>
           </CardContent>
@@ -561,10 +561,10 @@ export default function Dashboard({ user }) {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Lock className="h-5 w-5" />
-                <span>Change Password</span>
+                <span>{t('auth.resetPassword')}</span>
               </CardTitle>
               <CardDescription>
-                Enter your current password and choose a new one
+                {t('auth.currentPassword')}
               </CardDescription>
             </CardHeader>
             
@@ -587,7 +587,7 @@ export default function Dashboard({ user }) {
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
+                  <Label htmlFor="current-password">{t('dashboard.currentPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="current-password"
@@ -612,7 +612,7 @@ export default function Dashboard({ user }) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
+                  <Label htmlFor="new-password">{t('dashboard.newPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -635,11 +635,11 @@ export default function Dashboard({ user }) {
                       {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500">Must be at least 6 characters</p>
+                  <p className="text-xs text-gray-500">{t('dashboard.passwordMinLength')}</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                  <Label htmlFor="confirm-new-password">{t('dashboard.confirmNewPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirm-new-password"
@@ -671,7 +671,7 @@ export default function Dashboard({ user }) {
                   className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                   disabled={isChangingPassword}
                 >
-                  {isChangingPassword ? 'Changing...' : 'Change Password'}
+                  {isChangingPassword ? t('auth.changing') : t('auth.resetPassword')}
                 </Button>
                 <Button 
                   type="button"
