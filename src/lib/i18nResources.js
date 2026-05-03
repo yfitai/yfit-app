@@ -340,7 +340,10 @@ const resources = {
         "daily": "Daily",
         "weekly": "Weekly",
         "asNeeded": "As Needed",
-        "glucose": "Glucose"
+        "glucose": "Glucose",
+        "disclaimer": "Important Medical Disclaimer",
+        "disclaimerText": "This tool is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider before starting, stopping, or changing any medication.",
+        "subtitle": "Track medications, check interactions, and manage your health safely"
       },
       "progress": {
         "title": "Progress",
@@ -763,7 +766,10 @@ const resources = {
         "daily": "Quotidien",
         "weekly": "Hebdomadaire",
         "asNeeded": "Au besoin",
-        "glucose": "Glucose"
+        "glucose": "Glucose",
+        "disclaimer": "Avertissement médical important",
+        "disclaimerText": "Cet outil est uniquement à titre informatif et ne remplace pas les conseils médicaux professionnels. Consultez toujours votre médecin avant de modifier tout médicament.",
+        "subtitle": "Suivez vos médicaments, vérifiez les interactions et gérez votre santé en toute sécurité"
       },
       "progress": {
         "title": "Progrès",
@@ -1186,7 +1192,10 @@ const resources = {
         "daily": "Diario",
         "weekly": "Semanal",
         "asNeeded": "Según Necesidad",
-        "glucose": "Glucosa"
+        "glucose": "Glucosa",
+        "disclaimer": "Aviso médico importante",
+        "disclaimerText": "Esta herramienta es solo informativa y no sustituye el consejo médico profesional. Consulte siempre a su médico antes de cambiar cualquier medicamento.",
+        "subtitle": "Rastree medicamentos, verifique interacciones y gestione su salud de forma segura"
       },
       "progress": {
         "title": "Progreso",
@@ -1609,7 +1618,10 @@ const resources = {
         "daily": "Diário",
         "weekly": "Semanal",
         "asNeeded": "Conforme Necessário",
-        "glucose": "Glicose"
+        "glucose": "Glicose",
+        "disclaimer": "Aviso médico importante",
+        "disclaimerText": "Esta ferramenta é apenas informativa e não substitui o conselho médico profissional. Consulte sempre o seu médico antes de alterar qualquer medicação.",
+        "subtitle": "Acompanhe medicamentos, verifique interações e gerencie sua saúde com segurança"
       },
       "progress": {
         "title": "Progresso",
@@ -2032,7 +2044,10 @@ const resources = {
         "daily": "每日",
         "weekly": "每周",
         "asNeeded": "按需",
-        "glucose": "葡萄糖"
+        "glucose": "葡萄糖",
+        "disclaimer": "重要医疗免责声明",
+        "disclaimerText": "本工具仅供参考，不能替代专业医疗建议。在更改任何药物之前，请务必和您的医生咨询。",
+        "subtitle": "跟踪药物、检查相互作用并安全管理您的健康"
       },
       "progress": {
         "title": "进展",
@@ -2455,7 +2470,10 @@ const resources = {
         "daily": "दैनिक",
         "weekly": "साप्ताहिक",
         "asNeeded": "आवश्यकतानुसार",
-        "glucose": "ग्लूकोज"
+        "glucose": "ग्लूकोज",
+        "disclaimer": "महत्वपूर्ण चिकित्सा अस्वीकरण",
+        "disclaimerText": "यह उपकरण केवल सूचना के लिए है और पेशेवर चिकित्सा सलाह का विकल्प नहीं है। कोई भी दवाई बदलने से पहले अपने डॉक्टर से सलाह लें।",
+        "subtitle": "दवाईयाँ ट्रैक करें, इंटरैक्शन जांचें और सुरक्षित रूप से अपने स्वास्थ्य का प्रबंधन करें"
       },
       "progress": {
         "title": "प्रगति",
@@ -2878,7 +2896,10 @@ const resources = {
         "daily": "Täglich",
         "weekly": "Wöchentlich",
         "asNeeded": "Bei Bedarf",
-        "glucose": "Glukose"
+        "glucose": "Glukose",
+        "disclaimer": "Wichtiger medizinischer Haftungsausschluss",
+        "disclaimerText": "Dieses Tool dient nur zu Informationszwecken und ersetzt keine professionelle medizinische Beratung. Konsultieren Sie immer Ihren Arzt, bevor Sie Medikamente ändern.",
+        "subtitle": "Medikamente verfolgen, Wechselwirkungen prüfen und Ihre Gesundheit sicher verwalten"
       },
       "progress": {
         "title": "Fortschritt",
@@ -3301,7 +3322,10 @@ const resources = {
         "daily": "毎日",
         "weekly": "毎週",
         "asNeeded": "必要に応じて",
-        "glucose": "グルコース"
+        "glucose": "グルコース",
+        "disclaimer": "重要な医療免責事項",
+        "disclaimerText": "このツールは情報提供のみを目的としており、専門的な医療アドバイスの代わりにはなりません。薬を変更する前に必ず医師に相談してください。",
+        "subtitle": "薬を追跡し、相互作用を確認し、安全に健康を管理する"
       },
       "progress": {
         "title": "進捗",

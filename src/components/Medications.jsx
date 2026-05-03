@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Pill, AlertTriangle, FileText, Users, Activity } from 'lucide-react'
 import MedicationList from './MedicationList'
 import MedicationSearch from './MedicationSearch'
@@ -7,14 +8,15 @@ import MedicationLog from './MedicationLog'
 import ProviderReport from './ProviderReport'
 
 export default function Medications({ user }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('my-medications')
 
   const tabs = [
-    { id: 'my-medications', label: 'My Medications', icon: Pill },
-    { id: 'add-medication', label: 'Add Medication', icon: Pill },
-    { id: 'interactions', label: 'Safety Check', icon: AlertTriangle },
-    { id: 'adherence', label: 'Adherence Log', icon: Activity },
-    { id: 'providers', label: 'Provider Report', icon: FileText },
+    { id: 'my-medications', label: t('medications.myMedications'), icon: Pill },
+    { id: 'add-medication', label: t('medications.addMedication'), icon: Pill },
+    { id: 'interactions', label: t('medications.taken'), icon: AlertTriangle },
+    { id: 'adherence', label: t('medications.logDose'), icon: Activity },
+    { id: 'providers', label: t('medications.providerReport'), icon: FileText },
   ]
 
   return (
@@ -23,10 +25,10 @@ export default function Medications({ user }) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
-            Medication Management
+            {t('medications.title')}
           </h1>
           <p className="text-gray-600">
-            Track medications, check interactions, and manage your health safely
+            {t('medications.subtitle')}
           </p>
         </div>
 
@@ -36,12 +38,10 @@ export default function Medications({ user }) {
             <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800 font-medium">
-                Important Medical Disclaimer
+                {t('medications.disclaimer')}
               </p>
               <p className="text-sm text-yellow-700 mt-1">
-                This tool is for informational purposes only and is not a substitute for professional medical advice, 
-                diagnosis, or treatment. Always consult your healthcare provider before starting, stopping, or changing 
-                any medication. In case of emergency, call 911 or your local emergency services.
+                {t('medications.disclaimerText')}
               </p>
             </div>
           </div>
