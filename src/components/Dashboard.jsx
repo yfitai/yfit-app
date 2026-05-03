@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
@@ -11,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert.jsx'
 // Logo is loaded from public/assets/yfit-logo.png
 
 export default function Dashboard({ user }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
