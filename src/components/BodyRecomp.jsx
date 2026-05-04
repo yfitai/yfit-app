@@ -153,7 +153,7 @@ export default function BodyRecomp({ user }) {
 
     const isReducing = REDUCING_MEASUREMENTS.includes(type)
     const totalChange = Math.abs(goalCm - startCm)
-    if (totalChange === 0) return 100
+    if (totalChange === 0) return 0  // start equals goal — no meaningful progress yet
 
     const actualChange = isReducing
       ? startCm - currentCm   // positive = progress for reducing
