@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import { Search, Filter, X, ChevronRight, Dumbbell, Target, Zap, ExternalLink } from 'lucide-react';
 
 const ExerciseLibrary = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   // List of exercises with implemented form analysis
@@ -204,7 +206,7 @@ const ExerciseLibrary = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading exercises from database...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -215,7 +217,7 @@ const ExerciseLibrary = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Exercise Library</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('fitness.exerciseLibrary', 'Exercise Library')}</h2>
           <p className="text-gray-600 mt-1">
             {filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''} available
           </p>
@@ -322,8 +324,8 @@ const ExerciseLibrary = () => {
       {filteredExercises.length === 0 ? (
         <div className="text-center py-12">
           <Dumbbell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No exercises found</h3>
-          <p className="text-gray-600 mb-4">Try adjusting your filters or search query</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('fitness.noExercisesFound', 'No exercises found')}</h3>
+          <p className="text-gray-600 mb-4">{t('fitness.adjustFilters', 'Try adjusting your filters or search query')}</p>
           {hasActiveFilters() && (
             <button
               onClick={clearFilters}
@@ -427,7 +429,7 @@ const ExerciseLibrary = () => {
                 <div className="mb-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">Starting Position</p>
+                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">{t('fitness.start', 'Starting Position')}</p>
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                         <img
                           src={selectedExercise.gif_url}
@@ -437,7 +439,7 @@ const ExerciseLibrary = () => {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">Extended Position</p>
+                      <p className="text-sm font-medium text-gray-600 mb-2 text-center">{t('fitness.extended', 'Extended Position')}</p>
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                         <img
                           src={selectedExercise.image_url_2}
@@ -478,7 +480,7 @@ const ExerciseLibrary = () => {
 
                 {selectedExercise.secondary_muscles && selectedExercise.secondary_muscles.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Secondary Muscles</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('fitness.secondaryMuscles', 'Secondary Muscles')}</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedExercise.secondary_muscles.map((muscle, idx) => (
                         <span
@@ -521,7 +523,7 @@ const ExerciseLibrary = () => {
 
                 {selectedExercise.description && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Instructions</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('fitness.instructions', 'Instructions')}</h4>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedExercise.description}
                     </p>

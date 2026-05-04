@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Pause, Check, X, ChevronLeft, ChevronRight, Timer, Award, TrendingUp } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import ProgressiveOverloadTracker from './ProgressiveOverloadTracker';
 
 const WorkoutSessionTracker = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [workoutPlans, setWorkoutPlans] = useState([]);
@@ -249,7 +251,7 @@ const WorkoutSessionTracker = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -259,7 +261,7 @@ const WorkoutSessionTracker = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to track workouts</p>
+          <p className="text-gray-600">{t('fitness.signInToLog')}</p>
         </div>
       </div>
     );
@@ -322,7 +324,7 @@ const WorkoutSessionTracker = () => {
               <div className="text-4xl font-bold text-yellow-600 mb-2">
                 {Math.floor(restTimer / 60)}:{(restTimer % 60).toString().padStart(2, '0')}
               </div>
-              <div className="text-sm text-gray-600 mb-4">Rest Time Remaining</div>
+              <div className="text-sm text-gray-600 mb-4">{t('fitness.restTimeRemaining', 'Rest Time Remaining')}</div>
               <button
                 onClick={skipRestTimer}
                 className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
@@ -346,7 +348,7 @@ const WorkoutSessionTracker = () => {
               <div className="max-w-2xl mx-auto mb-6">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">Start</p>
+                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">{t('fitness.start', 'Start')}</p>
                     <img
                       src={currentExercise.exercise.gif_url}
                       alt={`${currentExercise.exercise.name} - start`}
@@ -354,7 +356,7 @@ const WorkoutSessionTracker = () => {
                     />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">Extended</p>
+                    <p className="text-xs font-medium text-gray-500 mb-1 text-center">{t('fitness.extended', 'Extended')}</p>
                     <img
                       src={currentExercise.exercise.image_url_2}
                       alt={`${currentExercise.exercise.name} - end`}
@@ -373,7 +375,7 @@ const WorkoutSessionTracker = () => {
 
             {/* Target */}
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
-              <div className="text-sm text-gray-600 mb-2">Target</div>
+              <div className="text-sm text-gray-600 mb-2">{t('fitness.target', 'Target')}</div>
               <div className="flex gap-4">
                 <div>
                   <span className="font-semibold">{planExercise.target_sets}</span> sets
@@ -397,7 +399,7 @@ const WorkoutSessionTracker = () => {
 
             {/* Set Logging Form */}
             <div className="bg-gray-50 rounded-lg p-6 mt-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Log Set {currentSet}</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">{t('fitness.logSet', 'Log Set')} {currentSet}</h3>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -454,7 +456,7 @@ const WorkoutSessionTracker = () => {
             {/* Completed Sets */}
             {exerciseSets.length > 0 && (
               <div className="mt-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Completed Sets</h3>
+                <h3 className="font-semibold text-gray-900 mb-3">{t('fitness.completedSets', 'Completed Sets')}</h3>
                 <div className="space-y-2">
                   {exerciseSets.map((set, index) => (
                     <div key={index} className="flex justify-between items-center bg-green-50 border border-green-200 rounded-lg p-3">
@@ -503,12 +505,12 @@ const WorkoutSessionTracker = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Start Workout</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('fitness.startWorkout', 'Start Workout')}</h1>
 
         {workoutPlans.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <p className="text-gray-600 mb-4">No workout plans found</p>
-            <p className="text-sm text-gray-500">Create a workout plan first using the Workout Builder</p>
+            <p className="text-gray-600 mb-4">{t('fitness.noWorkoutPlans', 'No workout plans found')}</p>
+            <p className="text-sm text-gray-500">{t('fitness.createWorkoutPlanFirst', 'Create a workout plan first using the Workout Builder')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

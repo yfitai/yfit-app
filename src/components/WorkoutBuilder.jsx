@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import { Plus, X, Save, Search, GripVertical, Trash2, Edit2 } from 'lucide-react';
 
 const WorkoutBuilder = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [workoutName, setWorkoutName] = useState('');
   const [workoutDescription, setWorkoutDescription] = useState('');
@@ -310,7 +312,7 @@ const WorkoutBuilder = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -320,7 +322,7 @@ const WorkoutBuilder = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to create workouts</p>
+          <p className="text-gray-600">{t('fitness.signInToLog')}</p>
         </div>
       </div>
     );
@@ -329,16 +331,16 @@ const WorkoutBuilder = () => {
   return (
     <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Create Workout</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('fitness.createFirstWorkout')}</h1>
 
         {/* Workout Details */}
         <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-6 mb-6 border border-teal-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Workout Details</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.workoutDetails', 'Workout Details')}</h2>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Workout Name *
+                {t('fitness.workoutName', 'Workout Name')} *
               </label>
               <input
                 type="text"
@@ -354,7 +356,7 @@ const WorkoutBuilder = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                {t('common.description')}
               </label>
               <textarea
                 value={workoutDescription}
@@ -381,18 +383,18 @@ const WorkoutBuilder = () => {
               title={!workoutName.trim() ? 'Enter a workout name first' : ''}
             >
               <Plus className="w-5 h-5" />
-              Add Exercise
+              {t('fitness.addExercise', 'Add Exercise')}
             </button>
           </div>
 
           {selectedExercises.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <p className="mb-4">No exercises added yet</p>
+              <p className="mb-4">{t('fitness.noExercisesAdded', 'No exercises added yet')}</p>
               <button
                 onClick={() => setShowExerciseSelector(true)}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Add Your First Exercise
+                {t('fitness.addExercise', 'Add Your First Exercise')}
               </button>
             </div>
           ) : (
@@ -445,7 +447,7 @@ const WorkoutBuilder = () => {
                       {exerciseType === 'strength' && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Sets</label>
+                          <label className="block text-xs text-gray-600 mb-1">{t('fitness.sets')}</label>
                           <input
                             type="number"
                             value={item.target_sets}
@@ -455,7 +457,7 @@ const WorkoutBuilder = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Min Reps</label>
+                          <label className="block text-xs text-gray-600 mb-1">{t('fitness.minReps', 'Min Reps')}</label>
                           <input
                             type="number"
                             value={item.target_reps_min}
@@ -465,7 +467,7 @@ const WorkoutBuilder = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Max Reps</label>
+                          <label className="block text-xs text-gray-600 mb-1">{t('fitness.maxReps', 'Max Reps')}</label>
                           <input
                             type="number"
                             value={item.target_reps_max}
@@ -475,7 +477,7 @@ const WorkoutBuilder = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Rest (sec)</label>
+                          <label className="block text-xs text-gray-600 mb-1">{t('fitness.restSec', 'Rest (sec)')}</label>
                           <input
                             type="number"
                             value={item.rest_seconds}
@@ -524,7 +526,7 @@ const WorkoutBuilder = () => {
             onClick={resetForm}
             className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
           >
-            Reset
+            {t('common.reset', 'Reset')}
           </button>
           <button
             onClick={saveWorkout}
@@ -532,7 +534,7 @@ const WorkoutBuilder = () => {
             className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
-            {saving ? 'Saving...' : 'Save Workout'}
+            {saving ? t('common.loading') : t('fitness.saveWorkout', 'Save Workout')}
           </button>
         </div>
       </div>
@@ -544,7 +546,7 @@ const WorkoutBuilder = () => {
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Select Exercise</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('fitness.selectExercise', 'Select Exercise')}</h2>
                 <button
                   onClick={() => setShowExerciseSelector(false)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -557,7 +559,7 @@ const WorkoutBuilder = () => {
               <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Name of Exercise */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name of Exercise</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('fitness.exerciseName', 'Name of Exercise')}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -572,7 +574,7 @@ const WorkoutBuilder = () => {
                 
                 {/* Muscle */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Muscle</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('fitness.muscleGroup')}</label>
                   <input
                     type="text"
                     value={filterTargetMuscle === 'all' ? '' : filterTargetMuscle}
@@ -583,8 +585,9 @@ const WorkoutBuilder = () => {
                 </div>
                 
                 {/* Equipment */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Equipment</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('fitness.equipment', 'Equipment')}</label>
                   <input
                     type="text"
                     value={filterEquipment === 'all' ? '' : filterEquipment}

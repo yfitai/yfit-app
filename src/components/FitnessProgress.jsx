@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
@@ -34,6 +35,7 @@ const isWeightedSession = (session) => {
 };
 
 const FitnessProgress = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [exercises, setExercises] = useState([]);
@@ -1051,7 +1053,7 @@ const FitnessProgress = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading progress data...</p>
+          <p className="mt-4 text-gray-600">{t('fitness.loadingProgress')}</p>
         </div>
       </div>
     );
@@ -1061,7 +1063,7 @@ const FitnessProgress = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to view progress</p>
+          <p className="text-gray-600">{t('fitness.pleaseSignIn')}</p>
         </div>
       </div>
     );
@@ -1071,7 +1073,7 @@ const FitnessProgress = () => {
     <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Fitness Progress</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('fitness.fitnessProgress')}</h1>
           
           {/* Time Range Selector */}
           <select
@@ -1079,10 +1081,10 @@ const FitnessProgress = () => {
             onChange={(e) => setTimeRange(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="7">Last 7 Days</option>
-            <option value="30">Last 30 Days</option>
-            <option value="90">Last 90 Days</option>
-            <option value="365">Last Year</option>
+            <option value="7">{t('fitness.lastWeek')}</option>
+            <option value="30">{t('fitness.lastMonth')}</option>
+            <option value="90">{t('fitness.last3Months')}</option>
+            <option value="365">{t('fitness.lastYear')}</option>
           </select>
         </div>
 
@@ -1094,9 +1096,9 @@ const FitnessProgress = () => {
               <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 mb-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Weekly Reset — New Week Starting</h3>
+                  <h3 className="text-lg font-bold">{t('fitness.weeklyReset')}</h3>
                 </div>
-                <p className="text-sm opacity-90">Your weekly workout count resets on Sunday. Stats below reflect your selected time range. Log your first workout today to kick off the new week!</p>
+                <p className="text-sm opacity-90">{t('fitness.weeklyResetDesc')}</p>
               </div>
             );
           }
@@ -1105,9 +1107,9 @@ const FitnessProgress = () => {
               <div className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-lg p-5 mb-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
                   <Award className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Fresh Week — Let's Go!</h3>
+                  <h3 className="text-lg font-bold">{t('fitness.freshWeek')}</h3>
                 </div>
-                <p className="text-sm opacity-90">No workouts logged yet this week. Your first session today will start building this week's stats.</p>
+                <p className="text-sm opacity-90">{t('fitness.freshWeekDesc')}</p>
               </div>
             );
           }
@@ -1124,7 +1126,7 @@ const FitnessProgress = () => {
               <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalWorkouts}</div>
-            <div className="text-sm text-teal-700">Total Workouts</div>
+            <div className="text-sm text-teal-700">{t('fitness.totalWorkouts')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
@@ -1135,7 +1137,7 @@ const FitnessProgress = () => {
               <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalVolume.toLocaleString()}</div>
-            <div className="text-sm text-teal-700">Total Volume (lbs)</div>
+            <div className="text-sm text-teal-700">{t('fitness.totalVolume')} (lbs)</div>
           </div>
 
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
@@ -1146,7 +1148,7 @@ const FitnessProgress = () => {
               <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalReps.toLocaleString()}</div>
-            <div className="text-sm text-teal-700">Total Reps</div>
+            <div className="text-sm text-teal-700">{t('fitness.totalReps')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
@@ -1157,7 +1159,7 @@ const FitnessProgress = () => {
               <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalDistance.toFixed(2)}</div>
-            <div className="text-sm text-teal-700">Total Distance (miles)</div>
+            <div className="text-sm text-teal-700">{t('fitness.totalDistance')} (miles)</div>
           </div>
 
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
@@ -1168,13 +1170,13 @@ const FitnessProgress = () => {
               <TrendingUp className="w-5 h-5 text-teal-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stats.avgFormScore}</div>
-            <div className="text-sm text-teal-700">Avg Form Score</div>
+            <div className="text-sm text-teal-700">{t('fitness.avgFormScore')}</div>
           </div>
         </div>
 
         {/* Exercise Selection */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise to Track</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.selectExercise')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
             {exercises.filter(ex => !hiddenExercises.includes(ex.id)).map(exercise => (
               <button
@@ -1215,7 +1217,7 @@ const FitnessProgress = () => {
                 <>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Distance Progression
+                      {selectedExercise.name} - {t('fitness.distanceProgression')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={progressData}>
@@ -1244,7 +1246,7 @@ const FitnessProgress = () => {
                   </div>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Duration
+                      {selectedExercise.name} - {t('fitness.duration')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={progressData}>
@@ -1264,7 +1266,7 @@ const FitnessProgress = () => {
               {exerciseType === 'stretching' && (
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    {selectedExercise.name} - Duration Progression
+                    {selectedExercise.name} - {t('fitness.durationProgression')}
                   </h2>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={progressData}>
@@ -1290,7 +1292,7 @@ const FitnessProgress = () => {
                 <>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Reps Progression
+                      {selectedExercise.name} - {t('fitness.repsProgression')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={progressData}>
@@ -1311,7 +1313,7 @@ const FitnessProgress = () => {
                   </div>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Total Reps per Session
+                      {selectedExercise.name} - {t('fitness.totalRepsPerSession')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={progressData}>
@@ -1332,7 +1334,7 @@ const FitnessProgress = () => {
                 <>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Strength Progression
+                      {selectedExercise.name} - {t('fitness.strengthProgression')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={progressData}>
@@ -1361,7 +1363,7 @@ const FitnessProgress = () => {
                   </div>
                   <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {selectedExercise.name} - Training Volume
+                      {selectedExercise.name} - {t('fitness.trainingVolume')}
                     </h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={progressData}>
@@ -1387,11 +1389,11 @@ const FitnessProgress = () => {
                 const forecast = calculateStrengthForecast();
                 return forecast && (
                   <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
-                    <h2 className="text-2xl font-semibold mb-4">💪 Strength Forecast</h2>
+                    <h2 className="text-2xl font-semibold mb-4">💪 {t('fitness.strengthForecast')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {forecast.predictions.map(pred => (
                         <div key={pred.weeks} className="bg-white/10 rounded-lg p-4">
-                          <div className="text-sm opacity-90 mb-2">In {pred.weeks} Weeks</div>
+                          <div className="text-sm opacity-90 mb-2">{t('fitness.inWeeks', { count: pred.weeks })}</div>
                           <div className="text-3xl font-bold">{pred.weight} lbs</div>
                           <div className="text-xs opacity-75 mt-2">
                             +{pred.weight - forecast.currentMax} lbs from current
@@ -1400,9 +1402,9 @@ const FitnessProgress = () => {
                       ))}
                     </div>
                     <div className="mt-4 flex items-center justify-between text-sm">
-                      <span>Weekly Growth: +{forecast.avgWeeklyGrowth} lbs</span>
-                      <span>Confidence: {forecast.confidence}%</span>
-                      <span className="capitalize">Trend: {forecast.trend}</span>
+                      <span>{t('fitness.weeklyGrowth')}: +{forecast.avgWeeklyGrowth} lbs</span>
+                      <span>{t('fitness.confidence')}: {forecast.confidence}%</span>
+                      <span className="capitalize">{t('fitness.trend')}: {forecast.trend}</span>
                     </div>
                   </div>
                 );
@@ -1413,19 +1415,19 @@ const FitnessProgress = () => {
                 const goal = calculateGoalAchievement();
                 return goal && (
                   <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-6 text-white">
-                    <h2 className="text-2xl font-semibold mb-4">🎯 Goal Achievement Probability</h2>
+                    <h2 className="text-2xl font-semibold mb-4">🎯 {t('fitness.goalAchievementProbability')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Current Max</div>
+                        <div className="text-sm opacity-90 mb-2">{t('fitness.currentMax')}</div>
                         <div className="text-3xl font-bold">{goal.currentMax} lbs</div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Goal Weight</div>
+                        <div className="text-sm opacity-90 mb-2">{t('fitness.goalWeight')}</div>
                         <div className="text-3xl font-bold">{goal.goalWeight} lbs</div>
                         <div className="text-xs opacity-75 mt-1">+10% increase</div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Success Probability</div>
+                        <div className="text-sm opacity-90 mb-2">{t('fitness.successProbability')}</div>
                         <div className="text-3xl font-bold">{goal.probability}%</div>
                         <div className="text-xs opacity-75 mt-1">By {goal.achievableBy}</div>
                       </div>
@@ -1442,13 +1444,13 @@ const FitnessProgress = () => {
                 const plateau = detectPlateau();
                 return plateau && plateau.detected && (
                   <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-6 text-white">
-                    <h2 className="text-2xl font-semibold mb-4">🚨 Plateau Detected</h2>
+                    <h2 className="text-2xl font-semibold mb-4">🚨 {t('fitness.plateauDetected')}</h2>
                     <div className="mb-4">
                       <p className="text-lg">Your progress has stalled at <strong>{plateau.currentWeight} lbs</strong></p>
-                      <p className="text-sm opacity-75 mt-1">Severity: {plateau.severity}</p>
+                      <p className="text-sm opacity-75 mt-1">{t('fitness.severity')}: {plateau.severity}</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-4">
-                      <div className="font-semibold mb-2">Recommendations:</div>
+                      <div className="font-semibold mb-2">{t('fitness.recommendations')}:</div>
                       <ul className="space-y-1 text-sm">
                         {plateau.recommendations.map((rec, i) => (
                           <li key={i}>• {rec}</li>
@@ -1464,24 +1466,24 @@ const FitnessProgress = () => {
                 const rest = recommendRestDay();
                 return rest && (
                   <div className={`bg-gradient-to-r ${rest.needsRest ? 'from-yellow-600 to-orange-600' : 'from-cyan-600 to-blue-600'} rounded-lg p-6 text-white`}>
-                    <h2 className="text-2xl font-semibold mb-4">🛌 Recovery Analysis</h2>
+                    <h2 className="text-2xl font-semibold mb-4">🛌 {t('fitness.recoveryAnalysis')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Training Frequency</div>
+                        <div className="text-sm opacity-90 mb-2">{t('fitness.trainingFrequency')}</div>
                         <div className="text-3xl font-bold">{rest.frequency}x/week</div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Days Since Last Workout</div>
+                        <div className="text-sm opacity-90 mb-2">{t('fitness.daysSinceLastWorkout')}</div>
                         <div className="text-3xl font-bold">{rest.daysSinceLastWorkout}</div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90 mb-2">Status</div>
+                        <div className="text-sm opacity-90 mb-2">{t('common.status')}</div>
                         <div className="text-2xl font-bold">{rest.needsRest ? '⚠️ Rest Needed' : '✅ Good to Go'}</div>
                       </div>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-semibold">{rest.recommendation}</p>
-                      {rest.reason && <p className="text-sm opacity-75 mt-1">Reason: {rest.reason}</p>}
+                      {rest.reason && <p className="text-sm opacity-75 mt-1">{t('fitness.reason')}: {rest.reason}</p>}
                     </div>
                   </div>
                 );
@@ -1489,33 +1491,33 @@ const FitnessProgress = () => {
 
               {/* Basic Predictions */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white">
-                <h2 className="text-2xl font-semibold mb-4">📊 Quick Stats</h2>
+                <h2 className="text-2xl font-semibold mb-4">📊 {t('fitness.quickStats')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <div className="text-sm opacity-90 mb-2">Predicted Next 1RM</div>
+                    <div className="text-sm opacity-90 mb-2">{t('fitness.predictedNext1RM')}</div>
                     {predictNext1RM() ? (
                       <>
                         <div className="text-4xl font-bold">{predictNext1RM()} lbs</div>
-                        <div className="text-sm opacity-75 mt-2">Based on your progression trend</div>
+                        <div className="text-sm opacity-75 mt-2">{t('fitness.basedOnTrend')}</div>
                       </>
                     ) : (
                       <>
-                        <div className="text-2xl font-bold opacity-60">Not enough data</div>
-                        <div className="text-sm opacity-75 mt-2">Complete this exercise in 2+ sessions to unlock predictions</div>
+                        <div className="text-2xl font-bold opacity-60">{t('fitness.notEnoughData')}</div>
+                        <div className="text-sm opacity-75 mt-2">{t('fitness.completeMoreSessions')}</div>
                       </>
                     )}
                   </div>
                   <div>
-                    <div className="text-sm opacity-90 mb-2">Recommended Working Weight</div>
+                    <div className="text-sm opacity-90 mb-2">{t('fitness.recommendedWorkingWeight')}</div>
                     {calculateRecommendedWeight() ? (
                       <>
                         <div className="text-4xl font-bold">{calculateRecommendedWeight()} lbs</div>
-                        <div className="text-sm opacity-75 mt-2">80% of predicted 1RM for optimal gains</div>
+                        <div className="text-sm opacity-75 mt-2">{t('fitness.eightyPercentDesc')}</div>
                       </>
                     ) : (
                       <>
-                        <div className="text-2xl font-bold opacity-60">Not enough data</div>
-                        <div className="text-sm opacity-75 mt-2">Complete this exercise in 2+ sessions to unlock</div>
+                        <div className="text-2xl font-bold opacity-60">{t('fitness.notEnoughData')}</div>
+                        <div className="text-sm opacity-75 mt-2">{t('fitness.completeMoreSessionsUnlock')}</div>
                       </>
                     )}
                   </div>
@@ -1530,9 +1532,9 @@ const FitnessProgress = () => {
         {selectedExercise && progressData.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center mb-6">
             <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Progress Data Yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('fitness.noProgressData')}</h3>
             <p className="text-gray-600">
-              Start logging workouts for {selectedExercise.name} to see your progress!
+              {t('fitness.startLoggingFor')} {selectedExercise.name}!
             </p>
           </div>
         )}
@@ -1540,11 +1542,11 @@ const FitnessProgress = () => {
         {/* Personal Records */}
         <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Personal Records</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t('fitness.personalRecords')}</h2>
             <Award className="w-6 h-6 text-yellow-600" />
           </div>
           {personalRecords.length === 0 ? (
-            <p className="text-gray-600 text-center py-8">No personal records yet. Keep training!</p>
+            <p className="text-gray-600 text-center py-8">{t('fitness.noPersonalRecords')}</p>
           ) : (
             <div className="space-y-3">
               {personalRecords.map(pr => (
@@ -1569,9 +1571,9 @@ const FitnessProgress = () => {
 
         {/* Recent Sessions */}
         <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Workouts</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.recentWorkouts')}</h2>
           {recentSessions.length === 0 ? (
-            <p className="text-gray-600 text-center py-8">No workout sessions yet</p>
+            <p className="text-gray-600 text-center py-8">{t('fitness.noWorkoutSessions')}</p>
           ) : (
             <div className="space-y-3">
               {recentSessions.map(session => (
@@ -1589,7 +1591,7 @@ const FitnessProgress = () => {
                       fetchSessionDetails(session.id);
                     }}
                   >
-                    <div className="font-semibold text-gray-900">{session.workout?.name || 'Quick Workout'}</div>
+                    <div className="font-semibold text-gray-900">{session.workout?.name || t('fitness.quickWorkout')}</div>
                     <div className="text-sm text-gray-600">
                       {new Date(session.start_time).toLocaleDateString()}
                       {session.total_distance > 0 || session.total_duration > 0 ? (
@@ -1605,17 +1607,17 @@ const FitnessProgress = () => {
                       {session.total_distance > 0 ? (
                         <>
                           <div className="text-lg font-bold text-blue-600">{session.total_distance.toFixed(2)} miles</div>
-                          <div className="text-xs text-gray-600">Total Distance</div>
+                          <div className="text-xs text-gray-600">{t('fitness.totalDistance')}</div>
                         </>
                       ) : session.total_duration > 0 ? (
                         <>
                           <div className="text-lg font-bold text-blue-600">{Math.round(session.total_duration)} min</div>
-                          <div className="text-xs text-gray-600">Duration</div>
+                          <div className="text-xs text-gray-600">{t('fitness.duration')}</div>
                         </>
                       ) : (
                         <>
                           <div className="text-lg font-bold text-blue-600">{Math.round(session.total_volume || 0)} lbs</div>
-                          <div className="text-xs text-gray-600">Total Volume</div>
+                          <div className="text-xs text-gray-600">{t('fitness.totalVolume')}</div>
                         </>
                       )}
                     </div>
@@ -1644,7 +1646,7 @@ const FitnessProgress = () => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedSession.workout?.name || 'Quick Workout'}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedSession.workout?.name || t('fitness.quickWorkout')}</h2>
                   <p className="text-sm text-gray-600 mt-1">
                     {new Date(selectedSession.start_time).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                   </p>
@@ -1671,11 +1673,11 @@ const FitnessProgress = () => {
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
-                        <div className="text-xs text-gray-600">Exercises</div>
+                        <div className="text-xs text-gray-600">{t('fitness.exercises')}</div>
                       </div>
                       <div className="text-center p-3 bg-orange-50 rounded-lg">
                         <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_duration)} min</div>
-                        <div className="text-xs text-gray-600">Total Duration</div>
+                        <div className="text-xs text-gray-600">{t('fitness.totalDuration')}</div>
                       </div>
                     </div>
                   );
@@ -1685,11 +1687,11 @@ const FitnessProgress = () => {
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
-                        <div className="text-xs text-gray-600">Exercises</div>
+                        <div className="text-xs text-gray-600">{t('fitness.exercises')}</div>
                       </div>
                       <div className="text-center p-3 bg-orange-50 rounded-lg">
                         <div className="text-2xl font-bold text-orange-600">{selectedSession.total_distance.toFixed(2)} mi</div>
-                        <div className="text-xs text-gray-600">Total Distance</div>
+                        <div className="text-xs text-gray-600">{t('fitness.totalDistance')}</div>
                       </div>
                     </div>
                   );
@@ -1699,19 +1701,19 @@ const FitnessProgress = () => {
                     <div className="grid grid-cols-4 gap-4 mt-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{selectedSession.total_exercises || 0}</div>
-                        <div className="text-xs text-gray-600">Exercises</div>
+                        <div className="text-xs text-gray-600">{t('fitness.exercises')}</div>
                       </div>
                       <div className="text-center p-3 bg-green-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-600">{selectedSession.total_sets || 0}</div>
-                        <div className="text-xs text-gray-600">Sets</div>
+                        <div className="text-xs text-gray-600">{t('fitness.sets')}</div>
                       </div>
                       <div className="text-center p-3 bg-purple-50 rounded-lg">
                         <div className="text-2xl font-bold text-purple-600">{selectedSession.total_reps || 0}</div>
-                        <div className="text-xs text-gray-600">Reps</div>
+                        <div className="text-xs text-gray-600">{t('fitness.reps')}</div>
                       </div>
                       <div className="text-center p-3 bg-orange-50 rounded-lg">
                         <div className="text-2xl font-bold text-orange-600">{Math.round(selectedSession.total_volume || 0)}</div>
-                        <div className="text-xs text-gray-600">Volume (lbs)</div>
+                        <div className="text-xs text-gray-600">{t('fitness.totalVolume')} (lbs)</div>
                       </div>
                     </div>
                   );
@@ -1724,10 +1726,10 @@ const FitnessProgress = () => {
               {!sessionDetails ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Loading workout details...</p>
+                  <p className="mt-4 text-gray-600">{t('fitness.loadingWorkoutDetails')}</p>
                 </div>
               ) : sessionDetails.length === 0 ? (
-                <p className="text-center text-gray-600 py-12">No exercise data found</p>
+                <p className="text-center text-gray-600 py-12">{t('fitness.noExerciseData')}</p>
               ) : (
                 <div className="space-y-4">
                   {sessionDetails.map((exercise, index) => (
@@ -1735,7 +1737,7 @@ const FitnessProgress = () => {
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-gray-900">{exercise.exercises?.name || 'Unknown Exercise'}</h3>
-                          <p className="text-sm text-gray-600">Set {exercise.set_number}</p>
+                          <p className="text-sm text-gray-600">{t('fitness.set')} {exercise.set_number}</p>
                         </div>
                       </div>
                       
@@ -1758,7 +1760,7 @@ const FitnessProgress = () => {
                           return (
                             <div className="grid grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Duration (minutes)</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.duration')} (min)</label>
                                 <input
                                   type="number"
                                   value={exercise.duration_minutes || 0}
@@ -1784,7 +1786,7 @@ const FitnessProgress = () => {
                           return (
                             <div className="grid grid-cols-3 gap-3">
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Distance (miles)</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.distance')} (miles)</label>
                                 <input
                                   type="number"
                                   value={exercise.distance || 0}
@@ -1793,7 +1795,7 @@ const FitnessProgress = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Duration (min)</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.duration')} (min)</label>
                                 <input
                                   type="number"
                                   value={exercise.duration_minutes || 0}
@@ -1819,7 +1821,7 @@ const FitnessProgress = () => {
                           return (
                             <div className="grid grid-cols-4 gap-3">
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Weight (lbs)</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.weight')} (lbs)</label>
                                 <input
                                   type="number"
                                   value={exercise.weight || 0}
@@ -1828,7 +1830,7 @@ const FitnessProgress = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Reps</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.reps')}</label>
                                 <input
                                   type="number"
                                   value={exercise.reps || 0}
@@ -1848,7 +1850,7 @@ const FitnessProgress = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-600 mb-1">Volume</label>
+                                <label className="block text-xs text-gray-600 mb-1">{t('fitness.volume')}</label>
                                 <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm font-semibold text-gray-900">
                                   {Math.round((exercise.weight || 0) * (exercise.reps || 0))} lbs
                                 </div>
