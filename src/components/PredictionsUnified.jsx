@@ -1565,9 +1565,9 @@ export default function PredictionsUnified({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/10 rounded-lg p-3">
                 <div className="font-semibold mb-2">{t('predictions.weightLoss')}</div>
-                <div className="text-sm">Mild: {predictions.tdee.deficit.mild} cal</div>
-                <div className="text-sm">Moderate: {predictions.tdee.deficit.moderate} cal</div>
-                <div className="text-sm">Aggressive: {predictions.tdee.deficit.aggressive} cal</div>
+                <div className="text-sm">{t('predictions.mild', 'Mild')}: {predictions.tdee.deficit.mild} cal</div>
+                <div className="text-sm">{t('predictions.moderate', 'Moderate')}: {predictions.tdee.deficit.moderate} cal</div>
+                <div className="text-sm">{t('predictions.aggressive', 'Aggressive')}: {predictions.tdee.deficit.aggressive} cal</div>
               </div>
               <div className="bg-white/10 rounded-lg p-3">
                 <div className="font-semibold mb-2">{t('predictions.maintenance')}</div>
@@ -1575,8 +1575,8 @@ export default function PredictionsUnified({ user }) {
               </div>
               <div className="bg-white/10 rounded-lg p-3">
                 <div className="font-semibold mb-2">{t('predictions.muscleGain')}</div>
-                <div className="text-sm">Lean: {predictions.tdee.surplus.lean} cal</div>
-                <div className="text-sm">Bulk: {predictions.tdee.surplus.bulk} cal</div>
+                <div className="text-sm">{t('predictions.lean', 'Lean')}: {predictions.tdee.surplus.lean} cal</div>
+                <div className="text-sm">{t('predictions.bulk', 'Bulk')}: {predictions.tdee.surplus.bulk} cal</div>
               </div>
             </div>
           </div>

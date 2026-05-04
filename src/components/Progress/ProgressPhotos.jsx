@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Camera as CameraIcon, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import Webcam from 'react-webcam'
 
 export default function ProgressPhotos({ userId }) {
+  const { t } = useTranslation()
   const [photos, setPhotos] = useState([])
   const [uploading, setUploading] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
@@ -213,7 +215,7 @@ export default function ProgressPhotos({ userId }) {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <CameraIcon className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">Progress Photos</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('progress.progressPhotos', 'Progress Photos')}</h2>
         </div>
         
         {/* View Mode Toggle */}
@@ -226,7 +228,7 @@ export default function ProgressPhotos({ userId }) {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Grid
+            {t('progress.gridView', 'Grid')}
           </button>
           <button
             onClick={() => setViewMode('timeline')}
@@ -236,7 +238,7 @@ export default function ProgressPhotos({ userId }) {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Timeline
+            {t('progress.timelineView', 'Timeline')}
           </button>
           <button
             onClick={() => setViewMode('compare')}
@@ -246,7 +248,7 @@ export default function ProgressPhotos({ userId }) {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Compare
+            {t('progress.compareView', 'Compare')}
           </button>
         </div>
       </div>
@@ -257,7 +259,7 @@ export default function ProgressPhotos({ userId }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600">{analytics.totalPhotos}</div>
-              <div className="text-sm text-gray-600">Total Photos</div>
+              <div className="text-sm text-gray-600">{t('progress.totalPhotos', 'Total Photos')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">{analytics.daysBetween}</div>
@@ -403,7 +405,7 @@ export default function ProgressPhotos({ userId }) {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h3 className="text-lg font-semibold mb-3">Before</h3>
+              <h3 className="text-lg font-semibold mb-3">{t('progress.before', 'Before')}</h3>
               {comparePhotos.before ? (
                 <div className="relative">
                   <img
@@ -426,7 +428,7 @@ export default function ProgressPhotos({ userId }) {
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-3">After</h3>
+              <h3 className="text-lg font-semibold mb-3">{t('progress.after', 'After')}</h3>
               {comparePhotos.after ? (
                 <div className="relative">
                   <img
@@ -450,7 +452,7 @@ export default function ProgressPhotos({ userId }) {
           </div>
 
           <div className="border-t pt-4">
-            <h3 className="text-lg font-semibold mb-3">Select Photos to Compare</h3>
+            <h3 className="text-lg font-semibold mb-3">{t('progress.selectPhotosToCompare', 'Select Photos to Compare')}</h3>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
               {photos.map((photo) => (
                 <img
@@ -546,9 +548,9 @@ export default function ProgressPhotos({ userId }) {
             
             {/* View Type Label */}
             <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
-              {currentViewType === 'front' && 'Front View'}
-              {currentViewType === 'side' && 'Side View'}
-              {currentViewType === 'back' && 'Back View'}
+              {currentViewType === 'front' && t('progress.frontView', 'Front View')}
+              {currentViewType === 'side' && t('progress.sideView', 'Side View')}
+              {currentViewType === 'back' && t('progress.backView', 'Back View')}
             </div>
           </div>
 

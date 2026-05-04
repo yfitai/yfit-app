@@ -720,7 +720,7 @@ export default function DailyTracker({ user }) {
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
                 rows="3"
-                placeholder="Any notes about today..."
+                placeholder={t('dailyTracker.notesPlaceholder', 'Any notes about today...')}
               />
             </div>
 
@@ -785,7 +785,7 @@ export default function DailyTracker({ user }) {
             <div>
               <h2 className="text-2xl font-bold text-gray-900">📏 {t('common.thisWeek')} {t('progress.addMeasurement')}</h2>
               {lastMeasurementDate && (
-                <p className="text-sm text-gray-600 mt-1">Last measured: {lastMeasurementDate}</p>
+                <p className="text-sm text-gray-600 mt-1">{t('dailyTracker.lastMeasured', 'Last measured')}: {lastMeasurementDate}</p>
               )}
             </div>
             <button
@@ -943,7 +943,7 @@ export default function DailyTracker({ user }) {
         {weeklyData.length > 0 && (
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">📈 {t('common.thisWeek')}</h2>
-            <p className="text-xs text-gray-500 -mt-3 mb-4">Rolling average — today minus 7 days</p>
+            <p className="text-xs text-gray-500 -mt-3 mb-4">{t('dailyTracker.rollingAverage', 'Rolling average — today minus 7 days')}</p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">{t('dailyTracker.sleep')}</div>

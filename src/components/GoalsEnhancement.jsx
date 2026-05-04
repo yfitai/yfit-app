@@ -324,7 +324,7 @@ export default function GoalsEnhancement({
             </select>
             {!manuallyEditedGoal && (
               <p className="text-xs text-gray-500 mt-1">
-                Auto-synced from Basic Info
+                {t('goals.autoSyncedFromBasicInfo', 'Auto-synced from Basic Info')}
               </p>
             )}
           </div>
@@ -431,13 +431,13 @@ export default function GoalsEnhancement({
            placeholder={isMetric ? "2000ml recommended" : "68oz recommended"}
 
             />
-     <p className="text-xs text-gray-500 mt-1">{isMetric ? '~8 glasses (2L)' : '~8 glasses (68oz)'}</p>
+     <p className="text-xs text-gray-500 mt-1">{t('goals.waterGlassesHint', isMetric ? '~8 glasses (2L)' : '~8 glasses (68oz)')}</p>
 
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Steps Goal (steps/day)
+              {t('goals.stepsGoalLabel', 'Steps Goal (steps/day)')}
             </label>
             <input
               type="number"

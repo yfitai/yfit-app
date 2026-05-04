@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { CATEGORY_SLUG_TO_KEY, ARTICLE_SLUG_TO_KEY } from '../lib/faqSlugMap'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
@@ -208,7 +209,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
             >
               <span className="flex items-center gap-2">
                 <span>{getCategoryIcon(category.icon)}</span>
-                <span>{category.name}</span>
+                <span>{CATEGORY_SLUG_TO_KEY[category.slug] ? t(`faq.${CATEGORY_SLUG_TO_KEY[category.slug]}`, category.name) : category.name}</span>
               </span>
               <span className="text-xs text-gray-400">{count}</span>
             </button>
@@ -256,12 +257,12 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
                         <div className="flex items-center gap-2 mb-1">
                           {category && (
                             <span className="text-xs px-2 py-1 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300">
-                              {getCategoryIcon(category.icon)} {category.name}
+                              {getCategoryIcon(category.icon)} {CATEGORY_SLUG_TO_KEY[category.slug] ? t(`faq.${CATEGORY_SLUG_TO_KEY[category.slug]}`, category.name) : category.name}
                             </span>
                           )}
                         </div>
                         <h3 className="font-medium text-gray-900 dark:text-gray-100">
-                          {article.question}
+                          {ARTICLE_SLUG_TO_KEY[article.slug] ? t(`faq.${ARTICLE_SLUG_TO_KEY[article.slug]}`, article.question) : article.question}
                         </h3>
                       </div>
                       {isExpanded ? (

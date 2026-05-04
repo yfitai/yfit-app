@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import MealSlot from './MealSlot'
 
 export default function DayColumn({
@@ -13,6 +14,7 @@ export default function DayColumn({
   onSaveAsTemplate,
   user
 }) {
+  const { t } = useTranslation()
   const isToday = date.toDateString() === new Date().toDateString()
 
   // Get emoji for meal type
@@ -54,16 +56,16 @@ export default function DayColumn({
 
       {/* Day Total */}
       <div className="p-3 border-t border-gray-200 bg-gray-50">
-        <div className="text-xs text-gray-600 mb-1">Total</div>
+        <div className="text-xs text-gray-600 mb-1">{t('nutrition.dayTotal', 'Total')}</div>
         <div className="text-lg font-bold text-gray-900">
           {totalCalories} cal
         </div>
         {totalCalories > 0 && (
           <div className="mt-1">
             {totalCalories >= 1400 && totalCalories <= 1600 ? (
-              <span className="text-xs text-green-600">✅ On target</span>
+              <span className="text-xs text-green-600">✅ {t('nutrition.onTarget', 'On target')}</span>
             ) : (
-              <span className="text-xs text-orange-600">⚠️ {totalCalories < 1400 ? 'Under' : 'Over'}</span>
+              <span className="text-xs text-orange-600">⚠️ {totalCalories < 1400 ? t('nutrition.under', 'Under') : t('nutrition.over', 'Over')}</span>
             )}
           </div>
         )}

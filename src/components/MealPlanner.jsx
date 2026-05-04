@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import WeeklyGrid from './MealPlanner/WeeklyGrid'
 import MealTemplates from './MealPlanner/MealTemplates'
@@ -7,6 +8,7 @@ import GroceryListModal from './MealPlanner/GroceryListModal'
 import { ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
 
 export default function MealPlanner({ user }) {
+  const { t } = useTranslation()
   const [currentWeekStart, setCurrentWeekStart] = useState(getWeekStart(new Date()))
   const [mealPlan, setMealPlan] = useState(null)
   const [mealPlanItems, setMealPlanItems] = useState([])
@@ -361,8 +363,8 @@ export default function MealPlanner({ user }) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Meal Planner</h1>
-        <p className="text-gray-600">Plan your meals for the week ahead</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('nutrition.mealPlannerTitle', 'Meal Planner')}</h1>
+        <p className="text-gray-600">{t('nutrition.planMealsForWeek', 'Plan your meals for the week ahead')}</p>
       </div>
 
       {/* Week Navigation */}
@@ -384,7 +386,7 @@ export default function MealPlanner({ user }) {
               onClick={goToCurrentWeek}
               className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
             >
-              This Week
+              {t('common.thisWeek', 'This Week')}
             </button>
           </div>
           
@@ -404,14 +406,14 @@ export default function MealPlanner({ user }) {
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          {showTemplates ? 'Hide Templates' : 'Show Templates'}
+          {showTemplates ? t('nutrition.hideTemplates', 'Hide Templates') : t('nutrition.showTemplates', 'Show Templates')}
         </button>
         
         <button
           onClick={() => setShowGroceryList(true)}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
-          Generate Grocery List
+          {t('nutrition.generateGroceryList', 'Generate Grocery List')}
         </button>
       </div>
 

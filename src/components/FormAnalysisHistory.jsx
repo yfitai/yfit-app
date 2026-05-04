@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Activity, TrendingUp, Award, Calendar, Clock, Filter } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
 
 const FormAnalysisHistory = ({ user: propUser }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(propUser || null);
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -121,10 +123,10 @@ const FormAnalysisHistory = ({ user: propUser }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Activity className="text-purple-600" size={28} />
-            Form Analysis History
+            {t('progress.formAnalysisHistory', 'Form Analysis History')}
           </h2>
           <p className="text-gray-600 mt-1">
-            Track your form improvement over time with live analysis sessions
+            {t('progress.formAnalysisSubtitle', 'Track your form improvement over time with live analysis sessions')}
           </p>
         </div>
       </div>
@@ -137,7 +139,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
               <Activity size={20} className="text-blue-600" />
               <span className="text-2xl font-bold text-blue-600">{stats.totalSessions}</span>
             </div>
-            <div className="text-sm text-gray-700 font-medium">Total Sessions</div>
+            <div className="text-sm text-gray-700 font-medium">{t('progress.totalSessions', 'Total Sessions')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
@@ -145,7 +147,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
               <Award size={20} className="text-purple-600" />
               <span className="text-2xl font-bold text-purple-600">{stats.avgScore}</span>
             </div>
-            <div className="text-sm text-gray-700 font-medium">Average Score</div>
+            <div className="text-sm text-gray-700 font-medium">{t('progress.averageScore', 'Average Score')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
@@ -153,7 +155,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
               <TrendingUp size={20} className="text-green-600" />
               <span className="text-2xl font-bold text-green-600">{stats.recentAvg}</span>
             </div>
-            <div className="text-sm text-gray-700 font-medium">Recent Average</div>
+            <div className="text-sm text-gray-700 font-medium">{t('progress.recentAverage', 'Recent Average')}</div>
           </div>
 
           <div className={`bg-gradient-to-br rounded-lg p-4 border ${
@@ -167,7 +169,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
                 {parseFloat(stats.improvement) >= 0 ? '+' : ''}{stats.improvement}
               </span>
             </div>
-            <div className="text-sm text-gray-700 font-medium">Improvement</div>
+            <div className="text-sm text-gray-700 font-medium">{t('progress.improvement', 'Improvement')}</div>
           </div>
         </div>
       )}
@@ -181,7 +183,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
             onChange={(e) => setFilterExercise(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="all">All Exercises</option>
+            <option value="all">{t('progress.allExercises', 'All Exercises')}</option>
             {exercises.map((exercise) => (
               <option key={exercise} value={exercise}>
                 {exercise}
@@ -195,15 +197,15 @@ const FormAnalysisHistory = ({ user: propUser }) => {
       {sessions.length === 0 ? (
         <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-200">
           <Activity size={48} className="text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Form Analyses Yet</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('progress.noFormAnalysesYet', 'No Form Analyses Yet')}</h3>
           <p className="text-gray-600 mb-4">
-            Start a live form analysis session to get real-time feedback and track your progress!
+            {t('progress.startFormAnalysis', 'Start a live form analysis session to get real-time feedback and track your progress!')}
           </p>
           <a
             href="/fitness"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
-            Go to Fitness Tab
+            {t('progress.goToFitnessTab', 'Go to Fitness Tab')}
           </a>
         </div>
       ) : (
@@ -228,7 +230,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
               <div className="p-4 space-y-3">
                 {/* Form Score */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 font-medium">Form Score</span>
+                  <span className="text-sm text-gray-600 font-medium">{t('progress.formScore', 'Form Score')}</span>
                   <span className={`px-3 py-1 rounded-full text-lg font-bold border ${
                     getScoreColor(session.average_form_score || 0)
                   }`}>
@@ -238,7 +240,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
 
                 {/* Reps */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 font-medium">Total Reps</span>
+                  <span className="text-sm text-gray-600 font-medium">{t('progress.totalReps', 'Total Reps')}</span>
                   <span className="text-lg font-bold text-gray-900">
                     {session.total_reps || 0}
                   </span>
@@ -248,7 +250,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 font-medium flex items-center gap-1">
                     <Clock size={14} />
-                    Duration
+                    {t('progress.duration', 'Duration')}
                   </span>
                   <span className="text-sm font-semibold text-gray-700">
                     {formatDuration(session.duration_seconds)}
@@ -258,7 +260,7 @@ const FormAnalysisHistory = ({ user: propUser }) => {
                 {/* Score Range */}
                 {session.min_form_score !== null && session.max_form_score !== null && (
                   <div className="pt-3 border-t border-gray-100">
-                    <div className="text-xs text-gray-500 mb-1">Score Range</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('progress.scoreRange', 'Score Range')}</div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-red-600 font-medium">
                         Min: {session.min_form_score.toFixed ? session.min_form_score.toFixed(0) : session.min_form_score}

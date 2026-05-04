@@ -594,9 +594,9 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-3 text-xs text-gray-500">
-          💡 Only tracks <span className="font-semibold">weighted exercises</span> (bench press, squats, rows, etc.) where volume = weight × reps.
+          💡 {t('analytics.onlyTracksWeighted', 'Only tracks')} <span className="font-semibold">{t('analytics.weightedExercises', 'weighted exercises')}</span> {t('analytics.weightedExercisesNote', '(bench press, squats, rows, etc.) where volume = weight × reps.')}
           <div className="mt-1">
-            Time-based exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.
+            {t('analytics.timeBasedNote', 'Time-based exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.')}
           </div>
         </div>
       </div>

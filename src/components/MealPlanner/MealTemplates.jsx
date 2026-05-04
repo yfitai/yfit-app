@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { Star, Plus, Trash2 } from 'lucide-react'
 import CreateTemplateModal from './CreateTemplateModal'
 
 export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, onDeleteTemplate }) {
+  const { t } = useTranslation()
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, breakfast, lunch, dinner, snack, favorites
@@ -72,7 +74,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
     <div className="bg-white rounded-lg shadow-sm">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Meal Templates</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('nutrition.mealTemplatesTitle', 'Meal Templates')}</h3>
         
         {/* Filter Tabs */}
         <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-2">
@@ -87,7 +89,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
               }`}
             >
               {filterOption === 'favorites' && <Star className="w-3 h-3 inline mr-1" />}
-              {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+              {filterOption === 'all' ? t('nutrition.allFilter', 'All') : filterOption === 'favorites' ? t('nutrition.favoritesFilter', 'Favorites') : t(`nutrition.${filterOption}`, filterOption.charAt(0).toUpperCase() + filterOption.slice(1))}
             </button>
           ))}
         </div>
@@ -97,8 +99,8 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
       <div className="p-4 space-y-3 max-h-[600px] overflow-y-auto">
         {filteredTemplates.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p className="mb-2">No templates yet</p>
-            <p className="text-sm">Save your favorite meals to reuse them quickly!</p>
+            <p className="mb-2">{t('nutrition.noTemplatesYet', 'No templates yet')}</p>
+            <p className="text-sm">{t('nutrition.saveToReuse', 'Save your favorite meals to reuse them quickly!')}</p>
           </div>
         ) : (
           filteredTemplates.map((template) => (
@@ -129,7 +131,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-500">
-                  {(template.meal_template_items?.length || template.meals?.length || 0)} items • Used {template.use_count || 0} times
+                  {(template.meal_template_items?.length || template.meals?.length || 0)} {t('nutrition.items', 'items')} • {t('nutrition.usedTimes', 'Used {{count}} times', { count: template.use_count || 0 })}
                 </div>
               </button>
               
@@ -156,7 +158,7 @@ export default function MealTemplates({ user, onSelectTemplate, onSaveTemplate, 
           className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Create Template
+          {t('nutrition.createTemplate', 'Create Template')}
         </button>
       </div>
 
