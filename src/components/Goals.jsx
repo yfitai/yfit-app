@@ -576,6 +576,12 @@ export default function Goals({ user: propUser }) {
           .delete()
           .eq('user_id', user.id)
 
+        // 12. Delete progress_measurements (Body Recomp daily tracking entries)
+        const { error: progressMeasurementsError } = await supabase
+          .from('progress_measurements')
+          .delete()
+          .eq('user_id', user.id)
+
         // Check for any errors (ignore 404/406 errors for tables that don't exist)
         const allErrors = [
           { name: 'sessionsError', error: sessionsError },
@@ -591,7 +597,8 @@ export default function Goals({ user: propUser }) {
           { name: 'mealLogsError', error: mealLogsError },
           { name: 'dailyLogsError', error: dailyLogsError },
           { name: 'dailyTrackersError', error: dailyTrackersError },
-          { name: 'formAnalysisError', error: formAnalysisError }
+          { name: 'formAnalysisError', error: formAnalysisError },
+          { name: 'progressMeasurementsError', error: progressMeasurementsError }
         ];
         
         // Log all errors for debugging

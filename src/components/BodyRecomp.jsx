@@ -81,6 +81,8 @@ export default function BodyRecomp({ user }) {
         .limit(1)
         .maybeSingle()
 
+      // Journey start date = when the current body_measurements record was created
+      let journeyStartDate = null
       if (bm) {
         const start = {}
         const goal = {}
@@ -90,10 +92,17 @@ export default function BodyRecomp({ user }) {
         })
         setStartMeasurements(start)
         setGoalMeasurements(goal)
+        journeyStartDate = bm.created_at
       }
 
       // Load measurement history from progress_measurements (saved by DailyTracker)
-      const since = new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000).toISOString()
+      // Only include entries from the current journey (on or after journey start date)
+      // This prevents pre-restart measurements from showing as the current "Now" value
+      const timeRangeSince = new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000).toISOString()
+      // Use the later of: journey start date OR time range window
+      const since = journeyStartDate && journeyStartDate > timeRangeSince
+        ? journeyStartDate
+        : timeRangeSince
       const { data: hist, error: histError } = await supabase
         .from('progress_measurements')
         .select('measurement_type, measurement_value, unit, measured_at')
