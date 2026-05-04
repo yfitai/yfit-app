@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react'
 
 export default function FAQBrowser({ userId, onAskAICoach }) {
+  const { t } = useTranslation()
   const [categories, setCategories] = useState([])
   const [articles, setArticles] = useState([])
   const [filteredArticles, setFilteredArticles] = useState([])
@@ -168,7 +170,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search for help..."
+            placeholder={t('faq.searchPlaceholder', 'Search for help...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -188,7 +190,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
         >
           <span className="flex items-center gap-2">
             <span>📚</span>
-            <span>All Categories</span>
+            <span>{t('faq.allCategories', 'All Categories')}</span>
           </span>
           <span className="text-xs text-gray-400">{articles.length}</span>
         </button>
@@ -218,15 +220,15 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       <div className="flex-1 overflow-y-auto p-4 pb-4">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
-            Loading FAQ articles...
+            {t('faq.loading', 'Loading FAQ articles...')}
           </div>
         ) : filteredArticles.length === 0 ? (
           <div className="text-center py-8">
             <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-4" />
             <p className="text-gray-500 mb-4">
               {searchQuery || selectedCategory
-                ? 'No articles found matching your search.'
-                : 'No FAQ articles available.'}
+                ? t('faq.noResults', 'No articles found matching your search.')
+                : t('faq.noArticles', 'No FAQ articles available.')}
             </p>
             <Button
               onClick={() => onAskAICoach && onAskAICoach()}
@@ -234,7 +236,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
               className="gap-2"
             >
               <Sparkles className="h-4 w-4" />
-              Ask AI Coach Instead
+              {t('faq.askAICoachInstead', 'Ask AI Coach Instead')}
             </Button>
           </div>
         ) : (
@@ -278,7 +280,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
                       
                       {/* Feedback buttons */}
                       <div className="flex items-center gap-4 mt-4 pt-4 border-t">
-                        <span className="text-sm text-gray-500">Was this helpful?</span>
+                        <span className="text-sm text-gray-500">{t('faq.wasHelpful', 'Was this helpful?')}</span>
                         <div className="flex gap-2">
                           <Button
                             variant="ghost"
@@ -312,7 +314,7 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
       {/* Footer - Sticky at bottom */}
       <div className="sticky bottom-0 p-4 border-t bg-gray-50 dark:bg-gray-900 shadow-lg">
         <p className="text-xs text-gray-500 text-center mb-2">
-          Can't find what you're looking for?
+          {t('faq.cantFind', "Can't find what you're looking for?")}
         </p>
         <Button
           onClick={() => onAskAICoach && onAskAICoach()}
@@ -320,8 +322,8 @@ export default function FAQBrowser({ userId, onAskAICoach }) {
           className="w-full gap-2"
         >
           <Sparkles className="h-4 w-4" />
-          Ask AI Coach
-        </Button>
+              {t('faq.askAICoach', 'Ask AI Coach')}
+          </Button>
       </div>
     </div>
   )

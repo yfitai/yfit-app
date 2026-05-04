@@ -3,6 +3,31 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Pill, Edit, Trash2, AlertCircle, Calendar, Leaf } from 'lucide-react'
 
+// Map stored English values to translation keys for display
+const FREQUENCY_KEY_MAP = {
+  'Once daily': 'medications.onceDaily',
+  'Twice daily': 'medications.twiceDaily',
+  'Three times daily': 'medications.threeTimesDaily',
+  'Four times daily': 'medications.fourTimesDaily',
+  'Every other day': 'medications.everyOtherDay',
+  'Once weekly': 'medications.onceWeekly',
+  'As needed': 'medications.asNeeded',
+}
+const ROUTE_KEY_MAP = {
+  'Oral': 'medications.oral',
+  'Injection': 'medications.injection',
+  'Topical': 'medications.topical',
+  'Inhalation': 'medications.inhalation',
+  'Inhaled': 'medications.inhalation',
+  'Sublingual': 'medications.sublingual',
+  'Rectal': 'medications.rectal',
+  'Transdermal': 'medications.transdermal',
+  'Nasal': 'medications.nasal',
+  'Ophthalmic': 'medications.ophthalmic',
+  'Otic': 'medications.otic',
+  'Other': 'medications.other',
+}
+
 export default function MedicationList({ user, onAddMedication }) {
   const { t } = useTranslation()
   const [medications, setMedications] = useState([])
@@ -242,11 +267,11 @@ export default function MedicationList({ user, onAddMedication }) {
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
                 <span className="font-medium text-gray-900">{item.dosage}</span>
                 <span className="text-gray-400">•</span>
-                <span className="text-gray-700">{item.frequency}</span>
+                <span className="text-gray-700">{FREQUENCY_KEY_MAP[item.frequency] ? t(FREQUENCY_KEY_MAP[item.frequency]) : item.frequency}</span>
                 {item.route && (
                   <>
                     <span className="text-gray-400">•</span>
-                    <span className="text-gray-700">{item.route}</span>
+                    <span className="text-gray-700">{ROUTE_KEY_MAP[item.route] ? t(ROUTE_KEY_MAP[item.route]) : item.route}</span>
                   </>
                 )}
               </div>

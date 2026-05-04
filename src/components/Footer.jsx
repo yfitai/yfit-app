@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { FileText, Mail, Heart } from 'lucide-react'
+import { FileText, Mail } from 'lucide-react'
 import ContactSupportModal from './ContactSupportModal'
 
 export default function Footer() {
+  const { t } = useTranslation()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   return (
@@ -16,9 +18,8 @@ export default function Footer() {
               <div className="mb-4">
                 <img src="/assets/yfit-logo.png" alt="YFIT Logo" className="h-10" />
               </div>
-
               <p className="text-gray-400">
-                Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.
+                {t('footer.tagline', 'Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.')}
               </p>
             </div>
 
@@ -26,27 +27,27 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Legal
+                {t('footer.legal', 'Legal')}
               </h3>
               <ul className="space-y-2">
                 <li>
                   <Link to="/legal" className="text-gray-400 hover:text-white transition-colors">
-                    Privacy Policy
+                    {t('footer.privacyPolicy', 'Privacy Policy')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/legal" className="text-gray-400 hover:text-white transition-colors">
-                    Terms of Service
+                    {t('footer.termsOfService', 'Terms of Service')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/legal" className="text-gray-400 hover:text-white transition-colors">
-                    Cookie Policy
+                    {t('footer.cookiePolicy', 'Cookie Policy')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/legal" className="text-gray-400 hover:text-white transition-colors">
-                    HIPAA Notice
+                    {t('footer.hipaaNotice', 'HIPAA Notice')}
                   </Link>
                 </li>
               </ul>
@@ -56,27 +57,27 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Mail className="w-5 h-5" />
-                Contact
+                {t('footer.contact', 'Contact')}
               </h3>
               <p className="text-gray-400 mb-4">
-                Have questions or need support?
+                {t('footer.contactQuestion', 'Have questions or need support?')}
               </p>
               <button
                 onClick={() => setIsContactModalOpen(true)}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
               >
                 <Mail className="w-5 h-5" />
-                Contact Support
+                {t('footer.contactSupport', 'Contact Support')}
               </button>
               <p className="text-sm text-gray-500 mt-3">
-                Get AI-powered responses in minutes
+                {t('footer.aiResponse', 'Get AI-powered responses in minutes')}
               </p>
             </div>
           </div>
 
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} YFIT AI. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} YFIT AI. {t('footer.allRightsReserved', 'All rights reserved.')}</p>
           </div>
         </div>
       </footer>

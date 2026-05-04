@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Lightbulb, ChevronDown, ChevronUp, X, ExternalLink, BookOpen } from 'lucide-react'
+import i18n from '../lib/i18n'
 
 /**
  * DailyInsight — Persistent daily health headline strip
@@ -36,6 +37,7 @@ const FALLBACK_INSIGHTS = [
 export default function DailyInsight({ variant = 'strip', className = '' }) {
   const { t } = useTranslation()
   const [article, setArticle] = useState(null)
+  const [translatedTitle, setTranslatedTitle] = useState(null)
   const [expanded, setExpanded] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -51,6 +53,32 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
     }
     fetchDailyInsight()
   }, [])
+
+  // Translate article title when article loads and language is not English
+  useEffect(() => {
+    if (!article) return
+    const lang = i18n.language?.split('-')[0] || 'en'
+    if (lang === 'en') {
+      setTranslatedTitle(null)
+      return
+    }
+    // Check localStorage cache first
+    const cacheKey = `yfit_title_${article.id}_${lang}`
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      setTranslatedTitle(cached)
+      return
+    }
+    // Call translate-title edge function
+    supabase.functions.invoke('translate-title', {
+      body: { title: article.title, targetLang: lang }
+    }).then(({ data, error }) => {
+      if (!error && data?.translatedTitle) {
+        setTranslatedTitle(data.translatedTitle)
+        try { localStorage.setItem(cacheKey, data.translatedTitle) } catch {}
+      }
+    }).catch(() => { /* silently fall back to English title */ })
+  }, [article])
 
   const fetchDailyInsight = async () => {
     try {
@@ -160,7 +188,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
               </span>
             )}
             <p className="text-xs text-gray-700 flex-1 truncate font-medium">
-              {article.title}
+              {translatedTitle || article.title}
             </p>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button
@@ -231,7 +259,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
                 )}
               </div>
               <p className="text-sm font-semibold text-gray-800 leading-snug">
-                {article.title}
+                {translatedTitle || article.title}
               </p>
             </div>
           </div>

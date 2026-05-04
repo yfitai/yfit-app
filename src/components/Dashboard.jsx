@@ -41,29 +41,20 @@ export default function Dashboard({ user }) {
   const [passwordSuccess, setPasswordSuccess] = useState('')
   const [isChangingPassword, setIsChangingPassword] = useState(false)
 
-  // Motivational quotes database
-  const morningQuotes = [
-    "Every morning is a new opportunity to become stronger!",
-    "Today is your day to shine and make healthy choices!",
-    "Rise and shine! Your body will thank you for the effort!",
-    "Start your day with intention and watch your health transform!",
-    "Good morning! Small steps today lead to big changes tomorrow!"
+  // Motivational quote keys — resolved at render time via t()
+  const morningQuoteKeys = [
+    'dashboard.morningQuote1',
+    'dashboard.morningQuote2',
+    'dashboard.morningQuote3',
+    'dashboard.morningQuote4',
+    'dashboard.morningQuote5',
   ]
-
-  const eveningQuotes = [
-    "Great job today! Every healthy choice counts!",
-    "You're making progress! Keep up the amazing work!",
-    "End your day knowing you're one step closer to your goals!",
-    "Reflect on today's wins and prepare for tomorrow's success!",
-    "You showed up today, and that's what matters most!"
-  ]
-
-  const didYouKnowFacts = [
-    "Did you know? Drinking water before meals can help with weight management!",
-    "Did you know? Just 30 minutes of daily exercise can significantly improve your mood!",
-    "Did you know? Getting 7-9 hours of sleep is crucial for muscle recovery!",
-    "Did you know? Protein helps build and repair muscles after workouts!",
-    "Did you know? Consistency is more important than perfection in fitness!"
+  const eveningQuoteKeys = [
+    'dashboard.eveningQuote1',
+    'dashboard.eveningQuote2',
+    'dashboard.eveningQuote3',
+    'dashboard.eveningQuote4',
+    'dashboard.eveningQuote5',
   ]
 
   useEffect(() => {
@@ -243,20 +234,20 @@ export default function Dashboard({ user }) {
   const setGreetingAndQuote = () => {
     const hour = new Date().getHours()
     const isEvening = hour >= 17
-    
-    // Set greeting
+        // Set greeting key (resolved via t() at render time)
     if (hour < 12) {
-      setGreeting('Good Morning')
+      setGreeting('dashboard.goodMorning')
     } else if (hour < 17) {
-      setGreeting('Good Afternoon')
+      setGreeting('dashboard.goodAfternoon')
     } else {
-      setGreeting('Good Evening')
+      setGreeting('dashboard.goodEvening')
     }
 
-    // Set motivational quote
-    const quotes = isEvening ? eveningQuotes : morningQuotes
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
-    setMotivationalQuote(randomQuote)
+    // Set motivational quote key (resolved via t() at render time)
+    const quoteKeys = isEvening ? eveningQuoteKeys : morningQuoteKeys
+    
+    const randomKey = quoteKeys[Math.floor(Math.random() * quoteKeys.length)]
+    setMotivationalQuote(randomKey)
   }
 
   const handleSignOut = async () => {
@@ -371,11 +362,11 @@ export default function Dashboard({ user }) {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            {greeting}, {firstName}! 👋
+            {t(greeting)}, {firstName}! 👋
           </h2>
           <div className="flex items-start space-x-2 bg-gradient-to-r from-blue-100 to-green-100 p-4 rounded-lg border border-blue-200">
             <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <p className="text-gray-700 font-medium">{motivationalQuote}</p>
+            <p className="text-gray-700 font-medium">{t(motivationalQuote)}</p>
           </div>
         </div>
 
@@ -423,7 +414,7 @@ export default function Dashboard({ user }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
-                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? 'day' : 'days'}` : '--'}
+                {streakDays !== null ? `${streakDays} ${streakDays === 1 ? t('common.day') : t('common.days')}` : '--'}
               </div>
               <p className="text-xs text-teal-600">
                 {streakDays !== null
@@ -446,8 +437,8 @@ export default function Dashboard({ user }) {
               // First full week — no prior week data yet
               <div className="bg-white/15 rounded-lg p-4 text-center">
                 <div className="text-3xl mb-2">🌱</div>
-                <p className="font-semibold text-sm">Your first full week summary will appear next Sunday.</p>
-                <p className="text-xs opacity-80 mt-1">Keep logging workouts this week — your recap will show here once the week wraps on Saturday night.</p>
+                <p className="font-semibold text-sm">{t('dashboard.firstWeekSummaryPending')}</p>
+                <p className="text-xs opacity-80 mt-1">{t('dashboard.firstWeekSummaryHint')}</p>
               </div>
             ) : (
               <>

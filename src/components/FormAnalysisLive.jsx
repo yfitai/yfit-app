@@ -6,8 +6,10 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS } from '@mediapipe/pose';
 import { Camera as CameraIcon, StopCircle, Play, CheckCircle, AlertCircle, History, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase, getCurrentUser } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 const FormAnalysisLive = ({ preSelectedExerciseName }) => {
+  const { t } = useTranslation();
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -996,7 +998,7 @@ const analyzeBicepCurl = (landmarks) => {
 
   const startAnalysis = async () => {
     if (!selectedExercise) {
-      alert('Please select an exercise first');
+      alert(t('fitness.pleaseSelectExercise', 'Please select an exercise first'));
       return;
     }
 
@@ -1168,15 +1170,15 @@ return (
   <div className="min-h-screen bg-gray-50 p-6">
     <div className="max-w-6xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Live Form Analysis</h1>
-        <p className="text-gray-600">Real-time AI-powered exercise form checking</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('fitness.liveFormAnalysis', 'Live Form Analysis')}</h1>
+        <p className="text-gray-600">{t('fitness.realtimeAIFormChecking', 'Real-time AI-powered exercise form checking')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Camera Feed */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Camera Feed</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.cameraFeed', 'Camera Feed')}</h2>
             
             {/* Camera Angle Instruction */}
             {selectedExercise && (
@@ -1203,7 +1205,7 @@ return (
                 }}
                 onUserMediaError={(error) => {
                   console.error('Camera error:', error);
-                  setCameraError('Camera access denied or not available. Please allow camera access and refresh.');
+                  setCameraError(t('fitness.cameraAccessDenied', 'Camera access denied or not available. Please allow camera access and refresh.'));
                 }}
                 className="w-full h-full object-cover"
               />
@@ -1219,8 +1221,8 @@ return (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
                   <div className="text-center text-white">
                     <CameraIcon className="w-16 h-16 mx-auto mb-4 animate-pulse" />
-                    <p>Requesting camera access...</p>
-                    <p className="text-sm mt-2 opacity-75">Please allow camera permissions</p>
+                    <p>{t('fitness.requestingCameraAccess', 'Requesting camera access...')}</p>
+                    <p className="text-sm mt-2 opacity-75">{t('fitness.pleaseAllowCamera', 'Please allow camera permissions')}</p>
                   </div>
                 </div>
               )}
@@ -1234,7 +1236,7 @@ return (
                       onClick={() => window.location.reload()}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                      Refresh Page
+                      {t('common.refreshPage', 'Refresh Page')}
                     </button>
                   </div>
                 </div>
@@ -1284,7 +1286,7 @@ return (
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   <Play className="w-5 h-5" />
-                  Start Analysis
+                  {t('fitness.startAnalysis', 'Start Analysis')}
                 </button>
               ) : (
                 <button
@@ -1292,7 +1294,7 @@ return (
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   <StopCircle className="w-5 h-5" />
-                  Stop Analysis
+                  {t('fitness.stopAnalysis', 'Stop Analysis')}
                 </button>
               )}
             </div>
@@ -1303,7 +1305,7 @@ return (
         <div className="space-y-6">
           {/* Exercise Selection */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Exercise</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.selectExercise', 'Select Exercise')}</h2>
             
             <div className="space-y-3 max-h-96 overflow-y-auto">
   {exercises.map(exercise => (
@@ -1331,13 +1333,13 @@ return (
 
           {/* Rep Counter - Always Visible */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rep Count</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.repCount', 'Rep Count')}</h2>
             <div className="text-center">
               <div className={`text-6xl font-bold ${repCount > 0 ? 'text-green-600' : 'text-gray-300'}`}>
                 {repCount}
               </div>
               {repCount > 0 && (
-                <div className="text-gray-600 mt-2">Reps Completed</div>
+                <div className="text-gray-600 mt-2">{t('fitness.repsCompleted', 'Reps Completed')}</div>
               )}
             </div>
           </div>
@@ -1345,13 +1347,13 @@ return (
           {/* Persistent Form Feedback */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Form Feedback</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('fitness.formFeedback', 'Form Feedback')}</h2>
               {feedbackHistory.length > 0 && (
                  <button
                      onClick={clearFeedback}
                      className="px-4 py-2 text-sm font-semibold bg-red-100 text-red-700 rounded-lg hover:bg-red-200 border border-red-300 transition-colors"
                 >
-                     🗑️ Clear All
+                     {t('fitness.clearAll', '🗑️ Clear All')}
                </button>
   )}
             </div>
@@ -1359,8 +1361,8 @@ return (
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {feedbackHistory.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
-                  <p className="text-sm">No feedback yet</p>
-                  <p className="text-xs mt-1">Start exercising to see form tips</p>
+                  <p className="text-sm">{t('fitness.noFeedbackYet', 'No feedback yet')}</p>
+                  <p className="text-xs mt-1">{t('fitness.startExercisingForTips', 'Start exercising to see form tips')}</p>
                 </div>
               ) : (
                 feedbackHistory.map((item) => (
@@ -1401,16 +1403,16 @@ return (
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <History className="w-5 h-5 text-gray-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Session History</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{t('fitness.sessionHistory', 'Session History')}</h2>
                 <span className="text-sm text-gray-400">— {selectedExercise.name}</span>
               </div>
               {loadingHistory ? (
-                <div className="text-center py-4 text-gray-400 text-sm">Loading history...</div>
+                <div className="text-center py-4 text-gray-400 text-sm">{t('fitness.loadingHistory', 'Loading history...')}</div>
               ) : sessionHistory.length === 0 ? (
                 <div className="text-center py-6 text-gray-400">
                   <History className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No past sessions yet</p>
-                  <p className="text-xs mt-1">Complete a session to start tracking</p>
+                  <p className="text-sm">{t('fitness.noPastSessions', 'No past sessions yet')}</p>
+                  <p className="text-xs mt-1">{t('fitness.completeSessionToTrack', 'Complete a session to start tracking')}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1456,7 +1458,7 @@ return (
                         </div>
                         {/* Score label */}
                         <div className={`text-xs font-bold ${scoreColor} flex-shrink-0`}>
-                          {score >= 90 ? 'Excellent' : score >= 75 ? 'Good' : 'Needs Work'}
+                          {score >= 90 ? t('fitness.scoreExcellent', 'Excellent') : score >= 75 ? t('fitness.scoreGood', 'Good') : t('fitness.scoreNeedsWork', 'Needs Work')}
                         </div>
                       </div>
                     );

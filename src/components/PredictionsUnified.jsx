@@ -1348,7 +1348,7 @@ export default function PredictionsUnified({ user }) {
         <div className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">🔮 AI Predictions</h1>
-            <p className="text-gray-600">Data-driven insights and forecasts based on your health journey</p>
+            <p className="text-gray-600">{t('predictions.datadriven')}</p>
           </div>
           <button
             onClick={fetchAllData}
@@ -1406,10 +1406,10 @@ export default function PredictionsUnified({ user }) {
                   </div>
                   <div className="bg-white/15 rounded-lg p-3 text-center">
                     <div className="text-3xl font-bold">{lastWeekWorkouts.length >= 4 ? '🔥' : lastWeekWorkouts.length >= 2 ? '👍' : '💪'}</div>
-                    <div className="text-sm opacity-90">{lastWeekWorkouts.length >= 4 ? 'Strong week!' : lastWeekWorkouts.length >= 2 ? 'Good effort!' : 'New week ahead!'}</div>
+                    <div className="text-sm opacity-90">{lastWeekWorkouts.length >= 4 ? t('predictions.strongWeek') : lastWeekWorkouts.length >= 2 ? t('predictions.goodEffort') : t('predictions.newWeekAhead')}</div>
                   </div>
                 </div>
-                <p className="text-sm opacity-80 mt-3">Fresh week starts today — let's build on last week's momentum!</p>
+                <p className="text-sm opacity-80 mt-3">{t('predictions.freshWeekMessage')}</p>
               </div>
             );
           }
@@ -1421,7 +1421,7 @@ export default function PredictionsUnified({ user }) {
                   <Calendar className="w-6 h-6" />
                   <h3 className="text-lg font-bold">{t('predictions.weeklyResetDay')}</h3>
                 </div>
-                <p className="text-sm opacity-90 mb-4">Predictions reset each Sunday. Log a workout today to close out the week strong — it counts toward your streak and weekly total!</p>
+                <p className="text-sm opacity-90 mb-4">{t('predictions.sundayResetMessage')}</p>
                 <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => navigate('/fitness')}
@@ -1721,7 +1721,7 @@ export default function PredictionsUnified({ user }) {
               <div>
                 <div className="text-sm opacity-90 mb-1">{t('predictions.worstDay')}</div>
                 <div className="text-2xl font-bold">{predictions.medicationAdherence.worstDay.day}</div>
-                <div className="text-sm opacity-75">{predictions.medicationAdherence.worstDay.rate}% adherence</div>
+                <div className="text-sm opacity-75">{predictions.medicationAdherence.worstDay.rate}% {t('predictions.adherenceLabel')}</div>
               </div>
             </div>
             {predictions.medicationAdherence.recommendations.length > 0 && (
@@ -1739,7 +1739,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Pill className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.medicationAdherence')}</h3>
-            <p className="text-teal-700">Log 14+ medication doses to analyze adherence</p>
+            <p className="text-teal-700">{t('predictions.log14DosesMessage')}</p>
           </div>
         )}
 
@@ -1756,17 +1756,17 @@ export default function PredictionsUnified({ user }) {
                 <div className="text-3xl font-bold">{predictions.nutritionPatterns.avgMacros.calories}</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Protein</div>
+                <div className="text-sm opacity-90 mb-1">{t('nutrition.protein')}</div>
                 <div className="text-3xl font-bold">{predictions.nutritionPatterns.avgMacros.protein}g</div>
                 <div className="text-sm opacity-75">{predictions.nutritionPatterns.ratios.protein}%</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Carbs</div>
+                <div className="text-sm opacity-90 mb-1">{t('nutrition.carbs')}</div>
                 <div className="text-3xl font-bold">{predictions.nutritionPatterns.avgMacros.carbs}g</div>
                 <div className="text-sm opacity-75">{predictions.nutritionPatterns.ratios.carbs}%</div>
               </div>
               <div>
-                <div className="text-sm opacity-90 mb-1">Fat</div>
+                <div className="text-sm opacity-90 mb-1">{t('nutrition.fat')}</div>
                 <div className="text-3xl font-bold">{predictions.nutritionPatterns.avgMacros.fat}g</div>
                 <div className="text-sm opacity-75">{predictions.nutritionPatterns.ratios.fat}%</div>
               </div>
@@ -1791,7 +1791,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Apple className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.nutritionPatternAnalysis')}</h3>
-            <p className="text-teal-700">Log 7+ days of nutrition to analyze patterns</p>
+            <p className="text-teal-700">{t('predictions.log7DaysMessage')}</p>
           </div>
         )}
 

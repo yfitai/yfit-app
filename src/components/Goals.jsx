@@ -723,11 +723,10 @@ export default function Goals({ user: propUser }) {
           <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
             <User className="w-6 h-6 text-blue-500" />
-            Understanding Your Body Type
+            {t('goals.understandingBodyType')}
           </h2>
           <p className="text-gray-600 mb-6">
-            Everyone has a unique body type that influences how they gain muscle, lose fat, and respond to training. 
-            Understanding your body type helps set realistic goals and choose the right approach.
+            {t('goals.bodyTypeIntro')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-4">
@@ -736,16 +735,16 @@ export default function Goals({ user: propUser }) {
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-bold text-lg text-gray-800 mb-2">Ectomorph</h3>
-              <p className="text-sm text-gray-600 mb-3">Lean & Long</p>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">{t('goals.ectomorph')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('goals.ectomorphSubtitle')}</p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Naturally thin build</li>
-                <li>• Fast metabolism</li>
-                <li>• Difficulty gaining weight</li>
-                <li>• Long limbs, lean muscle</li>
+                <li>• {t('goals.ectomorphTrait1')}</li>
+                <li>• {t('goals.ectomorphTrait2')}</li>
+                <li>• {t('goals.ectomorphTrait3')}</li>
+                <li>• {t('goals.ectomorphTrait4')}</li>
               </ul>
               <p className="text-xs text-blue-600 mt-3 font-medium">
-                Focus: Heavy strength training, higher calories
+                {t('goals.ectomorphFocus')}
               </p>
             </div>
 
@@ -754,16 +753,16 @@ export default function Goals({ user: propUser }) {
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
                 <Activity className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="font-bold text-lg text-gray-800 mb-2">Mesomorph</h3>
-              <p className="text-sm text-gray-600 mb-3">Athletic & Muscular</p>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">{t('goals.mesomorph')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('goals.mesomorphSubtitle')}</p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Naturally athletic</li>
-                <li>• Gains muscle easily</li>
-                <li>• Moderate metabolism</li>
-                <li>• V-shaped physique</li>
+                <li>• {t('goals.mesomorphTrait1')}</li>
+                <li>• {t('goals.mesomorphTrait2')}</li>
+                <li>• {t('goals.mesomorphTrait3')}</li>
+                <li>• {t('goals.mesomorphTrait4')}</li>
               </ul>
               <p className="text-xs text-green-600 mt-3 font-medium">
-                Focus: Balanced strength & cardio
+                {t('goals.mesomorphFocus')}
               </p>
             </div>
 
@@ -772,24 +771,23 @@ export default function Goals({ user: propUser }) {
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
                 <Target className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="font-bold text-lg text-gray-800 mb-2">Endomorph</h3>
-              <p className="text-sm text-gray-600 mb-3">Solid & Strong</p>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">{t('goals.endomorph')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('goals.endomorphSubtitle')}</p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Larger bone structure</li>
-                <li>• Gains weight easily</li>
-                <li>• Slower metabolism</li>
-                <li>• Strong and powerful</li>
+                <li>• {t('goals.endomorphTrait1')}</li>
+                <li>• {t('goals.endomorphTrait2')}</li>
+                <li>• {t('goals.endomorphTrait3')}</li>
+                <li>• {t('goals.endomorphTrait4')}</li>
               </ul>
               <p className="text-xs text-purple-600 mt-3 font-medium">
-                Focus: Higher cardio, careful calories
+                {t('goals.endomorphFocus')}
               </p>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-gray-700">
-              <strong>Note:</strong> Most people are a combination of two body types. After you enter your measurements, 
-              we'll identify your primary body type and provide personalized recommendations.
+              <strong>{t('common.note')}:</strong> {t('goals.bodyTypeCombinationNote')}
             </p>
           </div>
         </div>
@@ -954,52 +952,52 @@ export default function Goals({ user: propUser }) {
           <div className="bg-teal-50 border border-teal-100 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('goals.recordCurrentMeasurements')}</h2>
           <p className="text-gray-600 mb-6">
-            Enter all 10 measurements for accurate body composition analysis. Measure at the widest/narrowest point of each area.
+            {t('goals.measurementsInstructions')}
           </p>
 
           <div className="space-y-8">
             {/* Upper Body */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-200">
-                Upper Body
+                {t('goals.upperBody')}
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Neck ({getMeasurementUnit(unitSystem)})
+                    {t('goals.neck')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.neck}
                     onChange={(e) => handleMeasurementChange('neck', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Narrowest point"
+                    placeholder={t('goals.narrowestPoint')}
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Shoulders ({getMeasurementUnit(unitSystem)})
+                    {t('goals.shoulders')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.shoulders}
                     onChange={(e) => handleMeasurementChange('shoulders', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Across shoulder blades"
+                    placeholder={t('goals.acrossShoulderBlades')}
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Chest ({getMeasurementUnit(unitSystem)})
+                    {t('goals.chest')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.chest}
                     onChange={(e) => handleMeasurementChange('chest', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Fullest point"
+                    placeholder={t('goals.fullestPoint')}
                     step="0.1"
                   />
                 </div>
@@ -1009,32 +1007,32 @@ export default function Goals({ user: propUser }) {
             {/* Core */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">
-                Core
+                {t('goals.core')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Waist ({getMeasurementUnit(unitSystem)})
+                    {t('goals.waist')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.waist}
                     onChange={(e) => handleMeasurementChange('waist', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    placeholder="At navel"
+                    placeholder={t('goals.atNavel')}
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Hips ({getMeasurementUnit(unitSystem)})
+                    {t('goals.hips')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.hips}
                     onChange={(e) => handleMeasurementChange('hips', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    placeholder="Widest point"
+                    placeholder={t('goals.widestPoint')}
                     step="0.1"
                   />
                 </div>
@@ -1044,32 +1042,32 @@ export default function Goals({ user: propUser }) {
             {/* Arms */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-purple-200">
-                Arms
+                {t('goals.arms')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Biceps ({getMeasurementUnit(unitSystem)})
+                    {t('goals.biceps')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.biceps}
                     onChange={(e) => handleMeasurementChange('biceps', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Largest point"
+                    placeholder={t('goals.largestPoint')}
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Forearms ({getMeasurementUnit(unitSystem)})
+                    {t('goals.forearms')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.forearms}
                     onChange={(e) => handleMeasurementChange('forearms', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Widest point"
+                    placeholder={t('goals.widestPoint')}
                     step="0.1"
                   />
                 </div>
@@ -1079,25 +1077,25 @@ export default function Goals({ user: propUser }) {
             {/* Legs */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-orange-200">
-                Legs
+                {t('goals.legs')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Thighs ({getMeasurementUnit(unitSystem)})
+                    {t('goals.thighs')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
                     value={measurements.thighs}
                     onChange={(e) => handleMeasurementChange('thighs', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                    placeholder="Widest point"
+                    placeholder={t('goals.widestPoint')}
                     step="0.1"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Calves ({getMeasurementUnit(unitSystem)})
+                    {t('goals.calves')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1116,22 +1114,22 @@ export default function Goals({ user: propUser }) {
         {/* Target Measurements (Goals) */}
         <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 mb-8 border-2 border-amber-200">
           <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-            <span>🎯</span> Target Measurements (Optional)
+            <span>🎯</span> {t('goals.targetMeasurements')}
           </h3>
           <p className="text-sm text-gray-600 mb-6">
-            Set your goal measurements to track progress. Leave blank for measurements you don't want to track.
+            {t('goals.targetMeasurementsHint')}
           </p>
 
           <div className="space-y-6">
             {/* Torso Goals */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-200">
-                Torso Goals
+                {t('goals.torsoGoals')}
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Neck Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.neck')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1144,7 +1142,7 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Shoulders Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.shoulders')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1157,7 +1155,7 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Chest Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.chest')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1174,12 +1172,12 @@ export default function Goals({ user: propUser }) {
             {/* Core Goals */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">
-                Core Goals
+                {t('goals.coreGoals')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Waist Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.waist')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1192,7 +1190,7 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Hips Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.hips')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1209,12 +1207,12 @@ export default function Goals({ user: propUser }) {
             {/* Arms Goals */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-purple-200">
-                Arms Goals
+                {t('goals.armsGoals')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Biceps Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.biceps')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1227,7 +1225,7 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Forearms Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.forearms')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1244,12 +1242,12 @@ export default function Goals({ user: propUser }) {
             {/* Legs Goals */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-orange-200">
-                Legs Goals
+                {t('goals.legsGoals')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Thighs Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.thighs')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1262,7 +1260,7 @@ export default function Goals({ user: propUser }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Calves Goal ({getMeasurementUnit(unitSystem)})
+                    {t('goals.calves')} {t('goals.goalSuffix')} ({getMeasurementUnit(unitSystem)})
                   </label>
                   <input
                     type="number"
@@ -1281,10 +1279,10 @@ export default function Goals({ user: propUser }) {
         {/* Manual Override Options */}
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 mb-8 border-2 border-purple-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span>⚙️</span> Advanced Options (Optional)
+            <span>⚙️</span> {t('goals.advancedOptions')}
           </h3>
           <p className="text-sm text-gray-600 mb-6">
-            If you know your body fat percentage from a DEXA scan or your TDEE from metabolic testing, you can enter them manually here.
+            {t('goals.advancedOptionsHint')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -1299,13 +1297,13 @@ export default function Goals({ user: propUser }) {
                   className="w-5 h-5 text-purple-600"
                 />
                 <label htmlFor="useManualBodyFat" className="font-semibold text-gray-800 cursor-pointer">
-                  I know my Body Fat %
+                  {t('goals.iKnowMyBodyFat')}
                 </label>
               </div>
               {useManualBodyFat && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Body Fat Percentage (%)
+                    {t('goals.bodyFatPercentageLabel')}
                   </label>
                   <input
                     type="number"
@@ -1318,7 +1316,7 @@ export default function Goals({ user: propUser }) {
                     max="50"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    From DEXA scan, calipers, or other accurate method
+                    {t('goals.bodyFatSource')}
                   </p>
                 </div>
               )}
@@ -1335,13 +1333,13 @@ export default function Goals({ user: propUser }) {
                   className="w-5 h-5 text-purple-600"
                 />
                 <label htmlFor="useManualTDEE" className="font-semibold text-gray-800 cursor-pointer">
-                  I know my TDEE
+                  {t('goals.iKnowMyTDEE')}
                 </label>
               </div>
               {useManualTDEE && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    TDEE (calories/day)
+                    {t('goals.tdeeLabel')}
                   </label>
                   <input
                     type="number"
@@ -1354,7 +1352,7 @@ export default function Goals({ user: propUser }) {
                     max="5000"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    From metabolic testing or fitness tracker
+                    {t('goals.tdeeSource')}
                   </p>
                 </div>
               )}
@@ -1390,7 +1388,7 @@ export default function Goals({ user: propUser }) {
     onClick={() => setShowResetModal(true)}
     className="px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
   >
-    🔄 Start Fresh Journey
+    🔄 {t('goals.startFreshJourney')}
   </button>
 </div>
 
@@ -1421,17 +1419,17 @@ export default function Goals({ user: propUser }) {
         {showResetModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">⚠️ Start Fresh Journey?</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">⚠️ {t('goals.startFreshJourney')}?</h2>
               <p className="text-gray-600 mb-6">
-                This will permanently delete:
+                {t('goals.startFreshWarning')}
               </p>
               <ul className="list-disc list-inside text-gray-600 mb-6 space-y-2">
-                <li>All meal logs & completed workout sessions</li>
-                <li>Your current goals and body measurements</li>
-                <li>All progress data and analytics</li>
+                <li>{t('goals.startFreshDelete1')}</li>
+                <li>{t('goals.startFreshDelete2')}</li>
+                <li>{t('goals.startFreshDelete3')}</li>
               </ul>
               <p className="text-green-600 font-medium mb-6">
-                ✅ Your workout templates, medications list, custom foods, favorites, and meal templates will be saved.
+                ✅ {t('goals.startFreshKeep')}
               </p>
               <div className="flex gap-3">
                 <button

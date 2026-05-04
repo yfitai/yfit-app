@@ -922,6 +922,30 @@ const resources = {
         "submitFeedback": "Submit Feedback",
         "pleaseFillTitleAndDescription": "Please fill in the title and description.",
         "failedToSubmit": "Failed to submit feedback. Please try again."
+      },
+      "footer": {
+        "tagline": "Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.",
+        "legal": "Legal",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service",
+        "cookiePolicy": "Cookie Policy",
+        "hipaaNotice": "HIPAA Notice",
+        "contact": "Contact",
+        "contactQuestion": "Have questions or need support?",
+        "contactSupport": "Contact Support",
+        "aiResponse": "Get AI-powered responses in minutes",
+        "allRightsReserved": "All rights reserved."
+      },
+      "faq": {
+        "searchPlaceholder": "Search for help...",
+        "allCategories": "All Categories",
+        "loading": "Loading FAQ articles...",
+        "noResults": "No articles found matching your search.",
+        "noArticles": "No FAQ articles available.",
+        "askAICoachInstead": "Ask AI Coach Instead",
+        "wasHelpful": "Was this helpful?",
+        "cantFind": "Can't find what you're looking for?",
+        "askAICoach": "Ask AI Coach"
       }
     }
   },
@@ -1862,6 +1886,30 @@ const resources = {
         "submitFeedback": "Soumettre les commentaires",
         "pleaseFillTitleAndDescription": "Veuillez remplir le titre et la description.",
         "failedToSubmit": "Échec de la soumission. Veuillez réessayer."
+      },
+      "footer": {
+        "tagline": "Votre compagnon fitness personnel propulsé par l'IA. Suivez vos entraînements, votre nutrition et vos objectifs de santé avec des insights intelligents.",
+        "legal": "Mentions légales",
+        "privacyPolicy": "Politique de confidentialité",
+        "termsOfService": "Conditions d'utilisation",
+        "cookiePolicy": "Politique des cookies",
+        "hipaaNotice": "Avis HIPAA",
+        "contact": "Contact",
+        "contactQuestion": "Des questions ou besoin d'aide ?",
+        "contactSupport": "Contacter le support",
+        "aiResponse": "Obtenez des réponses IA en quelques minutes",
+        "allRightsReserved": "Tous droits réservés."
+      },
+      "faq": {
+        "searchPlaceholder": "Rechercher de l'aide...",
+        "allCategories": "Toutes les catégories",
+        "loading": "Chargement des articles FAQ...",
+        "noResults": "Aucun article trouvé correspondant à votre recherche.",
+        "noArticles": "Aucun article FAQ disponible.",
+        "askAICoachInstead": "Demander au Coach IA",
+        "wasHelpful": "Cela vous a-t-il aidé ?",
+        "cantFind": "Vous ne trouvez pas ce que vous cherchez ?",
+        "askAICoach": "Demander au Coach IA"
       }
     }
   },
@@ -2779,6 +2827,30 @@ const resources = {
         "submitFeedback": "Enviar comentarios",
         "pleaseFillTitleAndDescription": "Por favor completa el título y la descripción.",
         "failedToSubmit": "Error al enviar. Por favor intenta de nuevo."
+      },
+      "footer": {
+        "tagline": "Tu compañero personal de fitness impulsado por IA. Rastrea entrenamientos, nutrición y objetivos de salud con información inteligente.",
+        "legal": "Legal",
+        "privacyPolicy": "Política de privacidad",
+        "termsOfService": "Términos de servicio",
+        "cookiePolicy": "Política de cookies",
+        "hipaaNotice": "Aviso HIPAA",
+        "contact": "Contacto",
+        "contactQuestion": "¿Tienes preguntas o necesitas soporte?",
+        "contactSupport": "Contactar soporte",
+        "aiResponse": "Obtén respuestas impulsadas por IA en minutos",
+        "allRightsReserved": "Todos los derechos reservados."
+      },
+      "faq": {
+        "searchPlaceholder": "Buscar ayuda...",
+        "allCategories": "Todas las categorías",
+        "loading": "Cargando artículos de FAQ...",
+        "noResults": "No se encontraron artículos que coincidan con tu búsqueda.",
+        "noArticles": "No hay artículos de FAQ disponibles.",
+        "askAICoachInstead": "Preguntar al Entrenador IA",
+        "wasHelpful": "¿Fue útil esto?",
+        "cantFind": "¿No encuentras lo que buscas?",
+        "askAICoach": "Preguntar al Entrenador IA"
       }
     }
   },
@@ -3695,6 +3767,30 @@ const resources = {
         "submitFeedback": "Enviar feedback",
         "pleaseFillTitleAndDescription": "Por favor preencha o título e a descrição.",
         "failedToSubmit": "Falha ao enviar. Por favor tente novamente."
+      },
+      "footer": {
+        "tagline": "Seu companheiro pessoal de fitness com IA. Acompanhe treinos, nutrição e metas de saúde com insights inteligentes.",
+        "legal": "Legal",
+        "privacyPolicy": "Política de privacidade",
+        "termsOfService": "Termos de serviço",
+        "cookiePolicy": "Política de cookies",
+        "hipaaNotice": "Aviso HIPAA",
+        "contact": "Contato",
+        "contactQuestion": "Tem perguntas ou precisa de suporte?",
+        "contactSupport": "Contatar suporte",
+        "aiResponse": "Obtenha respostas com IA em minutos",
+        "allRightsReserved": "Todos os direitos reservados."
+      },
+      "faq": {
+        "searchPlaceholder": "Pesquisar ajuda...",
+        "allCategories": "Todas as categorias",
+        "loading": "Carregando artigos de FAQ...",
+        "noResults": "Nenhum artigo encontrado correspondendo à sua pesquisa.",
+        "noArticles": "Nenhum artigo de FAQ disponível.",
+        "askAICoachInstead": "Perguntar ao Treinador IA",
+        "wasHelpful": "Isso foi útil?",
+        "cantFind": "Não encontrou o que procura?",
+        "askAICoach": "Perguntar ao Treinador IA"
       }
     }
   },
@@ -4620,6 +4716,30 @@ const resources = {
         "submitFeedback": "提交反馈",
         "pleaseFillTitleAndDescription": "请填写标题和描述。",
         "failedToSubmit": "提交失败。请重试。"
+      },
+      "footer": {
+        "tagline": "您的个人AI健身伴侣。通过智能洞察追踪锻炼、营养和健康目标。",
+        "legal": "法律",
+        "privacyPolicy": "隐私政策",
+        "termsOfService": "服务条款",
+        "cookiePolicy": "Cookie政策",
+        "hipaaNotice": "HIPAA通知",
+        "contact": "联系我们",
+        "contactQuestion": "有问题或需要支持？",
+        "contactSupport": "联系支持",
+        "aiResponse": "几分钟内获得AI驱动的回复",
+        "allRightsReserved": "版权所有。"
+      },
+      "faq": {
+        "searchPlaceholder": "搜索帮助...",
+        "allCategories": "所有类别",
+        "loading": "正在加载FAQ文章...",
+        "noResults": "未找到与您搜索匹配的文章。",
+        "noArticles": "暂无FAQ文章。",
+        "askAICoachInstead": "询问AI教练",
+        "wasHelpful": "这有帮助吗？",
+        "cantFind": "找不到您要找的内容？",
+        "askAICoach": "询问AI教练"
       }
     }
   },
@@ -5545,6 +5665,30 @@ const resources = {
         "submitFeedback": "प्रतिक्रिया सबमिट करें",
         "pleaseFillTitleAndDescription": "कृपया शीर्षक और विवरण भरें।",
         "failedToSubmit": "सबमिट करने में विफल। कृपया पुनः प्रयास करें।"
+      },
+      "footer": {
+        "tagline": "आपका व्यक्तिगत AI-संचालित फिटनेस साथी। बुद्धिमान अंतर्दृष्टि के साथ वर्कआउट, पोषण और स्वास्थ्य लक्ष्यों को ट्रैक करें।",
+        "legal": "कानूनी",
+        "privacyPolicy": "गोपनीयता नीति",
+        "termsOfService": "सेवा की शर्तें",
+        "cookiePolicy": "कुकी नीति",
+        "hipaaNotice": "HIPAA सूचना",
+        "contact": "संपर्क",
+        "contactQuestion": "प्रश्न हैं या सहायता चाहिए?",
+        "contactSupport": "सहायता से संपर्क करें",
+        "aiResponse": "मिनटों में AI-संचालित प्रतिक्रियाएं पाएं",
+        "allRightsReserved": "सर्वाधिकार सुरक्षित।"
+      },
+      "faq": {
+        "searchPlaceholder": "सहायता खोजें...",
+        "allCategories": "सभी श्रेणियां",
+        "loading": "FAQ लेख लोड हो रहे हैं...",
+        "noResults": "आपकी खोज से मेल खाने वाले कोई लेख नहीं मिले।",
+        "noArticles": "कोई FAQ लेख उपलब्ध नहीं है।",
+        "askAICoachInstead": "AI कोच से पूछें",
+        "wasHelpful": "क्या यह सहायक था?",
+        "cantFind": "जो ढूंढ रहे हैं वह नहीं मिल रहा?",
+        "askAICoach": "AI कोच से पूछें"
       }
     }
   },
@@ -6470,6 +6614,30 @@ const resources = {
         "submitFeedback": "Feedback einreichen",
         "pleaseFillTitleAndDescription": "Bitte füllen Sie Titel und Beschreibung aus.",
         "failedToSubmit": "Einreichen fehlgeschlagen. Bitte versuchen Sie es erneut."
+      },
+      "footer": {
+        "tagline": "Ihr persönlicher KI-gestützter Fitness-Begleiter. Verfolgen Sie Workouts, Ernährung und Gesundheitsziele mit intelligenten Einblicken.",
+        "legal": "Rechtliches",
+        "privacyPolicy": "Datenschutzrichtlinie",
+        "termsOfService": "Nutzungsbedingungen",
+        "cookiePolicy": "Cookie-Richtlinie",
+        "hipaaNotice": "HIPAA-Hinweis",
+        "contact": "Kontakt",
+        "contactQuestion": "Haben Sie Fragen oder benötigen Sie Unterstützung?",
+        "contactSupport": "Support kontaktieren",
+        "aiResponse": "Erhalten Sie KI-gestützte Antworten in Minuten",
+        "allRightsReserved": "Alle Rechte vorbehalten."
+      },
+      "faq": {
+        "searchPlaceholder": "Hilfe suchen...",
+        "allCategories": "Alle Kategorien",
+        "loading": "FAQ-Artikel werden geladen...",
+        "noResults": "Keine Artikel gefunden, die Ihrer Suche entsprechen.",
+        "noArticles": "Keine FAQ-Artikel verfügbar.",
+        "askAICoachInstead": "KI-Coach fragen",
+        "wasHelpful": "War das hilfreich?",
+        "cantFind": "Können Sie nicht finden, was Sie suchen?",
+        "askAICoach": "KI-Coach fragen"
       }
     }
   },
@@ -7395,6 +7563,30 @@ const resources = {
         "submitFeedback": "フィードバックを送信",
         "pleaseFillTitleAndDescription": "タイトルと説明を入力してください。",
         "failedToSubmit": "送信に失敗しました。もう一度お試しください。"
+      },
+      "footer": {
+        "tagline": "あなたの個人AIフィットネスコンパニオン。インテリジェントなインサイトでワークアウト、栄養、健康目標を追跡します。",
+        "legal": "法的情報",
+        "privacyPolicy": "プライバシーポリシー",
+        "termsOfService": "利用規約",
+        "cookiePolicy": "Cookieポリシー",
+        "hipaaNotice": "HIPAAに関するお知らせ",
+        "contact": "お問い合わせ",
+        "contactQuestion": "ご質問やサポートが必要ですか？",
+        "contactSupport": "サポートに連絡",
+        "aiResponse": "数分でAI搭載の回答を取得",
+        "allRightsReserved": "全著作権所有。"
+      },
+      "faq": {
+        "searchPlaceholder": "ヘルプを検索...",
+        "allCategories": "すべてのカテゴリ",
+        "loading": "FAQの記事を読み込んでいます...",
+        "noResults": "検索に一致する記事が見つかりませんでした。",
+        "noArticles": "利用可能なFAQ記事がありません。",
+        "askAICoachInstead": "AIコーチに質問する",
+        "wasHelpful": "これは役に立ちましたか？",
+        "cantFind": "お探しのものが見つかりませんか？",
+        "askAICoach": "AIコーチに質問する"
       }
     }
   }

@@ -163,11 +163,11 @@ export default function BodyRecomp({ user }) {
     const unit = unitLabel(unitSystem)
     const isReducing = REDUCING_MEASUREMENTS.includes(type)
 
-    if (Math.abs(diff) < 0.1) return { text: 'No change', color: 'text-gray-500', icon: <Minus className="w-4 h-4" /> }
-    if (isReducing && diff < 0) return { text: `${Math.abs(diff)}${unit} lost`, color: 'text-green-600', icon: <TrendingDown className="w-4 h-4" /> }
-    if (isReducing && diff > 0) return { text: `+${diff}${unit} gained`, color: 'text-red-500', icon: <TrendingUp className="w-4 h-4" /> }
-    if (!isReducing && diff > 0) return { text: `+${diff}${unit} gained`, color: 'text-green-600', icon: <TrendingUp className="w-4 h-4" /> }
-    return { text: `${diff}${unit} lost`, color: 'text-red-500', icon: <TrendingDown className="w-4 h-4" /> }
+    if (Math.abs(diff) < 0.1) return { text: t('bodyRecomp.noChange'), color: 'text-gray-500', icon: <Minus className="w-4 h-4" /> }
+    if (isReducing && diff < 0) return { text: `${Math.abs(diff)}${unit} ${t('bodyRecomp.lost')}`, color: 'text-green-600', icon: <TrendingDown className="w-4 h-4" /> }
+    if (isReducing && diff > 0) return { text: `+${diff}${unit} ${t('bodyRecomp.gained')}`, color: 'text-red-500', icon: <TrendingUp className="w-4 h-4" /> }
+    if (!isReducing && diff > 0) return { text: `+${diff}${unit} ${t('bodyRecomp.gained')}`, color: 'text-green-600', icon: <TrendingUp className="w-4 h-4" /> }
+    return { text: `${diff}${unit} ${t('bodyRecomp.lost')}`, color: 'text-red-500', icon: <TrendingDown className="w-4 h-4" /> }
   }
 
   // Overall recomp score: average of all measurements with goals
@@ -205,7 +205,7 @@ export default function BodyRecomp({ user }) {
           className="text-sm px-3 py-2 bg-teal-100 text-teal-700 border border-teal-300 rounded-lg hover:bg-teal-200 transition-colors"
           title="Refresh measurements"
         >
-          ↻ Refresh
+          ↻ {t('common.refresh')}
         </button>
         <select
           value={timeRange}
@@ -226,7 +226,7 @@ export default function BodyRecomp({ user }) {
           <Target className="w-8 h-8 text-amber-500 mx-auto mb-2" />
           <h3 className="font-semibold text-amber-800 mb-1">{t('bodyRecomp.setGoalsPrompt', 'Set your body measurement goals')}</h3>
           <p className="text-sm text-amber-700 mb-3">
-            Go to the Goals page and fill in your current measurements and target goals to start tracking here.
+            {t('bodyRecomp.goToGoalsMessage')}
           </p>
           <a href="/goals" className="inline-block bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors">
             Go to Goals →
@@ -240,7 +240,7 @@ export default function BodyRecomp({ user }) {
           <Activity className="w-8 h-8 text-blue-500 mx-auto mb-2" />
           <h3 className="font-semibold text-blue-800 mb-1">{t('bodyRecomp.startLogging', 'Start logging measurements')}</h3>
           <p className="text-sm text-blue-700 mb-3">
-            Use the Weekly Body Measurements section in the Daily Tracker to log your measurements and see progress here.
+            {t('bodyRecomp.useWeeklyMeasurementsMessage')}
           </p>
           <a href="/tracker" className="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
             Go to Tracker →
@@ -256,10 +256,10 @@ export default function BodyRecomp({ user }) {
               <p className="text-green-100 text-sm font-medium mb-1">{t('bodyRecomp.overallProgress', 'Overall Recomp Progress')}</p>
               <div className="text-5xl font-bold">{overallScore}%</div>
               <p className="text-green-100 text-sm mt-1">
-                {overallScore >= 80 ? '🔥 Outstanding progress!' :
-                 overallScore >= 50 ? '💪 Great work, keep going!' :
-                 overallScore >= 20 ? '📈 Building momentum' :
-                 '🌱 Just getting started'}
+                {overallScore >= 80 ? `🔥 ${t('bodyRecomp.outstandingProgress')}` :
+                 overallScore >= 50 ? `💪 ${t('bodyRecomp.greatWork')}` :
+                 overallScore >= 20 ? `📈 ${t('bodyRecomp.buildingMomentum')}` :
+                 `🌱 ${t('bodyRecomp.justStarted')}`}
               </p>
             </div>
             <div className="w-24 h-24 relative">
@@ -291,7 +291,7 @@ export default function BodyRecomp({ user }) {
               {groupName === 'Fat Loss' && <TrendingDown className="w-5 h-5 text-orange-500" />}
               {groupName === 'Muscle Gain' && <TrendingUp className="w-5 h-5 text-green-500" />}
               {groupName === 'Overall Build' && <Activity className="w-5 h-5 text-blue-500" />}
-              {groupName}
+              {t(`bodyRecomp.group_${groupName.replace(' ', '_').toLowerCase()}`, groupName)}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -314,11 +314,11 @@ export default function BodyRecomp({ user }) {
                     {/* Card Header */}
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-gray-800">{MEASUREMENT_LABELS[type]}</h3>
+                        <h3 className="font-semibold text-gray-800">{t(`bodyRecomp.${type}`)}</h3>
                         <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                           isReducing ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
                         }`}>
-                          {isReducing ? '↓ Reduce' : '↑ Build'}
+                          {isReducing ? `↓ ${t('bodyRecomp.reduce')}` : `↑ ${t('bodyRecomp.build')}`}
                         </span>
                       </div>
 
@@ -375,7 +375,7 @@ export default function BodyRecomp({ user }) {
                           className="w-full flex items-center justify-center gap-1 py-2 text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 transition-colors"
                         >
                           {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                          {isExpanded ? 'Hide chart' : `View trend (${chartData.length} entries)`}
+                          {isExpanded ? t('bodyRecomp.hideChart') : `${t('bodyRecomp.viewTrend')} (${chartData.length} ${t('common.entries')})`}
                         </button>
 
                         {isExpanded && (
@@ -397,7 +397,7 @@ export default function BodyRecomp({ user }) {
                                     y={goalDisplay}
                                     stroke="#10b981"
                                     strokeDasharray="4 4"
-                                    label={{ value: 'Goal', position: 'right', fontSize: 10, fill: '#10b981' }}
+                                    label={{ value: t('bodyRecomp.goal', 'Goal'), position: 'right', fontSize: 10, fill: '#10b981' }}
                                   />
                                 )}
                                 <Line
@@ -418,7 +418,7 @@ export default function BodyRecomp({ user }) {
                     {/* No history yet */}
                     {chartData.length === 0 && (startCm || goalCm) && (
                       <div className="px-4 pb-3 text-xs text-gray-400 text-center border-t border-gray-100 pt-2">
-                        Log measurements in Daily Tracker to see trend
+                        {t('bodyRecomp.logToSeeTrend')}
                       </div>
                     )}
                   </div>
@@ -448,7 +448,7 @@ export default function BodyRecomp({ user }) {
           href="/subscription"
           className="flex-shrink-0 bg-white text-green-700 font-bold px-5 py-2.5 rounded-xl hover:bg-green-50 transition-colors text-sm whitespace-nowrap"
         >
-          View Plans →
+          {t('common.viewPlans')} →
         </a>
       </div>
     </div>
