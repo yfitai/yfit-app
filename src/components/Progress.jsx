@@ -608,6 +608,7 @@ export default function Progress({ user: propUser }) {
 
 // Overview Card Component
 function OverviewCard({ title, current, goal, starting, unit, icon, color }) {
+  const { t } = useTranslation()
   // Journey progress: 0% at start, 100% when goal is reached
   const journeyTotal = starting != null && goal != null ? Math.abs(starting - goal) : null
   const journeyMade  = starting != null && current != null ? Math.abs(starting - current) : null
