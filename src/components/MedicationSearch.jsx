@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Search, Plus, AlertTriangle, CheckCircle } from 'lucide-react'
 
 export default function MedicationSearch({ user }) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
@@ -227,7 +229,7 @@ export default function MedicationSearch({ user }) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Medication</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('medications.addMedication')}</h2>
 
       {/* Toggle between database search and custom entry */}
       <div className="flex gap-4 mb-6">
@@ -239,7 +241,7 @@ export default function MedicationSearch({ user }) {
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
-          Search Database
+          {t('medications.searchDatabase', 'Search Database')}
         </button>
         <button
           onClick={() => setShowCustomForm(true)}
@@ -249,7 +251,7 @@ export default function MedicationSearch({ user }) {
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
-          Add Custom Medication
+          {t('medications.addCustomMedication', 'Add Custom Medication')}
         </button>
       </div>
 
@@ -258,7 +260,7 @@ export default function MedicationSearch({ user }) {
           {/* Search Bar */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search for Medication
+              {t('medications.searchForMedication', 'Search for Medication')}
             </label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -266,7 +268,7 @@ export default function MedicationSearch({ user }) {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Type medication name (e.g., Lisinopril, Metformin)..."
+                placeholder={t('medications.searchPlaceholder', 'Type medication name...')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -282,7 +284,7 @@ export default function MedicationSearch({ user }) {
                   >
                     <div className="font-medium text-gray-800">{med.name}</div>
                     {med.generic_name && med.name !== med.generic_name && (
-                      <div className="text-sm text-gray-500">Generic: {med.generic_name}</div>
+                      <div className="text-sm text-gray-500">{t('medications.generic', 'Generic')}: {med.generic_name}</div>
                     )}
                     {med.drug_class && (
                       <div className="text-xs text-gray-400 mt-1">{med.drug_class}</div>
@@ -293,7 +295,7 @@ export default function MedicationSearch({ user }) {
             )}
 
             {searching && (
-              <div className="mt-2 text-sm text-gray-500">Searching...</div>
+              <div className="mt-2 text-sm text-gray-500">{t('common.searching', 'Searching...')}</div>
             )}
           </div>
 
@@ -316,12 +318,12 @@ export default function MedicationSearch({ user }) {
                         <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-medium">
-                            {alert.severity.toUpperCase()} Interaction Detected
+                            {alert.severity.toUpperCase()} {t('medications.interactionDetected', 'Interaction Detected')}
                           </p>
                           <p className="text-sm mt-1">{alert.description}</p>
                           {alert.management && (
                             <p className="text-sm mt-2">
-                              <span className="font-medium">Management:</span> {alert.management}
+                              <span className="font-medium">{t('medications.management', 'Management')}:</span> {alert.management}
                             </p>
                           )}
                         </div>
@@ -334,13 +336,13 @@ export default function MedicationSearch({ user }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Dosage *
+                    {t('medications.dosage')} *
                   </label>
                   <input
                     type="text"
                     value={form.dosage}
                     onChange={(e) => setForm({ ...form, dosage: e.target.value })}
-                    placeholder="e.g., 10mg, 500mg"
+                    placeholder={t('medications.dosagePlaceholder', 'e.g., 10mg, 500mg')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -348,7 +350,7 @@ export default function MedicationSearch({ user }) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Frequency *
+                    {t('medications.frequency')} *
                   </label>
                   <select
                     value={form.frequency}
@@ -356,38 +358,38 @@ export default function MedicationSearch({ user }) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="">Select frequency</option>
-                    <option value="Once daily">Once daily</option>
-                    <option value="Twice daily">Twice daily</option>
-                    <option value="Three times daily">Three times daily</option>
-                    <option value="Four times daily">Four times daily</option>
-                    <option value="Every other day">Every other day</option>
-                    <option value="Once weekly">Once weekly</option>
-                    <option value="As needed">As needed</option>
+                    <option value="">{t('medications.selectFrequency', 'Select frequency')}</option>
+                    <option value="Once daily">{t('medications.onceDaily')}</option>
+                    <option value="Twice daily">{t('medications.twiceDaily')}</option>
+                    <option value="Three times daily">{t('medications.threeTimesDaily')}</option>
+                    <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
+                    <option value="Every other day">{t('medications.everyOtherDay')}</option>
+                    <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                    <option value="As needed">{t('medications.asNeeded')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Route
+                    {t('medications.route')}
                   </label>
                   <select
                     value={form.route}
                     onChange={(e) => setForm({ ...form, route: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="Oral">Oral</option>
-                    <option value="Injection">Injection</option>
-                    <option value="Topical">Topical</option>
-                    <option value="Inhalation">Inhalation</option>
-                    <option value="Rectal">Rectal</option>
-                    <option value="Other">Other</option>
+                    <option value="Oral">{t('medications.oral')}</option>
+                    <option value="Injection">{t('medications.injection')}</option>
+                    <option value="Topical">{t('medications.topical')}</option>
+                    <option value="Inhalation">{t('medications.inhalation')}</option>
+                    <option value="Rectal">{t('medications.rectal')}</option>
+                    <option value="Other">{t('medications.other')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
+                    {t('medications.startDate', 'Start Date')}
                   </label>
                   <input
                     type="date"
@@ -399,14 +401,14 @@ export default function MedicationSearch({ user }) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Prescriber
+                    {t('medications.prescriber', 'Prescriber')}
                   </label>
                   <select
                     value={form.prescriber_id}
                     onChange={(e) => setForm({ ...form, prescriber_id: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Select prescriber</option>
+                    <option value="">{t('medications.selectPrescriber')}</option>
                     {providers.map((provider) => (
                       <option key={provider.id} value={provider.id}>
                         Dr. {provider.name}
@@ -417,20 +419,20 @@ export default function MedicationSearch({ user }) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pharmacy
+                    {t('medications.pharmacy', 'Pharmacy')}
                   </label>
                   <input
                     type="text"
                     value={form.pharmacy}
                     onChange={(e) => setForm({ ...form, pharmacy: e.target.value })}
-                    placeholder="Pharmacy name"
+                    placeholder={t('medications.pharmacyPlaceholder', 'Pharmacy name')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Refills Remaining
+                    {t('medications.refillsRemaining', 'Refills Remaining')}
                   </label>
                   <input
                     type="number"
@@ -444,13 +446,13 @@ export default function MedicationSearch({ user }) {
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
+                  {t('medications.notes', 'Notes')}
                 </label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
                   rows={3}
-                  placeholder="Any special instructions or notes..."
+                  placeholder={t('medications.notesPlaceholder', 'Any special instructions or notes...')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -461,7 +463,7 @@ export default function MedicationSearch({ user }) {
                   className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:shadow-lg transition-all"
                 >
                   <Plus className="w-5 h-5" />
-                  Add Medication
+                  {t('medications.addMedication')}
                 </button>
                 <button
                   onClick={() => {
@@ -470,7 +472,7 @@ export default function MedicationSearch({ user }) {
                   }}
                   className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -480,10 +482,10 @@ export default function MedicationSearch({ user }) {
         /* Custom Medication Form */
         <div className="border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Add Custom Medication
+            {t('medications.addCustomMedication', 'Add Custom Medication')}
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Use this form if your medication is not in our database.
+            {t('medications.customMedNote', 'Use this form if your medication is not in our database.')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -495,7 +497,7 @@ export default function MedicationSearch({ user }) {
                 type="text"
                 value={customForm.custom_name}
                 onChange={(e) => setCustomForm({ ...customForm, custom_name: e.target.value })}
-                placeholder="Brand or generic name"
+                placeholder={t('medications.brandOrGeneric', 'Brand or generic name')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
               />
@@ -509,7 +511,7 @@ export default function MedicationSearch({ user }) {
                 type="text"
                 value={customForm.custom_generic_name}
                 onChange={(e) => setCustomForm({ ...customForm, custom_generic_name: e.target.value })}
-                placeholder="Generic name (if different)"
+                placeholder={t('medications.genericNamePlaceholder', 'Generic name (if different)')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -523,7 +525,7 @@ export default function MedicationSearch({ user }) {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <span className="text-sm font-medium text-gray-700">
-                  This is a supplement/vitamin (not a prescription medication)
+                  {t('medications.isSupplementLabel', 'This is a supplement/vitamin (not a prescription medication)')}
                 </span>
               </label>
             </div>
@@ -536,7 +538,7 @@ export default function MedicationSearch({ user }) {
                 type="text"
                 value={customForm.dosage}
                 onChange={(e) => setCustomForm({ ...customForm, dosage: e.target.value })}
-                placeholder="e.g., 10mg, 500mg"
+                placeholder={t('medications.dosagePlaceholder', 'e.g., 10mg, 500mg')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
               />
@@ -552,14 +554,14 @@ export default function MedicationSearch({ user }) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select frequency</option>
-                <option value="Once daily">Once daily</option>
-                <option value="Twice daily">Twice daily</option>
-                <option value="Three times daily">Three times daily</option>
-                <option value="Four times daily">Four times daily</option>
-                <option value="Every other day">Every other day</option>
-                <option value="Once weekly">Once weekly</option>
-                <option value="As needed">As needed</option>
+                <option value="">{t('medications.selectFrequency', 'Select frequency')}</option>
+                <option value="Once daily">{t('medications.onceDaily')}</option>
+                <option value="Twice daily">{t('medications.twiceDaily')}</option>
+                <option value="Three times daily">{t('medications.threeTimesDaily')}</option>
+                <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
+                <option value="Every other day">{t('medications.everyOtherDay')}</option>
+                <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
             </div>
 
@@ -572,12 +574,12 @@ export default function MedicationSearch({ user }) {
                 onChange={(e) => setCustomForm({ ...customForm, route: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Oral">Oral</option>
-                <option value="Injection">Injection</option>
-                <option value="Topical">Topical</option>
-                <option value="Inhalation">Inhalation</option>
-                <option value="Rectal">Rectal</option>
-                <option value="Other">Other</option>
+                <option value="Oral">{t('medications.oral')}</option>
+                <option value="Injection">{t('medications.injection')}</option>
+                <option value="Topical">{t('medications.topical')}</option>
+                <option value="Inhalation">{t('medications.inhalation')}</option>
+                <option value="Rectal">{t('medications.rectal')}</option>
+                <option value="Other">{t('medications.other')}</option>
               </select>
             </div>
 
@@ -596,13 +598,13 @@ export default function MedicationSearch({ user }) {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+              {t('medications.notes', 'Notes')}
             </label>
             <textarea
               value={customForm.notes}
               onChange={(e) => setCustomForm({ ...customForm, notes: e.target.value })}
               rows={3}
-              placeholder="Any special instructions or notes..."
+              placeholder={t('medications.notesPlaceholder', 'Any special instructions or notes...')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -613,13 +615,13 @@ export default function MedicationSearch({ user }) {
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:shadow-lg transition-all"
             >
               <Plus className="w-5 h-5" />
-              Add Custom Medication
+              {t('medications.addCustomMedication', 'Add Custom Medication')}
             </button>
             <button
               onClick={() => setShowCustomForm(false)}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>

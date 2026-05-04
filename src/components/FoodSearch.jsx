@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { searchFoods, getRecentFoods, getFavoriteFoods, addCustomFood, addFavoriteFood, removeFavoriteFood } from '../lib/foodDatabase'
 import CustomFoodModal from './CustomFoodModal'
 
 export default function FoodSearch({ user, onSelectFood, onClose, initialQuery = '' }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState([])
   const [recentFoods, setRecentFoods] = useState([])
@@ -171,7 +173,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-semibold text-gray-800">Search Foods</h2>
+            <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.searchFoods')}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -186,7 +188,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               type="text"
               value={query}
               onChange={handleSearchChange}
-              placeholder="Search for food..."
+              placeholder={t('nutrition.searchForFood')}
               className={`w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${query ? 'pr-10' : ''}`}
               autoFocus
             />
@@ -231,8 +233,8 @@ const handleToggleFavorite = async (food, isFavorited) => {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                 {filterOption === 'all' && '🔍 All Foods'}
-                {filterOption === 'custom' && '⭐ My Foods'}
+                 {filterOption === 'all' && t('nutrition.allFoods')}
+                {filterOption === 'custom' && t('nutrition.myFoods')}
 
               </button>
             ))}
@@ -243,7 +245,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
               className="ml-auto px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-1"
             >
               <span>➕</span>
-              <span>Create Custom Food</span>
+              <span>{t('nutrition.createCustomFood')}</span>
             </button>
           </div>
         </div>
@@ -254,7 +256,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
           {filter === 'custom' && favoriteFoods.length > 0 && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                My Foods (⭐ Saved | ✏️ Custom)
+                {t('nutrition.myFoodsSavedCustom')}
               </h3>
               <div className="space-y-2">
                 {favoriteFoods.map((food, index) => (
@@ -274,9 +276,9 @@ const handleToggleFavorite = async (food, isFavorited) => {
           {/* Empty state for My Foods tab */}
           {filter === 'custom' && favoriteFoods.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-600 text-lg mb-2">⭐ No saved foods yet</p>
+              <p className="text-gray-600 text-lg mb-2">⭐ {t('nutrition.noSavedFoodsYet')}</p>
               <p className="text-gray-500 text-sm">
-                Save foods from search or create custom foods to see them here
+                {t('nutrition.saveFoodsFromSearch')}
               </p>
             </div>
           )}
@@ -284,9 +286,9 @@ const handleToggleFavorite = async (food, isFavorited) => {
           {/* Empty state for All Foods tab */}
           {filter === 'all' && query.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-600 text-lg mb-2">🔍 Start searching</p>
+              <p className="text-gray-600 text-lg mb-2">🔍 {t('nutrition.startSearching')}</p>
               <p className="text-gray-500 text-sm">
-                Type at least 2 characters to search for foods
+                {t('nutrition.typeAtLeast2Chars')}
               </p>
             </div>
           )}
@@ -295,7 +297,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
           {loading && (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <p className="text-gray-600 mt-2">Searching...</p>
+              <p className="text-gray-600 mt-2">{t('common.searching')}...</p>
             </div>
           )}
 
@@ -303,7 +305,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
             <div className="text-center py-8">
               <p className="text-gray-600">No foods found for "{query}"</p>
               <p className="text-sm text-gray-500 mt-2">
-                Try a different search term or add a custom food
+                {t('nutrition.tryDifferentSearch')}
               </p>
             </div>
           )}
@@ -311,7 +313,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
           {!loading && results.length > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                Search Results ({results.length})
+                {t('nutrition.searchResults')} ({results.length})
               </h3>
               <div className="space-y-2">
                 {results.map((food, index) => (
@@ -336,7 +338,7 @@ const handleToggleFavorite = async (food, isFavorited) => {
             onClick={onClose}
             className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>

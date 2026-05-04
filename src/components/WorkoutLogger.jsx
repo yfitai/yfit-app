@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase, getCurrentUser } from '../lib/supabase';
 import { useUnitPreference } from '../contexts/UnitPreferenceContext';
 import { 
@@ -7,6 +8,7 @@ import {
 } from 'lucide-react';
 
 const WorkoutLogger = ({ onNavigateToBuilder }) => {
+  const { t } = useTranslation();
   const { distanceUnit, toggleDistanceUnit, isDistanceMetric, isDistanceImperial } = useUnitPreference();
   const [user, setUser] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
@@ -447,7 +449,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to log workouts</p>
+          <p className="text-gray-600">{t('fitness.signInToLog')}</p>
         </div>
       </div>
     );
@@ -458,20 +460,20 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
     return (
       <div className="min-h-screen p-6" style={{background: 'linear-gradient(to bottom right, #f0fdf4, #dbeafe, #cffafe)'}}>
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Start Workout</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('fitness.startWorkout')}</h1>
 
           {/* Saved Workouts */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Workouts</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('fitness.yourWorkouts')}</h2>
             {workouts.length === 0 ? (
               <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-8 text-center border border-teal-200">
                 <Dumbbell className="w-16 h-16 text-teal-300 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">No saved workouts yet</p>
+                <p className="text-gray-600 mb-4">{t('fitness.noSavedWorkouts')}</p>
                 <button 
                   onClick={onNavigateToBuilder}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Create Your First Workout
+                  {t('fitness.createFirstWorkout')}
                 </button>
               </div>
             ) : (
@@ -499,7 +501,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>{workout.workout_exercises?.length || 0} exercises</span>
+                      <span>{workout.workout_exercises?.length || 0} {t('fitness.exercises')}</span>
                       <span>•</span>
                       <span>{workout.estimated_duration_minutes || 45} min</span>
                     </div>
@@ -548,8 +550,8 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           <div className="max-w-4xl mx-auto p-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Quick Workout</h1>
-                <p className="text-sm text-gray-600">Freestyle session</p>
+                <h1 className="text-xl font-bold text-gray-900">{t('fitness.quickWorkout')}</h1>
+                <p className="text-sm text-gray-600">{t('fitness.freestyleSession')}</p>
               </div>
               <button
                 onClick={cancelWorkout}
@@ -563,21 +565,21 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             <div className={`grid ${exerciseType === 'strength' ? 'grid-cols-4' : 'grid-cols-1'} gap-4`}>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{formatTime(sessionStats.duration)}</div>
-                <div className="text-xs text-gray-600">Duration</div>
+                <div className="text-xs text-gray-600">{t('fitness.duration')}</div>
               </div>
               {exerciseType === 'strength' && (
                 <>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
-                    <div className="text-xs text-gray-600">Sets</div>
+                    <div className="text-xs text-gray-600">{t('fitness.sets')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
-                    <div className="text-xs text-gray-600">Reps</div>
+                    <div className="text-xs text-gray-600">{t('fitness.reps')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
-                    <div className="text-xs text-gray-600">Volume (lbs)</div>
+                    <div className="text-xs text-gray-600">{t('fitness.totalVolume')} (lbs)</div>
                   </div>
                 </>
               )}
@@ -588,15 +590,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         <div className="max-w-4xl mx-auto p-6">
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg shadow-sm p-8 text-center border border-teal-200">
             <Dumbbell className="w-16 h-16 text-teal-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Empty Workout</h2>
-            <p className="text-gray-600 mb-6">Add exercises as you go or complete this freestyle session</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('fitness.emptyWorkout')}</h2>
+            <p className="text-gray-600 mb-6">{t('fitness.emptyWorkoutDesc')}</p>
             <div className="flex gap-4 justify-center">
               <button
                 onClick={completeWorkout}
                 className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
               >
                 <Check className="w-5 h-5" />
-                Complete Workout
+                {t('fitness.completeWorkout')}
               </button>
             </div>
           </div>
@@ -612,12 +614,12 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         <div className="max-w-4xl mx-auto p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{selectedWorkout?.name || 'Quick Workout'}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{selectedWorkout?.name || t('fitness.quickWorkout')}</h1>
               <p className="text-sm text-gray-600">
                 {currentExercise ? (
                   <>{currentExercise.exercises.name} ({currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0})</>
                 ) : (
-                  <>Exercise {currentExerciseIndex + 1} of {selectedWorkout?.workout_exercises?.length || 0}</>
+                  <>{t('fitness.exercise')} {currentExerciseIndex + 1} {t('common.of')} {selectedWorkout?.workout_exercises?.length || 0}</>
                 )}
               </p>
             </div>
@@ -633,21 +635,21 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           <div className={`grid ${exerciseType === 'strength' ? 'grid-cols-4' : 'grid-cols-1'} gap-4`}>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{formatTime(sessionStats.duration)}</div>
-              <div className="text-xs text-gray-600">Duration</div>
+                <div className="text-xs text-gray-600">{t('fitness.duration')}</div>
             </div>
             {exerciseType === 'strength' && (
               <>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{sessionStats.totalSets}</div>
-                  <div className="text-xs text-gray-600">Sets</div>
+                  <div className="text-xs text-gray-600">{t('fitness.sets')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">{sessionStats.totalReps}</div>
-                  <div className="text-xs text-gray-600">Reps</div>
+                  <div className="text-xs text-gray-600">{t('fitness.reps')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{Math.round(sessionStats.totalVolume)}</div>
-                  <div className="text-xs text-gray-600">Volume (lbs)</div>
+                  <div className="text-xs text-gray-600">{t('fitness.totalVolume')} (lbs)</div>
                 </div>
               </>
             )}
@@ -660,12 +662,12 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         <div className="bg-blue-600 text-white p-6 text-center">
           <Timer className="w-12 h-12 mx-auto mb-2 animate-pulse" />
           <div className="text-4xl font-bold mb-2">{formatTime(restTimer)}</div>
-          <div className="text-sm opacity-90 mb-4">Rest Time Remaining</div>
+          <div className="text-sm opacity-90 mb-4">{t('fitness.restTimeRemaining')}</div>
           <button
             onClick={skipRest}
             className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
           >
-            Skip Rest
+            {t('fitness.skipRest')}
           </button>
         </div>
       )}
@@ -692,11 +694,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               <div className="bg-teal-100/60 p-4 rounded-lg mb-6">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">Target Sets</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('fitness.targetSets')}</div>
                     <div className="text-2xl font-bold text-gray-900">{currentExercise.target_sets}</div>
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600 mb-1">Target Reps</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('fitness.targetReps')}</div>
                     <div className="text-2xl font-bold text-gray-900">
                       {currentExercise.target_reps_min}-{currentExercise.target_reps_max}
                     </div>
@@ -710,12 +712,12 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               {exerciseType === 'strength' && (
                 <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Set {currentSet} of {currentExercise.target_sets}
+                    {t('fitness.set')} {currentSet} {t('common.of')} {currentExercise.target_sets}
                   </h3>
 
                   {/* Weight Input */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Weight (lbs)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.weight')} (lbs)</label>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setSetData(prev => ({ ...prev, weight: Math.max(0, (parseFloat(prev.weight) || 0) - 5).toString() }))}
@@ -741,7 +743,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
                   {/* Reps Input */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Reps</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.reps')}</label>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setSetData(prev => ({ ...prev, reps: Math.max(0, (parseInt(prev.reps) || 0) - 1).toString() }))}
@@ -768,9 +770,9 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                   {/* RPE Slider */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      RPE (Rate of Perceived Exertion): {setData.rpe}/10
+                      {t('fitness.rpe')}: {setData.rpe}/10
                     </label>
-                    <p className="text-xs text-gray-500 mb-2">Please select today's effort level</p>
+                    <p className="text-xs text-gray-500 mb-2">{t('fitness.selectEffortLevel')}</p>
                     <input
                       type="range"
                       min="1"
@@ -780,9 +782,9 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-gray-600 mt-1">
-                      <span>Easy</span>
-                      <span>Moderate</span>
-                      <span>Max Effort</span>
+                      <span>{t('fitness.easy')}</span>
+                      <span>{t('fitness.moderate')}</span>
+                      <span>{t('fitness.maxEffort')}</span>
                     </div>
                   </div>
 
@@ -793,7 +795,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Check className="w-6 h-6" />
-                    Complete Set
+                    {t('fitness.completeSet')}
                   </button>
                 </>
               )}
@@ -802,7 +804,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Cardio Session
+                      {t('fitness.cardioSession')}
                     </h3>
                     
                     {/* Distance Unit Toggle */}
@@ -830,10 +832,10 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
 
                   {/* Duration Input */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.duration')} (min)</label>
                     <input
                       type="number"
-                      placeholder="Enter duration in minutes"
+                      placeholder={t('fitness.enterDuration')}
                       value={cardioData.duration}
                       onChange={(e) => {
                         const duration = e.target.value;
@@ -850,7 +852,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                   {/* Pace Input */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Pace ({isDistanceMetric ? 'km/h' : 'mph'})
+                      {t('fitness.pace')} ({isDistanceMetric ? 'km/h' : 'mph'})
                     </label>
                     <input
                       type="number"
@@ -872,12 +874,12 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                   {/* Distance Display (Auto-calculated) */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Distance ({isDistanceMetric ? 'km' : 'miles'})
+                      {t('fitness.distance')} ({isDistanceMetric ? 'km' : 'miles'})
                     </label>
                     <div className="w-full text-center text-3xl font-bold p-4 bg-green-50 border-2 border-green-300 rounded-lg text-green-700">
                       {cardioData.distance || '0.00'}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 text-center">Auto-calculated from duration × pace</p>
+                    <p className="text-xs text-gray-500 mt-1 text-center">{t('fitness.autoCalculated')}</p>
                   </div>
 
                   {/* Log Cardio Button */}
@@ -887,7 +889,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Check className="w-6 h-6" />
-                    Complete Cardio
+                    {t('fitness.completeCardio')}
                   </button>
                 </>
               )}
@@ -895,15 +897,15 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
               {exerciseType === 'time_based' && (
                 <>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  ⏱️ Log Time-Based Exercise
+                  ⏱️ {t('fitness.logTimeBasedExercise')}
                 </h3>
 
                   {/* Duration Input */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('fitness.duration')} (min)</label>
                     <input
                       type="number"
-                      placeholder="Enter duration in minutes"
+                      placeholder={t('fitness.enterDuration')}
                       value={timeBasedData.duration}
                       onChange={(e) => setTimeBasedData({ duration: e.target.value })}
                       className="w-full text-center text-2xl font-bold p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
@@ -917,7 +919,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                     className="w-full py-4 bg-green-600 text-white rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Check className="w-6 h-6" />
-                    Complete Duration Exercise
+                    {t('fitness.completeDurationExercise')}
                   </button>
                 </>
               )}
@@ -939,7 +941,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             disabled={currentExerciseIndex === 0}
             className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Previous Exercise
+            {t('fitness.previousExercise')}
           </button>
           <button
             onClick={() => {
@@ -954,7 +956,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
             disabled={currentExerciseIndex >= selectedWorkout.workout_exercises.length - 1}
             className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next Exercise
+            {t('fitness.nextExercise')}
           </button>
         </div>
 
@@ -964,7 +966,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           className="w-full mt-4 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           <Save className="w-6 h-6" />
-          Finish Workout
+          {t('fitness.finishWorkout')}
         </button>
       </div>
     </div>

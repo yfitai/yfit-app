@@ -15,6 +15,7 @@
  */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Zap, Check, Star, Crown, ArrowRight, Lock } from 'lucide-react'
 
 // Stripe Checkout URLs
@@ -88,6 +89,7 @@ export default function UpgradeModal({
   featureDescription,
   usageInfo = null,  // { used, limit } for rate-limited features
 }) {
+  const { t } = useTranslation()
   const [selectedPlan, setSelectedPlan] = useState('pro_yearly')
 
   if (!isOpen) return null
@@ -120,8 +122,8 @@ export default function UpgradeModal({
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm text-white/80 font-medium">Pro Feature</p>
-              <h2 className="text-xl font-bold">{featureLabel || 'Upgrade to Pro'}</h2>
+              <p className="text-sm text-white/80 font-medium">{t('subscription.proFeature')}</p>
+              <h2 className="text-xl font-bold">{featureLabel || t('subscription.upgradeToPro')}</h2>
             </div>
           </div>
 
@@ -133,8 +135,8 @@ export default function UpgradeModal({
           {usageInfo && usageInfo.limit && (
             <div className="mt-3 bg-white/10 rounded-lg p-3">
               <div className="flex justify-between text-sm mb-1">
-                <span>This month</span>
-                <span className="font-bold">{usageInfo.used} / {usageInfo.limit} sessions used</span>
+                <span>{t('subscription.thisMonth')}</span>
+                <span className="font-bold">{usageInfo.used} / {usageInfo.limit} {t('subscription.sessionsUsed')}</span>
               </div>
               <div className="w-full bg-white/20 rounded-full h-2">
                 <div
@@ -142,14 +144,14 @@ export default function UpgradeModal({
                   style={{ width: `${Math.min(100, (usageInfo.used / usageInfo.limit) * 100)}%` }}
                 />
               </div>
-              <p className="text-white/70 text-xs mt-1">Upgrade for unlimited access</p>
+              <p className="text-white/70 text-xs mt-1">{t('subscription.upgradeForUnlimited')}</p>
             </div>
           )}
         </div>
 
         {/* Pro highlights */}
         <div className="px-6 py-4 border-b border-gray-100">
-          <p className="text-sm font-semibold text-gray-700 mb-3">Everything in Pro:</p>
+          <p className="text-sm font-semibold text-gray-700 mb-3">{t('subscription.everythingInPro')}:</p>
           <div className="grid grid-cols-1 gap-1.5">
             {PRO_HIGHLIGHTS.map((item, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
@@ -162,7 +164,7 @@ export default function UpgradeModal({
 
         {/* Plan selector */}
         <div className="px-6 py-4">
-          <p className="text-sm font-semibold text-gray-700 mb-3">Choose your plan:</p>
+          <p className="text-sm font-semibold text-gray-700 mb-3">{t('subscription.chooseYourPlan')}:</p>
           <div className="space-y-3">
             {PLANS.map((plan) => {
               const Icon = plan.icon
@@ -211,17 +213,17 @@ export default function UpgradeModal({
             onClick={handleUpgrade}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-base shadow-lg shadow-blue-500/25"
           >
-            Upgrade to Pro
+            {t('subscription.upgradeToPro')}
             <ArrowRight className="w-5 h-5" />
           </button>
           <p className="text-center text-xs text-gray-400 mt-3">
-            Secure payment via Stripe · Cancel anytime · 30-day money-back guarantee
+            {t('subscription.securePaymentStripe')}
           </p>
           <button
             onClick={onClose}
             className="w-full mt-2 text-center text-sm text-gray-400 hover:text-gray-600 transition-colors py-1"
           >
-            Continue with Free plan
+            {t('subscription.continueWithFree')}
           </button>
         </div>
       </div>

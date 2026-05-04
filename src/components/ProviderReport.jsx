@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase, getUserProfile } from '../lib/supabase'
 import { FileText, Printer, Download, Plus, User, Trash2 } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 
 export default function ProviderReport({ user }) {
+  const { t } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [allergies, setAllergies] = useState([])
@@ -465,9 +467,9 @@ export default function ProviderReport({ user }) {
       {/* Action Bar — hidden when printing */}
       <div className="print:hidden flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Provider Report</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t('medications.providerReport')}</h2>
           <p className="text-gray-600 mt-1">
-            Generate a medication list to share with healthcare providers
+            {t('medications.providerReportDesc', 'Generate a medication list to share with healthcare providers')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -476,7 +478,7 @@ export default function ProviderReport({ user }) {
             className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
           >
             <Printer className="w-4 h-4" />
-            Print
+            {t('common.print', 'Print')}
           </button>
           <button
             onClick={handleDownloadPDF}
@@ -486,12 +488,12 @@ export default function ProviderReport({ user }) {
             {pdfGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Generating…
+                {t('common.generating', 'Generating…')}
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                Download PDF
+                {t('medications.downloadPDF', 'Download PDF')}
               </>
             )}
           </button>
@@ -501,13 +503,13 @@ export default function ProviderReport({ user }) {
       {/* Provider selector — hidden when printing */}
       {providers.length > 0 && (
         <div className="print:hidden mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Addressed To (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('medications.addressedTo')}</label>
           <select
             value={selectedProviderId}
             onChange={(e) => setSelectedProviderId(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           >
-            <option value="">— Select a provider —</option>
+            <option value="">{t('medications.selectProvider', '— Select a provider —')}</option>
             {providers.map(p => (
               <option key={p.id} value={p.id}>
                 {p.name}{p.specialty ? ` (${p.specialty})` : ''}
@@ -525,14 +527,14 @@ export default function ProviderReport({ user }) {
       >
         {/* Header */}
         <div className="mb-8 pb-6 border-b-2 border-gray-300">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Medication List</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('medications.medicationList', 'Medication List')}</h1>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <p className="text-sm text-gray-600">Patient</p>
+              <p className="text-sm text-gray-600">{t('medications.patient')}</p>
               <p className="font-medium text-gray-900">{patientName}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Date Generated</p>
+              <p className="text-sm text-gray-600">{t('medications.dateGenerated')}</p>
               <p className="font-medium text-gray-900">
                 {new Date().toLocaleDateString('en-US', {
                   year: 'numeric', month: 'long', day: 'numeric'
@@ -541,7 +543,7 @@ export default function ProviderReport({ user }) {
             </div>
             {selectedProvider && (
               <div className="col-span-2">
-                <p className="text-sm text-gray-600">Prepared for</p>
+                <p className="text-sm text-gray-600">{t('medications.preparedFor')}</p>
                 <p className="font-medium text-gray-900">
                   {selectedProvider.name}{selectedProvider.specialty ? `, ${selectedProvider.specialty}` : ''}
                 </p>
@@ -565,7 +567,7 @@ export default function ProviderReport({ user }) {
                     <span className="ml-2 text-sm font-normal">({allergy.severity})</span>
                   </p>
                   {allergy.reaction && (
-                    <p className="text-sm text-red-700 mt-1">Reaction: {allergy.reaction}</p>
+                    <p className="text-sm text-red-700 mt-1">{t('medications.reaction')}: {allergy.reaction}</p>
                   )}
                 </div>
               ))}
@@ -576,7 +578,7 @@ export default function ProviderReport({ user }) {
         {/* Medications */}
         {medications.length > 0 ? (
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Current Medications</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('medications.currentMedications')}</h2>
             <div className="space-y-4">
               {medications.map((med, index) => (
                 <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
@@ -586,27 +588,27 @@ export default function ProviderReport({ user }) {
                   {med.medication?.generic_name &&
                     med.medication.name !== med.medication.generic_name && (
                     <p className="text-sm text-gray-600 italic">
-                      Generic: {med.medication.generic_name}
+                      {t('medications.generic', 'Generic')}: {med.medication.generic_name}
                     </p>
                   )}
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div className="flex flex-col">
-                      <span className="text-gray-600">Dosage:</span>
+                      <span className="text-gray-600">{t('medications.dosage')}:</span>
                       <span className="font-medium break-words">{med.dosage}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-gray-600">Frequency:</span>
+                      <span className="text-gray-600">{t('medications.frequency')}:</span>
                       <span className="font-medium break-words">{med.frequency}</span>
                     </div>
                     {med.route && (
                       <div className="flex flex-col">
-                        <span className="text-gray-600">Route:</span>
+                        <span className="text-gray-600">{t('medications.route')}:</span>
                         <span className="font-medium">{med.route}</span>
                       </div>
                     )}
                     {med.start_date && (
                       <div className="flex flex-col">
-                        <span className="text-gray-600">Started:</span>
+                        <span className="text-gray-600">{t('medications.started')}:</span>
                         <span className="font-medium">
                           {new Date(med.start_date).toLocaleDateString()}
                         </span>
@@ -615,12 +617,12 @@ export default function ProviderReport({ user }) {
                   </div>
                   {med.prescriber_name && (
                     <p className="text-sm text-gray-600 mt-2">
-                      Prescribed by: {med.prescriber_name}
+                      {t('medications.prescribedBy', 'Prescribed by')}: {med.prescriber_name}
                     </p>
                   )}
                   {med.notes && (
                     <p className="text-sm text-gray-700 mt-2 bg-gray-50 p-2 rounded">
-                      <span className="font-medium">Notes:</span> {med.notes}
+                      <span className="font-medium">{t('medications.notes', 'Notes')}:</span> {med.notes}
                     </p>
                   )}
                 </div>
@@ -629,15 +631,15 @@ export default function ProviderReport({ user }) {
           </div>
         ) : (
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Current Medications</h2>
-            <p className="text-gray-500 italic">No current medications on file.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('medications.currentMedications')}</h2>
+            <p className="text-gray-500 italic">{t('medications.noMedications')}</p>
           </div>
         )}
 
         {/* Supplements */}
         {supplements.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Supplements &amp; Vitamins</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('medications.supplementsVitamins')}</h2>
             <div className="space-y-3">
               {supplements.map((supp, index) => (
                 <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
@@ -646,16 +648,16 @@ export default function ProviderReport({ user }) {
                   </h3>
                   <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div className="flex flex-col">
-                      <span className="text-gray-600">Dosage:</span>
+                      <span className="text-gray-600">{t('medications.dosage')}:</span>
                       <span className="font-medium break-words">{supp.dosage}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-gray-600">Frequency:</span>
+                      <span className="text-gray-600">{t('medications.frequency')}:</span>
                       <span className="font-medium break-words">{supp.frequency}</span>
                     </div>
                     {supp.start_date && (
                       <div className="flex flex-col">
-                        <span className="text-gray-600">Started:</span>
+                        <span className="text-gray-600">{t('medications.started')}:</span>
                         <span className="font-medium">
                           {new Date(supp.start_date).toLocaleDateString()}
                         </span>
@@ -670,31 +672,31 @@ export default function ProviderReport({ user }) {
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-600">
-          <p>This medication list was generated by YFIT AI - Health &amp; Fitness Tracker</p>
-          <p className="mt-1">Please review this list with your healthcare provider</p>
+          <p>{t('medications.reportGeneratedBy', 'This medication list was generated by YFIT AI - Health & Fitness Tracker')}</p>
+          <p className="mt-1">{t('medications.reviewWithProvider', 'Please review this list with your healthcare provider')}</p>
         </div>
       </div>
 
       {/* Healthcare Providers Section — hidden when printing */}
       <div className="print:hidden mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">My Healthcare Providers</h3>
+          <h3 className="text-xl font-bold text-gray-800">{t('medications.myHealthcareProviders', 'My Healthcare Providers')}</h3>
           <button
             onClick={() => setShowProviderForm(!showProviderForm)}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
           >
             <Plus className="w-4 h-4" />
-            Add Provider
+            {t('medications.addProvider', 'Add Provider')}
           </button>
         </div>
 
         {showProviderForm && (
           <div className="bg-white border border-gray-300 rounded-lg p-6 mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Add New Provider</h4>
+            <h4 className="font-semibold text-gray-900 mb-4">{t('medications.addNewProvider', 'Add New Provider')}</h4>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Provider Name *
+                  {t('medications.providerName', 'Provider Name')} *
                 </label>
                 <input
                   type="text"
@@ -705,7 +707,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('medications.specialty', 'Specialty')}</label>
                 <input
                   type="text"
                   value={providerForm.specialty}
@@ -715,7 +717,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.phone', 'Phone')}</label>
                 <input
                   type="tel"
                   value={providerForm.phone}
@@ -725,7 +727,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.email', 'Email')}</label>
                 <input
                   type="email"
                   value={providerForm.email}
@@ -735,7 +737,7 @@ export default function ProviderReport({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.address', 'Address')}</label>
                 <textarea
                   value={providerForm.address}
                   onChange={(e) => setProviderForm({...providerForm, address: e.target.value})}
@@ -749,13 +751,13 @@ export default function ProviderReport({ user }) {
                   onClick={handleAddProvider}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >
-                  Save Provider
+                  {t('medications.saveProvider', 'Save Provider')}
                 </button>
                 <button
                   onClick={() => setShowProviderForm(false)}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-all"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -794,7 +796,7 @@ export default function ProviderReport({ user }) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 text-center py-8">No providers added yet</p>
+          <p className="text-gray-600 text-center py-8">{t('medications.noProvidersYet', 'No providers added yet')}</p>
         )}
       </div>
     </div>

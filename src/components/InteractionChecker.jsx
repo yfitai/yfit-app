@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { AlertTriangle, CheckCircle, Shield } from 'lucide-react'
 
 
 
 export default function InteractionChecker({ user }) {
+  const { t } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [safetyAlerts, setSafetyAlerts] = useState([])
@@ -157,9 +159,9 @@ export default function InteractionChecker({ user }) {
   return (
     <div>
         <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Safety Check</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{t('medications.safetyCheck')}</h2>
         <p className="text-gray-600 mt-1">
-          Review interactions and safety alerts for your medications
+          {t('medications.safetyCheckDesc', 'Review interactions and safety alerts for your medications')}
         </p>
       </div>
 
@@ -173,7 +175,7 @@ export default function InteractionChecker({ user }) {
             </div>
             <div>
               <p className="text-2xl font-bold text-blue-900">{medications.length}</p>
-              <p className="text-sm text-blue-700">Active Medications</p>
+              <p className="text-sm text-blue-700">{t('medications.activeMedications')}</p>
             </div>
           </div>
         </div>
@@ -185,7 +187,7 @@ export default function InteractionChecker({ user }) {
             </div>
             <div>
               <p className="text-2xl font-bold text-green-900">{supplements.length}</p>
-              <p className="text-sm text-green-700">Active Supplements</p>
+              <p className="text-sm text-green-700">{t('medications.activeSupplements')}</p>
             </div>
           </div>
         </div>
@@ -200,7 +202,7 @@ export default function InteractionChecker({ user }) {
                 {safetyAlerts.length}
               </p>
               <p className={`text-sm ${safetyAlerts.length > 0 ? 'text-red-700' : 'text-gray-600'}`}>
-                Active Alerts
+                {t('medications.activeSafetyAlerts')}
               </p>
             </div>
           </div>
@@ -210,7 +212,7 @@ export default function InteractionChecker({ user }) {
       {/* Safety Alerts */}
       {safetyAlerts.length > 0 ? (
         <div className="space-y-4 mb-8">
-          <h3 className="text-lg font-semibold text-gray-800">Active Safety Alerts</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t('medications.activeSafetyAlerts')}</h3>
           {safetyAlerts.map((alert) => {
             const colors = getSeverityColor(alert.severity)
             return (
@@ -239,7 +241,7 @@ export default function InteractionChecker({ user }) {
                       {alert.recommendation && (
                         <div className="bg-white rounded-lg p-3 mt-3">
                           <p className="text-sm font-medium text-gray-700 mb-1">
-                            Recommendation:
+                            {t('medications.recommendation', 'Recommendation')}:
                           </p>
                           <p className="text-sm text-gray-600">
                             {alert.recommendation}
@@ -248,7 +250,7 @@ export default function InteractionChecker({ user }) {
                       )}
                       {alert.metadata && alert.metadata.evidence_level && (
                         <p className="text-xs text-gray-500 mt-2">
-                          Evidence Level: {alert.metadata.evidence_level.replace('_', ' ').toUpperCase()}
+                          {t('medications.evidenceLevel', 'Evidence Level')}: {alert.metadata.evidence_level.replace('_', ' ').toUpperCase()}
                         </p>
                       )}
                     </div>
@@ -257,7 +259,7 @@ export default function InteractionChecker({ user }) {
                     onClick={() => acknowledgeAlert(alert.id)}
                     className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-all text-sm font-medium flex-shrink-0"
                   >
-                    Acknowledge
+                    {t('medications.acknowledge', 'Acknowledge')}
                   </button>
                 </div>
               </div>
@@ -269,9 +271,9 @@ export default function InteractionChecker({ user }) {
           <div className="flex items-center justify-center gap-3 text-green-700">
             <CheckCircle className="w-8 h-8" />
             <div>
-              <p className="text-lg font-semibold">No Active Safety Alerts</p>
+              <p className="text-lg font-semibold">{t('medications.noSafetyAlerts')}</p>
               <p className="text-sm text-green-600 mt-1">
-                Your current medications and supplements have no detected interactions.
+                {t('medications.noInteractionsDesc', 'Your current medications and supplements have no detected interactions.')}
               </p>
             </div>
           </div>
@@ -281,7 +283,7 @@ export default function InteractionChecker({ user }) {
       {/* Current Medications List */}
       {medications.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Medications</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('medications.currentMedications')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {medications.map((med) => (
               <div
@@ -308,7 +310,7 @@ export default function InteractionChecker({ user }) {
       {/* Current Supplements List */}
       {supplements.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Supplements</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('medications.supplementsVitamins')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {supplements.map((supp) => (
               <div
@@ -336,10 +338,10 @@ export default function InteractionChecker({ user }) {
         <div className="text-center py-12">
           <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            No Medications to Check
+            {t('medications.noMedsToCheck', 'No Medications to Check')}
           </h3>
           <p className="text-gray-500">
-            Add medications or supplements to check for interactions.
+            {t('medications.addMedsToCheck', 'Add medications or supplements to check for interactions.')}
           </p>
         </div>
       )}
@@ -347,10 +349,7 @@ export default function InteractionChecker({ user }) {
       {/* Disclaimer */}
       <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg">
         <p className="text-xs text-gray-600">
-          <strong>Disclaimer:</strong> This interaction checker is for informational purposes only. 
-          It does not replace professional medical advice. Always consult your healthcare provider 
-          before making changes to your medications. If you experience any adverse effects, seek 
-          immediate medical attention.
+          <strong>{t('medications.disclaimer', 'Disclaimer')}:</strong> {t('medications.disclaimerText', 'This interaction checker is for informational purposes only. It does not replace professional medical advice. Always consult your healthcare provider before making changes to your medications. If you experience any adverse effects, seek immediate medical attention.')}
         </p>
       </div>
     </div>

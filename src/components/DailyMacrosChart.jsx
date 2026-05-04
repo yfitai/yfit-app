@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { supabase } from '../lib/supabase';
 
 const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
+  const { t } = useTranslation();
   const [macrosData, setMacrosData] = useState([]);
   const [goals, setGoals] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -163,10 +165,10 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
   if (macrosData.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Macros</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('nutrition.dailyMacros')}</h3>
         <div className="text-center py-12">
-          <p className="text-gray-600">No nutrition data yet</p>
-          <p className="text-sm text-gray-500 mt-2">Start logging meals to see your progress!</p>
+          <p className="text-gray-600">{t('nutrition.noNutritionData')}</p>
+          <p className="text-sm text-gray-500 mt-2">{t('nutrition.startLoggingMeals')}</p>
         </div>
       </div>
     );
@@ -175,8 +177,8 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Daily Macros</h3>
-        <p className="text-sm text-gray-600">Calories, Protein, Carbs & Fat Tracking</p>
+        <h3 className="text-lg font-semibold text-gray-800">{t('nutrition.dailyMacros')}</h3>
+        <p className="text-sm text-gray-600">{t('nutrition.caloriesProteinCarbsFatTracking')}</p>
       </div>
       
       <ResponsiveContainer width="100%" height={350}>
@@ -203,7 +205,7 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
             dataKey="calories" 
             stroke="#3b82f6" 
             strokeWidth={2} 
-            name="Calories"
+            name={t('nutrition.calories')}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
           />
@@ -212,7 +214,7 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
             dataKey="protein" 
             stroke="#ef4444" 
             strokeWidth={2} 
-            name="Protein (g)"
+            name={`${t('nutrition.protein')} (g)`}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
           />
@@ -221,7 +223,7 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
             dataKey="carbs" 
             stroke="#fbbf24" 
             strokeWidth={2} 
-            name="Carbs (g)"
+            name={`${t('nutrition.carbs')} (g)`}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
           />
@@ -230,7 +232,7 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
             dataKey="fat" 
             stroke="#10b981" 
             strokeWidth={2} 
-            name="Fat (g)"
+            name={`${t('nutrition.fat')} (g)`}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
           />
@@ -239,30 +241,30 @@ const DailyMacrosChart = ({ userId, timeRange = '7' }) => {
 
       {/* Goals Reference */}
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <p className="text-xs text-gray-600 mb-2">Daily Goals:</p>
+        <p className="text-xs text-gray-600 mb-2">{t('nutrition.dailyGoals')}:</p>
         <div className="flex flex-wrap gap-4 text-sm">
           {goals?.target_calories && (
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-700">Calories: {goals.target_calories}</span>
+              <span className="text-gray-700">{t('nutrition.calories')}: {goals.target_calories}</span>
             </div>
           )}
           {goals?.protein_goal_g && (
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-700">Protein: {goals.protein_goal_g}g</span>
+              <span className="text-gray-700">{t('nutrition.protein')}: {goals.protein_goal_g}g</span>
             </div>
           )}
           {goals?.carbs_goal_g && (
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-gray-700">Carbs: {goals.carbs_goal_g}g</span>
+              <span className="text-gray-700">{t('nutrition.carbs')}: {goals.carbs_goal_g}g</span>
             </div>
           )}
           {goals?.fat_goal_g && (
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-gray-700">Fat: {goals.fat_goal_g}g</span>
+              <span className="text-gray-700">{t('nutrition.fat')}: {goals.fat_goal_g}g</span>
             </div>
           )}
         </div>

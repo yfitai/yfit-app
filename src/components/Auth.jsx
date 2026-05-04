@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
@@ -11,6 +12,7 @@ import { Mail, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 
 export default function Auth({ onAuthSuccess }) {
+const { t } = useTranslation()
 const [isLoading, setIsLoading] = useState(false)
 const [showLoginPassword, setShowLoginPassword] = useState(false)
 const [showSignupPassword, setShowSignupPassword] = useState(false)
@@ -357,24 +359,24 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
         {/* Logo */}
            <div className="text-center mb-8 animate-fade-in">
           <img src="/assets/yfit-logo.png" alt="YFIT AI" className="h-24 mx-auto mb-4" />
-          <p className="text-gray-600 mt-2">Your Intelligent Health Companion</p>
+          <p className="text-gray-600 mt-2">{t('auth.intelligentHealthCompanion', 'Your Intelligent Health Companion')}</p>
         </div>
 
 
         {/* Auth Tabs */}
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="login">{t('auth.signIn')}</TabsTrigger>
+            <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
           </TabsList>
 
           {/* Login Tab */}
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>Welcome Back!</CardTitle>
+                <CardTitle>{t('auth.welcomeBack')}</CardTitle>
                 <CardDescription>
-                  Sign in to continue your health journey
+                  {t('auth.signInToContinue', 'Sign in to continue your health journey')}
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleLogin}>
@@ -396,7 +398,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   )}
                   
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">{t('common.email')}</Label>
                     <Input
                       id="login-email"
                       type="email"
@@ -411,7 +413,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     />
                   </div>
                   <div className="space-y-2">
-  <Label htmlFor="login-password">Password</Label>
+  <Label htmlFor="login-password">{t('auth.password')}</Label>
   <div className="relative">
     <Input
       id="login-password"
@@ -443,7 +445,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
       }}
       className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
     >
-      Forgot Password?
+      {t('auth.forgotPassword')}
     </button>
   </div>
 </div>
@@ -456,7 +458,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    {isLoading ? t('auth.signingIn', 'Signing in...') : t('auth.signIn')}
                   </Button>
                 </CardFooter>
               </form>
@@ -467,9 +469,9 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
           <TabsContent value="signup">
             <Card>
               <CardHeader>
-                <CardTitle>Create Account</CardTitle>
+                <CardTitle>{t('auth.createAccount')}</CardTitle>
                 <CardDescription>
-                  Start your personalized health journey today
+                  {t('auth.startHealthJourney', 'Start your personalized health journey today')}
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSignup}>
@@ -492,7 +494,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name *</Label>
+                      <Label htmlFor="first-name">{t('auth.firstName')} *</Label>
                       <Input
                         id="first-name"
                         type="text"
@@ -508,7 +510,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name *</Label>
+                      <Label htmlFor="last-name">{t('auth.lastName')} *</Label>
                       <Input
                         id="last-name"
                         type="text"
@@ -525,7 +527,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email *</Label>
+                    <Label htmlFor="signup-email">{t('common.email')} *</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -540,7 +542,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     />
                   </div>
                   <div className="space-y-2">
-  <Label htmlFor="signup-password">Password *</Label>
+  <Label htmlFor="signup-password">{t('auth.password')} *</Label>
   <div className="relative">
     <Input
       id="signup-password"
@@ -562,7 +564,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
       {showSignupPassword ? <EyeOff size={20} /> : <Eye size={20} />}
        </button>
   </div>
-  <p className="text-xs text-gray-500">Minimum 6 characters</p>
+  <p className="text-xs text-gray-500">{t('auth.passwordMinLength', 'Minimum 6 characters')}</p>
 </div>
 
 
@@ -574,7 +576,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
                     className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Creating account...' : 'Create Account'}
+                    {isLoading ? t('auth.creatingAccount', 'Creating account...') : t('auth.createAccount')}
                   </Button>
                 </CardFooter>
               </form>
@@ -584,7 +586,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-600 mt-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+          {t('auth.termsAgreement', 'By continuing, you agree to our Terms of Service and Privacy Policy')}
         </p>
       </div>
     </div>

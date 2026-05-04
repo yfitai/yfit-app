@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Check, X, Clock, TrendingUp, Pill } from 'lucide-react'
 
@@ -6,6 +7,7 @@ const BUILD_VERSION = '2026-01-15-daily-average-fix-v2'; // New calculation appr
 console.log('🔥🔥🔥 MedicationLog loaded - version:', BUILD_VERSION, '🔥🔥🔥');
 
 export default function MedicationLog({ user }) {
+  const { t } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [todayLogs, setTodayLogs] = useState([])
@@ -551,60 +553,60 @@ export default function MedicationLog({ user }) {
         {/* Today's Medications */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-blue-900">Today's Medications</h3>
+            <h3 className="text-sm font-medium text-blue-900">{t('medications.todaysMedications')}</h3>
             <Pill className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-blue-600">{stats.todayMedRate}%</span>
-            <span className="text-sm text-blue-600">adherence</span>
+            <span className="text-sm text-blue-600">{t('medications.adherence', 'adherence')}</span>
           </div>
           <p className="text-sm text-blue-700 mt-1">
-            {stats.todayMedTaken} of {stats.todayMedTotal} doses taken today
+            {stats.todayMedTaken} {t('common.of')} {stats.todayMedTotal} {t('medications.dosesTakenToday', 'doses taken today')}
           </p>
         </div>
 
         {/* Overall Medication Adherence */}
         <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-blue-900">Overall Medications</h3>
+            <h3 className="text-sm font-medium text-blue-900">{t('medications.overallMedications', 'Overall Medications')}</h3>
             <TrendingUp className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-blue-600">{stats.overallMedRate}%</span>
-            <span className="text-sm text-blue-600">average</span>
+            <span className="text-sm text-blue-600">{t('medications.average', 'average')}</span>
           </div>
           <p className="text-sm text-blue-700 mt-1">
-            Across {stats.daysTracked} days tracked
+            {t('medications.across', 'Across')} {stats.daysTracked} {t('medications.daysTracked', 'days tracked')}
           </p>
         </div>
 
         {/* Today's Supplements */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-green-900">Today's Supplements</h3>
+            <h3 className="text-sm font-medium text-green-900">{t('medications.todaysSupplements')}</h3>
             <Pill className="w-5 h-5 text-green-600" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-green-600">{stats.todaySuppRate}%</span>
-            <span className="text-sm text-green-600">adherence</span>
+            <span className="text-sm text-green-600">{t('medications.adherence', 'adherence')}</span>
           </div>
           <p className="text-sm text-green-700 mt-1">
-            {stats.todaySuppTaken} of {stats.todaySuppTotal} doses taken today
+            {stats.todaySuppTaken} {t('common.of')} {stats.todaySuppTotal} {t('medications.dosesTakenToday', 'doses taken today')}
           </p>
         </div>
 
         {/* Overall Supplement Adherence */}
         <div className="bg-green-100 border border-green-300 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-green-900">Overall Supplements</h3>
+            <h3 className="text-sm font-medium text-green-900">{t('medications.overallSupplements', 'Overall Supplements')}</h3>
             <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-green-600">{stats.overallSuppRate}%</span>
-            <span className="text-sm text-green-600">average</span>
+            <span className="text-sm text-green-600">{t('medications.average', 'average')}</span>
           </div>
           <p className="text-sm text-green-700 mt-1">
-            Across {stats.daysTracked} days tracked
+            {t('medications.across', 'Across')} {stats.daysTracked} {t('medications.daysTracked', 'days tracked')}
           </p>
         </div>
       </div>
@@ -613,11 +615,11 @@ export default function MedicationLog({ user }) {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Clock className="w-5 h-5" />
-          Today's Medications
+          {t('medications.todaysMedications')}
         </h3>
         
         {medications.length === 0 ? (
-          <p className="text-gray-500 text-sm">No medications scheduled for today</p>
+          <p className="text-gray-500 text-sm">{t('medications.noMedsToday', 'No medications scheduled for today')}</p>
         ) : (
           <div className="space-y-3">
             {medications.map(med => {
@@ -652,11 +654,11 @@ export default function MedicationLog({ user }) {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <TrendingUp className="w-5 h-5" />
-          Today's Supplements
+          {t('medications.todaysSupplements')}
         </h3>
         
         {supplements.length === 0 ? (
-          <p className="text-gray-500 text-sm">No supplements scheduled for today</p>
+          <p className="text-gray-500 text-sm">{t('medications.noSuppsToday', 'No supplements scheduled for today')}</p>
         ) : (
           <div className="space-y-3">
             {supplements.map(supp => {
@@ -689,7 +691,7 @@ export default function MedicationLog({ user }) {
       {/* Daily Breakdown */}
       {dailyBreakdown.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Daily Breakdown</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('medications.dailyBreakdown')}</h3>
           
           <div className="space-y-4">
             {dailyBreakdown.map((day, idx) => (
@@ -704,7 +706,7 @@ export default function MedicationLog({ user }) {
                 {day.medTotal > 0 && (
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-blue-900">Medications</span>
+                      <span className="text-sm font-medium text-blue-900">{t('medications.medications')}</span>
                       <span className={`text-sm font-semibold ${
                         day.medRate === 100 ? 'text-green-600' : 
                         day.medRate >= 80 ? 'text-yellow-600' : 'text-red-600'
@@ -742,7 +744,7 @@ export default function MedicationLog({ user }) {
                 {day.suppTotal > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-green-900">Supplements</span>
+                      <span className="text-sm font-medium text-green-900">{t('medications.supplementsVitamins')}</span>
                       <span className={`text-sm font-semibold ${
                         day.suppRate === 100 ? 'text-green-600' : 
                         day.suppRate >= 80 ? 'text-yellow-600' : 'text-red-600'

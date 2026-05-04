@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Pill, Edit, Trash2, AlertCircle, Calendar, Leaf } from 'lucide-react'
 
 export default function MedicationList({ user, onAddMedication }) {
+  const { t } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [loading, setLoading] = useState(true)
@@ -122,7 +124,7 @@ export default function MedicationList({ user, onAddMedication }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dosage
+                {t('medications.dosage')}
               </label>
               <input
                 type="text"
@@ -133,42 +135,42 @@ export default function MedicationList({ user, onAddMedication }) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Frequency
+                {t('medications.frequency')}
               </label>
               <select
                 value={editForm.frequency}
                 onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Once daily">Once daily</option>
-                <option value="Twice daily">Twice daily</option>
-                <option value="Three times daily">Three times daily</option>
-                <option value="Four times daily">Four times daily</option>
-                <option value="Every other day">Every other day</option>
-                <option value="Once weekly">Once weekly</option>
-                <option value="As needed">As needed</option>
+                <option value="Once daily">{t('medications.onceDaily')}</option>
+                <option value="Twice daily">{t('medications.twiceDaily')}</option>
+                <option value="Three times daily">{t('medications.threeTimesDaily')}</option>
+                <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
+                <option value="Every other day">{t('medications.everyOtherDay')}</option>
+                <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Route
+                {t('medications.route')}
               </label>
               <select
                 value={editForm.route}
                 onChange={(e) => setEditForm({ ...editForm, route: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Oral">Oral</option>
-                <option value="Injection">Injection</option>
-                <option value="Topical">Topical</option>
-                <option value="Inhalation">Inhalation</option>
-                <option value="Rectal">Rectal</option>
-                <option value="Other">Other</option>
+                <option value="Oral">{t('medications.oral')}</option>
+                <option value="Injection">{t('medications.injection')}</option>
+                <option value="Topical">{t('medications.topical')}</option>
+                <option value="Inhalation">{t('medications.inhalation')}</option>
+                <option value="Rectal">{t('medications.rectal')}</option>
+                <option value="Other">{t('medications.other')}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
+                {t('medications.notes', 'Notes')}
               </label>
               <textarea
                 value={editForm.notes}
@@ -182,13 +184,13 @@ export default function MedicationList({ user, onAddMedication }) {
                 onClick={handleSaveEdit}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
               >
-                Save
+                {t('common.save', 'Save')}
               </button>
               <button
                 onClick={() => setEditingId(null)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -212,7 +214,7 @@ export default function MedicationList({ user, onAddMedication }) {
                   </h3>
                   {item.medication?.generic_name && item.medication.name !== item.medication.generic_name && (
                     <p className="text-sm text-gray-500">
-                      Generic: {item.medication.generic_name}
+                      {t('medications.generic', 'Generic')}: {item.medication.generic_name}
                     </p>
                   )}
                 </div>
@@ -252,21 +254,21 @@ export default function MedicationList({ user, onAddMedication }) {
               {item.start_date && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Calendar className="w-4 h-4" />
-                  <span>Started: {new Date(item.start_date).toLocaleDateString()}</span>
+                  <span>{t('medications.started')}: {new Date(item.start_date).toLocaleDateString()}</span>
                 </div>
               )}
 
               {item.refills_remaining !== null && item.refills_remaining !== undefined && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <AlertCircle className="w-4 h-4" />
-                  <span>{item.refills_remaining} refills remaining</span>
+                  <span>{item.refills_remaining} {t('medications.refillsRemaining', 'refills remaining')}</span>
                 </div>
               )}
 
               {item.notes && (
                 <div className="mt-2 p-3 bg-teal-100/60 rounded-lg">
                   <p className="text-sm text-gray-700">
-                    <span className="font-medium">Notes:</span> {item.notes}
+                    <span className="font-medium">{t('medications.notes', 'Notes')}:</span> {item.notes}
                   </p>
                 </div>
               )}
@@ -289,15 +291,15 @@ export default function MedicationList({ user, onAddMedication }) {
     return (
       <div className="text-center py-12">
         <Pill className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">No Medications or Supplements Yet</h3>
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('medications.noMedicationsYet', 'No Medications or Supplements Yet')}</h3>
         <p className="text-gray-500 mb-6">
-          Start by adding your current medications and supplements to track them.
+          {t('medications.noMedicationsDesc', 'Start by adding your current medications and supplements to track them.')}
         </p>
         <button
           onClick={onAddMedication}
           className="px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg hover:shadow-lg transition-all"
         >
-          Add Your First Item
+          {t('medications.addFirstItem', 'Add Your First Item')}
         </button>
       </div>
     )
@@ -312,9 +314,9 @@ export default function MedicationList({ user, onAddMedication }) {
             <div>
               <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <Pill className="w-6 h-6 text-blue-600" />
-                Current Medications
+                {t('medications.currentMedications')}
               </h2>
-              <p className="text-gray-600 mt-1">{medications.length} active medication{medications.length !== 1 ? 's' : ''}</p>
+              <p className="text-gray-600 mt-1">{medications.length} {t('medications.activeMedication', 'active medication')}{medications.length !== 1 ? t('medications.plural', 's') : ''}</p>
             </div>
           </div>
 
@@ -331,9 +333,9 @@ export default function MedicationList({ user, onAddMedication }) {
             <div>
               <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <Leaf className="w-6 h-6 text-green-600" />
-                Supplements
+                {t('medications.supplementsVitamins')}
               </h2>
-              <p className="text-gray-600 mt-1">{supplements.length} active supplement{supplements.length !== 1 ? 's' : ''}</p>
+              <p className="text-gray-600 mt-1">{supplements.length} {t('medications.activeSupplement', 'active supplement')}{supplements.length !== 1 ? t('medications.plural', 's') : ''}</p>
             </div>
           </div>
 

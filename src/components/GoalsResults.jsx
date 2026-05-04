@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
 import { Activity, Target, TrendingUp, Zap, Flame, Scale, Heart } from 'lucide-react'
 
@@ -10,6 +11,7 @@ export default function GoalsResults({ metrics, firstName }) {
   if (!metrics) return null
 
   const { isMetric } = useUnitPreference()
+  const { t } = useTranslation()
 
   const {
     bmi,
@@ -58,9 +60,9 @@ export default function GoalsResults({ metrics, firstName }) {
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-green-500 rounded-xl p-6 text-white text-center">
         <h2 className="text-2xl font-bold mb-1">
-          {firstName ? `Great work, ${firstName}!` : 'Your Results'}
+          {firstName ? `${t('goals.greatWork')}, ${firstName}!` : t('goals.yourResults')}
         </h2>
-        <p className="text-blue-100 text-sm">Here are your personalised health metrics</p>
+        <p className="text-blue-100 text-sm">{t('goals.personalizedMetrics')}</p>
       </div>
 
       {/* Key Metrics Grid */}
@@ -69,23 +71,23 @@ export default function GoalsResults({ metrics, firstName }) {
         <div className="bg-white rounded-xl shadow p-4 text-center border border-gray-100">
           <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-800">{Math.round(bmr)}</div>
-          <div className="text-xs text-gray-500 mt-1">BMR (cal/day)</div>
-          <div className="text-xs text-gray-400">Resting burn</div>
+          <div className="text-xs text-gray-500 mt-1">{t('goals.bmiCalDay')}</div>
+          <div className="text-xs text-gray-400">{t('goals.restingBurn')}</div>
         </div>
 
         {/* TDEE */}
         <div className="bg-white rounded-xl shadow p-4 text-center border border-gray-100">
           <Zap className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-800">{Math.round(tdee)}</div>
-          <div className="text-xs text-gray-500 mt-1">TDEE (cal/day)</div>
-          <div className="text-xs text-gray-400">Total daily burn</div>
+          <div className="text-xs text-gray-500 mt-1">{t('goals.tdeeCalDay')}</div>
+          <div className="text-xs text-gray-400">{t('goals.totalDailyBurn')}</div>
         </div>
 
         {/* Target Calories */}
         <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl shadow p-4 text-center border border-blue-200">
           <Target className="w-6 h-6 text-blue-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-blue-700">{Math.round(adjustedCalories || tdee)}</div>
-          <div className="text-xs text-blue-600 mt-1 font-medium">Target (cal/day)</div>
+          <div className="text-xs text-blue-600 mt-1 font-medium">{t('goals.targetCalDay')}</div>
           <div className="text-xs text-gray-400 truncate">{goalDescription}</div>
         </div>
 
@@ -100,7 +102,7 @@ export default function GoalsResults({ metrics, firstName }) {
         </div>
       </div>
 
-      {/* Body Composition */}
+      {/* {t('goals.bodyComposition')} */}
       <div className="bg-white rounded-xl shadow p-5 border border-gray-100">
         <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
           <Heart className="w-5 h-5 text-red-500" />
@@ -111,7 +113,7 @@ export default function GoalsResults({ metrics, firstName }) {
             <div className="text-xl font-bold text-red-600">
               {bodyFatPercentage != null ? `${bodyFatPercentage.toFixed(1)}%` : '—'}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Body Fat</div>
+            <div className="text-xs text-gray-500 mt-1">{t('goals.bodyFatLabel')}</div>
             {bodyFatCategory && (
               <div className={`text-xs font-medium mt-1 ${bodyFatCategory.color}`}>
                 {bodyFatCategory.category}
@@ -122,8 +124,8 @@ export default function GoalsResults({ metrics, firstName }) {
             <div className="text-xl font-bold text-green-600">
               {leanMassDisplay}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Lean Mass</div>
-            <div className="text-xs text-gray-400 mt-1">Muscle + bone + water</div>
+            <div className="text-xs text-gray-500 mt-1">{t('goals.leanMass')}</div>
+            <div className="text-xs text-gray-400 mt-1">{t('goals.muscleBoneWater')}</div>
           </div>
         </div>
       </div>
@@ -132,27 +134,27 @@ export default function GoalsResults({ metrics, firstName }) {
       <div className="bg-white rounded-xl shadow p-5 border border-gray-100">
         <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
           <Activity className="w-5 h-5 text-green-500" />
-          Daily Macro Targets
+          {t('goals.dailyMacroTargets')}
         </h3>
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-blue-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-blue-600">{proteinG}g</div>
-            <div className="text-xs text-gray-500 mt-1">Protein</div>
+            <div className="text-xs text-gray-500 mt-1">{t('goals.protein')}</div>
             <div className="text-xs text-blue-400">{proteinCals} cal · 30%</div>
           </div>
           <div className="bg-amber-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-amber-600">{carbsG}g</div>
-            <div className="text-xs text-gray-500 mt-1">Carbs</div>
+            <div className="text-xs text-gray-500 mt-1">{t('goals.carbs')}</div>
             <div className="text-xs text-amber-400">{carbCals} cal · 40%</div>
           </div>
           <div className="bg-pink-50 rounded-lg p-3 text-center">
             <div className="text-xl font-bold text-pink-600">{fatG}g</div>
-            <div className="text-xs text-gray-500 mt-1">Fat</div>
+            <div className="text-xs text-gray-500 mt-1">{t('goals.fat')}</div>
             <div className="text-xs text-pink-400">{fatCals} cal · 30%</div>
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-3 text-center">
-          Based on a balanced 30/40/30 protein/carb/fat split. Adjust in Nutrition settings.
+          {t('goals.macroSplitNote')}
         </p>
       </div>
 
@@ -161,10 +163,10 @@ export default function GoalsResults({ metrics, firstName }) {
         <div className={`rounded-xl shadow p-5 border ${bodyTypeColor}`}>
           <h3 className="font-bold mb-3 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Your Body Type: <span className="capitalize">{bodyType}</span> {bodyTypeEmoji}
+            {t('goals.bodyType')}: <span className="capitalize">{bodyType}</span> {bodyTypeEmoji}
             {bodyTypeConfidence != null && (
               <span className="text-xs font-normal opacity-70 ml-1">
-                ({Math.round(bodyTypeConfidence * 100)}% match)
+                ({Math.round(bodyTypeConfidence * 100)}% {t('goals.match')})
               </span>
             )}
           </h3>
@@ -175,13 +177,13 @@ export default function GoalsResults({ metrics, firstName }) {
               )}
               {bodyTypeInfo.strengths?.length > 0 && (
                 <div>
-                  <span className="font-medium">Strengths: </span>
+                  <span className="font-medium">{t('goals.strengths')}: </span>
                   <span className="opacity-70">{bodyTypeInfo.strengths.join(', ')}</span>
                 </div>
               )}
               {bodyTypeInfo.recommendations?.length > 0 && (
                 <div>
-                  <span className="font-medium">Recommendations: </span>
+                  <span className="font-medium">{t('goals.bodyTypeRecommendations')}: </span>
                   <span className="opacity-70">{bodyTypeInfo.recommendations.join(', ')}</span>
                 </div>
               )}

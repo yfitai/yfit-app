@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Target, Activity, Award, Calendar, Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const timeRange = parentTimeRange; // Use parent's time range (7, 30, 90, 365 days)
   const [weeklyAnalytics, setWeeklyAnalytics] = useState([]);
@@ -330,8 +332,8 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Workout Analytics</h2>
-        <p className="text-sm text-gray-600 mt-1">Showing {timeRange === '7' ? '1 week' : timeRange === '30' ? '1 month' : timeRange === '90' ? '3 months' : '1 year'} of data</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('analytics.workoutAnalytics')}</h2>
+        <p className="text-sm text-gray-600 mt-1">{t('analytics.showing')} {timeRange === '7' ? t('analytics.oneWeek') : timeRange === '30' ? t('analytics.oneMonth') : timeRange === '90' ? t('analytics.threeMonths') : t('analytics.oneYear')} {t('analytics.ofData')}</p>
       </div>
 
       {/* Sunday reset banner */}
@@ -339,9 +341,9 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-5 text-white">
           <div className="flex items-center gap-3 mb-2">
             <Calendar className="w-6 h-6" />
-            <h3 className="text-lg font-bold">Weekly Reset — New Week Starting</h3>
+            <h3 className="text-lg font-bold">{t('analytics.weeklyReset')}</h3>
           </div>
-          <p className="text-sm opacity-90">Weekly workout count resets today. Log your first workout to start building this week's analytics!</p>
+          <p className="text-sm opacity-90">{t('analytics.weeklyResetMessage')}</p>
         </div>
       )}
 
@@ -350,20 +352,20 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-600">Total Volume</div>
+              <div className="text-sm text-gray-600">{t('analytics.totalVolume')}</div>
               <TrendingUp className="text-green-600" size={20} />
             </div>
             <div className="text-3xl font-bold text-gray-900">
               {currentWeekStats.total_volume.toLocaleString('en-US', { maximumFractionDigits: 0 })}
             </div>
-            <div className="text-sm text-gray-600 mt-1">lbs lifted</div>
+            <div className="text-sm text-gray-600 mt-1">{t('analytics.lbsLifted')}</div>
             {currentWeekStats.volume_change_percent !== undefined && currentWeekStats.volume_change_percent !== 0 ? (
               <div className={`mt-2 flex items-center gap-1 text-sm ${currentWeekStats.volume_change_percent > 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {currentWeekStats.volume_change_percent > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                {Math.abs(currentWeekStats.volume_change_percent).toFixed(1)}% vs last week
+                {Math.abs(currentWeekStats.volume_change_percent).toFixed(1)}% {t('analytics.vsLastWeek')}
               </div>
             ) : (
-              <div className="mt-2 text-xs text-gray-500">First week of tracking</div>
+              <div className="mt-2 text-xs text-gray-500">{t('analytics.firstWeekOfTracking')}</div>
             )}
           </div>
         </div>
@@ -374,7 +376,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="text-blue-600" size={24} />
-            <h3 className="text-lg font-semibold text-gray-900">Predictive Insights</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('analytics.predictiveInsights')}</h3>
             <span className="ml-auto px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
               {predictions.confidence} confidence
             </span>
@@ -383,12 +385,12 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Card 1: Next Week Volume */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
-              <div className="text-sm text-gray-600 mb-1">Next Week Volume</div>
+              <div className="text-sm text-gray-600 mb-1">{t('analytics.nextWeekVolume')}</div>
               <div className="text-2xl font-bold text-blue-600">
                 {predictions.nextWeekVolume.toLocaleString()} lbs
               </div>
               <div className="text-xs text-gray-600 mt-1">
-                Based on {predictions.volumeChange > 0 ? 'upward' : 'downward'} trend
+                {t('analytics.basedOn')} {predictions.volumeChange > 0 ? t('analytics.upward') : t('analytics.downward')} {t('analytics.trend')}
               </div>
             </div>
 
@@ -399,7 +401,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
                 an absolute strength gain prediction. */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
-                Volume Trend
+                {t('analytics.volumeTrend')}
                 <span className="text-xs text-gray-400" title="Week-over-week change in total workout volume (weight × reps). Positive = you're lifting more than last week.">ⓘ</span>
               </div>
               {(() => {
@@ -413,7 +415,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
                       {isUp ? '+' : ''}{clampedChange.toFixed(1)}%
                     </div>
                     <div className="text-xs text-gray-600 mt-1">
-                      {isUp ? 'Volume increasing' : 'Volume decreasing'} vs last week
+                      {isUp ? t('analytics.volumeIncreasing') : t('analytics.volumeDecreasing')} {t('analytics.vsLastWeek')}
                     </div>
                   </>
                 );
@@ -423,14 +425,14 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             {/* Card 3: Goal Achievement */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
               <div className="text-sm text-gray-600 mb-1 flex items-center gap-1">
-                Goal Achievement
+                {t('analytics.goalAchievement')}
                 <span className="text-xs text-gray-400" title="Progress toward your weekly workout volume and frequency goals">ⓘ</span>
               </div>
               <div className="text-2xl font-bold text-purple-600">
                 {currentWeekStats?.goal_progress_percent ? Math.round(currentWeekStats.goal_progress_percent) : 57}%
               </div>
               <div className="text-xs text-gray-600 mt-1">
-                On track to meet goals
+                {t('analytics.onTrackToMeetGoals')}
               </div>
             </div>
           </div>
@@ -482,15 +484,15 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
           <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow-sm p-6 border border-orange-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Workout Streak</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('analytics.workoutStreak')}</h3>
                 <div className="flex items-center gap-3">
                   <div>
                     <div className="text-3xl font-bold text-orange-600">🔥 {currentStreak}</div>
-                    <div className="text-sm text-gray-600 mt-1">days in a row!</div>
+                    <div className="text-sm text-gray-600 mt-1">{t('analytics.daysInARow')}</div>
                   </div>
                   <div className="ml-6 pl-6 border-l border-orange-200">
                     <div className="text-xl font-bold text-gray-700">{longestStreak}</div>
-                    <div className="text-xs text-gray-600">longest streak</div>
+                    <div className="text-xs text-gray-600">{t('analytics.longestStreak')}</div>
                   </div>
                 </div>
               </div>
@@ -519,7 +521,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
         
         return (
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Workout Summary</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.dailyWorkoutSummary')}</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={durationData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -564,7 +566,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
 
       {/* Volume Trend Chart */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Volume Progression</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.volumeProgression')}</h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -604,16 +606,16 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
       {/* Exercise Progress Table */}
       {exerciseProgress.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Exercise Progress</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.exerciseProgress')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Exercise</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Current</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Max PR</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Workouts</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">{t('analytics.exercise')}</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">{t('analytics.current')}</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">{t('analytics.maxPR')}</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">{t('analytics.workouts')}</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">{t('common.status')}</th>
                 </tr>
               </thead>
               <tbody>

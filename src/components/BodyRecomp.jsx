@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUnitPreference } from '../contexts/UnitPreferenceContext'
@@ -42,6 +43,7 @@ function unitLabel(unitSystem) {
 }
 
 export default function BodyRecomp({ user }) {
+  const { t } = useTranslation()
   const { unitSystem } = useUnitPreference()
   const location = useLocation()
   const [loading, setLoading] = useState(true)
@@ -194,8 +196,8 @@ export default function BodyRecomp({ user }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Body Recomp</h1>
-          <p className="text-sm text-gray-500 mt-1">Track your body measurement progress toward goals</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('bodyRecomp.title', 'Body Recomp')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('bodyRecomp.subtitle', 'Track your body measurement progress toward goals')}</p>
         </div>
         <div className="flex items-center gap-2">
         <button
@@ -210,10 +212,10 @@ export default function BodyRecomp({ user }) {
           onChange={e => setTimeRange(Number(e.target.value))}
           className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white"
         >
-          <option value={30}>Last 30 days</option>
-          <option value={90}>Last 90 days</option>
-          <option value={180}>Last 6 months</option>
-          <option value={365}>Last year</option>
+          <option value={30}>{t('bodyRecomp.last30Days', 'Last 30 days')}</option>
+          <option value={90}>{t('bodyRecomp.last90Days', 'Last 90 days')}</option>
+          <option value={180}>{t('bodyRecomp.last6Months', 'Last 6 months')}</option>
+          <option value={365}>{t('bodyRecomp.lastYear', 'Last year')}</option>
         </select>
         </div>
       </div>
@@ -222,7 +224,7 @@ export default function BodyRecomp({ user }) {
       {!hasGoals && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6 text-center">
           <Target className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-          <h3 className="font-semibold text-amber-800 mb-1">Set your body measurement goals</h3>
+          <h3 className="font-semibold text-amber-800 mb-1">{t('bodyRecomp.setGoalsPrompt', 'Set your body measurement goals')}</h3>
           <p className="text-sm text-amber-700 mb-3">
             Go to the Goals page and fill in your current measurements and target goals to start tracking here.
           </p>
@@ -236,7 +238,7 @@ export default function BodyRecomp({ user }) {
       {hasGoals && !hasHistory && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 text-center">
           <Activity className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-          <h3 className="font-semibold text-blue-800 mb-1">Start logging measurements</h3>
+          <h3 className="font-semibold text-blue-800 mb-1">{t('bodyRecomp.startLogging', 'Start logging measurements')}</h3>
           <p className="text-sm text-blue-700 mb-3">
             Use the Weekly Body Measurements section in the Daily Tracker to log your measurements and see progress here.
           </p>
@@ -251,7 +253,7 @@ export default function BodyRecomp({ user }) {
         <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 mb-6 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium mb-1">Overall Recomp Progress</p>
+              <p className="text-green-100 text-sm font-medium mb-1">{t('bodyRecomp.overallProgress', 'Overall Recomp Progress')}</p>
               <div className="text-5xl font-bold">{overallScore}%</div>
               <p className="text-green-100 text-sm mt-1">
                 {overallScore >= 80 ? '🔥 Outstanding progress!' :
@@ -323,17 +325,17 @@ export default function BodyRecomp({ user }) {
                       {/* Current / Start / Goal */}
                       <div className="grid grid-cols-3 gap-2 mb-3 text-center">
                         <div>
-                          <p className="text-xs text-gray-500">Start</p>
+                          <p className="text-xs text-gray-500">{t('bodyRecomp.start', 'Start')}</p>
                           <p className="font-semibold text-gray-700 text-sm">{startDisplay ? `${startDisplay}${unit}` : '—'}</p>
                         </div>
                         <div className="border-x border-gray-100">
-                          <p className="text-xs text-gray-500">Now</p>
+                          <p className="text-xs text-gray-500">{t('bodyRecomp.now', 'Now')}</p>
                           <p className={`font-bold text-base ${currentCm ? 'text-gray-900' : 'text-gray-400'}`}>
                             {currentDisplay ? `${currentDisplay}${unit}` : '—'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Goal</p>
+                          <p className="text-xs text-gray-500">{t('bodyRecomp.goal', 'Goal')}</p>
                           <p className="font-semibold text-green-600 text-sm">{goalDisplay ? `${goalDisplay}${unit}` : '—'}</p>
                         </div>
                       </div>
@@ -342,7 +344,7 @@ export default function BodyRecomp({ user }) {
                       {progress !== null && (
                         <div className="mb-2">
                           <div className="flex justify-between text-xs text-gray-500 mb-1">
-                            <span>Progress</span>
+                            <span>{t('bodyRecomp.progress', 'Progress')}</span>
                             <span>{progress}%</span>
                           </div>
                           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -431,16 +433,16 @@ export default function BodyRecomp({ user }) {
       {!hasGoals && !hasHistory && (
         <div className="text-center py-16 text-gray-400">
           <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-lg font-medium">No data yet</p>
-          <p className="text-sm mt-1">Set goals in the Goals page and log measurements in the Daily Tracker</p>
+          <p className="text-lg font-medium">{t('common.noData')}</p>
+          <p className="text-sm mt-1">{t('bodyRecomp.emptyStateDesc', 'Set goals in the Goals page and log measurements in the Daily Tracker')}</p>
         </div>
       )}
 
       {/* Upgrade CTA — gentle nudge */}
       <div className="mt-8 rounded-2xl bg-gradient-to-r from-green-500 to-teal-600 p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <p className="font-bold text-lg">Get AI-Powered Recomp Recommendations</p>
-          <p className="text-white/80 text-sm mt-0.5">Pro unlocks personalised cutting, bulking, and maintenance plans based on your actual data.</p>
+          <p className="font-bold text-lg">{t('bodyRecomp.aiCta', 'Get AI-Powered Recomp Recommendations')}</p>
+          <p className="text-white/80 text-sm mt-0.5">{t('bodyRecomp.aiCtaDesc', 'Pro unlocks personalised cutting, bulking, and maintenance plans based on your actual data.')}</p>
         </div>
         <a
           href="/subscription"

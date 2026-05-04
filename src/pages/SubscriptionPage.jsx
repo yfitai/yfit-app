@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import UpgradeModal from '../components/UpgradeModal'
 import {
@@ -70,6 +71,7 @@ function UsageMeter({ label, used, limit, icon: Icon }) {
 }
 
 export default function SubscriptionPage({ user }) {
+  const { t } = useTranslation()
   const {
     isPro, isTrialing, trialDaysRemaining, loading,
     planLabel, checkUsage
@@ -118,7 +120,7 @@ export default function SubscriptionPage({ user }) {
               )}
             </div>
             <div>
-              <p className="text-white/80 text-xs font-medium uppercase tracking-wide">Current Plan</p>
+              <p className="text-white/80 text-xs font-medium uppercase tracking-wide">{t('subscription.currentPlan', 'Current Plan')}</p>
               <h2 className="text-xl font-bold">{planLabel}</h2>
             </div>
           </div>
@@ -139,7 +141,7 @@ export default function SubscriptionPage({ user }) {
                   : 'Your free trial ends today'}
               </p>
               <p className="text-white/80 text-xs mt-0.5">
-                Subscribe before it ends to keep full Pro access
+                {t('subscription.subscribeBeforeEnds', 'Subscribe before it ends to keep full Pro access')}
               </p>
             </div>
           </div>
@@ -147,7 +149,7 @@ export default function SubscriptionPage({ user }) {
 
         {!isPro && !isTrialing && (
           <p className="text-white/80 text-sm">
-            Upgrade to unlock unlimited access to all Pro features.
+            {t('subscription.upgradeToUnlock', 'Upgrade to unlock unlimited access to all Pro features.')}
           </p>
         )}
       </div>
@@ -155,8 +157,8 @@ export default function SubscriptionPage({ user }) {
       {/* Usage Meters — only shown to free/trial users */}
       {(!isPro || isTrialing) && (
         <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-1">This Month's Usage</h3>
-          <p className="text-xs text-gray-500 mb-4">Resets on the 1st of each month</p>
+          <h3 className="font-semibold text-gray-800 mb-1">{t('subscription.thisMonthUsage', "This Month's Usage")}</h3>
+          <p className="text-xs text-gray-500 mb-4">{t('subscription.resetsMonthly', 'Resets on the 1st of each month')}</p>
           <UsageMeter
             label="AI Form Analysis"
             used={formUsage.used}
@@ -180,14 +182,14 @@ export default function SubscriptionPage({ user }) {
 
       {/* Feature Comparison Table */}
       <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6 shadow-sm">
-        <h3 className="font-semibold text-gray-800 mb-4">Plan Comparison</h3>
+        <h3 className="font-semibold text-gray-800 mb-4">{t('subscription.planComparison', 'Plan Comparison')}</h3>
         <div className="overflow-x-auto -mx-1">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left pb-2 text-gray-500 font-medium w-1/2">Feature</th>
-                <th className="text-center pb-2 text-gray-500 font-medium w-1/4">Free</th>
-                <th className="text-center pb-2 text-blue-600 font-bold w-1/4">Pro</th>
+                <th className="text-left pb-2 text-gray-500 font-medium w-1/2">{t('subscription.feature', 'Feature')}</th>
+                <th className="text-center pb-2 text-gray-500 font-medium w-1/4">{t('common.free')}</th>
+                <th className="text-center pb-2 text-blue-600 font-bold w-1/4">{t('common.pro')}</th>
               </tr>
             </thead>
             <tbody>
@@ -216,7 +218,7 @@ export default function SubscriptionPage({ user }) {
       {/* Upgrade Plans — only shown to non-Pro users */}
       {(!isPro || isTrialing) && (
         <div className="space-y-3 mb-6">
-          <h3 className="font-semibold text-gray-800">Choose a Plan</h3>
+          <h3 className="font-semibold text-gray-800">{t('subscription.chooseYourPlan')}</h3>
 
           {/* Pro Monthly */}
           <button
@@ -300,7 +302,7 @@ export default function SubscriptionPage({ user }) {
           </button>
 
           <p className="text-center text-xs text-gray-400 pt-1">
-            Secure payment via Stripe · Cancel anytime · 30-day money-back guarantee
+            {t('subscription.securePaymentStripe')}
           </p>
         </div>
       )}
@@ -308,7 +310,7 @@ export default function SubscriptionPage({ user }) {
       {/* Pro users — manage billing */}
       {isPro && !isTrialing && (
         <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-3">Manage Subscription</h3>
+          <h3 className="font-semibold text-gray-800 mb-3">{t('subscription.manageSubscription', 'Manage Subscription')}</h3>
           <a
             href="https://billing.stripe.com/p/login/test_00000000"
             target="_blank"
@@ -317,12 +319,12 @@ export default function SubscriptionPage({ user }) {
           >
             <div className="flex items-center gap-3">
               <RefreshCw className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Manage billing &amp; invoices</span>
+              <span className="text-sm font-medium text-gray-700">{t('subscription.manageBilling', 'Manage billing & invoices')}</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-400" />
           </a>
           <p className="text-xs text-gray-400 mt-3 text-center">
-            To cancel or change your plan, visit the Stripe billing portal above.
+            {t('subscription.cancelInPortal', 'To cancel or change your plan, visit the Stripe billing portal above.')}
           </p>
         </div>
       )}

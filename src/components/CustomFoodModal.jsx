@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 
 export default function CustomFoodModal({ user, onSave, onClose }) {
+  const { t } = useTranslation()
   const [form, setForm] = useState({
     name: '',
     brand: '',
@@ -27,7 +29,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
     e.preventDefault()
     
     if (!form.name || !form.calories) {
-      alert('Please enter at least a food name and calories')
+      alert(t('nutrition.pleaseEnterFoodNameAndCalories'))
       return
     }
 
@@ -56,7 +58,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800">Create Custom Food</h2>
+          <h2 className="text-xl font-semibold text-gray-800">{t('nutrition.createCustomFood')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -71,7 +73,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             {/* Food Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Food Name <span className="text-red-500">*</span>
+                {t('nutrition.foodName')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -87,7 +89,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             {/* Brand (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Brand (Optional)
+                {t('nutrition.brandOptional')}
               </label>
               <input
                 type="text"
@@ -103,7 +105,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Serving Size
+                  {t('nutrition.servingSize')}
                 </label>
                 <input
                   type="number"
@@ -117,7 +119,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Unit
+                  {t('common.unit')}
                 </label>
                 <select
                   name="serving_unit"
@@ -141,7 +143,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Calories <span className="text-red-500">*</span>
+                  {t('nutrition.calories')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -156,7 +158,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Protein (g)
+                  {t('nutrition.protein')} (g)
                 </label>
                 <input
                   type="number"
@@ -173,7 +175,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Carbs (g)
+                  {t('nutrition.carbs')} (g)
                 </label>
                 <input
                   type="number"
@@ -187,7 +189,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fat (g)
+                  {t('nutrition.fat')} (g)
                 </label>
                 <input
                   type="number"
@@ -203,11 +205,11 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
 
             {/* Optional Nutrients */}
             <div className="border-t border-gray-200 pt-4 mt-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Optional Nutrients</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">{t('nutrition.optionalNutrients')}</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Fiber (g)
+                    {t('nutrition.fiber')} (g)
                   </label>
                   <input
                     type="number"
@@ -221,7 +223,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Sugar (g)
+                    {t('nutrition.sugar')} (g)
                   </label>
                   <input
                     type="number"
@@ -235,7 +237,7 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Sodium (mg)
+                    {t('nutrition.sodium')} (mg)
                   </label>
                   <input
                     type="number"
@@ -259,14 +261,14 @@ export default function CustomFoodModal({ user, onSave, onClose }) {
             onClick={onClose}
             className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSubmit}
             disabled={saving}
             className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving...' : 'Save Custom Food'}
+            {saving ? t('common.saving') : t('nutrition.saveCustomFood')}
           </button>
         </div>
       </div>

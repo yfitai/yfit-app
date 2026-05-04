@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { ChartNoAxesCombined } from 'lucide-react'
@@ -9,6 +10,7 @@ import { ChartNoAxesCombined } from 'lucide-react'
  * Displays a COMBINED chart for Fiber, Sugar, and Sodium intake (like Protein/Carbs/Fat)
  */
 export default function NutritionProgressCharts({ user, timeRange = '30' }) {
+  const { t } = useTranslation()
   const [nutritionData, setNutritionData] = useState([])
   const [goals, setGoals] = useState({
     fiber: 25,
@@ -173,18 +175,18 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
     const isNewWeek = todayDay === 0;
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Micronutrients</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('nutrition.dailyMicronutrients')}</h3>
         <div className="text-center py-12">
           <ChartNoAxesCombined className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           {isNewWeek ? (
             <>
-              <p className="text-gray-700 font-medium">Fresh week — no meals logged yet</p>
-              <p className="text-sm text-gray-500 mt-2">Your weekly nutrition resets every Sunday. Log your first meal to start tracking!</p>
+              <p className="text-gray-700 font-medium">{t('nutrition.freshWeekNoMeals')}</p>
+              <p className="text-sm text-gray-500 mt-2">{t('nutrition.weeklyResetMessage')}</p>
             </>
           ) : (
             <>
-              <p className="text-gray-600">No nutrition data for this period</p>
-              <p className="text-sm text-gray-500 mt-2">Start logging meals to see your micronutrient progress.</p>
+              <p className="text-gray-600">{t('nutrition.noNutritionData')}</p>
+              <p className="text-sm text-gray-500 mt-2">{t('nutrition.startLoggingMeals')}</p>
             </>
           )}
         </div>
@@ -197,8 +199,8 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
       {/* Combined Chart */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Daily Micronutrients</h3>
-          <p className="text-sm text-gray-600">Fiber, Sugar & Sodium Tracking</p>
+          <h3 className="text-lg font-semibold text-gray-800">{t('nutrition.dailyMicronutrients')}</h3>
+          <p className="text-sm text-gray-600">{t('nutrition.fiberSugarSodiumTracking')}</p>
         </div>
 
         {/* Combined Chart - All Three Nutrients */}
@@ -218,7 +220,7 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
               dataKey="fiber" 
               stroke="#10b981" 
               strokeWidth={2} 
-              name="Fiber (g)"
+              name={`${t('nutrition.fiber')} (g)`}
               dot={{ r: 3 }}
               activeDot={{ r: 5 }}
             />
@@ -230,7 +232,7 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
               dataKey="sugar" 
               stroke="#f59e0b" 
               strokeWidth={2} 
-              name="Sugar (g)"
+              name={`${t('nutrition.sugar')} (g)`}
               dot={{ r: 3 }}
               activeDot={{ r: 5 }}
             />
@@ -242,7 +244,7 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
               dataKey="sodium" 
               stroke="#ef4444" 
               strokeWidth={2} 
-              name="Sodium (mg)"
+              name={`${t('nutrition.sodium')} (mg)`}
               dot={{ r: 3 }}
               activeDot={{ r: 5 }}
             />
@@ -251,19 +253,19 @@ export default function NutritionProgressCharts({ user, timeRange = '30' }) {
 
         {/* Goals Reference */}
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-xs text-gray-600 mb-2">Daily Goals:</p>
+          <p className="text-xs text-gray-600 mb-2">{t('nutrition.dailyGoals')}:</p>
           <div className="flex gap-6 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-gray-700">Fiber: {goals.fiber}g</span>
+              <span className="text-gray-700">{t('nutrition.fiber')}: {goals.fiber}g</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-gray-700">Sugar Limit: {goals.sugar}g</span>
+              <span className="text-gray-700">{t('nutrition.sugarLimit')}: {goals.sugar}g</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-700">Sodium Limit: {goals.sodium}mg</span>
+              <span className="text-gray-700">{t('nutrition.sodiumLimit')}: {goals.sodium}mg</span>
             </div>
           </div>
         </div>

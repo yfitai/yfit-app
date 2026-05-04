@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { MessageSquarePlus, X, Bug, Lightbulb, Heart, MessageCircle, Send, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
@@ -30,6 +31,7 @@ function resetForm() {
 }
 
 export default function FeedbackButton({ user }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -54,7 +56,7 @@ export default function FeedbackButton({ user }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!title.trim() || !description.trim()) {
-      setError('Please fill in the title and description.')
+      setError(t('feedback.pleaseFillTitleAndDescription'))
       return
     }
     setSubmitting(true)
@@ -101,7 +103,7 @@ export default function FeedbackButton({ user }) {
       }, 3000)
     } catch (err) {
       console.error('Feedback submit error:', err)
-      setError('Failed to submit feedback. Please try again.')
+      setError(t('feedback.failedToSubmit'))
     }
     setSubmitting(false)
   }
@@ -132,8 +134,8 @@ export default function FeedbackButton({ user }) {
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-green-600 p-4 flex items-center justify-between">
             <div>
-              <h3 className="text-white font-semibold text-sm">Send Feedback</h3>
-              <p className="text-blue-100 text-xs">Help us improve YFIT</p>
+              <h3 className="text-white font-semibold text-sm">{t('feedback.sendFeedback')}</h3>
+              <p className="text-blue-100 text-xs">{t('feedback.helpUsImprove')}</p>
             </div>
             <button 
               onClick={handleClose}
@@ -146,8 +148,8 @@ export default function FeedbackButton({ user }) {
           {submitted ? (
             <div className="p-8 text-center">
               <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-              <h4 className="font-semibold text-gray-800 mb-1">Thank you!</h4>
-              <p className="text-sm text-gray-500">Your feedback has been received. We read every submission.</p>
+              <h4 className="font-semibold text-gray-800 mb-1">{t('feedback.thankYou')}</h4>
+              <p className="text-sm text-gray-500">{t('feedback.feedbackReceived')}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
@@ -170,20 +172,20 @@ export default function FeedbackButton({ user }) {
 
               {/* Category */}
               <div className="space-y-1">
-                <Label className="text-xs">Category</Label>
+                <Label className="text-xs">{t('feedback.category')}</Label>
                 <select
                   value={category}
                   onChange={e => setCategory(e.target.value)}
                   className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Select area...</option>
+                  <option value="">{t('feedback.selectArea')}</option>
                   {CATEGORIES.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
                 </select>
               </div>
 
               {/* Title */}
               <div className="space-y-1">
-                <Label className="text-xs">Title *</Label>
+                <Label className="text-xs">{t('feedback.titleRequired')}</Label>
                 <Input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
@@ -195,7 +197,7 @@ export default function FeedbackButton({ user }) {
 
               {/* Description */}
               <div className="space-y-1">
-                <Label className="text-xs">Description *</Label>
+                <Label className="text-xs">{t('feedback.descriptionRequired')}</Label>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
@@ -219,12 +221,12 @@ export default function FeedbackButton({ user }) {
                 {submitting ? (
                   <span className="flex items-center gap-2">
                     <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Sending...
+                    {t('support.sending')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Send className="w-4 h-4" />
-                    Submit Feedback
+                    {t('feedback.submitFeedback')}
                   </span>
                 )}
               </Button>

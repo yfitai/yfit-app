@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
@@ -27,6 +28,7 @@ const GOAL_TYPES = [
 ]
 
 export default function OnboardingWizard({ user, onComplete }) {
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -160,8 +162,8 @@ export default function OnboardingWizard({ user, onComplete }) {
             <Activity className="w-5 h-5 text-green-600" />
             <span className="font-bold text-gray-800">YFIT AI</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Let's set up your profile</h1>
-          <p className="text-gray-500 text-sm mt-1">Step {step} of {TOTAL_STEPS}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('onboarding.setupProfile', "Let's set up your profile")}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('onboarding.stepOf', 'Step {{step}} of {{total}}', { step, total: TOTAL_STEPS })}</p>
         </div>
 
         {/* Progress bar */}
@@ -182,14 +184,14 @@ export default function OnboardingWizard({ user, onComplete }) {
                     <User className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <CardTitle>About You</CardTitle>
-                    <CardDescription>Basic info to personalize your experience</CardDescription>
+                    <CardTitle>{t('onboarding.aboutYou', 'About You')}</CardTitle>
+                    <CardDescription>{t('onboarding.basicInfo', 'Basic info to personalize your experience')}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>First Name</Label>
+                  <Label>{t('auth.firstName')}</Label>
                   <Input 
                     value={firstName} 
                     onChange={e => setFirstName(e.target.value)} 
@@ -197,7 +199,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Age</Label>
+                  <Label>{t('goals.age')}</Label>
                   <Input 
                     type="number" 
                     value={age} 
@@ -207,7 +209,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Biological Sex</Label>
+                  <Label>{t('onboarding.biologicalSex', 'Biological Sex')}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {['male', 'female'].map(g => (
                       <button
@@ -238,8 +240,8 @@ export default function OnboardingWizard({ user, onComplete }) {
                     <Ruler className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <CardTitle>Your Measurements</CardTitle>
-                    <CardDescription>Used to calculate your calorie needs</CardDescription>
+                    <CardTitle>{t('onboarding.yourMeasurements', 'Your Measurements')}</CardTitle>
+                    <CardDescription>{t('onboarding.measurementsDesc', 'Used to calculate your calorie needs')}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -265,7 +267,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                 {unitSystem === 'imperial' ? (
                   <>
                     <div className="space-y-2">
-                      <Label>Height</Label>
+                      <Label>{t('goals.height')}</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="relative">
                           <Input type="number" value={heightFt} onChange={e => setHeightFt(e.target.value)} placeholder="5" min="3" max="8" />
@@ -278,7 +280,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Current Weight</Label>
+                      <Label>{t('goals.currentWeight')}</Label>
                       <div className="relative">
                         <Input type="number" value={weightLbs} onChange={e => setWeightLbs(e.target.value)} placeholder="180" min="50" max="700" step="0.1" />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">lbs</span>
@@ -288,14 +290,14 @@ export default function OnboardingWizard({ user, onComplete }) {
                 ) : (
                   <>
                     <div className="space-y-2">
-                      <Label>Height</Label>
+                      <Label>{t('goals.height')}</Label>
                       <div className="relative">
                         <Input type="number" value={heightCm} onChange={e => setHeightCm(e.target.value)} placeholder="178" min="100" max="250" />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">cm</span>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Current Weight</Label>
+                      <Label>{t('goals.currentWeight')}</Label>
                       <div className="relative">
                         <Input type="number" value={weightKg} onChange={e => setWeightKg(e.target.value)} placeholder="82" min="20" max="320" step="0.1" />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">kg</span>
@@ -316,14 +318,14 @@ export default function OnboardingWizard({ user, onComplete }) {
                     <Target className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <CardTitle>Your Goals</CardTitle>
-                    <CardDescription>What are you working toward?</CardDescription>
+                    <CardTitle>{t('onboarding.yourGoals', 'Your Goals')}</CardTitle>
+                    <CardDescription>{t('onboarding.goalsDesc', 'What are you working toward?')}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Primary Goal</Label>
+                  <Label>{t('onboarding.primaryGoal', 'Primary Goal')}</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {GOAL_TYPES.map(g => (
                       <button
@@ -346,7 +348,7 @@ export default function OnboardingWizard({ user, onComplete }) {
 
                 {goalType && goalType !== 'maintain' && (
                   <div className="space-y-2">
-                    <Label>Target Weight</Label>
+                    <Label>{t('goals.targetWeight')}</Label>
                     <div className="relative">
                       <Input 
                         type="number" 
@@ -363,7 +365,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                 )}
 
                 <div className="space-y-2">
-                  <Label>Activity Level</Label>
+                  <Label>{t('goals.activityLevel')}</Label>
                   <div className="space-y-2">
                     {ACTIVITY_LEVELS.map(a => (
                       <button
@@ -399,8 +401,8 @@ export default function OnboardingWizard({ user, onComplete }) {
                     <Zap className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <CardTitle>What YFIT Can Do</CardTitle>
-                    <CardDescription>Here's what's waiting for you</CardDescription>
+                    <CardTitle>{t('onboarding.whatYfitCanDo', 'What YFIT Can Do')}</CardTitle>
+                    <CardDescription>{t('onboarding.featuresWaiting', "Here's what's waiting for you")}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -436,7 +438,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8 text-green-600" />
                   </div>
-                  <CardTitle className="text-2xl">You're all set, {firstName}!</CardTitle>
+                  <CardTitle className="text-2xl">{t('onboarding.allSet', "You're all set, {{name}}!", { name: firstName })}</CardTitle>
                   <CardDescription className="mt-2">
                     Your personalized YFIT profile is ready. Start by logging today's meals or checking out your AI predictions.
                   </CardDescription>
@@ -464,17 +466,17 @@ export default function OnboardingWizard({ user, onComplete }) {
           <div className="flex gap-3 p-6 pt-0">
             {step > 1 && (
               <Button variant="outline" onClick={handleBack} className="flex-1">
-                <ChevronLeft className="w-4 h-4 mr-1" /> Back
+                <ChevronLeft className="w-4 h-4 mr-1" /> {t('common.back')}
               </Button>
             )}
             {step < TOTAL_STEPS - 1 && (
               <Button onClick={handleNext} className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
-                Next <ChevronRight className="w-4 h-4 ml-1" />
+                {t('common.next')} <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             )}
             {step === TOTAL_STEPS - 1 && (
               <Button onClick={handleNext} className="flex-1 bg-gradient-to-r from-blue-600 to-green-600">
-                See Features <ChevronRight className="w-4 h-4 ml-1" />
+                {t('onboarding.seeFeatures', 'See Features')} <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             )}
             {step === TOTAL_STEPS && (
@@ -483,7 +485,7 @@ export default function OnboardingWizard({ user, onComplete }) {
                 disabled={saving}
                 className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
               >
-                {saving ? 'Saving...' : '🚀 Start Using YFIT'}
+                {saving ? t('common.saving') : t('onboarding.startUsingYfit', '🚀 Start Using YFIT')}
               </Button>
             )}
           </div>

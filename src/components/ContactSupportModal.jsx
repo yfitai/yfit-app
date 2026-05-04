@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 export default function ContactSupportModal({ isOpen, onClose }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -46,7 +48,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
     } catch (error) {
       console.error('Error sending support request:', error)
       setStatus('error')
-      setErrorMessage(error.message || 'Failed to send message. Please try again.')
+      setErrorMessage(error.message || t('support.failedToSend'))
     }
   }
 
@@ -65,9 +67,9 @@ export default function ContactSupportModal({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Contact Support</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t('support.contactSupport')}</h2>
             <p className="text-sm text-gray-600 mt-1">
-              We typically respond within minutes using AI-powered support
+              {t('support.respondWithinMinutes')}
             </p>
           </div>
           <button
@@ -86,9 +88,9 @@ export default function ContactSupportModal({ isOpen, onClose }) {
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-green-900">Message sent successfully!</h3>
+                <h3 className="font-semibold text-green-900">{t('support.messageSentSuccessfully')}</h3>
                 <p className="text-sm text-green-700 mt-1">
-                  You'll receive an AI-generated response at {formData.email} within a few minutes.
+                  {t('support.aiResponseAtEmail', { email: formData.email })}
                 </p>
               </div>
             </div>
@@ -99,7 +101,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-red-900">Failed to send message</h3>
+                <h3 className="font-semibold text-red-900">{t('support.failedToSend')}</h3>
                 <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
               </div>
             </div>
@@ -108,7 +110,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
           {/* Name Field */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Your Name
+              {t('support.yourName')}
             </label>
             <input
               type="text"
@@ -126,7 +128,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
           {/* Email Field */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+              {t('common.email')}
             </label>
             <input
               type="email"
@@ -144,7 +146,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
           {/* Subject Field */}
           <div>
             <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-              Subject
+              {t('support.subject')}
             </label>
             <input
               type="text"
@@ -162,7 +164,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
           {/* Message Field */}
           <div>
             <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-              Message
+              {t('support.message')}
             </label>
             <textarea
               id="message"
@@ -185,7 +187,7 @@ export default function ContactSupportModal({ isOpen, onClose }) {
               disabled={status === 'loading'}
               className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -195,12 +197,12 @@ export default function ContactSupportModal({ isOpen, onClose }) {
               {status === 'loading' ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Sending...
+                  {t('support.sending')}
                 </>
               ) : (
                 <>
                   <Send className="w-5 h-5" />
-                  Send Message
+                  {t('support.sendMessage')}
                 </>
               )}
             </button>
