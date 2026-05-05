@@ -159,101 +159,101 @@ export default function LandingPage() {
   // Pricing plans
   const pricingPlans = [
     {
-      name: "Free Basic",
+      name: t("landing.plan1Name"),
       price: "$0",
       period: "",
-      description: "Perfect for getting started",
+      description: t("landing.plan1Desc"),
       badge: null,
       badgeColor: null,
       features: [
-        "Basic workout tracking",
-        "Manual meal logging",
-        "2 saved workout routines",
-        "Basic progress tracking",
-        "Weight & body metrics",
-        "3 AI form analyses/month",
-        "Limited AI Coach queries"
+        t("landing.plan1F1"),
+        t("landing.plan1F2"),
+        t("landing.plan1F3"),
+        t("landing.plan1F4"),
+        t("landing.plan1F5"),
+        t("landing.plan1F6"),
+        t("landing.plan1F7"),
       ],
-      buttonText: "Start Free — No Credit Card",
+      buttonText: t("landing.plan1Btn"),
       buttonStyle: "outline" as const,
       highlighted: false,
       stripeKey: "signup" as any,
     },
     {
-      name: "Pro Monthly",
+      name: t("landing.plan2Name"),
       price: "$12.99",
       period: "/month",
-      description: "Most flexible option",
+      description: t("landing.plan2Desc"),
       badge: null,
       badgeColor: null,
       features: [
-        "Everything in Free",
-        "Barcode nutrition scanning",
-        "AI form analysis",
-        "Medication tracking",
-        "Provider reports",
-        "Advanced analytics",
-        "Priority support"
+        t("landing.plan2F1"),
+        t("landing.plan2F2"),
+        t("landing.plan2F3"),
+        t("landing.plan2F4"),
+        t("landing.plan2F5"),
+        t("landing.plan2F6"),
+        t("landing.plan2F7"),
       ],
-      buttonText: "Start Pro Monthly",
+      buttonText: t("landing.plan2Btn"),
       buttonStyle: "default" as const,
       highlighted: false,
       stripeKey: "proMonthly" as const,
     },
     {
-      name: "Pro Yearly",
+      name: t("landing.plan3Name"),
       price: "$99.99",
       period: "/year",
-      description: "Save 35% vs monthly",
-      badge: "BEST VALUE",
+      description: t("landing.plan3Desc"),
+      badge: t("landing.plan3Badge"),
       badgeColor: "bg-green-600",
       features: [
-        "Everything in Pro Monthly",
-        "Exclusive workshops",
-        "Early access to new features",
-        "Advanced health insights",
-        "Priority support"
+        t("landing.plan3F1"),
+        t("landing.plan3F2"),
+        t("landing.plan3F3"),
+        t("landing.plan3F4"),
+        t("landing.plan3F5"),
       ],
-      buttonText: "Start Pro Yearly",
+      buttonText: t("landing.plan3Btn"),
       buttonStyle: "default" as const,
       highlighted: true,
       stripeKey: "proYearly" as const,
     },
     {
-      name: "Pro Lifetime",
+      name: t("landing.plan4Name"),
       price: "$249.99",
       period: " one-time",
-      description: "Pay once, own forever",
-      badge: "MOST POPULAR",
+      description: t("landing.plan4Desc"),
+      badge: t("landing.plan4Badge"),
       badgeColor: "bg-violet-600",
       features: [
-        "Everything in Pro Yearly",
-        "Lifetime access — pay once",
-        "All future features included",
-        "Founder's Badge",
-        "Direct developer access",
-        "No recurring charges ever"
+        t("landing.plan4F1"),
+        t("landing.plan4F2"),
+        t("landing.plan4F3"),
+        t("landing.plan4F4"),
+        t("landing.plan4F5"),
+        t("landing.plan4F6"),
       ],
-      buttonText: "Get Lifetime Access",
+      buttonText: t("landing.plan4Btn"),
       buttonStyle: "default" as const,
       highlighted: false,
       stripeKey: "proLifetime" as const,
     },
     {
-      name: "Limited Time Offer",
+      name: t("landing.plan5Name"),
       price: "1 Month FREE",
       period: "",
-      description: "Full featured Pro plan",
-      badge: "LIMITED TIME",
+      description: t("landing.plan5Desc"),
+      badge: t("landing.plan5Badge"),
       badgeColor: "bg-orange-500",
       features: [
-        "Full Pro features included",
-        "No credit card required",
-        "Cancel anytime",
-        "Instant access",
-        "All 8 app features",
+        t("landing.plan5F1"),
+        t("landing.plan5F2"),
+        t("landing.plan5F3"),
+        t("landing.plan5F4"),
+        t("landing.plan5F5"),
       ],
-      buttonText: "Claim Free Month",
+      buttonText: t("landing.plan5Btn"),
       buttonStyle: "default" as const,
       highlighted: false,
       isOffer: true,
@@ -509,17 +509,15 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold mb-2">{t("landing.unique.formTitle")}</h3>
               <p className="text-white/80 text-sm mb-4">{t("landing.unique.formSubtitle")}</p>
               <div className="bg-white/10 rounded-xl p-4 mb-6">
-                <p className="text-white/90 text-sm leading-relaxed">
-                  <strong>67% of gym injuries</strong> are caused by poor form. YFIT's AI analyzes your movement in real-time using your device camera, giving instant audio and visual corrections before injury happens.
-                </p>
+                <p className="text-white/90 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t("landing.formStat") }} />
               </div>
               <ul className="space-y-2">
                 {[
-                  "Live posture correction during every exercise",
-                  "Instant audio cues for immediate adjustments",
-                  "Form score tracked over time",
-                  "Detailed form report after each workout",
-                  "Injury prevention recommendations"
+                  t("landing.formF1"),
+                  t("landing.formF2"),
+                  t("landing.formF3"),
+                  t("landing.formF4"),
+                  t("landing.formF5"),
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-white/90">
                     <Check className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
@@ -676,54 +674,54 @@ export default function LandingPage() {
                   {
                     section: t("landing.pricing.sectionTracking"),
                     rows: [
-                      { label: "Basic Workout Tracking",   free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Manual Meal Logging",       free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Weight & Body Metrics",     free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Step Count & Daily Activity",free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Barcode Scanner",           free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Micronutrient Tracking",    free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Water Intake Logging",      free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Medication Tracking",       free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow1"),  free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow2"),  free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow3"),  free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow4"),  free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow5"),  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow6"),  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow7"),  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow8"),  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                     ]
                   },
                   {
                     section: t("landing.pricing.sectionAI"),
                     rows: [
-                      { label: "AI Form Analysis",          free: "3/month", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
-                      { label: "AI Coach",                  free: "Limited", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
-                      { label: "AI Predictions & Forecasts",free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Personalised Meal Plans",   free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Workout Recommendations",   free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow9"),  free: "3/month", monthly: t("landing.tableUnlimited"), yearly: t("landing.tableUnlimited"), lifetime: t("landing.tableUnlimited") },
+                      { label: t("landing.tableRow10"), free: t("landing.tableLimited"), monthly: t("landing.tableUnlimited"), yearly: t("landing.tableUnlimited"), lifetime: t("landing.tableUnlimited") },
+                      { label: t("landing.tableRow11"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow12"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow13"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                     ]
                   },
                   {
                     section: t("landing.pricing.sectionPlanning"),
                     rows: [
-                      { label: "Saved Workout Routines",    free: "2", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
-                      { label: "Grocery Lists",             free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Provider Reports",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Medication Reminders",      free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow14"), free: "2", monthly: t("landing.tableUnlimited"), yearly: t("landing.tableUnlimited"), lifetime: t("landing.tableUnlimited") },
+                      { label: t("landing.tableRow15"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow16"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow17"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                     ]
                   },
                   {
                     section: t("landing.pricing.sectionAnalytics"),
                     rows: [
-                      { label: "Basic Progress Charts",     free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Advanced Analytics",        free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Trend Analysis Over Time",  free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow18"), free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow19"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow20"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
                     ]
                   },
                   {
                     section: t("landing.pricing.sectionSupport"),
                     rows: [
-                      { label: "Community Support",         free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Priority Support",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
-                      { label: "Exclusive Workshops",       free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
-                      { label: "Early Access Features",     free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
-                      { label: "Founder's Badge",           free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
-                      { label: "Direct Dev Access",         free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
-                      { label: "All Future Features",       free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
-                      { label: "No Recurring Charges",      free: "✅", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: t("landing.tableRow21"), free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow22"), free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow23"), free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow24"), free: "❌", monthly: "❌", yearly: "✅", lifetime: "✅" },
+                      { label: t("landing.tableRow25"), free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: t("landing.tableRow26"), free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: t("landing.tableRow27"), free: "❌", monthly: "❌", yearly: "❌", lifetime: "✅" },
+                      { label: t("landing.tableRow28"), free: "✅", monthly: "❌", yearly: "❌", lifetime: "✅" },
                     ]
                   },
                 ] as { section: string; rows: { label: string; free: string; monthly: string; yearly: string; lifetime: string }[] }[]).map((group, gi) => (
@@ -791,22 +789,22 @@ export default function LandingPage() {
                         <div key={i} className={`h-2 rounded-full ${c} opacity-70`} />
                       ))}
                     </div>
-                    <p className="text-gray-500 text-xs text-center mt-2 leading-relaxed">8 integrated<br/>tracking modules</p>
+                    <p className="text-gray-500 text-xs text-center mt-2 leading-relaxed">{t("landing.infoPanelModules")}</p>
                   </div>
                 </div>
                 <div className="flex-1">
                   <p className="text-gray-300 text-base leading-relaxed mb-6">
-                    YFIT is a comprehensive health and fitness app that tracks everything you need in one place:
+                    {t("landing.infoPanelIntro")}
                   </p>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[
-                      { color: "bg-green-500", label: "Nutrition", detail: "Daily calories, macros (protein, carbs, fat), meal logs, and water intake" },
-                      { color: "bg-purple-500", label: "Fitness", detail: "Workout sessions, exercises, sets, reps, weights, and form analysis scores" },
-                      { color: "bg-blue-500", label: "Body Metrics", detail: "Weight, body fat %, BMI, and 9 body measurements (waist, hips, biceps, etc.)" },
-                      { color: "bg-orange-500", label: "Daily Activity", detail: "Step count, calories burned, and activity streaks" },
-                      { color: "bg-pink-500", label: "Medications", detail: "Medication schedules, dosages, reminders and provider reports" },
-                      { color: "bg-teal-500", label: "Progress", detail: "Charts and trends for all tracked metrics over time" },
-                      { color: "bg-indigo-500", label: "AI Coaching", detail: "Personalised advice, workout recommendations, and Q&A" },
+                      { color: "bg-green-500", label: t("landing.moduleNutritionLabel"), detail: t("landing.moduleNutritionDetail") },
+                      { color: "bg-purple-500", label: t("landing.moduleFitnessLabel"), detail: t("landing.moduleFitnessDetail") },
+                      { color: "bg-blue-500", label: t("landing.moduleBodyLabel"), detail: t("landing.moduleBodyDetail") },
+                      { color: "bg-orange-500", label: t("landing.moduleActivityLabel"), detail: t("landing.moduleActivityDetail") },
+                      { color: "bg-pink-500", label: t("landing.moduleMedsLabel"), detail: t("landing.moduleMedsDetail") },
+                      { color: "bg-teal-500", label: t("landing.moduleProgressLabel"), detail: t("landing.moduleProgressDetail") },
+                      { color: "bg-indigo-500", label: t("landing.moduleAILabel"), detail: t("landing.moduleAIDetail") },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
                         <div className={`w-2.5 h-2.5 rounded-full ${item.color} flex-shrink-0 mt-1.5`} />
@@ -818,7 +816,7 @@ export default function LandingPage() {
                     ))}
                   </div>
                   <p className="mt-6 text-gray-300 text-sm leading-relaxed border-t border-white/10 pt-4">
-                    <span className="text-white font-semibold">Everything is connected</span> — so your AI Coach can give you personalised advice based on your actual data.
+                    <span className="text-white font-semibold">{t("landing.infoPanelConnected")}</span> {t("landing.infoPanelConnectedSuffix")}
                   </p>
                 </div>
               </div>
@@ -827,9 +825,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: Smartphone, color: "bg-blue-600", title: "Barcode Scanner", desc: "Scan any food barcode for instant nutrition tracking. Our database logs nutritional information and calculates your daily macros automatically.", bg: "bg-blue-50" },
-              { icon: Activity, color: "bg-violet-600", title: "Smart AI Coaching", desc: "Your personal AI coach adapts to your progress, providing tailored workout plans, nutrition advice, and motivation when you need it most.", bg: "bg-violet-50" },
-              { icon: BarChart3, color: "bg-teal-600", title: "Deep Analytics", desc: "Visualize your progress with professional-grade analytics. Track muscle recovery, strength trends, and more with detailed insights.", bg: "bg-teal-50" },
+              { icon: Smartphone, color: "bg-blue-600", title: t("landing.card1Title"), desc: t("landing.card1Desc"), bg: "bg-blue-50" },
+              { icon: Activity, color: "bg-violet-600", title: t("landing.card2Title"), desc: t("landing.card2Desc"), bg: "bg-violet-50" },
+              { icon: BarChart3, color: "bg-teal-600", title: t("landing.card3Title"), desc: t("landing.card3Desc"), bg: "bg-teal-50" },
             ].map((item, i) => {
               const Icon = item.icon;
               return (
