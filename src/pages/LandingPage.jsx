@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import FormAnalysisShowcase from '../components/FormAnalysisShowcase';
 import MedicationShowcase from '../components/MedicationShowcase';
 import {
@@ -172,12 +173,14 @@ export default function LandingPage() {
             <button onClick={() => scrollTo('unique')}   className="text-sm font-medium text-gray-500 hover:text-emerald-600 transition-colors">What's Different</button>
             <button onClick={() => scrollTo('pricing')}  className="text-sm font-medium text-gray-500 hover:text-emerald-600 transition-colors">Pricing</button>
             <button onClick={() => scrollTo('faq')}      className="text-sm font-medium text-gray-500 hover:text-emerald-600 transition-colors">Help &amp; FAQ</button>
+            <LanguageSwitcher />
             <button onClick={goToLogin}  className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">Sign In</button>
             <button onClick={goToSignup} className="px-5 py-2 rounded-lg text-white text-sm font-semibold hover:opacity-90 transition-opacity" style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}>
               Get Started Free
             </button>
           </div>
           <div className="flex md:hidden gap-3">
+            <LanguageSwitcher compact />
             <button onClick={goToLogin}  className="px-4 py-2 rounded-lg border border-emerald-300 text-emerald-700 text-sm font-medium">Sign In</button>
             <button onClick={goToSignup} className="px-4 py-2 rounded-lg text-white text-sm font-semibold" style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}>Sign Up</button>
           </div>
