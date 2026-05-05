@@ -4,7 +4,8 @@ import { supabase } from '../lib/supabase'
 import { Pill, Edit, Trash2, AlertCircle, Calendar, Leaf } from 'lucide-react'
 
 // Map stored English values to translation keys for display
-const FREQUENCY_KEY_MAP = {
+// Build case-insensitive lookup helpers
+const _FREQUENCY_KEY_MAP = {
   'Once daily': 'medications.onceDaily',
   'Twice daily': 'medications.twiceDaily',
   'Three times daily': 'medications.threeTimesDaily',
@@ -13,7 +14,18 @@ const FREQUENCY_KEY_MAP = {
   'Once weekly': 'medications.onceWeekly',
   'As needed': 'medications.asNeeded',
 }
-const ROUTE_KEY_MAP = {
+const FREQUENCY_KEY_MAP = new Proxy(_FREQUENCY_KEY_MAP, {
+  get(target, key) {
+    if (typeof key !== 'string') return target[key]
+    // Exact match first
+    if (key in target) return target[key]
+    // Case-insensitive fallback
+    const lower = key.toLowerCase()
+    const found = Object.keys(target).find(k => k.toLowerCase() === lower)
+    return found ? target[found] : undefined
+  }
+})
+const _ROUTE_KEY_MAP = {
   'Oral': 'medications.oral',
   'Injection': 'medications.injection',
   'Topical': 'medications.topical',
@@ -27,6 +39,15 @@ const ROUTE_KEY_MAP = {
   'Otic': 'medications.otic',
   'Other': 'medications.other',
 }
+const ROUTE_KEY_MAP = new Proxy(_ROUTE_KEY_MAP, {
+  get(target, key) {
+    if (typeof key !== 'string') return target[key]
+    if (key in target) return target[key]
+    const lower = key.toLowerCase()
+    const found = Object.keys(target).find(k => k.toLowerCase() === lower)
+    return found ? target[found] : undefined
+  }
+})
 
 export default function MedicationList({ user, onAddMedication }) {
   const { t } = useTranslation()

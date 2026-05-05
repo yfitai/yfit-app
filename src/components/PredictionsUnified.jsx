@@ -1514,7 +1514,7 @@ export default function PredictionsUnified({ user }) {
             </div>
             {predictions.weightLoss.isLowDataWarning && (
               <div className="bg-yellow-400/20 border border-yellow-300/40 rounded-lg p-3 text-sm mb-3">
-                ⚠️ <strong>Early estimate:</strong> Only {predictions.weightLoss.daysOfData} day{predictions.weightLoss.daysOfData !== 1 ? 's' : ''} of data — weekly rate capped at ±5 lbs/week. Log weight daily for 7+ days for accurate projections.
+                ⚠️ <strong>{t('common.earlyEstimate', 'Early estimate')}:</strong> {t('common.daysOfData', '{{count}} day of data', { count: predictions.weightLoss.daysOfData })} — {t('common.weeklyCapped', 'weekly rate capped at ±5 lbs/week')}. {t('common.logWeightDaily', 'Log weight daily for 7+ days for accurate projections')}.
               </div>
             )}
             <div className="bg-white/10 rounded-lg p-3 text-sm">
@@ -1558,8 +1558,14 @@ export default function PredictionsUnified({ user }) {
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">{t('predictions.activityLevel')}</div>
-                <div className="text-2xl font-bold capitalize">{predictions.tdee.activityLevel}</div>
-                <div className="text-sm opacity-75">{predictions.tdee.workoutsPerWeek}x/week</div>
+                <div className="text-2xl font-bold capitalize">
+                  {predictions.tdee.activityLevel === 'sedentary' ? t('goals.sedentaryLabel', 'Sedentary') :
+                   predictions.tdee.activityLevel === 'lightly active' ? t('goals.lightlyActiveLabel', 'Lightly Active') :
+                   predictions.tdee.activityLevel === 'active' ? t('goals.activeLabel', 'Active') :
+                   predictions.tdee.activityLevel === 'very active' ? t('goals.veryActiveLabel', 'Very Active') :
+                   predictions.tdee.activityLevel}
+                </div>
+                <div className="text-sm opacity-75">{t('common.xPerWeek', '{{count}}x/week', { count: predictions.tdee.workoutsPerWeek })}</div>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1584,7 +1590,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Flame className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.calorieNeedsTDEE')}</h3>
-            <p className="text-teal-700">Log 7+ days of weight and nutrition to calculate TDEE</p>
+            <p className="text-teal-700">{t('predictions.log7DaysTDEE', 'Log 7+ days of weight and nutrition to calculate TDEE')}</p>
           </div>
         )}
 
@@ -1639,7 +1645,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <AlertTriangle className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.injuryRiskAssessment')}</h3>
-            <p className="text-teal-700">Log 3+ strength workouts to assess injury risk</p>
+            <p className="text-teal-700">{t('predictions.log3StrengthWorkouts', 'Log 3+ strength workouts to assess injury risk')}</p>
           </div>
         )}
 
@@ -1692,7 +1698,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.deloadWeekPredictor')}</h3>
-            <p className="text-teal-700">Log 8+ workouts across 3+ weeks to predict deload timing</p>
+            <p className="text-teal-700">{t('predictions.log8WorkoutsDeload', 'Log 8+ workouts across 3+ weeks to predict deload timing')}</p>
           </div>
         )}
 
@@ -1830,7 +1836,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Clock className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.optimalTrainingTime')}</h3>
-            <p className="text-teal-700">Log 10+ workouts at different times to find your peak performance window</p>
+            <p className="text-teal-700">{t('predictions.log10WorkoutsOptimal', 'Log 10+ workouts at different times to find your peak performance window')}</p>
           </div>
         )}
 
@@ -1880,7 +1886,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.bodyRecompForecast')}</h3>
-            <p className="text-teal-700">Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition</p>
+            <p className="text-teal-700">{t('predictions.log7DaysBodyRecomp', 'Log 7+ days of weight, 10+ workouts, and nutrition to forecast body composition')}</p>
           </div>
         )}
 
@@ -1995,7 +2001,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <Activity className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.bpGoalTracking')}</h3>
-            <p className="text-teal-700">Log 7+ blood pressure readings in Daily Tracker to track progress</p>
+            <p className="text-teal-700">{t('predictions.log7BPReadings', 'Log 7+ blood pressure readings in Daily Tracker to track progress')}</p>
           </div>
         )}
 
@@ -2072,7 +2078,7 @@ export default function PredictionsUnified({ user }) {
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-8 text-center mb-6">
             <TrendingUp className="w-12 h-12 text-teal-300 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('predictions.glucoseGoalTracking')}</h3>
-            <p className="text-teal-700">Log 7+ blood glucose readings in Daily Tracker to track progress</p>
+            <p className="text-teal-700">{t('predictions.log7GlucoseReadings', 'Log 7+ blood glucose readings in Daily Tracker to track progress')}</p>
           </div>
         )}
 

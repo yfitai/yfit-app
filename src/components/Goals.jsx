@@ -947,8 +947,8 @@ export default function Goals({ user: propUser }) {
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
                   {goalType === 'lose_weight' 
-                    ? 'Faster weight loss may result in muscle loss. 1-1.5 lbs/week is optimal for most people.'
-                    : 'Slower weight gain minimizes fat gain. 0.5-1 lb/week is optimal for lean muscle growth.'}
+                    ? t('goals.fasterWeightLoss', 'Faster weight loss may result in muscle loss. 1-1.5 lbs/week is optimal for most people.')
+                    : t('goals.slowerWeightGain', 'Slower weight gain minimizes fat gain. 0.5-1 lb/week is optimal for lean muscle growth.')}
                 </p>
               </div>
             )}

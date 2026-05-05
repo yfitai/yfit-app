@@ -57,69 +57,70 @@ const FormAnalysisLive = ({ preSelectedExerciseName }) => {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
 
-// Exercise options (10 total exercises)
-const exercises = [
+// Exercise options — translated via i18n
+  const exercises = React.useMemo(() => [
   { 
     id: 'squat', 
-    name: 'Bodyweight Squat', 
-    description: 'Stand with feet shoulder-width apart',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.bodyweightSquat', 'Bodyweight Squat'), 
+    description: t('fitness.bodyweightSquatDesc', 'Stand with feet shoulder-width apart'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'pushup', 
-    name: 'Push-Up', 
-    description: 'Start in plank position',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.pushUp', 'Push-Up'), 
+    description: t('fitness.pushUpDesc', 'Start in plank position'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'plank', 
-    name: 'Plank Hold', 
-    description: 'Hold plank position with proper form',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.plankHold', 'Plank Hold'), 
+    description: t('fitness.plankHoldDesc', 'Hold plank position with proper form'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'situp', 
-    name: 'Sit-Up', 
-    description: 'Lie on your back with knees bent',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.sitUp', 'Sit-Up'), 
+    description: t('fitness.sitUpDesc', 'Lie on your back with knees bent'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'deadlift', 
-    name: 'Deadlift', 
-    description: 'Stand with feet hip-width apart, barbell over mid-foot',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.deadlift', 'Deadlift'), 
+    description: t('fitness.deadliftDesc', 'Stand with feet hip-width apart, barbell over mid-foot'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'benchpress', 
-    name: 'Bench Press', 
-    description: 'Lie on bench with feet flat on floor',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.benchPress', 'Bench Press'), 
+    description: t('fitness.benchPressDesc', 'Lie on bench with feet flat on floor'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   },
   { 
     id: 'lateralraise', 
-    name: 'Lateral Raise', 
-    description: 'Stand with dumbbells at sides',
-    cameraAngle: '📸 Front view recommended'
+    name: t('fitness.lateralRaise', 'Lateral Raise'), 
+    description: t('fitness.lateralRaiseDesc', 'Stand with dumbbells at sides'),
+    cameraAngle: t('fitness.frontViewRecommended', '📸 Front view recommended')
   },
   { 
     id: 'preachercurl', 
-    name: 'Preacher Curl', 
-    description: 'Sit at preacher bench with arms extended',
-    cameraAngle: '📸 Front view recommended'
+    name: t('fitness.preacherCurl', 'Preacher Curl'), 
+    description: t('fitness.preacherCurlDesc', 'Sit at preacher bench with arms extended'),
+    cameraAngle: t('fitness.frontViewRecommended', '📸 Front view recommended')
   },
   { 
     id: 'bicepcurl', 
-    name: 'Bicep Curl', 
-    description: 'Stand with dumbbells at sides, palms forward',
-    cameraAngle: '📸 Front view recommended'
+    name: t('fitness.bicepCurl', 'Bicep Curl'), 
+    description: t('fitness.bicepCurlDesc', 'Stand with dumbbells at sides, palms forward'),
+    cameraAngle: t('fitness.frontViewRecommended', '📸 Front view recommended')
   },
   { 
     id: 'bentoverrow', 
-    name: 'Dumbbell Bent Over Row', 
-    description: 'Bend at hips with back straight, dumbbells hanging',
-    cameraAngle: '📸 Side view recommended'
+    name: t('fitness.dumbbellBentOverRow', 'Dumbbell Bent Over Row'), 
+    description: t('fitness.dumbbellBentOverRowDesc', 'Bend at hips with back straight, dumbbells hanging'),
+    cameraAngle: t('fitness.sideViewRecommended', '📸 Side view recommended')
   }
-];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [t]);
 
 
   useEffect(() => {

@@ -263,18 +263,18 @@ export default function ProgressPhotos({ userId }) {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">{analytics.daysBetween}</div>
-              <div className="text-sm text-gray-600">Days Tracked</div>
+              <div className="text-sm text-gray-600">{t('progress.daysTracked', 'Days Tracked')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600">{analytics.consistency}</div>
-              <div className="text-sm text-gray-600">Consistency</div>
+              <div className="text-sm text-gray-600">{t('progress.consistency', 'Consistency')}</div>
             </div>
           </div>
           
           <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
-              <h3 className="font-semibold text-gray-900">Progress Insights</h3>
+              <h3 className="font-semibold text-gray-900">{t('progress.progressInsights', 'Progress Insights')}</h3>
             </div>
             <ul className="space-y-1">
               {analytics.insights.map((insight, idx) => (
@@ -298,7 +298,7 @@ export default function ProgressPhotos({ userId }) {
               className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <CameraIcon className="w-5 h-5" />
-              Take {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
+              {viewType === 'front' ? t('progress.takeFront', 'Take Front') : viewType === 'side' ? t('progress.takeSide', 'Take Side') : t('progress.takeBack', 'Take Back')}
             </button>
             
             <label className="block">
@@ -311,7 +311,7 @@ export default function ProgressPhotos({ userId }) {
               />
               <div className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer text-center flex items-center justify-center gap-2">
                 <Upload className="w-4 h-4" />
-                Upload {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
+                {viewType === 'front' ? t('progress.uploadFront', 'Upload Front') : viewType === 'side' ? t('progress.uploadSide', 'Upload Side') : t('progress.uploadBack', 'Upload Back')}
               </div>
             </label>
           </div>
