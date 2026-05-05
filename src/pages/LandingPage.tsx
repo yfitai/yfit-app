@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import FormAnalysisShowcase from "@/components/FormAnalysisShowcase";
 import MedicationShowcase from "@/components/MedicationShowcase";
@@ -235,13 +236,15 @@ export default function LandingPage() {
             <button onClick={scrollToFeatures} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Features</button>
             <button onClick={scrollToPricing} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</button>
             <button onClick={goToContact} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Contact</button>
+            <LanguageSwitcher compact={false} />
             <Button onClick={goToSignIn} variant="outline" size="sm">Sign In</Button>
             <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white">
               Get Started
             </Button>
           </div>
           {/* Mobile nav */}
-          <div className="md:hidden flex gap-2">
+          <div className="md:hidden flex gap-2 items-center">
+            <LanguageSwitcher compact={true} />
             <Button onClick={goToSignIn} variant="outline" size="sm">Sign In</Button>
             <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">Start</Button>
           </div>
