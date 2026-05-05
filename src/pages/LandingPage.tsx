@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import FormAnalysisShowcase from "@/components/FormAnalysisShowcase";
@@ -11,6 +12,7 @@ import './LandingPage.css';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const scrollToPricing = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
@@ -58,59 +60,99 @@ export default function LandingPage() {
   const features = [
     {
       icon: Target,
-      title: "Goals",
-      description: "Set and track personalized fitness goals tailored to your unique journey",
+      title: t("landing.features.goals.title"),
+      description: t("landing.features.goals.description"),
       cardBg: "bg-blue-600",
-      features: ["Set personalized fitness targets", "Track body measurements", "Calculate BMI and body fat", "Adjust goals based on progress"]
+      features: [
+        t("landing.features.goals.f1"),
+        t("landing.features.goals.f2"),
+        t("landing.features.goals.f3"),
+        t("landing.features.goals.f4"),
+      ]
     },
     {
       icon: Apple,
-      title: "Nutrition",
-      description: "Scan barcodes, log meals, and track macros with AI-powered nutrition insights",
+      title: t("landing.features.nutrition.title"),
+      description: t("landing.features.nutrition.description"),
       cardBg: "bg-green-600",
-      features: ["Barcode scanning for quick logging", "Track macros and calories", "AI-powered meal suggestions", "Nutritional insights and reports"]
+      features: [
+        t("landing.features.nutrition.f1"),
+        t("landing.features.nutrition.f2"),
+        t("landing.features.nutrition.f3"),
+        t("landing.features.nutrition.f4"),
+      ]
     },
     {
       icon: Dumbbell,
-      title: "Fitness",
-      description: "Access personalized workout plans with real-time form analysis and coaching",
+      title: t("landing.features.fitness.title"),
+      description: t("landing.features.fitness.description"),
       cardBg: "bg-purple-600",
-      features: ["Personalized workout plans", "Real-time form analysis", "Exercise demonstrations", "Progressive overload tracking"]
+      features: [
+        t("landing.features.fitness.f1"),
+        t("landing.features.fitness.f2"),
+        t("landing.features.fitness.f3"),
+        t("landing.features.fitness.f4"),
+      ]
     },
     {
       icon: Calendar,
-      title: "Daily Tracker",
-      description: "Log your daily activities, meals, workouts, and medications in one place",
+      title: t("landing.features.dailyTracker.title"),
+      description: t("landing.features.dailyTracker.description"),
       cardBg: "bg-orange-600",
-      features: ["Log daily activities", "Track meals and workouts", "Monitor medications", "Daily progress overview"]
+      features: [
+        t("landing.features.dailyTracker.f1"),
+        t("landing.features.dailyTracker.f2"),
+        t("landing.features.dailyTracker.f3"),
+        t("landing.features.dailyTracker.f4"),
+      ]
     },
     {
       icon: Pill,
-      title: "Medications",
-      description: "Track prescriptions, supplements, and generate provider reports for doctor visits",
+      title: t("landing.features.medications.title"),
+      description: t("landing.features.medications.description"),
       cardBg: "bg-pink-600",
-      features: ["Track prescriptions and supplements", "Generate provider reports", "Monitor medication schedules", "Health integration"]
+      features: [
+        t("landing.features.medications.f1"),
+        t("landing.features.medications.f2"),
+        t("landing.features.medications.f3"),
+        t("landing.features.medications.f4"),
+      ]
     },
     {
       icon: BarChart3,
-      title: "Progress",
-      description: "Visualize your transformation with detailed analytics and progress photos",
+      title: t("landing.features.progress.title"),
+      description: t("landing.features.progress.description"),
       cardBg: "bg-teal-600",
-      features: ["Visual progress charts", "Body measurement tracking", "Progress photo comparisons", "Milestone celebrations"]
+      features: [
+        t("landing.features.progress.f1"),
+        t("landing.features.progress.f2"),
+        t("landing.features.progress.f3"),
+        t("landing.features.progress.f4"),
+      ]
     },
     {
       icon: TrendingUp,
-      title: "Predictions",
-      description: "AI-powered forecasts for your weight, strength, and fitness milestones",
+      title: t("landing.features.predictions.title"),
+      description: t("landing.features.predictions.description"),
       cardBg: "bg-indigo-600",
-      features: ["AI weight forecasting", "Strength progression predictions", "Goal timeline estimates", "Personalized insights"]
+      features: [
+        t("landing.features.predictions.f1"),
+        t("landing.features.predictions.f2"),
+        t("landing.features.predictions.f3"),
+        t("landing.features.predictions.f4"),
+      ]
     },
     {
       icon: Brain,
-      title: "AI Coach",
-      description: "Your 24/7 intelligent fitness companion providing personalized guidance",
+      title: t("landing.features.aiCoach.title"),
+      description: t("landing.features.aiCoach.description"),
       cardBg: "bg-violet-600",
-      features: ["24/7 AI coaching", "Personalized workout advice", "Nutrition recommendations", "Motivation and support"]
+      features: [
+        t("landing.features.aiCoach.f1"),
+        t("landing.features.aiCoach.f2"),
+        t("landing.features.aiCoach.f3"),
+        t("landing.features.aiCoach.f4"),
+      ]
     },
   ];
 
@@ -223,7 +265,7 @@ export default function LandingPage() {
     <div className="landing-page min-h-screen flex flex-col">
       {/* Limited Time Offer Banner */}
       <div className="w-full bg-gradient-to-r from-primary to-accent text-white py-3 text-center font-semibold text-sm md:text-base">
-        🎉 LIMITED TIME OFFER: Get 1 Month FREE on All Pro Plans! 🎉
+        {t("landing.banner")}
       </div>
 
       {/* Navigation */}
@@ -233,20 +275,20 @@ export default function LandingPage() {
             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI Logo" className="h-10 w-auto object-contain" />
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <button onClick={scrollToFeatures} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Features</button>
-            <button onClick={scrollToPricing} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</button>
-            <button onClick={goToContact} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Contact</button>
+            <button onClick={scrollToFeatures} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("landing.nav.features")}</button>
+            <button onClick={scrollToPricing} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("landing.nav.pricing")}</button>
+            <button onClick={goToContact} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t("landing.nav.contact")}</button>
             <LanguageSwitcher compact={false} />
-            <Button onClick={goToSignIn} variant="outline" size="sm">Sign In</Button>
+            <Button onClick={goToSignIn} variant="outline" size="sm">{t("landing.nav.signIn")}</Button>
             <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white">
-              Get Started
+              {t("landing.nav.getStarted")}
             </Button>
           </div>
           {/* Mobile nav */}
           <div className="md:hidden flex gap-2 items-center">
             <LanguageSwitcher compact={true} />
-            <Button onClick={goToSignIn} variant="outline" size="sm">Sign In</Button>
-            <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">Start</Button>
+            <Button onClick={goToSignIn} variant="outline" size="sm">{t("landing.nav.signIn")}</Button>
+            <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">{t("landing.nav.start")}</Button>
           </div>
         </div>
       </nav>
@@ -258,22 +300,22 @@ export default function LandingPage() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-600/10 border border-green-600/20 text-green-700 text-sm font-medium">
                 <Zap className="w-4 h-4" />
-                <span>The only all in one health and fitness app that tracks everything</span>
+                <span>{t("landing.hero.badge")}</span>
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight text-foreground">
-                Finally, a health and fitness app that tracks your medications and{" "}
-                <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">analyses your exercises.</span>
+                {t("landing.hero.headline1")}{" "}
+                <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">{t("landing.hero.headline2")}</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-lg leading-relaxed">
-                YFIT AI is a hybrid, human and AI app that combines AI coaching, nutrition tracking, and medication-aware workout plans — all in one app. Built to help busy people who want an all in one plan for improved health.
+                {t("landing.hero.subtext")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 text-white shadow-lg">
-                  Start Free — No Credit Card Required
+                  {t("landing.hero.ctaPrimary")}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <Button onClick={scrollToPricing} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
-                  View Pricing
+                  {t("landing.hero.ctaSecondary")}
                 </Button>
               </div>
               {/* Social proof strip */}
@@ -284,11 +326,11 @@ export default function LandingPage() {
                       <div key={i} className={`w-7 h-7 rounded-full ${c} border-2 border-white flex items-center justify-center text-white text-xs font-bold`}>{["J","S","M","A"][i]}</div>
                     ))}
                   </div>
-                  <span><strong className="text-foreground">Join our growing community</strong> of early adopters</span>
+                  <span><strong className="text-foreground">{t("landing.hero.socialProof")}</strong> {t("landing.hero.socialProofSub")}</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm">
                   {[1,2,3,4,5].map(i => <span key={i} className="text-yellow-400">★</span>)}
-                  <span className="text-muted-foreground ml-1">Early access members</span>
+                  <span className="text-muted-foreground ml-1">{t("landing.hero.earlyAccess")}</span>
                 </div>
               </div>
             </div>
@@ -297,12 +339,12 @@ export default function LandingPage() {
             <div className="relative">
               <div className="absolute -inset-8 bg-gradient-to-r from-blue-600/10 to-violet-600/10 opacity-50 blur-3xl rounded-full" />
               <div className="relative bg-white rounded-2xl border border-gray-200 shadow-2xl p-6 space-y-3">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">App Features Preview</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">{t("landing.hero.appPreviewTitle")}</p>
                 {[
-                  { label: "Set Goals", sub: "Personalized targets", color: "bg-blue-600", textColor: "text-blue-700", bgLight: "bg-blue-50" },
-                  { label: "Track Nutrition", sub: "Scan barcodes", color: "bg-green-600", textColor: "text-green-700", bgLight: "bg-green-50" },
-                  { label: "AI Form Analysis", sub: "Real-time coaching", color: "bg-purple-600", textColor: "text-purple-700", bgLight: "bg-purple-50" },
-                  { label: "Track Medications", sub: "Provider reports", color: "bg-pink-600", textColor: "text-pink-700", bgLight: "bg-pink-50" },
+                  { label: t("landing.hero.previewGoals"), sub: t("landing.hero.previewGoalsSub"), color: "bg-blue-600", textColor: "text-blue-700", bgLight: "bg-blue-50" },
+                  { label: t("landing.hero.previewNutrition"), sub: t("landing.hero.previewNutritionSub"), color: "bg-green-600", textColor: "text-green-700", bgLight: "bg-green-50" },
+                  { label: t("landing.hero.previewForm"), sub: t("landing.hero.previewFormSub"), color: "bg-purple-600", textColor: "text-purple-700", bgLight: "bg-purple-50" },
+                  { label: t("landing.hero.previewMeds"), sub: t("landing.hero.previewMedsSub"), color: "bg-pink-600", textColor: "text-pink-700", bgLight: "bg-pink-50" },
                 ].map((item, i) => (
                   <div key={i} className={`flex items-center gap-4 p-3 rounded-xl ${item.bgLight} border border-gray-100`}>
                     <div className={`w-10 h-10 rounded-lg ${item.color} flex items-center justify-center flex-shrink-0`}>
@@ -323,41 +365,41 @@ export default function LandingPage() {
       {/* Social Proof Section */}
       <section className="py-12 bg-white border-y border-gray-100">
         <div className="container mx-auto px-6">
-          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">What early users are saying</p>
+          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">{t("landing.testimonials.sectionTitle")}</p>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
               {
-                quote: "Finally an app that lets me track my blood pressure meds alongside my workouts. My doctor loves the reports it generates.",
-                name: "Sarah M.",
-                role: "Beta Tester · Vancouver, BC",
+                quote: t("landing.testimonials.quote1"),
+                name: t("landing.testimonials.name1"),
+                role: t("landing.testimonials.role1"),
                 avatar: "S",
                 color: "bg-green-500"
               },
               {
-                quote: "The AI form analysis caught my squat form issue that was causing knee pain. Three weeks in and the pain is gone.",
-                name: "James R.",
-                role: "Beta Tester · Toronto, ON",
+                quote: t("landing.testimonials.quote2"),
+                name: t("landing.testimonials.name2"),
+                role: t("landing.testimonials.role2"),
                 avatar: "J",
                 color: "bg-blue-500"
               },
               {
-                quote: "I've tried MyFitnessPal, Noom, and five others. YFIT is the first one that actually connects everything — nutrition, meds, and workouts in one place.",
-                name: "Maria T.",
-                role: "Beta Tester · Calgary, AB",
+                quote: t("landing.testimonials.quote3"),
+                name: t("landing.testimonials.name3"),
+                role: t("landing.testimonials.role3"),
                 avatar: "M",
                 color: "bg-violet-500"
               }
-            ].map((t, i) => (
+            ].map((testimonial, i) => (
               <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 flex flex-col gap-4">
                 <div className="flex gap-1">
                   {[1,2,3,4,5].map(s => <span key={s} className="text-yellow-400 text-sm">★</span>)}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.quote}"</p>
+                <p className="text-sm text-muted-foreground leading-relaxed italic">"{testimonial.quote}"</p>
                 <div className="flex items-center gap-3 mt-auto">
-                  <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>{t.avatar}</div>
+                  <div className={`w-9 h-9 rounded-full ${testimonial.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>{testimonial.avatar}</div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                    <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -376,9 +418,9 @@ export default function LandingPage() {
       <section id="features" className="py-20 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">Everything You Need</h2>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.features.sectionTitle")}</h2>
             <p className="text-lg text-muted-foreground">
-              YFIT AI provides 8 powerful tools to help you achieve your fitness goals with personalized AI guidance.
+              {t("landing.features.sectionSubtitle")}
             </p>
           </div>
 
@@ -412,11 +454,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-block mb-4 px-4 py-2 rounded-full bg-violet-100 border border-violet-200 text-violet-700 text-sm font-bold">
-              EXCLUSIVE FEATURES
+              {t("landing.unique.badge")}
             </div>
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">What Makes YFIT Different</h2>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.unique.sectionTitle")}</h2>
             <p className="text-lg text-muted-foreground">
-              While other apps focus on basic tracking, YFIT offers features you won't find anywhere else.
+              {t("landing.unique.sectionSubtitle")}
             </p>
           </div>
 
@@ -427,22 +469,22 @@ export default function LandingPage() {
                 <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
                   <Pill className="w-8 h-8 text-white" />
                 </div>
-                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">EXCLUSIVE FEATURE</span>
+                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">{t("landing.unique.medBadge")}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-2">Medication-Aware Fitness</h3>
-              <p className="text-white/80 text-sm mb-4">The only fitness app that integrates your prescriptions</p>
+              <h3 className="text-2xl font-bold mb-2">{t("landing.unique.medTitle")}</h3>
+              <p className="text-white/80 text-sm mb-4">{t("landing.unique.medSubtitle")}</p>
               <div className="bg-white/10 rounded-xl p-4 mb-6">
                 <p className="text-white/90 text-sm leading-relaxed">
-                  <strong>66% of adults</strong> take at least one prescription medication. Yet every other fitness app ignores this entirely. YFIT tracks your medications alongside your workouts and nutrition — and generates professional reports your doctor can actually use.
+                  <strong>{t("landing.unique.medStat")}</strong> {t("landing.unique.medStatText")}
                 </p>
               </div>
               <ul className="space-y-2">
                 {[
-                  "Smart reminders synced to your workout schedule",
-                  "Track supplements, vitamins & prescriptions",
-                  "Generate provider reports for doctor visits",
-                  "AI Coach considers your medications in advice",
-                  "Monitor how medications affect your performance"
+                  t("landing.unique.medF1"),
+                  t("landing.unique.medF2"),
+                  t("landing.unique.medF3"),
+                  t("landing.unique.medF4"),
+                  t("landing.unique.medF5"),
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-white/90">
                     <Check className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
@@ -451,7 +493,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Button onClick={goToSignUp} className="mt-6 w-full bg-white text-blue-700 hover:bg-blue-50 font-semibold">
-                Try It Free
+                {t("landing.unique.medCta")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -462,10 +504,10 @@ export default function LandingPage() {
                 <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
                   <Eye className="w-8 h-8 text-white" />
                 </div>
-                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">AI-POWERED</span>
+                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">{t("landing.unique.formBadge")}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-2">Real-Time Form Analysis</h3>
-              <p className="text-white/80 text-sm mb-4">Your personal AI trainer watching every rep</p>
+              <h3 className="text-2xl font-bold mb-2">{t("landing.unique.formTitle")}</h3>
+              <p className="text-white/80 text-sm mb-4">{t("landing.unique.formSubtitle")}</p>
               <div className="bg-white/10 rounded-xl p-4 mb-6">
                 <p className="text-white/90 text-sm leading-relaxed">
                   <strong>67% of gym injuries</strong> are caused by poor form. YFIT's AI analyzes your movement in real-time using your device camera, giving instant audio and visual corrections before injury happens.
@@ -486,7 +528,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Button onClick={goToSignUp} className="mt-6 w-full bg-white text-teal-700 hover:bg-teal-50 font-semibold">
-                Try It Free
+                {t("landing.unique.medCta")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -500,11 +542,11 @@ export default function LandingPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 border border-orange-300 text-orange-700 text-sm font-bold mb-4">
               <Zap className="w-4 h-4" />
-              Limited Time: Get 1 Month FREE on any Pro plan
+              {t("landing.pricing.offerBadge")}
             </div>
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">Start Free. Upgrade When Ready.</h2>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.pricing.sectionTitle")}</h2>
             <p className="text-lg text-muted-foreground">
-              No credit card required to start. Cancel anytime. Your first Pro month is on us.
+              {t("landing.pricing.sectionSubtitle")}
             </p>
           </div>
 
@@ -519,10 +561,10 @@ export default function LandingPage() {
                     </span>
                   </div>
                 )}
-                <Card className={`flex flex-col h-full ${plan.highlighted ? 'border-green-500 shadow-xl ring-2 ring-green-500/30' : plan.isOffer ? 'border-orange-400 bg-orange-50' : 'border-gray-200'} ${plan.badge ? 'pt-2' : ''}`}>
+                <Card className={`flex flex-col h-full ${plan.highlighted ? 'border-green-500 shadow-xl ring-2 ring-green-500/30' : (plan as any).isOffer ? 'border-orange-400 bg-orange-50' : 'border-gray-200'} ${plan.badge ? 'pt-2' : ''}`}>
                   <CardHeader className="pb-4">
-                    <CardTitle className={`text-lg ${plan.isOffer ? 'text-orange-600' : plan.highlighted ? 'text-green-700' : ''}`}>{plan.name}</CardTitle>
-                    <div className={`text-2xl font-bold mt-1 ${plan.isOffer ? 'text-orange-600' : ''}`}>
+                    <CardTitle className={`text-lg ${(plan as any).isOffer ? 'text-orange-600' : plan.highlighted ? 'text-green-700' : ''}`}>{plan.name}</CardTitle>
+                    <div className={`text-2xl font-bold mt-1 ${(plan as any).isOffer ? 'text-orange-600' : ''}`}>
                       {plan.price}
                       <span className="text-sm font-normal text-muted-foreground">{plan.period}</span>
                     </div>
@@ -532,7 +574,7 @@ export default function LandingPage() {
                     <ul className="space-y-2">
                       {plan.features.map((f, i) => (
                         <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                          <Check className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${plan.isOffer ? 'text-orange-500' : plan.highlighted ? 'text-green-600' : 'text-primary'}`} />
+                          <Check className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${(plan as any).isOffer ? 'text-orange-500' : plan.highlighted ? 'text-green-600' : 'text-primary'}`} />
                           {f}
                         </li>
                       ))}
@@ -555,11 +597,11 @@ export default function LandingPage() {
                         }
                       }}
                       disabled={checkoutLoading === plan.stripeKey}
-                      className={`w-full text-sm ${plan.isOffer ? 'bg-orange-500 hover:bg-orange-600 text-white' : plan.highlighted ? 'bg-green-600 hover:bg-green-700 text-white' : plan.buttonStyle === 'outline' ? '' : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white'}`}
+                      className={`w-full text-sm ${(plan as any).isOffer ? 'bg-orange-500 hover:bg-orange-600 text-white' : plan.highlighted ? 'bg-green-600 hover:bg-green-700 text-white' : plan.buttonStyle === 'outline' ? '' : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white'}`}
                       variant={plan.buttonStyle === 'outline' ? 'outline' : 'default'}
                     >
                       {checkoutLoading === plan.stripeKey ? (
-                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("landing.pricing.processing")}</>
                       ) : (
                         plan.buttonText
                       )}
@@ -581,15 +623,15 @@ export default function LandingPage() {
                 <svg className="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.341 14.63 12l2.893-3.341A1 1 0 0 0 16.77 7H7.23a1 1 0 0 0-.753 1.659L9.37 12l-2.893 3.341A1 1 0 0 0 7.23 17h9.54a1 1 0 0 0 .753-1.659z"/></svg>
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">Using YFIT on Android?</p>
-                <p className="text-green-300 text-xs mt-0.5">Subscribe on our website and pay less — no app store fees added to your plan price.</p>
+                <p className="text-white font-semibold text-sm">{t("landing.unique.androidTitle")}</p>
+                <p className="text-green-300 text-xs mt-0.5">{t("landing.unique.androidSubtitle")}</p>
               </div>
             </div>
             <button
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
               className="flex-shrink-0 inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-green-500/25 whitespace-nowrap"
             >
-              View Plans
+              {t("landing.unique.androidCta")}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
             </button>
           </div>
@@ -600,31 +642,31 @@ export default function LandingPage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 lg:px-6">
           <div className="text-center max-w-3xl mx-auto mb-10">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">Compare Plans</h2>
-            <p className="text-muted-foreground text-lg">Everything you need to choose the right plan for your fitness journey.</p>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">{t("landing.pricing.comparePlansTitle")}</h2>
+            <p className="text-muted-foreground text-lg">{t("landing.pricing.comparePlansSubtitle")}</p>
           </div>
           <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-900 text-white">
                   <th className="text-left px-5 py-4 font-semibold w-52">Feature</th>
-                  <th className="text-center px-4 py-4 font-semibold">Free</th>
-                  <th className="text-center px-4 py-4 font-semibold">Pro Monthly</th>
-                  <th className="text-center px-4 py-4 font-semibold bg-green-700">Pro Yearly</th>
-                  <th className="text-center px-4 py-4 font-semibold bg-violet-700">Pro Lifetime</th>
+                  <th className="text-center px-4 py-4 font-semibold">{t("landing.pricing.colFree")}</th>
+                  <th className="text-center px-4 py-4 font-semibold">{t("landing.pricing.colMonthly")}</th>
+                  <th className="text-center px-4 py-4 font-semibold bg-green-700">{t("landing.pricing.colYearly")}</th>
+                  <th className="text-center px-4 py-4 font-semibold bg-violet-700">{t("landing.pricing.colLifetime")}</th>
                 </tr>
                 <tr className="bg-gray-800 text-gray-300 text-xs">
-                  <td className="px-5 py-2 text-gray-400">Price</td>
+                  <td className="px-5 py-2 text-gray-400">{t("landing.pricing.rowPrice")}</td>
                   <td className="text-center px-4 py-2 font-medium text-white">$0</td>
                   <td className="text-center px-4 py-2 font-medium text-white">$12.99/mo</td>
                   <td className="text-center px-4 py-2 font-medium text-white bg-green-900">$99.99/yr</td>
                   <td className="text-center px-4 py-2 font-medium text-white bg-violet-900">$249.99 once</td>
                 </tr>
                 <tr className="bg-orange-50 text-xs border-b border-orange-100">
-                  <td className="px-5 py-2 text-gray-500 italic">Promotional Offer</td>
+                  <td className="px-5 py-2 text-gray-500 italic">{t("landing.pricing.rowPromo")}</td>
                   <td className="text-center px-4 py-2 text-gray-400">—</td>
-                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">+1 Month FREE</td>
-                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">+1 Month FREE</td>
+                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">{t("landing.pricing.promoMonthly")}</td>
+                  <td className="text-center px-4 py-2 text-orange-600 font-semibold">{t("landing.pricing.promoYearly")}</td>
                   <td className="text-center px-4 py-2 text-gray-400">—</td>
                 </tr>
               </thead>
@@ -632,7 +674,7 @@ export default function LandingPage() {
                 {/* Section header helper */}
                 {([
                   {
-                    section: "TRACKING",
+                    section: t("landing.pricing.sectionTracking"),
                     rows: [
                       { label: "Basic Workout Tracking",   free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Manual Meal Logging",       free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -645,7 +687,7 @@ export default function LandingPage() {
                     ]
                   },
                   {
-                    section: "AI FEATURES",
+                    section: t("landing.pricing.sectionAI"),
                     rows: [
                       { label: "AI Form Analysis",          free: "3/month", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
                       { label: "AI Coach",                  free: "Limited", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
@@ -655,7 +697,7 @@ export default function LandingPage() {
                     ]
                   },
                   {
-                    section: "PLANNING",
+                    section: t("landing.pricing.sectionPlanning"),
                     rows: [
                       { label: "Saved Workout Routines",    free: "2", monthly: "Unlimited", yearly: "Unlimited", lifetime: "Unlimited" },
                       { label: "Grocery Lists",             free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -664,7 +706,7 @@ export default function LandingPage() {
                     ]
                   },
                   {
-                    section: "ANALYTICS",
+                    section: t("landing.pricing.sectionAnalytics"),
                     rows: [
                       { label: "Basic Progress Charts",     free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Advanced Analytics",        free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -672,7 +714,7 @@ export default function LandingPage() {
                     ]
                   },
                   {
-                    section: "SUPPORT & PERKS",
+                    section: t("landing.pricing.sectionSupport"),
                     rows: [
                       { label: "Community Support",         free: "✅", monthly: "✅", yearly: "✅", lifetime: "✅" },
                       { label: "Priority Support",          free: "❌", monthly: "✅", yearly: "✅", lifetime: "✅" },
@@ -809,19 +851,19 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-sm font-semibold mb-6">
             <Zap className="w-4 h-4" />
-            No credit card required · Free forever plan available
+            {t("landing.cta.badge")}
           </div>
-          <h2 className="text-3xl lg:text-5xl font-bold mb-6">The fitness app that actually knows you.</h2>
+          <h2 className="text-3xl lg:text-5xl font-bold mb-6">{t("landing.cta.headline")}</h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Medications, workouts, nutrition, and AI coaching — all connected. Start free today.
+            {t("landing.cta.subtext")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-white text-green-700 hover:bg-gray-100 shadow-lg font-semibold">
-              Start Free — No Credit Card Required
+              {t("landing.cta.primary")}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button onClick={scrollToPricing} size="lg" variant="outline" className="text-lg px-8 border-white text-white hover:bg-white/10">
-              View Pricing
+              {t("landing.cta.secondary")}
             </Button>
           </div>
         </div>
@@ -835,50 +877,51 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 mb-4">
                 <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI" className="h-10 w-auto object-contain" />
               </div>
-              <p className="text-sm text-muted-foreground">The most personalized AI fitness app ever built.</p>
+              <p className="text-sm text-muted-foreground">{t("landing.footer.tagline")}</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-sm">Product</h4>
+              <h4 className="font-semibold mb-3 text-sm">{t("landing.footer.product")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={scrollToFeatures} className="hover:text-primary transition-colors">Features</button></li>
-                <li><button onClick={scrollToPricing} className="hover:text-primary transition-colors">Pricing</button></li>
+                <li><button onClick={scrollToFeatures} className="hover:text-primary transition-colors">{t("landing.nav.features")}</button></li>
+                <li><button onClick={scrollToPricing} className="hover:text-primary transition-colors">{t("landing.nav.pricing")}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-sm">Legal</h4>
+              <h4 className="font-semibold mb-3 text-sm">{t("landing.footer.legal")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={goToPrivacy} className="hover:text-primary transition-colors">Privacy Policy</button></li>
-                <li><button onClick={goToTerms} className="hover:text-primary transition-colors">Terms of Service</button></li>
+                <li><button onClick={goToPrivacy} className="hover:text-primary transition-colors">{t("landing.footer.privacy")}</button></li>
+                <li><button onClick={goToTerms} className="hover:text-primary transition-colors">{t("landing.footer.terms")}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-sm">Support</h4>
+              <h4 className="font-semibold mb-3 text-sm">{t("landing.footer.support")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={goToContact} className="hover:text-primary transition-colors">Contact Us</button></li>
-                <li><button onClick={goToFAQ} className="hover:text-primary transition-colors">Support Center</button></li>
+                <li><button onClick={goToContact} className="hover:text-primary transition-colors">{t("landing.footer.contactUs")}</button></li>
+                <li><button onClick={goToFAQ} className="hover:text-primary transition-colors">{t("landing.footer.supportCenter")}</button></li>
                 <li><p className="text-xs">support@yfitai.com</p></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© 2026 YFIT AI. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">{t("landing.footer.copyright")}</p>
             <div className="flex gap-4 text-sm text-muted-foreground">
-              <button onClick={goToPrivacy} className="hover:text-primary transition-colors">Privacy</button>
-              <button onClick={goToTerms} className="hover:text-primary transition-colors">Terms</button>
-              <button onClick={goToContact} className="hover:text-primary transition-colors">Contact</button>
+              <button onClick={goToPrivacy} className="hover:text-primary transition-colors">{t("landing.footer.privacyShort")}</button>
+              <button onClick={goToTerms} className="hover:text-primary transition-colors">{t("landing.footer.termsShort")}</button>
+              <button onClick={goToContact} className="hover:text-primary transition-colors">{t("landing.footer.contactShort")}</button>
             </div>
           </div>
         </div>
       </footer>
+
       {/* Mobile Sticky CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 shadow-2xl px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-xs font-semibold text-foreground">Start Free Today</p>
-            <p className="text-xs text-muted-foreground">No credit card required</p>
+            <p className="text-xs font-semibold text-foreground">{t("landing.mobileCta.title")}</p>
+            <p className="text-xs text-muted-foreground">{t("landing.mobileCta.subtitle")}</p>
           </div>
           <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold px-5 flex-shrink-0">
-            Get Started
+            {t("landing.mobileCta.button")}
             <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>
@@ -905,31 +948,31 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 flex items-center justify-center">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Join the Waitlist</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t("landing.waitlist.title")}</h2>
                 </div>
                 <p className="text-gray-500 mb-6 text-sm">
-                  Be the first to know when YFIT AI launches. We'll send you early access and exclusive launch offers.
+                  {t("landing.waitlist.subtitle")}
                 </p>
                 <form onSubmit={handleWaitlistSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("landing.waitlist.nameLabel")}</label>
                     <input
                       type="text"
                       required
                       value={waitlistName}
                       onChange={e => setWaitlistName(e.target.value)}
-                      placeholder="First name"
+                      placeholder={t("landing.waitlist.namePlaceholder")}
                       className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("landing.waitlist.emailLabel")}</label>
                     <input
                       type="email"
                       required
                       value={waitlistEmail}
                       onChange={e => setWaitlistEmail(e.target.value)}
-                      placeholder="you@example.com"
+                      placeholder={t("landing.waitlist.emailPlaceholder")}
                       className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -939,38 +982,38 @@ export default function LandingPage() {
                     className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white font-semibold py-2.5"
                   >
                     {waitlistLoading ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Joining...</>
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("landing.waitlist.joining")}</>
                     ) : (
-                      "Join Waitlist — It's Free"
+                      t("landing.waitlist.submit")
                     )}
                   </Button>
                 </form>
-                <p className="text-xs text-gray-400 mt-4 text-center">No spam. Unsubscribe anytime.</p>
+                <p className="text-xs text-gray-400 mt-4 text-center">{t("landing.waitlist.noSpam")}</p>
               </>
             ) : (
               <div className="text-center py-4">
                 <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                   <Check className="w-8 h-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">You're on the list! 🎉</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("landing.waitlist.successTitle")}</h2>
                 <p className="text-gray-500 text-sm mb-3">
-                  Welcome, <strong>{waitlistName.trim().split(' ')[0]}</strong>! Check your inbox — we just sent you a welcome email at <strong>{waitlistEmail}</strong>.
+                  Welcome, <strong>{waitlistName.trim().split(' ')[0]}</strong>! {t("landing.waitlist.successText")} <strong>{waitlistEmail}</strong>.
                 </p>
                 <div className="bg-gradient-to-r from-blue-50 to-violet-50 border border-blue-100 rounded-xl p-4 mb-5">
-                  <p className="text-sm font-semibold text-gray-800 mb-1">Ready to start right now?</p>
-                  <p className="text-xs text-gray-500">Create your free account and get instant access to YFIT AI — no credit card required.</p>
+                  <p className="text-sm font-semibold text-gray-800 mb-1">{t("landing.waitlist.readyTitle")}</p>
+                  <p className="text-xs text-gray-500">{t("landing.waitlist.readySubtext")}</p>
                 </div>
                 <Button
                   onClick={() => { navigate('/signup'); setShowWaitlist(false); }}
                   className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 text-white font-semibold py-3 text-base mb-3"
                 >
-                  Create My Free Account →
+                  {t("landing.waitlist.createAccount")}
                 </Button>
                 <button
                   onClick={() => setShowWaitlist(false)}
                   className="text-xs text-gray-400 hover:text-gray-600 underline"
                 >
-                  I'll sign up later
+                  {t("landing.waitlist.signUpLater")}
                 </button>
               </div>
             )}

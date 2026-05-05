@@ -2,6 +2,203 @@
 const resources = {
   "en": {
     "translation": {
+      "landing": {
+        "banner": "🎉 LIMITED TIME OFFER: Get 1 Month FREE on All Pro Plans! 🎉",
+        "nav": {
+          "features": "Features",
+          "pricing": "Pricing",
+          "contact": "Contact",
+          "signIn": "Sign In",
+          "getStarted": "Get Started",
+          "start": "Start"
+        },
+        "hero": {
+          "badge": "The only all in one health and fitness app that tracks everything",
+          "headline1": "Finally, a health and fitness app that tracks your medications and",
+          "headline2": "analyses your exercises.",
+          "subtext": "YFIT AI is a hybrid, human and AI app that combines AI coaching, nutrition tracking, and medication-aware workout plans — all in one app. Built to help busy people who want an all in one plan for improved health.",
+          "ctaPrimary": "Start Free — No Credit Card Required",
+          "ctaSecondary": "View Pricing",
+          "socialProof": "Join our growing community",
+          "socialProofSub": "of early adopters",
+          "earlyAccess": "Early access members",
+          "appPreviewTitle": "App Features Preview",
+          "previewGoals": "Set Goals",
+          "previewGoalsSub": "Personalized targets",
+          "previewNutrition": "Track Nutrition",
+          "previewNutritionSub": "Scan barcodes",
+          "previewForm": "AI Form Analysis",
+          "previewFormSub": "Real-time coaching",
+          "previewMeds": "Track Medications",
+          "previewMedsSub": "Provider reports"
+        },
+        "testimonials": {
+          "sectionTitle": "What early users are saying",
+          "quote1": "Finally an app that lets me track my blood pressure meds alongside my workouts. My doctor loves the reports it generates.",
+          "name1": "Sarah M.",
+          "role1": "Beta Tester · Vancouver, BC",
+          "quote2": "The AI form analysis caught my squat form issue that was causing knee pain. Three weeks in and the pain is gone.",
+          "name2": "James R.",
+          "role2": "Beta Tester · Toronto, ON",
+          "quote3": "I've tried MyFitnessPal, Noom, and five others. YFIT is the first one that actually connects everything — nutrition, meds, and workouts in one place.",
+          "name3": "Maria T.",
+          "role3": "Beta Tester · Calgary, AB"
+        },
+        "features": {
+          "sectionTitle": "Everything You Need",
+          "sectionSubtitle": "YFIT AI provides 8 powerful tools to help you achieve your fitness goals with personalized AI guidance.",
+          "goals": {
+            "title": "Goals",
+            "description": "Set and track personalized fitness goals tailored to your unique journey",
+            "f1": "Set personalized fitness targets",
+            "f2": "Track body measurements",
+            "f3": "Calculate BMI and body fat",
+            "f4": "Adjust goals based on progress"
+          },
+          "nutrition": {
+            "title": "Nutrition",
+            "description": "Scan barcodes, log meals, and track macros with AI-powered nutrition insights",
+            "f1": "Barcode scanning for quick logging",
+            "f2": "Track macros and calories",
+            "f3": "AI-powered meal suggestions",
+            "f4": "Nutritional insights and reports"
+          },
+          "fitness": {
+            "title": "Fitness",
+            "description": "Access personalized workout plans with real-time form analysis and coaching",
+            "f1": "Personalized workout plans",
+            "f2": "Real-time form analysis",
+            "f3": "Exercise demonstrations",
+            "f4": "Progressive overload tracking"
+          },
+          "dailyTracker": {
+            "title": "Daily Tracker",
+            "description": "Log your daily activities, meals, workouts, and medications in one place",
+            "f1": "Log daily activities",
+            "f2": "Track meals and workouts",
+            "f3": "Monitor medications",
+            "f4": "Daily progress overview"
+          },
+          "medications": {
+            "title": "Medications",
+            "description": "Track prescriptions, supplements, and generate provider reports for doctor visits",
+            "f1": "Track prescriptions and supplements",
+            "f2": "Generate provider reports",
+            "f3": "Monitor medication schedules",
+            "f4": "Health integration"
+          },
+          "progress": {
+            "title": "Progress",
+            "description": "Visualize your transformation with detailed analytics and progress photos",
+            "f1": "Visual progress charts",
+            "f2": "Body measurement tracking",
+            "f3": "Progress photo comparisons",
+            "f4": "Milestone celebrations"
+          },
+          "predictions": {
+            "title": "Predictions",
+            "description": "AI-powered forecasts for your weight, strength, and fitness milestones",
+            "f1": "AI weight forecasting",
+            "f2": "Strength progression predictions",
+            "f3": "Goal timeline estimates",
+            "f4": "Personalized insights"
+          },
+          "aiCoach": {
+            "title": "AI Coach",
+            "description": "Your 24/7 intelligent fitness companion providing personalized guidance",
+            "f1": "24/7 AI coaching",
+            "f2": "Personalized workout advice",
+            "f3": "Nutrition recommendations",
+            "f4": "Motivation and support"
+          }
+        },
+        "unique": {
+          "badge": "EXCLUSIVE FEATURES",
+          "sectionTitle": "What Makes YFIT Different",
+          "sectionSubtitle": "While other apps focus on basic tracking, YFIT offers features you won't find anywhere else.",
+          "medBadge": "EXCLUSIVE FEATURE",
+          "medTitle": "Medication-Aware Fitness",
+          "medSubtitle": "The only fitness app that integrates your prescriptions",
+          "medStat": "66% of adults",
+          "medStatText": "take at least one prescription medication. Yet every other fitness app ignores this entirely. YFIT tracks your medications alongside your workouts and nutrition — and generates professional reports your doctor can actually use.",
+          "medF1": "Smart reminders synced to your workout schedule",
+          "medF2": "Track supplements, vitamins & prescriptions",
+          "medF3": "Generate provider reports for doctor visits",
+          "medF4": "AI Coach considers your medications in advice",
+          "medF5": "Monitor how medications affect your performance",
+          "medCta": "Try It Free",
+          "formBadge": "AI-POWERED",
+          "formTitle": "Real-Time Form Analysis",
+          "formSubtitle": "Your personal AI coach watches your form",
+          "androidTitle": "Using YFIT on Android?",
+          "androidSubtitle": "Subscribe on our website and pay less — no app store fees added to your plan price.",
+          "androidCta": "View Plans"
+        },
+        "pricing": {
+          "offerBadge": "Limited Time: Get 1 Month FREE on any Pro plan",
+          "sectionTitle": "Start Free. Upgrade When Ready.",
+          "sectionSubtitle": "No credit card required to start. Cancel anytime. Your first Pro month is on us.",
+          "processing": "Processing...",
+          "comparePlansTitle": "Compare Plans",
+          "comparePlansSubtitle": "Everything you need to choose the right plan for your fitness journey.",
+          "colFree": "Free",
+          "colMonthly": "Pro Monthly",
+          "colYearly": "Pro Yearly",
+          "colLifetime": "Pro Lifetime",
+          "rowPrice": "Price",
+          "rowPromo": "Promotional Offer",
+          "promoMonthly": "+1 Month FREE",
+          "promoYearly": "+1 Month FREE",
+          "sectionTracking": "TRACKING",
+          "sectionAI": "AI FEATURES",
+          "sectionPlanning": "PLANNING",
+          "sectionAnalytics": "ANALYTICS",
+          "sectionSupport": "SUPPORT & PERKS"
+        },
+        "cta": {
+          "badge": "No credit card required · Free forever plan available",
+          "headline": "The fitness app that actually knows you.",
+          "subtext": "Medications, workouts, nutrition, and AI coaching — all connected. Start free today.",
+          "primary": "Start Free — No Credit Card Required",
+          "secondary": "View Pricing"
+        },
+        "footer": {
+          "tagline": "The most personalized AI fitness app ever built.",
+          "product": "Product",
+          "legal": "Legal",
+          "support": "Support",
+          "privacy": "Privacy Policy",
+          "terms": "Terms of Service",
+          "contactUs": "Contact Us",
+          "supportCenter": "Support Center",
+          "copyright": "© 2026 YFIT AI. All rights reserved.",
+          "privacyShort": "Privacy",
+          "termsShort": "Terms",
+          "contactShort": "Contact"
+        },
+        "mobileCta": {
+          "title": "Start Free Today",
+          "subtitle": "No credit card required",
+          "button": "Get Started"
+        },
+        "waitlist": {
+          "title": "Join the Waitlist",
+          "subtitle": "Be the first to know when YFIT AI launches. We'll send you early access and exclusive launch offers.",
+          "namePlaceholder": "First name",
+          "nameLabel": "Your Name",
+          "emailLabel": "Email Address",
+          "emailPlaceholder": "you@example.com",
+          "submit": "Join Waitlist — It's Free",
+          "joining": "Joining...",
+          "noSpam": "No spam. Unsubscribe anytime.",
+          "successTitle": "You're on the list! 🎉",
+          "successText": "Check your inbox — we just sent you a welcome email at",
+          "readyTitle": "Ready to start right now?",
+          "readySubtext": "Create your free account and get instant access to YFIT AI — no credit card required.",
+          "createAccount": "Create My Free Account →",
+          "signUpLater": "I'll sign up later"
+        }
+      },
       "nav": {
         "dashboard": "Dashboard",
         "goals": "Goals",
@@ -1355,6 +1552,203 @@ const resources = {
   },
   "fr": {
     "translation": {
+      "landing": {
+        "banner": "🎉 OFFRE LIMITÉE : Obtenez 1 mois GRATUIT sur tous les plans Pro ! 🎉",
+        "nav": {
+          "features": "Fonctionnalités",
+          "pricing": "Tarifs",
+          "contact": "Contact",
+          "signIn": "Se connecter",
+          "getStarted": "Commencer",
+          "start": "Démarrer"
+        },
+        "hero": {
+          "badge": "La seule application santé et fitness tout-en-un qui suit tout",
+          "headline1": "Enfin, une application santé et fitness qui suit vos médicaments et",
+          "headline2": "analyse vos exercices.",
+          "subtext": "YFIT AI est une application hybride, humaine et IA, qui combine le coaching IA, le suivi nutritionnel et des plans d'entraînement adaptés à vos médicaments — tout en un. Conçue pour les personnes occupées qui veulent un plan complet pour une meilleure santé.",
+          "ctaPrimary": "Commencer gratuitement — Sans carte de crédit",
+          "ctaSecondary": "Voir les tarifs",
+          "socialProof": "Rejoignez notre communauté grandissante",
+          "socialProofSub": "d'utilisateurs précoces",
+          "earlyAccess": "Membres en accès anticipé",
+          "appPreviewTitle": "Aperçu des fonctionnalités",
+          "previewGoals": "Définir des objectifs",
+          "previewGoalsSub": "Objectifs personnalisés",
+          "previewNutrition": "Suivre la nutrition",
+          "previewNutritionSub": "Scanner les codes-barres",
+          "previewForm": "Analyse de forme IA",
+          "previewFormSub": "Coaching en temps réel",
+          "previewMeds": "Suivre les médicaments",
+          "previewMedsSub": "Rapports fournisseurs"
+        },
+        "testimonials": {
+          "sectionTitle": "Ce que disent les premiers utilisateurs",
+          "quote1": "Enfin une application qui me permet de suivre mes médicaments pour la tension artérielle avec mes entraînements. Mon médecin adore les rapports qu'elle génère.",
+          "name1": "Sarah M.",
+          "role1": "Bêta-testeur · Vancouver, BC",
+          "quote2": "L'analyse de forme IA a détecté mon problème de squat qui causait des douleurs aux genoux. Trois semaines plus tard, la douleur a disparu.",
+          "name2": "James R.",
+          "role2": "Bêta-testeur · Toronto, ON",
+          "quote3": "J'ai essayé MyFitnessPal, Noom et cinq autres. YFIT est la première qui connecte vraiment tout — nutrition, médicaments et entraînements en un seul endroit.",
+          "name3": "Maria T.",
+          "role3": "Bêta-testeur · Calgary, AB"
+        },
+        "features": {
+          "sectionTitle": "Tout ce dont vous avez besoin",
+          "sectionSubtitle": "YFIT AI fournit 8 outils puissants pour vous aider à atteindre vos objectifs fitness avec des conseils IA personnalisés.",
+          "goals": {
+            "title": "Objectifs",
+            "description": "Définissez et suivez des objectifs fitness personnalisés adaptés à votre parcours unique",
+            "f1": "Définir des objectifs fitness personnalisés",
+            "f2": "Suivre les mesures corporelles",
+            "f3": "Calculer l'IMC et la graisse corporelle",
+            "f4": "Ajuster les objectifs selon les progrès"
+          },
+          "nutrition": {
+            "title": "Nutrition",
+            "description": "Scannez les codes-barres, enregistrez les repas et suivez les macros avec des insights nutritionnels IA",
+            "f1": "Scanner les codes-barres pour un enregistrement rapide",
+            "f2": "Suivre les macros et les calories",
+            "f3": "Suggestions de repas alimentées par IA",
+            "f4": "Insights et rapports nutritionnels"
+          },
+          "fitness": {
+            "title": "Fitness",
+            "description": "Accédez à des plans d'entraînement personnalisés avec analyse de forme en temps réel et coaching",
+            "f1": "Plans d'entraînement personnalisés",
+            "f2": "Analyse de forme en temps réel",
+            "f3": "Démonstrations d'exercices",
+            "f4": "Suivi de la surcharge progressive"
+          },
+          "dailyTracker": {
+            "title": "Suivi quotidien",
+            "description": "Enregistrez vos activités quotidiennes, repas, entraînements et médicaments en un seul endroit",
+            "f1": "Enregistrer les activités quotidiennes",
+            "f2": "Suivre les repas et les entraînements",
+            "f3": "Surveiller les médicaments",
+            "f4": "Aperçu des progrès quotidiens"
+          },
+          "medications": {
+            "title": "Médicaments",
+            "description": "Suivez les ordonnances, les suppléments et générez des rapports fournisseurs pour les visites médicales",
+            "f1": "Suivre les ordonnances et les suppléments",
+            "f2": "Générer des rapports fournisseurs",
+            "f3": "Surveiller les horaires de médicaments",
+            "f4": "Intégration santé"
+          },
+          "progress": {
+            "title": "Progrès",
+            "description": "Visualisez votre transformation avec des analyses détaillées et des photos de progression",
+            "f1": "Graphiques de progression visuels",
+            "f2": "Suivi des mesures corporelles",
+            "f3": "Comparaisons de photos de progression",
+            "f4": "Célébrations des jalons"
+          },
+          "predictions": {
+            "title": "Prédictions",
+            "description": "Prévisions alimentées par IA pour votre poids, votre force et vos jalons fitness",
+            "f1": "Prévisions de poids IA",
+            "f2": "Prédictions de progression de force",
+            "f3": "Estimations de calendrier d'objectifs",
+            "f4": "Insights personnalisés"
+          },
+          "aiCoach": {
+            "title": "Coach IA",
+            "description": "Votre compagnon fitness intelligent 24h/24 fournissant des conseils personnalisés",
+            "f1": "Coaching IA 24h/24",
+            "f2": "Conseils d'entraînement personnalisés",
+            "f3": "Recommandations nutritionnelles",
+            "f4": "Motivation et soutien"
+          }
+        },
+        "unique": {
+          "badge": "FONCTIONNALITÉS EXCLUSIVES",
+          "sectionTitle": "Ce qui distingue YFIT",
+          "sectionSubtitle": "Pendant que les autres applications se concentrent sur le suivi de base, YFIT offre des fonctionnalités introuvables ailleurs.",
+          "medBadge": "FONCTIONNALITÉ EXCLUSIVE",
+          "medTitle": "Fitness adapté aux médicaments",
+          "medSubtitle": "La seule application fitness qui intègre vos ordonnances",
+          "medStat": "66 % des adultes",
+          "medStatText": "prennent au moins un médicament sur ordonnance. Pourtant, toutes les autres applications fitness ignorent cela complètement. YFIT suit vos médicaments avec vos entraînements et votre nutrition — et génère des rapports professionnels que votre médecin peut réellement utiliser.",
+          "medF1": "Rappels intelligents synchronisés avec votre programme d'entraînement",
+          "medF2": "Suivre les suppléments, vitamines et ordonnances",
+          "medF3": "Générer des rapports fournisseurs pour les visites médicales",
+          "medF4": "Le Coach IA prend en compte vos médicaments dans ses conseils",
+          "medF5": "Surveiller comment les médicaments affectent vos performances",
+          "medCta": "Essayer gratuitement",
+          "formBadge": "ALIMENTÉ PAR IA",
+          "formTitle": "Analyse de forme en temps réel",
+          "formSubtitle": "Votre coach IA personnel surveille votre forme",
+          "androidTitle": "Vous utilisez YFIT sur Android ?",
+          "androidSubtitle": "Abonnez-vous sur notre site et payez moins — aucun frais de boutique d'applications ajouté à votre prix.",
+          "androidCta": "Voir les plans"
+        },
+        "pricing": {
+          "offerBadge": "Offre limitée : Obtenez 1 mois GRATUIT sur tout plan Pro",
+          "sectionTitle": "Commencez gratuitement. Passez à la version supérieure quand vous êtes prêt.",
+          "sectionSubtitle": "Aucune carte de crédit requise pour commencer. Annulez à tout moment. Votre premier mois Pro est offert.",
+          "processing": "Traitement en cours...",
+          "comparePlansTitle": "Comparer les plans",
+          "comparePlansSubtitle": "Tout ce dont vous avez besoin pour choisir le bon plan pour votre parcours fitness.",
+          "colFree": "Gratuit",
+          "colMonthly": "Pro Mensuel",
+          "colYearly": "Pro Annuel",
+          "colLifetime": "Pro À vie",
+          "rowPrice": "Prix",
+          "rowPromo": "Offre promotionnelle",
+          "promoMonthly": "+1 mois GRATUIT",
+          "promoYearly": "+1 mois GRATUIT",
+          "sectionTracking": "SUIVI",
+          "sectionAI": "FONCTIONNALITÉS IA",
+          "sectionPlanning": "PLANIFICATION",
+          "sectionAnalytics": "ANALYSES",
+          "sectionSupport": "SUPPORT & AVANTAGES"
+        },
+        "cta": {
+          "badge": "Aucune carte de crédit requise · Plan gratuit à vie disponible",
+          "headline": "L'application fitness qui vous connaît vraiment.",
+          "subtext": "Médicaments, entraînements, nutrition et coaching IA — tout connecté. Commencez gratuitement aujourd'hui.",
+          "primary": "Commencer gratuitement — Sans carte de crédit",
+          "secondary": "Voir les tarifs"
+        },
+        "footer": {
+          "tagline": "L'application fitness IA la plus personnalisée jamais créée.",
+          "product": "Produit",
+          "legal": "Légal",
+          "support": "Support",
+          "privacy": "Politique de confidentialité",
+          "terms": "Conditions d'utilisation",
+          "contactUs": "Nous contacter",
+          "supportCenter": "Centre d'assistance",
+          "copyright": "© 2026 YFIT AI. Tous droits réservés.",
+          "privacyShort": "Confidentialité",
+          "termsShort": "Conditions",
+          "contactShort": "Contact"
+        },
+        "mobileCta": {
+          "title": "Commencez gratuitement aujourd'hui",
+          "subtitle": "Aucune carte de crédit requise",
+          "button": "Commencer"
+        },
+        "waitlist": {
+          "title": "Rejoindre la liste d'attente",
+          "subtitle": "Soyez le premier à savoir quand YFIT AI sera lancé. Nous vous enverrons un accès anticipé et des offres de lancement exclusives.",
+          "namePlaceholder": "Prénom",
+          "nameLabel": "Votre nom",
+          "emailLabel": "Adresse e-mail",
+          "emailPlaceholder": "vous@exemple.com",
+          "submit": "Rejoindre la liste — C'est gratuit",
+          "joining": "Inscription...",
+          "noSpam": "Pas de spam. Désabonnez-vous à tout moment.",
+          "successTitle": "Vous êtes sur la liste ! 🎉",
+          "successText": "Vérifiez votre boîte de réception — nous venons de vous envoyer un e-mail de bienvenue à",
+          "readyTitle": "Prêt à commencer maintenant ?",
+          "readySubtext": "Créez votre compte gratuit et accédez instantanément à YFIT AI — sans carte de crédit.",
+          "createAccount": "Créer mon compte gratuit →",
+          "signUpLater": "Je m'inscrirai plus tard"
+        }
+      },
       "nav": {
         "dashboard": "Tableau de bord",
         "goals": "Objectifs",
@@ -2733,6 +3127,203 @@ const resources = {
   },
   "es": {
     "translation": {
+      "landing": {
+        "banner": "🎉 OFERTA POR TIEMPO LIMITADO: ¡Obtén 1 mes GRATIS en todos los planes Pro! 🎉",
+        "nav": {
+          "features": "Características",
+          "pricing": "Precios",
+          "contact": "Contacto",
+          "signIn": "Iniciar sesión",
+          "getStarted": "Comenzar",
+          "start": "Empezar"
+        },
+        "hero": {
+          "badge": "La única aplicación de salud y fitness todo en uno que rastrea todo",
+          "headline1": "Por fin, una aplicación de salud y fitness que rastrea tus medicamentos y",
+          "headline2": "analiza tus ejercicios.",
+          "subtext": "YFIT AI es una aplicación híbrida, humana e IA, que combina coaching IA, seguimiento nutricional y planes de entrenamiento adaptados a tus medicamentos — todo en una sola app. Diseñada para personas ocupadas que quieren un plan integral para mejorar su salud.",
+          "ctaPrimary": "Comenzar gratis — Sin tarjeta de crédito",
+          "ctaSecondary": "Ver precios",
+          "socialProof": "Únete a nuestra creciente comunidad",
+          "socialProofSub": "de usuarios pioneros",
+          "earlyAccess": "Miembros de acceso anticipado",
+          "appPreviewTitle": "Vista previa de funciones",
+          "previewGoals": "Establecer objetivos",
+          "previewGoalsSub": "Objetivos personalizados",
+          "previewNutrition": "Rastrear nutrición",
+          "previewNutritionSub": "Escanear códigos de barras",
+          "previewForm": "Análisis de forma IA",
+          "previewFormSub": "Coaching en tiempo real",
+          "previewMeds": "Rastrear medicamentos",
+          "previewMedsSub": "Informes de proveedores"
+        },
+        "testimonials": {
+          "sectionTitle": "Lo que dicen los primeros usuarios",
+          "quote1": "Por fin una app que me permite rastrear mis medicamentos para la presión arterial junto con mis entrenamientos. A mi médico le encantan los informes que genera.",
+          "name1": "Sarah M.",
+          "role1": "Beta Tester · Vancouver, BC",
+          "quote2": "El análisis de forma IA detectó mi problema de sentadilla que causaba dolor de rodilla. Tres semanas después, el dolor desapareció.",
+          "name2": "James R.",
+          "role2": "Beta Tester · Toronto, ON",
+          "quote3": "He probado MyFitnessPal, Noom y otros cinco. YFIT es la primera que realmente conecta todo — nutrición, medicamentos y entrenamientos en un solo lugar.",
+          "name3": "Maria T.",
+          "role3": "Beta Tester · Calgary, AB"
+        },
+        "features": {
+          "sectionTitle": "Todo lo que necesitas",
+          "sectionSubtitle": "YFIT AI proporciona 8 herramientas poderosas para ayudarte a alcanzar tus objetivos fitness con orientación IA personalizada.",
+          "goals": {
+            "title": "Objetivos",
+            "description": "Establece y rastrea objetivos fitness personalizados adaptados a tu viaje único",
+            "f1": "Establecer objetivos fitness personalizados",
+            "f2": "Rastrear medidas corporales",
+            "f3": "Calcular IMC y grasa corporal",
+            "f4": "Ajustar objetivos según el progreso"
+          },
+          "nutrition": {
+            "title": "Nutrición",
+            "description": "Escanea códigos de barras, registra comidas y rastrea macros con insights nutricionales IA",
+            "f1": "Escaneo de códigos de barras para registro rápido",
+            "f2": "Rastrear macros y calorías",
+            "f3": "Sugerencias de comidas con IA",
+            "f4": "Insights y reportes nutricionales"
+          },
+          "fitness": {
+            "title": "Fitness",
+            "description": "Accede a planes de entrenamiento personalizados con análisis de forma en tiempo real y coaching",
+            "f1": "Planes de entrenamiento personalizados",
+            "f2": "Análisis de forma en tiempo real",
+            "f3": "Demostraciones de ejercicios",
+            "f4": "Seguimiento de sobrecarga progresiva"
+          },
+          "dailyTracker": {
+            "title": "Seguimiento diario",
+            "description": "Registra tus actividades diarias, comidas, entrenamientos y medicamentos en un solo lugar",
+            "f1": "Registrar actividades diarias",
+            "f2": "Rastrear comidas y entrenamientos",
+            "f3": "Monitorear medicamentos",
+            "f4": "Resumen del progreso diario"
+          },
+          "medications": {
+            "title": "Medicamentos",
+            "description": "Rastrea recetas, suplementos y genera informes de proveedores para visitas médicas",
+            "f1": "Rastrear recetas y suplementos",
+            "f2": "Generar informes de proveedores",
+            "f3": "Monitorear horarios de medicamentos",
+            "f4": "Integración de salud"
+          },
+          "progress": {
+            "title": "Progreso",
+            "description": "Visualiza tu transformación con análisis detallados y fotos de progreso",
+            "f1": "Gráficos de progreso visual",
+            "f2": "Seguimiento de medidas corporales",
+            "f3": "Comparaciones de fotos de progreso",
+            "f4": "Celebraciones de hitos"
+          },
+          "predictions": {
+            "title": "Predicciones",
+            "description": "Pronósticos impulsados por IA para tu peso, fuerza e hitos fitness",
+            "f1": "Pronóstico de peso IA",
+            "f2": "Predicciones de progresión de fuerza",
+            "f3": "Estimaciones de cronograma de objetivos",
+            "f4": "Insights personalizados"
+          },
+          "aiCoach": {
+            "title": "Coach IA",
+            "description": "Tu compañero fitness inteligente 24/7 que proporciona orientación personalizada",
+            "f1": "Coaching IA 24/7",
+            "f2": "Consejos de entrenamiento personalizados",
+            "f3": "Recomendaciones nutricionales",
+            "f4": "Motivación y apoyo"
+          }
+        },
+        "unique": {
+          "badge": "CARACTERÍSTICAS EXCLUSIVAS",
+          "sectionTitle": "Qué hace diferente a YFIT",
+          "sectionSubtitle": "Mientras otras apps se centran en el seguimiento básico, YFIT ofrece características que no encontrarás en ningún otro lugar.",
+          "medBadge": "CARACTERÍSTICA EXCLUSIVA",
+          "medTitle": "Fitness consciente de medicamentos",
+          "medSubtitle": "La única app fitness que integra tus recetas",
+          "medStat": "El 66% de los adultos",
+          "medStatText": "toma al menos un medicamento recetado. Sin embargo, todas las demás apps fitness ignoran esto por completo. YFIT rastrea tus medicamentos junto con tus entrenamientos y nutrición — y genera informes profesionales que tu médico puede realmente usar.",
+          "medF1": "Recordatorios inteligentes sincronizados con tu horario de entrenamiento",
+          "medF2": "Rastrear suplementos, vitaminas y recetas",
+          "medF3": "Generar informes de proveedores para visitas médicas",
+          "medF4": "El Coach IA considera tus medicamentos en sus consejos",
+          "medF5": "Monitorear cómo los medicamentos afectan tu rendimiento",
+          "medCta": "Pruébalo gratis",
+          "formBadge": "IMPULSADO POR IA",
+          "formTitle": "Análisis de forma en tiempo real",
+          "formSubtitle": "Tu coach IA personal observa tu forma",
+          "androidTitle": "¿Usas YFIT en Android?",
+          "androidSubtitle": "Suscríbete en nuestro sitio web y paga menos — sin tarifas de tienda de aplicaciones añadidas a tu precio.",
+          "androidCta": "Ver planes"
+        },
+        "pricing": {
+          "offerBadge": "Tiempo limitado: Obtén 1 mes GRATIS en cualquier plan Pro",
+          "sectionTitle": "Comienza gratis. Actualiza cuando estés listo.",
+          "sectionSubtitle": "No se requiere tarjeta de crédito para comenzar. Cancela en cualquier momento. Tu primer mes Pro es gratis.",
+          "processing": "Procesando...",
+          "comparePlansTitle": "Comparar planes",
+          "comparePlansSubtitle": "Todo lo que necesitas para elegir el plan correcto para tu viaje fitness.",
+          "colFree": "Gratis",
+          "colMonthly": "Pro Mensual",
+          "colYearly": "Pro Anual",
+          "colLifetime": "Pro De por vida",
+          "rowPrice": "Precio",
+          "rowPromo": "Oferta promocional",
+          "promoMonthly": "+1 mes GRATIS",
+          "promoYearly": "+1 mes GRATIS",
+          "sectionTracking": "SEGUIMIENTO",
+          "sectionAI": "CARACTERÍSTICAS IA",
+          "sectionPlanning": "PLANIFICACIÓN",
+          "sectionAnalytics": "ANÁLISIS",
+          "sectionSupport": "SOPORTE Y VENTAJAS"
+        },
+        "cta": {
+          "badge": "No se requiere tarjeta de crédito · Plan gratuito para siempre disponible",
+          "headline": "La app fitness que realmente te conoce.",
+          "subtext": "Medicamentos, entrenamientos, nutrición y coaching IA — todo conectado. Comienza gratis hoy.",
+          "primary": "Comenzar gratis — Sin tarjeta de crédito",
+          "secondary": "Ver precios"
+        },
+        "footer": {
+          "tagline": "La app fitness IA más personalizada jamás creada.",
+          "product": "Producto",
+          "legal": "Legal",
+          "support": "Soporte",
+          "privacy": "Política de privacidad",
+          "terms": "Términos de servicio",
+          "contactUs": "Contáctanos",
+          "supportCenter": "Centro de soporte",
+          "copyright": "© 2026 YFIT AI. Todos los derechos reservados.",
+          "privacyShort": "Privacidad",
+          "termsShort": "Términos",
+          "contactShort": "Contacto"
+        },
+        "mobileCta": {
+          "title": "Comienza gratis hoy",
+          "subtitle": "No se requiere tarjeta de crédito",
+          "button": "Comenzar"
+        },
+        "waitlist": {
+          "title": "Unirse a la lista de espera",
+          "subtitle": "Sé el primero en saber cuándo se lanza YFIT AI. Te enviaremos acceso anticipado y ofertas de lanzamiento exclusivas.",
+          "namePlaceholder": "Nombre",
+          "nameLabel": "Tu nombre",
+          "emailLabel": "Dirección de correo electrónico",
+          "emailPlaceholder": "tú@ejemplo.com",
+          "submit": "Unirse a la lista — Es gratis",
+          "joining": "Uniéndose...",
+          "noSpam": "Sin spam. Cancela la suscripción en cualquier momento.",
+          "successTitle": "¡Estás en la lista! 🎉",
+          "successText": "Revisa tu bandeja de entrada — acabamos de enviarte un correo de bienvenida a",
+          "readyTitle": "¿Listo para comenzar ahora mismo?",
+          "readySubtext": "Crea tu cuenta gratuita y obtén acceso instantáneo a YFIT AI — sin tarjeta de crédito.",
+          "createAccount": "Crear mi cuenta gratuita →",
+          "signUpLater": "Me registraré más tarde"
+        }
+      },
       "nav": {
         "dashboard": "Panel de Control",
         "goals": "Metas",
@@ -4069,6 +4660,203 @@ const resources = {
   },
   "pt": {
     "translation": {
+      "landing": {
+        "banner": "🎉 OFERTA POR TEMPO LIMITADO: Ganhe 1 mês GRÁTIS em todos os planos Pro! 🎉",
+        "nav": {
+          "features": "Recursos",
+          "pricing": "Preços",
+          "contact": "Contato",
+          "signIn": "Entrar",
+          "getStarted": "Começar",
+          "start": "Iniciar"
+        },
+        "hero": {
+          "badge": "O único app de saúde e fitness tudo-em-um que rastreia tudo",
+          "headline1": "Finalmente, um app de saúde e fitness que rastreia seus medicamentos e",
+          "headline2": "analisa seus exercícios.",
+          "subtext": "YFIT AI é um app híbrido, humano e IA, que combina coaching IA, rastreamento nutricional e planos de treino adaptados aos seus medicamentos — tudo em um app. Criado para pessoas ocupadas que querem um plano completo para melhorar a saúde.",
+          "ctaPrimary": "Começar grátis — Sem cartão de crédito",
+          "ctaSecondary": "Ver preços",
+          "socialProof": "Junte-se à nossa comunidade crescente",
+          "socialProofSub": "de adotantes iniciais",
+          "earlyAccess": "Membros de acesso antecipado",
+          "appPreviewTitle": "Prévia dos recursos do app",
+          "previewGoals": "Definir metas",
+          "previewGoalsSub": "Metas personalizadas",
+          "previewNutrition": "Rastrear nutrição",
+          "previewNutritionSub": "Escanear códigos de barras",
+          "previewForm": "Análise de forma IA",
+          "previewFormSub": "Coaching em tempo real",
+          "previewMeds": "Rastrear medicamentos",
+          "previewMedsSub": "Relatórios de provedores"
+        },
+        "testimonials": {
+          "sectionTitle": "O que os primeiros usuários estão dizendo",
+          "quote1": "Finalmente um app que me permite rastrear meus medicamentos para pressão arterial junto com meus treinos. Meu médico adora os relatórios que ele gera.",
+          "name1": "Sarah M.",
+          "role1": "Beta Tester · Vancouver, BC",
+          "quote2": "A análise de forma IA detectou meu problema de agachamento que causava dor no joelho. Três semanas depois, a dor sumiu.",
+          "name2": "James R.",
+          "role2": "Beta Tester · Toronto, ON",
+          "quote3": "Já testei MyFitnessPal, Noom e outros cinco. YFIT é o primeiro que realmente conecta tudo — nutrição, medicamentos e treinos em um só lugar.",
+          "name3": "Maria T.",
+          "role3": "Beta Tester · Calgary, AB"
+        },
+        "features": {
+          "sectionTitle": "Tudo que você precisa",
+          "sectionSubtitle": "YFIT AI fornece 8 ferramentas poderosas para ajudá-lo a alcançar seus objetivos fitness com orientação IA personalizada.",
+          "goals": {
+            "title": "Metas",
+            "description": "Defina e rastreie metas fitness personalizadas adaptadas à sua jornada única",
+            "f1": "Definir metas fitness personalizadas",
+            "f2": "Rastrear medidas corporais",
+            "f3": "Calcular IMC e gordura corporal",
+            "f4": "Ajustar metas com base no progresso"
+          },
+          "nutrition": {
+            "title": "Nutrição",
+            "description": "Escaneie códigos de barras, registre refeições e rastreie macros com insights nutricionais IA",
+            "f1": "Escaneamento de código de barras para registro rápido",
+            "f2": "Rastrear macros e calorias",
+            "f3": "Sugestões de refeições com IA",
+            "f4": "Insights e relatórios nutricionais"
+          },
+          "fitness": {
+            "title": "Fitness",
+            "description": "Acesse planos de treino personalizados com análise de forma em tempo real e coaching",
+            "f1": "Planos de treino personalizados",
+            "f2": "Análise de forma em tempo real",
+            "f3": "Demonstrações de exercícios",
+            "f4": "Rastreamento de sobrecarga progressiva"
+          },
+          "dailyTracker": {
+            "title": "Rastreador diário",
+            "description": "Registre suas atividades diárias, refeições, treinos e medicamentos em um só lugar",
+            "f1": "Registrar atividades diárias",
+            "f2": "Rastrear refeições e treinos",
+            "f3": "Monitorar medicamentos",
+            "f4": "Visão geral do progresso diário"
+          },
+          "medications": {
+            "title": "Medicamentos",
+            "description": "Rastreie prescrições, suplementos e gere relatórios de provedores para consultas médicas",
+            "f1": "Rastrear prescrições e suplementos",
+            "f2": "Gerar relatórios de provedores",
+            "f3": "Monitorar horários de medicamentos",
+            "f4": "Integração de saúde"
+          },
+          "progress": {
+            "title": "Progresso",
+            "description": "Visualize sua transformação com análises detalhadas e fotos de progresso",
+            "f1": "Gráficos de progresso visual",
+            "f2": "Rastreamento de medidas corporais",
+            "f3": "Comparações de fotos de progresso",
+            "f4": "Celebrações de marcos"
+          },
+          "predictions": {
+            "title": "Previsões",
+            "description": "Previsões impulsionadas por IA para seu peso, força e marcos fitness",
+            "f1": "Previsão de peso IA",
+            "f2": "Previsões de progressão de força",
+            "f3": "Estimativas de cronograma de metas",
+            "f4": "Insights personalizados"
+          },
+          "aiCoach": {
+            "title": "Coach IA",
+            "description": "Seu companheiro fitness inteligente 24/7 fornecendo orientação personalizada",
+            "f1": "Coaching IA 24/7",
+            "f2": "Conselhos de treino personalizados",
+            "f3": "Recomendações nutricionais",
+            "f4": "Motivação e suporte"
+          }
+        },
+        "unique": {
+          "badge": "RECURSOS EXCLUSIVOS",
+          "sectionTitle": "O que torna o YFIT diferente",
+          "sectionSubtitle": "Enquanto outros apps focam no rastreamento básico, YFIT oferece recursos que você não encontrará em nenhum outro lugar.",
+          "medBadge": "RECURSO EXCLUSIVO",
+          "medTitle": "Fitness consciente de medicamentos",
+          "medSubtitle": "O único app fitness que integra suas prescrições",
+          "medStat": "66% dos adultos",
+          "medStatText": "tomam pelo menos um medicamento prescrito. No entanto, todos os outros apps fitness ignoram isso completamente. YFIT rastreia seus medicamentos junto com seus treinos e nutrição — e gera relatórios profissionais que seu médico pode realmente usar.",
+          "medF1": "Lembretes inteligentes sincronizados com seu cronograma de treino",
+          "medF2": "Rastrear suplementos, vitaminas e prescrições",
+          "medF3": "Gerar relatórios de provedores para consultas médicas",
+          "medF4": "O Coach IA considera seus medicamentos nos conselhos",
+          "medF5": "Monitorar como os medicamentos afetam seu desempenho",
+          "medCta": "Experimente grátis",
+          "formBadge": "IMPULSIONADO POR IA",
+          "formTitle": "Análise de forma em tempo real",
+          "formSubtitle": "Seu coach IA pessoal observa sua forma",
+          "androidTitle": "Usando YFIT no Android?",
+          "androidSubtitle": "Assine em nosso site e pague menos — sem taxas de loja de aplicativos adicionadas ao seu preço.",
+          "androidCta": "Ver planos"
+        },
+        "pricing": {
+          "offerBadge": "Tempo limitado: Ganhe 1 mês GRÁTIS em qualquer plano Pro",
+          "sectionTitle": "Comece grátis. Atualize quando estiver pronto.",
+          "sectionSubtitle": "Nenhum cartão de crédito necessário para começar. Cancele a qualquer momento. Seu primeiro mês Pro é por nossa conta.",
+          "processing": "Processando...",
+          "comparePlansTitle": "Comparar planos",
+          "comparePlansSubtitle": "Tudo que você precisa para escolher o plano certo para sua jornada fitness.",
+          "colFree": "Grátis",
+          "colMonthly": "Pro Mensal",
+          "colYearly": "Pro Anual",
+          "colLifetime": "Pro Vitalício",
+          "rowPrice": "Preço",
+          "rowPromo": "Oferta promocional",
+          "promoMonthly": "+1 mês GRÁTIS",
+          "promoYearly": "+1 mês GRÁTIS",
+          "sectionTracking": "RASTREAMENTO",
+          "sectionAI": "RECURSOS IA",
+          "sectionPlanning": "PLANEJAMENTO",
+          "sectionAnalytics": "ANÁLISES",
+          "sectionSupport": "SUPORTE E VANTAGENS"
+        },
+        "cta": {
+          "badge": "Nenhum cartão de crédito necessário · Plano gratuito para sempre disponível",
+          "headline": "O app fitness que realmente te conhece.",
+          "subtext": "Medicamentos, treinos, nutrição e coaching IA — tudo conectado. Comece grátis hoje.",
+          "primary": "Começar grátis — Sem cartão de crédito",
+          "secondary": "Ver preços"
+        },
+        "footer": {
+          "tagline": "O app fitness IA mais personalizado já criado.",
+          "product": "Produto",
+          "legal": "Legal",
+          "support": "Suporte",
+          "privacy": "Política de privacidade",
+          "terms": "Termos de serviço",
+          "contactUs": "Fale conosco",
+          "supportCenter": "Central de suporte",
+          "copyright": "© 2026 YFIT AI. Todos os direitos reservados.",
+          "privacyShort": "Privacidade",
+          "termsShort": "Termos",
+          "contactShort": "Contato"
+        },
+        "mobileCta": {
+          "title": "Comece grátis hoje",
+          "subtitle": "Nenhum cartão de crédito necessário",
+          "button": "Começar"
+        },
+        "waitlist": {
+          "title": "Entrar na lista de espera",
+          "subtitle": "Seja o primeiro a saber quando o YFIT AI for lançado. Enviaremos acesso antecipado e ofertas exclusivas de lançamento.",
+          "namePlaceholder": "Nome",
+          "nameLabel": "Seu nome",
+          "emailLabel": "Endereço de e-mail",
+          "emailPlaceholder": "você@exemplo.com",
+          "submit": "Entrar na lista — É grátis",
+          "joining": "Entrando...",
+          "noSpam": "Sem spam. Cancele a inscrição a qualquer momento.",
+          "successTitle": "Você está na lista! 🎉",
+          "successText": "Verifique sua caixa de entrada — acabamos de enviar um e-mail de boas-vindas para",
+          "readyTitle": "Pronto para começar agora mesmo?",
+          "readySubtext": "Crie sua conta gratuita e obtenha acesso instantâneo ao YFIT AI — sem cartão de crédito.",
+          "createAccount": "Criar minha conta gratuita →",
+          "signUpLater": "Vou me inscrever mais tarde"
+        }
+      },
       "nav": {
         "dashboard": "Painel",
         "goals": "Metas",
@@ -5396,6 +6184,203 @@ const resources = {
   },
   "zh": {
     "translation": {
+      "landing": {
+        "banner": "🎉 限时优惠：所有Pro计划免费获得1个月！🎉",
+        "nav": {
+          "features": "功能",
+          "pricing": "定价",
+          "contact": "联系我们",
+          "signIn": "登录",
+          "getStarted": "开始使用",
+          "start": "开始"
+        },
+        "hero": {
+          "badge": "唯一一款追踪一切的全能健康与健身应用",
+          "headline1": "终于，一款可以追踪您的药物并",
+          "headline2": "分析您的锻炼的健康与健身应用。",
+          "subtext": "YFIT AI是一款混合型、人机协作的应用，结合了AI教练、营养追踪和药物感知的锻炼计划——全部集成在一个应用中。专为忙碌的人设计，帮助他们制定全面的健康改善计划。",
+          "ctaPrimary": "免费开始 — 无需信用卡",
+          "ctaSecondary": "查看定价",
+          "socialProof": "加入我们不断增长的社区",
+          "socialProofSub": "早期采用者",
+          "earlyAccess": "早期访问会员",
+          "appPreviewTitle": "应用功能预览",
+          "previewGoals": "设定目标",
+          "previewGoalsSub": "个性化目标",
+          "previewNutrition": "追踪营养",
+          "previewNutritionSub": "扫描条形码",
+          "previewForm": "AI动作分析",
+          "previewFormSub": "实时教练",
+          "previewMeds": "追踪药物",
+          "previewMedsSub": "提供商报告"
+        },
+        "testimonials": {
+          "sectionTitle": "早期用户的评价",
+          "quote1": "终于有一款应用可以让我在锻炼的同时追踪血压药物。我的医生非常喜欢它生成的报告。",
+          "name1": "Sarah M.",
+          "role1": "Beta测试者 · 温哥华, BC",
+          "quote2": "AI动作分析发现了我导致膝盖疼痛的深蹲问题。三周后疼痛消失了。",
+          "name2": "James R.",
+          "role2": "Beta测试者 · 多伦多, ON",
+          "quote3": "我试过MyFitnessPal、Noom和其他五款应用。YFIT是第一个真正将一切连接起来的——营养、药物和锻炼都在一个地方。",
+          "name3": "Maria T.",
+          "role3": "Beta测试者 · 卡尔加里, AB"
+        },
+        "features": {
+          "sectionTitle": "您所需要的一切",
+          "sectionSubtitle": "YFIT AI提供8个强大工具，帮助您通过个性化AI指导实现健身目标。",
+          "goals": {
+            "title": "目标",
+            "description": "设定并追踪适合您独特旅程的个性化健身目标",
+            "f1": "设定个性化健身目标",
+            "f2": "追踪身体测量数据",
+            "f3": "计算BMI和体脂率",
+            "f4": "根据进度调整目标"
+          },
+          "nutrition": {
+            "title": "营养",
+            "description": "扫描条形码、记录餐食，并通过AI营养洞察追踪宏量营养素",
+            "f1": "条形码扫描快速记录",
+            "f2": "追踪宏量营养素和卡路里",
+            "f3": "AI驱动的餐食建议",
+            "f4": "营养洞察和报告"
+          },
+          "fitness": {
+            "title": "健身",
+            "description": "获取个性化锻炼计划，实时动作分析和教练指导",
+            "f1": "个性化锻炼计划",
+            "f2": "实时动作分析",
+            "f3": "运动演示",
+            "f4": "渐进超负荷追踪"
+          },
+          "dailyTracker": {
+            "title": "每日追踪",
+            "description": "在一个地方记录您的日常活动、餐食、锻炼和药物",
+            "f1": "记录日常活动",
+            "f2": "追踪餐食和锻炼",
+            "f3": "监控药物",
+            "f4": "每日进度概览"
+          },
+          "medications": {
+            "title": "药物",
+            "description": "追踪处方、补充剂，并为医生就诊生成提供商报告",
+            "f1": "追踪处方和补充剂",
+            "f2": "生成提供商报告",
+            "f3": "监控用药时间表",
+            "f4": "健康整合"
+          },
+          "progress": {
+            "title": "进度",
+            "description": "通过详细分析和进度照片可视化您的转变",
+            "f1": "可视化进度图表",
+            "f2": "身体测量追踪",
+            "f3": "进度照片对比",
+            "f4": "里程碑庆祝"
+          },
+          "predictions": {
+            "title": "预测",
+            "description": "AI驱动的体重、力量和健身里程碑预测",
+            "f1": "AI体重预测",
+            "f2": "力量进步预测",
+            "f3": "目标时间线估算",
+            "f4": "个性化洞察"
+          },
+          "aiCoach": {
+            "title": "AI教练",
+            "description": "您的24/7智能健身伴侣，提供个性化指导",
+            "f1": "24/7 AI教练",
+            "f2": "个性化锻炼建议",
+            "f3": "营养推荐",
+            "f4": "激励与支持"
+          }
+        },
+        "unique": {
+          "badge": "独家功能",
+          "sectionTitle": "YFIT的与众不同之处",
+          "sectionSubtitle": "当其他应用专注于基本追踪时，YFIT提供您在其他地方找不到的功能。",
+          "medBadge": "独家功能",
+          "medTitle": "药物感知健身",
+          "medSubtitle": "唯一整合您处方的健身应用",
+          "medStat": "66%的成年人",
+          "medStatText": "至少服用一种处方药。然而，其他所有健身应用都完全忽视了这一点。YFIT将您的药物与锻炼和营养一起追踪——并生成您的医生可以实际使用的专业报告。",
+          "medF1": "与您的锻炼时间表同步的智能提醒",
+          "medF2": "追踪补充剂、维生素和处方",
+          "medF3": "为医生就诊生成提供商报告",
+          "medF4": "AI教练在建议中考虑您的药物",
+          "medF5": "监控药物如何影响您的表现",
+          "medCta": "免费试用",
+          "formBadge": "AI驱动",
+          "formTitle": "实时动作分析",
+          "formSubtitle": "您的个人AI教练观察您的动作",
+          "androidTitle": "在Android上使用YFIT？",
+          "androidSubtitle": "在我们的网站订阅，支付更少——计划价格中不添加应用商店费用。",
+          "androidCta": "查看计划"
+        },
+        "pricing": {
+          "offerBadge": "限时：在任何Pro计划上免费获得1个月",
+          "sectionTitle": "免费开始。准备好后升级。",
+          "sectionSubtitle": "开始不需要信用卡。随时取消。您的第一个Pro月份由我们承担。",
+          "processing": "处理中...",
+          "comparePlansTitle": "比较计划",
+          "comparePlansSubtitle": "您需要的一切，以选择适合您健身旅程的正确计划。",
+          "colFree": "免费",
+          "colMonthly": "Pro月付",
+          "colYearly": "Pro年付",
+          "colLifetime": "Pro终身",
+          "rowPrice": "价格",
+          "rowPromo": "促销优惠",
+          "promoMonthly": "+1个月免费",
+          "promoYearly": "+1个月免费",
+          "sectionTracking": "追踪",
+          "sectionAI": "AI功能",
+          "sectionPlanning": "计划",
+          "sectionAnalytics": "分析",
+          "sectionSupport": "支持与福利"
+        },
+        "cta": {
+          "badge": "无需信用卡 · 永久免费计划可用",
+          "headline": "真正了解您的健身应用。",
+          "subtext": "药物、锻炼、营养和AI教练——全部连接。今天免费开始。",
+          "primary": "免费开始 — 无需信用卡",
+          "secondary": "查看定价"
+        },
+        "footer": {
+          "tagline": "有史以来最个性化的AI健身应用。",
+          "product": "产品",
+          "legal": "法律",
+          "support": "支持",
+          "privacy": "隐私政策",
+          "terms": "服务条款",
+          "contactUs": "联系我们",
+          "supportCenter": "支持中心",
+          "copyright": "© 2026 YFIT AI. 保留所有权利。",
+          "privacyShort": "隐私",
+          "termsShort": "条款",
+          "contactShort": "联系"
+        },
+        "mobileCta": {
+          "title": "今天免费开始",
+          "subtitle": "无需信用卡",
+          "button": "开始使用"
+        },
+        "waitlist": {
+          "title": "加入等待名单",
+          "subtitle": "成为第一个知道YFIT AI何时推出的人。我们将向您发送早期访问权限和独家发布优惠。",
+          "namePlaceholder": "名字",
+          "nameLabel": "您的姓名",
+          "emailLabel": "电子邮件地址",
+          "emailPlaceholder": "您@示例.com",
+          "submit": "加入名单 — 免费",
+          "joining": "加入中...",
+          "noSpam": "无垃圾邮件。随时取消订阅。",
+          "successTitle": "您已在名单上！🎉",
+          "successText": "检查您的收件箱 — 我们刚刚向您发送了欢迎电子邮件至",
+          "readyTitle": "准备好立即开始了吗？",
+          "readySubtext": "创建您的免费账户，立即获得YFIT AI的访问权限 — 无需信用卡。",
+          "createAccount": "创建我的免费账户 →",
+          "signUpLater": "我稍后注册"
+        }
+      },
       "nav": {
         "dashboard": "仪表盘",
         "goals": "目标",
@@ -6664,6 +7649,203 @@ const resources = {
   },
   "hi": {
     "translation": {
+      "landing": {
+        "banner": "🎉 सीमित समय का ऑफर: सभी Pro प्लान पर 1 महीना मुफ्त पाएं! 🎉",
+        "nav": {
+          "features": "विशेषताएं",
+          "pricing": "मूल्य निर्धारण",
+          "contact": "संपर्क करें",
+          "signIn": "साइन इन करें",
+          "getStarted": "शुरू करें",
+          "start": "शुरू"
+        },
+        "hero": {
+          "badge": "एकमात्र ऑल-इन-वन स्वास्थ्य और फिटनेस ऐप जो सब कुछ ट्रैक करता है",
+          "headline1": "आखिरकार, एक स्वास्थ्य और फिटनेस ऐप जो आपकी दवाओं को ट्रैक करता है और",
+          "headline2": "आपके व्यायाम का विश्लेषण करता है।",
+          "subtext": "YFIT AI एक हाइब्रिड, मानव और AI ऐप है जो AI कोचिंग, पोषण ट्रैकिंग और दवा-जागरूक वर्कआउट प्लान को एक ऐप में जोड़ता है। व्यस्त लोगों के लिए बनाया गया जो बेहतर स्वास्थ्य के लिए एक संपूर्ण योजना चाहते हैं।",
+          "ctaPrimary": "मुफ्त शुरू करें — क्रेडिट कार्ड की जरूरत नहीं",
+          "ctaSecondary": "मूल्य निर्धारण देखें",
+          "socialProof": "हमारे बढ़ते समुदाय से जुड़ें",
+          "socialProofSub": "शुरुआती अपनाने वालों के",
+          "earlyAccess": "अर्ली एक्सेस सदस्य",
+          "appPreviewTitle": "ऐप फीचर्स प्रीव्यू",
+          "previewGoals": "लक्ष्य निर्धारित करें",
+          "previewGoalsSub": "व्यक्तिगत लक्ष्य",
+          "previewNutrition": "पोषण ट्रैक करें",
+          "previewNutritionSub": "बारकोड स्कैन करें",
+          "previewForm": "AI फॉर्म विश्लेषण",
+          "previewFormSub": "रियल-टाइम कोचिंग",
+          "previewMeds": "दवाएं ट्रैक करें",
+          "previewMedsSub": "प्रदाता रिपोर्ट"
+        },
+        "testimonials": {
+          "sectionTitle": "शुरुआती उपयोगकर्ता क्या कह रहे हैं",
+          "quote1": "आखिरकार एक ऐप जो मुझे अपने वर्कआउट के साथ ब्लड प्रेशर की दवाएं ट्रैक करने देता है। मेरे डॉक्टर को इसकी बनाई रिपोर्ट बहुत पसंद है।",
+          "name1": "Sarah M.",
+          "role1": "बीटा टेस्टर · वैंकूवर, BC",
+          "quote2": "AI फॉर्म विश्लेषण ने मेरी स्क्वाट की समस्या पकड़ी जो घुटने में दर्द का कारण थी। तीन हफ्ते में दर्द गायब हो गया।",
+          "name2": "James R.",
+          "role2": "बीटा टेस्टर · टोरंटो, ON",
+          "quote3": "मैंने MyFitnessPal, Noom और पांच अन्य आजमाए। YFIT पहला है जो वास्तव में सब कुछ जोड़ता है — पोषण, दवाएं और वर्कआउट एक जगह।",
+          "name3": "Maria T.",
+          "role3": "बीटा टेस्टर · कैलगरी, AB"
+        },
+        "features": {
+          "sectionTitle": "आपको जो चाहिए वो सब",
+          "sectionSubtitle": "YFIT AI 8 शक्तिशाली टूल प्रदान करता है जो व्यक्तिगत AI मार्गदर्शन के साथ आपके फिटनेस लक्ष्यों को प्राप्त करने में मदद करते हैं।",
+          "goals": {
+            "title": "लक्ष्य",
+            "description": "अपनी अनूठी यात्रा के अनुसार व्यक्तिगत फिटनेस लक्ष्य निर्धारित और ट्रैक करें",
+            "f1": "व्यक्तिगत फिटनेस लक्ष्य निर्धारित करें",
+            "f2": "शरीर के माप ट्रैक करें",
+            "f3": "BMI और शरीर की चर्बी की गणना करें",
+            "f4": "प्रगति के आधार पर लक्ष्य समायोजित करें"
+          },
+          "nutrition": {
+            "title": "पोषण",
+            "description": "बारकोड स्कैन करें, भोजन लॉग करें और AI-संचालित पोषण अंतर्दृष्टि के साथ मैक्रो ट्रैक करें",
+            "f1": "त्वरित लॉगिंग के लिए बारकोड स्कैनिंग",
+            "f2": "मैक्रो और कैलोरी ट्रैक करें",
+            "f3": "AI-संचालित भोजन सुझाव",
+            "f4": "पोषण संबंधी अंतर्दृष्टि और रिपोर्ट"
+          },
+          "fitness": {
+            "title": "फिटनेस",
+            "description": "रियल-टाइम फॉर्म विश्लेषण और कोचिंग के साथ व्यक्तिगत वर्कआउट प्लान एक्सेस करें",
+            "f1": "व्यक्तिगत वर्कआउट प्लान",
+            "f2": "रियल-टाइम फॉर्म विश्लेषण",
+            "f3": "व्यायाम प्रदर्शन",
+            "f4": "प्रगतिशील ओवरलोड ट्रैकिंग"
+          },
+          "dailyTracker": {
+            "title": "दैनिक ट्रैकर",
+            "description": "अपनी दैनिक गतिविधियां, भोजन, वर्कआउट और दवाएं एक जगह लॉग करें",
+            "f1": "दैनिक गतिविधियां लॉग करें",
+            "f2": "भोजन और वर्कआउट ट्रैक करें",
+            "f3": "दवाओं की निगरानी करें",
+            "f4": "दैनिक प्रगति अवलोकन"
+          },
+          "medications": {
+            "title": "दवाएं",
+            "description": "नुस्खे, सप्लीमेंट ट्रैक करें और डॉक्टर की यात्राओं के लिए प्रदाता रिपोर्ट बनाएं",
+            "f1": "नुस्खे और सप्लीमेंट ट्रैक करें",
+            "f2": "प्रदाता रिपोर्ट बनाएं",
+            "f3": "दवा अनुसूची की निगरानी करें",
+            "f4": "स्वास्थ्य एकीकरण"
+          },
+          "progress": {
+            "title": "प्रगति",
+            "description": "विस्तृत विश्लेषण और प्रगति फ़ोटो के साथ अपने परिवर्तन को देखें",
+            "f1": "दृश्य प्रगति चार्ट",
+            "f2": "शरीर माप ट्रैकिंग",
+            "f3": "प्रगति फ़ोटो तुलना",
+            "f4": "मील का पत्थर उत्सव"
+          },
+          "predictions": {
+            "title": "भविष्यवाणियां",
+            "description": "आपके वजन, ताकत और फिटनेस मील के पत्थर के लिए AI-संचालित पूर्वानुमान",
+            "f1": "AI वजन पूर्वानुमान",
+            "f2": "ताकत प्रगति भविष्यवाणियां",
+            "f3": "लक्ष्य समयरेखा अनुमान",
+            "f4": "व्यक्तिगत अंतर्दृष्टि"
+          },
+          "aiCoach": {
+            "title": "AI कोच",
+            "description": "आपका 24/7 बुद्धिमान फिटनेस साथी व्यक्तिगत मार्गदर्शन प्रदान करता है",
+            "f1": "24/7 AI कोचिंग",
+            "f2": "व्यक्तिगत वर्कआउट सलाह",
+            "f3": "पोषण संबंधी सिफारिशें",
+            "f4": "प्रेरणा और समर्थन"
+          }
+        },
+        "unique": {
+          "badge": "एक्सक्लूसिव फीचर्स",
+          "sectionTitle": "YFIT को क्या अलग बनाता है",
+          "sectionSubtitle": "जबकि अन्य ऐप बुनियादी ट्रैकिंग पर ध्यान देते हैं, YFIT ऐसी सुविधाएं प्रदान करता है जो आपको कहीं और नहीं मिलेंगी।",
+          "medBadge": "एक्सक्लूसिव फीचर",
+          "medTitle": "दवा-जागरूक फिटनेस",
+          "medSubtitle": "एकमात्र फिटनेस ऐप जो आपके नुस्खे एकीकृत करता है",
+          "medStat": "66% वयस्क",
+          "medStatText": "कम से कम एक प्रिस्क्रिप्शन दवा लेते हैं। फिर भी हर दूसरा फिटनेस ऐप इसे पूरी तरह नजरअंदाज करता है। YFIT आपकी दवाओं को आपके वर्कआउट और पोषण के साथ ट्रैक करता है — और पेशेवर रिपोर्ट बनाता है जिसे आपका डॉक्टर वास्तव में उपयोग कर सकता है।",
+          "medF1": "आपके वर्कआउट शेड्यूल के साथ सिंक किए गए स्मार्ट रिमाइंडर",
+          "medF2": "सप्लीमेंट, विटामिन और नुस्खे ट्रैक करें",
+          "medF3": "डॉक्टर की यात्राओं के लिए प्रदाता रिपोर्ट बनाएं",
+          "medF4": "AI कोच सलाह में आपकी दवाओं पर विचार करता है",
+          "medF5": "निगरानी करें कि दवाएं आपके प्रदर्शन को कैसे प्रभावित करती हैं",
+          "medCta": "मुफ्त में आजमाएं",
+          "formBadge": "AI-संचालित",
+          "formTitle": "रियल-टाइम फॉर्म विश्लेषण",
+          "formSubtitle": "आपका व्यक्तिगत AI कोच आपके फॉर्म को देखता है",
+          "androidTitle": "Android पर YFIT उपयोग कर रहे हैं?",
+          "androidSubtitle": "हमारी वेबसाइट पर सब्सक्राइब करें और कम भुगतान करें — आपकी प्लान कीमत में कोई ऐप स्टोर शुल्क नहीं जोड़ा जाता।",
+          "androidCta": "प्लान देखें"
+        },
+        "pricing": {
+          "offerBadge": "सीमित समय: किसी भी Pro प्लान पर 1 महीना मुफ्त पाएं",
+          "sectionTitle": "मुफ्त शुरू करें। तैयार होने पर अपग्रेड करें।",
+          "sectionSubtitle": "शुरू करने के लिए क्रेडिट कार्ड की जरूरत नहीं। कभी भी रद्द करें। आपका पहला Pro महीना हमारी ओर से है।",
+          "processing": "प्रसंस्करण हो रहा है...",
+          "comparePlansTitle": "प्लान तुलना करें",
+          "comparePlansSubtitle": "अपनी फिटनेस यात्रा के लिए सही प्लान चुनने के लिए आपको जो चाहिए वो सब।",
+          "colFree": "मुफ्त",
+          "colMonthly": "Pro मासिक",
+          "colYearly": "Pro वार्षिक",
+          "colLifetime": "Pro आजीवन",
+          "rowPrice": "मूल्य",
+          "rowPromo": "प्रचार ऑफर",
+          "promoMonthly": "+1 महीना मुफ्त",
+          "promoYearly": "+1 महीना मुफ्त",
+          "sectionTracking": "ट्रैकिंग",
+          "sectionAI": "AI फीचर्स",
+          "sectionPlanning": "योजना",
+          "sectionAnalytics": "विश्लेषण",
+          "sectionSupport": "समर्थन और लाभ"
+        },
+        "cta": {
+          "badge": "क्रेडिट कार्ड की जरूरत नहीं · हमेशा के लिए मुफ्त प्लान उपलब्ध",
+          "headline": "फिटनेस ऐप जो वास्तव में आपको जानता है।",
+          "subtext": "दवाएं, वर्कआउट, पोषण और AI कोचिंग — सब जुड़े हुए। आज मुफ्त शुरू करें।",
+          "primary": "मुफ्त शुरू करें — क्रेडिट कार्ड की जरूरत नहीं",
+          "secondary": "मूल्य निर्धारण देखें"
+        },
+        "footer": {
+          "tagline": "अब तक बना सबसे व्यक्तिगत AI फिटनेस ऐप।",
+          "product": "उत्पाद",
+          "legal": "कानूनी",
+          "support": "समर्थन",
+          "privacy": "गोपनीयता नीति",
+          "terms": "सेवा की शर्तें",
+          "contactUs": "हमसे संपर्क करें",
+          "supportCenter": "समर्थन केंद्र",
+          "copyright": "© 2026 YFIT AI. सर्वाधिकार सुरक्षित।",
+          "privacyShort": "गोपनीयता",
+          "termsShort": "शर्तें",
+          "contactShort": "संपर्क"
+        },
+        "mobileCta": {
+          "title": "आज मुफ्त शुरू करें",
+          "subtitle": "क्रेडिट कार्ड की जरूरत नहीं",
+          "button": "शुरू करें"
+        },
+        "waitlist": {
+          "title": "प्रतीक्षा सूची में शामिल हों",
+          "subtitle": "YFIT AI लॉन्च होने पर सबसे पहले जानें। हम आपको अर्ली एक्सेस और एक्सक्लूसिव लॉन्च ऑफर भेजेंगे।",
+          "namePlaceholder": "पहला नाम",
+          "nameLabel": "आपका नाम",
+          "emailLabel": "ईमेल पता",
+          "emailPlaceholder": "आप@उदाहरण.com",
+          "submit": "सूची में शामिल हों — यह मुफ्त है",
+          "joining": "शामिल हो रहे हैं...",
+          "noSpam": "कोई स्पैम नहीं। कभी भी अनसब्सक्राइब करें।",
+          "successTitle": "आप सूची में हैं! 🎉",
+          "successText": "अपना इनबॉक्स चेक करें — हमने अभी आपको एक स्वागत ईमेल भेजा है",
+          "readyTitle": "अभी शुरू करने के लिए तैयार हैं?",
+          "readySubtext": "अपना मुफ्त खाता बनाएं और YFIT AI तक तुरंत पहुंच पाएं — क्रेडिट कार्ड की जरूरत नहीं।",
+          "createAccount": "मेरा मुफ्त खाता बनाएं →",
+          "signUpLater": "मैं बाद में साइन अप करूंगा"
+        }
+      },
       "nav": {
         "dashboard": "डैशबोर्ड",
         "goals": "लक्ष्य",
@@ -7932,6 +9114,203 @@ const resources = {
   },
   "de": {
     "translation": {
+      "landing": {
+        "banner": "🎉 ZEITLICH BEGRENZTES ANGEBOT: Erhalte 1 Monat KOSTENLOS auf alle Pro-Pläne! 🎉",
+        "nav": {
+          "features": "Funktionen",
+          "pricing": "Preise",
+          "contact": "Kontakt",
+          "signIn": "Anmelden",
+          "getStarted": "Loslegen",
+          "start": "Start"
+        },
+        "hero": {
+          "badge": "Die einzige All-in-One-Gesundheits- und Fitness-App, die alles verfolgt",
+          "headline1": "Endlich eine Gesundheits- und Fitness-App, die deine Medikamente verfolgt und",
+          "headline2": "deine Übungen analysiert.",
+          "subtext": "YFIT AI ist eine hybride, menschliche und KI-App, die KI-Coaching, Ernährungsverfolgung und medikamentenbewusste Trainingspläne kombiniert — alles in einer App. Entwickelt für vielbeschäftigte Menschen, die einen umfassenden Plan für bessere Gesundheit wollen.",
+          "ctaPrimary": "Kostenlos starten — Keine Kreditkarte erforderlich",
+          "ctaSecondary": "Preise ansehen",
+          "socialProof": "Tritt unserer wachsenden Community bei",
+          "socialProofSub": "von Early Adopters",
+          "earlyAccess": "Early-Access-Mitglieder",
+          "appPreviewTitle": "App-Funktionen Vorschau",
+          "previewGoals": "Ziele setzen",
+          "previewGoalsSub": "Personalisierte Ziele",
+          "previewNutrition": "Ernährung verfolgen",
+          "previewNutritionSub": "Barcodes scannen",
+          "previewForm": "KI-Formanalyse",
+          "previewFormSub": "Echtzeit-Coaching",
+          "previewMeds": "Medikamente verfolgen",
+          "previewMedsSub": "Anbieterberichte"
+        },
+        "testimonials": {
+          "sectionTitle": "Was frühe Nutzer sagen",
+          "quote1": "Endlich eine App, mit der ich meine Blutdruckmedikamente neben meinen Workouts verfolgen kann. Mein Arzt liebt die Berichte, die sie erstellt.",
+          "name1": "Sarah M.",
+          "role1": "Beta-Tester · Vancouver, BC",
+          "quote2": "Die KI-Formanalyse hat mein Kniebeugen-Problem erkannt, das Knieschmerzen verursachte. Drei Wochen später sind die Schmerzen weg.",
+          "name2": "James R.",
+          "role2": "Beta-Tester · Toronto, ON",
+          "quote3": "Ich habe MyFitnessPal, Noom und fünf andere ausprobiert. YFIT ist die erste, die wirklich alles verbindet — Ernährung, Medikamente und Workouts an einem Ort.",
+          "name3": "Maria T.",
+          "role3": "Beta-Tester · Calgary, AB"
+        },
+        "features": {
+          "sectionTitle": "Alles was du brauchst",
+          "sectionSubtitle": "YFIT AI bietet 8 leistungsstarke Tools, die dir helfen, deine Fitnessziele mit personalisierter KI-Anleitung zu erreichen.",
+          "goals": {
+            "title": "Ziele",
+            "description": "Setze und verfolge personalisierte Fitnessziele, die auf deine einzigartige Reise zugeschnitten sind",
+            "f1": "Personalisierte Fitnessziele setzen",
+            "f2": "Körpermessungen verfolgen",
+            "f3": "BMI und Körperfett berechnen",
+            "f4": "Ziele basierend auf Fortschritt anpassen"
+          },
+          "nutrition": {
+            "title": "Ernährung",
+            "description": "Scanne Barcodes, protokolliere Mahlzeiten und verfolge Makros mit KI-gestützten Ernährungseinblicken",
+            "f1": "Barcode-Scanning für schnelle Protokollierung",
+            "f2": "Makros und Kalorien verfolgen",
+            "f3": "KI-gestützte Mahlzeitenvorschläge",
+            "f4": "Ernährungseinblicke und Berichte"
+          },
+          "fitness": {
+            "title": "Fitness",
+            "description": "Greife auf personalisierte Trainingspläne mit Echtzeit-Formanalyse und Coaching zu",
+            "f1": "Personalisierte Trainingspläne",
+            "f2": "Echtzeit-Formanalyse",
+            "f3": "Übungsdemonstrationen",
+            "f4": "Progressive Überlastungsverfolgung"
+          },
+          "dailyTracker": {
+            "title": "Täglicher Tracker",
+            "description": "Protokolliere deine täglichen Aktivitäten, Mahlzeiten, Workouts und Medikamente an einem Ort",
+            "f1": "Tägliche Aktivitäten protokollieren",
+            "f2": "Mahlzeiten und Workouts verfolgen",
+            "f3": "Medikamente überwachen",
+            "f4": "Tägliche Fortschrittsübersicht"
+          },
+          "medications": {
+            "title": "Medikamente",
+            "description": "Verfolge Rezepte, Nahrungsergänzungsmittel und erstelle Anbieterberichte für Arztbesuche",
+            "f1": "Rezepte und Nahrungsergänzungsmittel verfolgen",
+            "f2": "Anbieterberichte erstellen",
+            "f3": "Medikamentenpläne überwachen",
+            "f4": "Gesundheitsintegration"
+          },
+          "progress": {
+            "title": "Fortschritt",
+            "description": "Visualisiere deine Transformation mit detaillierten Analysen und Fortschrittsfotos",
+            "f1": "Visuelle Fortschrittsdiagramme",
+            "f2": "Körpermessungsverfolgung",
+            "f3": "Fortschrittsfotos-Vergleiche",
+            "f4": "Meilensteinfeierlichkeiten"
+          },
+          "predictions": {
+            "title": "Vorhersagen",
+            "description": "KI-gestützte Prognosen für dein Gewicht, deine Kraft und Fitness-Meilensteine",
+            "f1": "KI-Gewichtsprognose",
+            "f2": "Kraftfortschrittsvorhersagen",
+            "f3": "Zielzeitschätzungen",
+            "f4": "Personalisierte Einblicke"
+          },
+          "aiCoach": {
+            "title": "KI-Coach",
+            "description": "Dein 24/7 intelligenter Fitness-Begleiter mit personalisierter Anleitung",
+            "f1": "24/7 KI-Coaching",
+            "f2": "Personalisierte Trainingsratschläge",
+            "f3": "Ernährungsempfehlungen",
+            "f4": "Motivation und Unterstützung"
+          }
+        },
+        "unique": {
+          "badge": "EXKLUSIVE FUNKTIONEN",
+          "sectionTitle": "Was YFIT anders macht",
+          "sectionSubtitle": "Während andere Apps sich auf grundlegendes Tracking konzentrieren, bietet YFIT Funktionen, die du nirgendwo sonst findest.",
+          "medBadge": "EXKLUSIVE FUNKTION",
+          "medTitle": "Medikamentenbewusstes Fitness",
+          "medSubtitle": "Die einzige Fitness-App, die deine Rezepte integriert",
+          "medStat": "66% der Erwachsenen",
+          "medStatText": "nehmen mindestens ein verschreibungspflichtiges Medikament. Dennoch ignorieren alle anderen Fitness-Apps dies vollständig. YFIT verfolgt deine Medikamente neben deinen Workouts und deiner Ernährung — und erstellt professionelle Berichte, die dein Arzt tatsächlich nutzen kann.",
+          "medF1": "Intelligente Erinnerungen synchronisiert mit deinem Trainingsplan",
+          "medF2": "Nahrungsergänzungsmittel, Vitamine und Rezepte verfolgen",
+          "medF3": "Anbieterberichte für Arztbesuche erstellen",
+          "medF4": "KI-Coach berücksichtigt deine Medikamente in seinen Ratschlägen",
+          "medF5": "Überwachen, wie Medikamente deine Leistung beeinflussen",
+          "medCta": "Kostenlos ausprobieren",
+          "formBadge": "KI-GESTÜTZT",
+          "formTitle": "Echtzeit-Formanalyse",
+          "formSubtitle": "Dein persönlicher KI-Coach beobachtet deine Form",
+          "androidTitle": "Nutzt du YFIT auf Android?",
+          "androidSubtitle": "Abonniere auf unserer Website und zahle weniger — keine App-Store-Gebühren zu deinem Planpreis hinzugefügt.",
+          "androidCta": "Pläne ansehen"
+        },
+        "pricing": {
+          "offerBadge": "Begrenzte Zeit: Erhalte 1 Monat KOSTENLOS auf jeden Pro-Plan",
+          "sectionTitle": "Kostenlos starten. Upgraden wenn bereit.",
+          "sectionSubtitle": "Keine Kreditkarte zum Starten erforderlich. Jederzeit kündigen. Dein erster Pro-Monat geht auf uns.",
+          "processing": "Verarbeitung...",
+          "comparePlansTitle": "Pläne vergleichen",
+          "comparePlansSubtitle": "Alles was du brauchst, um den richtigen Plan für deine Fitness-Reise zu wählen.",
+          "colFree": "Kostenlos",
+          "colMonthly": "Pro Monatlich",
+          "colYearly": "Pro Jährlich",
+          "colLifetime": "Pro Lebenslang",
+          "rowPrice": "Preis",
+          "rowPromo": "Werbeangebot",
+          "promoMonthly": "+1 Monat KOSTENLOS",
+          "promoYearly": "+1 Monat KOSTENLOS",
+          "sectionTracking": "TRACKING",
+          "sectionAI": "KI-FUNKTIONEN",
+          "sectionPlanning": "PLANUNG",
+          "sectionAnalytics": "ANALYSEN",
+          "sectionSupport": "SUPPORT & VORTEILE"
+        },
+        "cta": {
+          "badge": "Keine Kreditkarte erforderlich · Kostenloser Plan für immer verfügbar",
+          "headline": "Die Fitness-App, die dich wirklich kennt.",
+          "subtext": "Medikamente, Workouts, Ernährung und KI-Coaching — alles verbunden. Starte heute kostenlos.",
+          "primary": "Kostenlos starten — Keine Kreditkarte erforderlich",
+          "secondary": "Preise ansehen"
+        },
+        "footer": {
+          "tagline": "Die personalisierteste KI-Fitness-App, die je gebaut wurde.",
+          "product": "Produkt",
+          "legal": "Rechtliches",
+          "support": "Support",
+          "privacy": "Datenschutzrichtlinie",
+          "terms": "Nutzungsbedingungen",
+          "contactUs": "Kontaktiere uns",
+          "supportCenter": "Support-Center",
+          "copyright": "© 2026 YFIT AI. Alle Rechte vorbehalten.",
+          "privacyShort": "Datenschutz",
+          "termsShort": "Bedingungen",
+          "contactShort": "Kontakt"
+        },
+        "mobileCta": {
+          "title": "Starte heute kostenlos",
+          "subtitle": "Keine Kreditkarte erforderlich",
+          "button": "Loslegen"
+        },
+        "waitlist": {
+          "title": "Warteliste beitreten",
+          "subtitle": "Sei der Erste, der erfährt, wenn YFIT AI startet. Wir schicken dir frühen Zugang und exklusive Launch-Angebote.",
+          "namePlaceholder": "Vorname",
+          "nameLabel": "Dein Name",
+          "emailLabel": "E-Mail-Adresse",
+          "emailPlaceholder": "du@beispiel.com",
+          "submit": "Liste beitreten — Kostenlos",
+          "joining": "Beitritt...",
+          "noSpam": "Kein Spam. Jederzeit abmelden.",
+          "successTitle": "Du bist auf der Liste! 🎉",
+          "successText": "Überprüfe deinen Posteingang — wir haben dir gerade eine Willkommens-E-Mail gesendet an",
+          "readyTitle": "Bereit, jetzt zu starten?",
+          "readySubtext": "Erstelle dein kostenloses Konto und erhalte sofortigen Zugang zu YFIT AI — keine Kreditkarte erforderlich.",
+          "createAccount": "Mein kostenloses Konto erstellen →",
+          "signUpLater": "Ich melde mich später an"
+        }
+      },
       "nav": {
         "dashboard": "Dashboard",
         "goals": "Ziele",
@@ -9200,6 +10579,203 @@ const resources = {
   },
   "ja": {
     "translation": {
+      "landing": {
+        "banner": "🎉 期間限定オファー：全Proプランで1ヶ月無料！🎉",
+        "nav": {
+          "features": "機能",
+          "pricing": "料金",
+          "contact": "お問い合わせ",
+          "signIn": "サインイン",
+          "getStarted": "始める",
+          "start": "スタート"
+        },
+        "hero": {
+          "badge": "すべてを追跡する唯一のオールインワン健康・フィットネスアプリ",
+          "headline1": "ついに、あなたの薬を追跡し、",
+          "headline2": "エクササイズを分析する健康・フィットネスアプリ。",
+          "subtext": "YFIT AIは、AIコーチング、栄養追跡、薬を考慮したワークアウトプランを組み合わせたハイブリッドな人間とAIのアプリです — すべて1つのアプリで。健康改善のための総合的なプランを求める忙しい人々のために作られました。",
+          "ctaPrimary": "無料で始める — クレジットカード不要",
+          "ctaSecondary": "料金を見る",
+          "socialProof": "成長するコミュニティに参加する",
+          "socialProofSub": "アーリーアダプターの",
+          "earlyAccess": "アーリーアクセスメンバー",
+          "appPreviewTitle": "アプリ機能プレビュー",
+          "previewGoals": "目標を設定",
+          "previewGoalsSub": "パーソナライズされた目標",
+          "previewNutrition": "栄養を追跡",
+          "previewNutritionSub": "バーコードをスキャン",
+          "previewForm": "AIフォーム分析",
+          "previewFormSub": "リアルタイムコーチング",
+          "previewMeds": "薬を追跡",
+          "previewMedsSub": "プロバイダーレポート"
+        },
+        "testimonials": {
+          "sectionTitle": "早期ユーザーの声",
+          "quote1": "ついにワークアウトと一緒に血圧の薬を追跡できるアプリが見つかりました。医師が生成されるレポートをとても気に入っています。",
+          "name1": "Sarah M.",
+          "role1": "ベータテスター · バンクーバー, BC",
+          "quote2": "AIフォーム分析が膝の痛みを引き起こしていたスクワットの問題を発見しました。3週間後、痛みは消えました。",
+          "name2": "James R.",
+          "role2": "ベータテスター · トロント, ON",
+          "quote3": "MyFitnessPal、Noom、その他5つを試しました。YFITは栄養、薬、ワークアウトを1か所で本当につなげた最初のアプリです。",
+          "name3": "Maria T.",
+          "role3": "ベータテスター · カルガリー, AB"
+        },
+        "features": {
+          "sectionTitle": "必要なものがすべて揃っています",
+          "sectionSubtitle": "YFIT AIは、パーソナライズされたAIガイダンスでフィットネス目標を達成するための8つの強力なツールを提供します。",
+          "goals": {
+            "title": "目標",
+            "description": "あなたのユニークな旅に合わせたパーソナライズされたフィットネス目標を設定・追跡する",
+            "f1": "パーソナライズされたフィットネス目標を設定",
+            "f2": "体の測定値を追跡",
+            "f3": "BMIと体脂肪を計算",
+            "f4": "進捗に基づいて目標を調整"
+          },
+          "nutrition": {
+            "title": "栄養",
+            "description": "バーコードをスキャンし、食事を記録し、AI栄養インサイトでマクロを追跡する",
+            "f1": "素早い記録のためのバーコードスキャン",
+            "f2": "マクロとカロリーを追跡",
+            "f3": "AI搭載の食事提案",
+            "f4": "栄養インサイトとレポート"
+          },
+          "fitness": {
+            "title": "フィットネス",
+            "description": "リアルタイムフォーム分析とコーチングでパーソナライズされたワークアウトプランにアクセスする",
+            "f1": "パーソナライズされたワークアウトプラン",
+            "f2": "リアルタイムフォーム分析",
+            "f3": "エクササイズのデモンストレーション",
+            "f4": "プログレッシブオーバーロード追跡"
+          },
+          "dailyTracker": {
+            "title": "デイリートラッカー",
+            "description": "日常の活動、食事、ワークアウト、薬を1か所に記録する",
+            "f1": "日常の活動を記録",
+            "f2": "食事とワークアウトを追跡",
+            "f3": "薬を監視",
+            "f4": "日々の進捗概要"
+          },
+          "medications": {
+            "title": "薬",
+            "description": "処方箋、サプリメントを追跡し、医師の診察のためのプロバイダーレポートを生成する",
+            "f1": "処方箋とサプリメントを追跡",
+            "f2": "プロバイダーレポートを生成",
+            "f3": "服薬スケジュールを監視",
+            "f4": "健康統合"
+          },
+          "progress": {
+            "title": "進捗",
+            "description": "詳細な分析と進捗写真であなたの変化を視覚化する",
+            "f1": "視覚的な進捗チャート",
+            "f2": "体の測定値追跡",
+            "f3": "進捗写真の比較",
+            "f4": "マイルストーンのお祝い"
+          },
+          "predictions": {
+            "title": "予測",
+            "description": "体重、筋力、フィットネスマイルストーンのAI搭載予測",
+            "f1": "AI体重予測",
+            "f2": "筋力進歩予測",
+            "f3": "目標タイムライン推定",
+            "f4": "パーソナライズされたインサイト"
+          },
+          "aiCoach": {
+            "title": "AIコーチ",
+            "description": "パーソナライズされたガイダンスを提供する24/7インテリジェントフィットネスコンパニオン",
+            "f1": "24/7 AIコーチング",
+            "f2": "パーソナライズされたワークアウトアドバイス",
+            "f3": "栄養推奨",
+            "f4": "モチベーションとサポート"
+          }
+        },
+        "unique": {
+          "badge": "独占機能",
+          "sectionTitle": "YFITが違う理由",
+          "sectionSubtitle": "他のアプリが基本的な追跡に焦点を当てている間、YFITは他では見つからない機能を提供します。",
+          "medBadge": "独占機能",
+          "medTitle": "薬を考慮したフィットネス",
+          "medSubtitle": "処方箋を統合する唯一のフィットネスアプリ",
+          "medStat": "成人の66%",
+          "medStatText": "が少なくとも1つの処方薬を服用しています。それにもかかわらず、他のすべてのフィットネスアプリはこれを完全に無視しています。YFITはあなたの薬をワークアウトと栄養と一緒に追跡し、医師が実際に使用できる専門的なレポートを生成します。",
+          "medF1": "ワークアウトスケジュールと同期したスマートリマインダー",
+          "medF2": "サプリメント、ビタミン、処方箋を追跡",
+          "medF3": "医師の診察のためのプロバイダーレポートを生成",
+          "medF4": "AIコーチがアドバイスであなたの薬を考慮",
+          "medF5": "薬があなたのパフォーマンスにどう影響するかを監視",
+          "medCta": "無料で試す",
+          "formBadge": "AI搭載",
+          "formTitle": "リアルタイムフォーム分析",
+          "formSubtitle": "あなたのパーソナルAIコーチがフォームを観察",
+          "androidTitle": "AndroidでYFITを使用していますか？",
+          "androidSubtitle": "当社のウェブサイトでサブスクライブして、より少なく支払う — プラン価格にアプリストア手数料は追加されません。",
+          "androidCta": "プランを見る"
+        },
+        "pricing": {
+          "offerBadge": "期間限定：任意のProプランで1ヶ月無料",
+          "sectionTitle": "無料で始める。準備ができたらアップグレード。",
+          "sectionSubtitle": "開始にクレジットカードは不要。いつでもキャンセル可能。最初のProの月は私たちが負担します。",
+          "processing": "処理中...",
+          "comparePlansTitle": "プランを比較",
+          "comparePlansSubtitle": "フィットネスの旅に適したプランを選ぶために必要なすべて。",
+          "colFree": "無料",
+          "colMonthly": "Pro月額",
+          "colYearly": "Pro年額",
+          "colLifetime": "Pro生涯",
+          "rowPrice": "価格",
+          "rowPromo": "プロモーションオファー",
+          "promoMonthly": "+1ヶ月無料",
+          "promoYearly": "+1ヶ月無料",
+          "sectionTracking": "トラッキング",
+          "sectionAI": "AI機能",
+          "sectionPlanning": "プランニング",
+          "sectionAnalytics": "アナリティクス",
+          "sectionSupport": "サポートと特典"
+        },
+        "cta": {
+          "badge": "クレジットカード不要 · 永久無料プラン利用可能",
+          "headline": "あなたを本当に知っているフィットネスアプリ。",
+          "subtext": "薬、ワークアウト、栄養、AIコーチング — すべてつながっています。今日無料で始めましょう。",
+          "primary": "無料で始める — クレジットカード不要",
+          "secondary": "料金を見る"
+        },
+        "footer": {
+          "tagline": "これまでに作られた最もパーソナライズされたAIフィットネスアプリ。",
+          "product": "製品",
+          "legal": "法的事項",
+          "support": "サポート",
+          "privacy": "プライバシーポリシー",
+          "terms": "利用規約",
+          "contactUs": "お問い合わせ",
+          "supportCenter": "サポートセンター",
+          "copyright": "© 2026 YFIT AI. 全著作権所有。",
+          "privacyShort": "プライバシー",
+          "termsShort": "規約",
+          "contactShort": "連絡先"
+        },
+        "mobileCta": {
+          "title": "今日無料で始める",
+          "subtitle": "クレジットカード不要",
+          "button": "始める"
+        },
+        "waitlist": {
+          "title": "ウェイトリストに参加",
+          "subtitle": "YFIT AIがいつ発売されるかを最初に知りましょう。アーリーアクセスと独占発売オファーをお送りします。",
+          "namePlaceholder": "名前",
+          "nameLabel": "お名前",
+          "emailLabel": "メールアドレス",
+          "emailPlaceholder": "あなた@例.com",
+          "submit": "リストに参加 — 無料です",
+          "joining": "参加中...",
+          "noSpam": "スパムなし。いつでも登録解除できます。",
+          "successTitle": "リストに入りました！🎉",
+          "successText": "受信トレイを確認してください — ウェルカムメールを送信しました",
+          "readyTitle": "今すぐ始める準備はできていますか？",
+          "readySubtext": "無料アカウントを作成して、YFIT AIに即座にアクセスしましょう — クレジットカード不要。",
+          "createAccount": "無料アカウントを作成 →",
+          "signUpLater": "後でサインアップします"
+        }
+      },
       "nav": {
         "dashboard": "ダッシュボード",
         "goals": "目標",
