@@ -313,23 +313,23 @@ export default function FormAnalysisShowcase() {
                   <div className="w-3 h-3 rounded-full bg-red-500/70" /><div className="w-3 h-3 rounded-full bg-yellow-500/70" /><div className="w-3 h-3 rounded-full bg-green-500/70" />
                 </div>
                 <span className="text-xs text-gray-500 font-mono">YFIT AI \u2014 {EXERCISES[activeExercise].name}</span>
-                <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /><span className="text-xs text-green-400">LIVE</span></div>
+                <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /><span className="text-xs text-green-400">{t("landing.formLiveLabel")}</span></div>
               </div>
               <canvas ref={canvasRef} width={400} height={420} className="w-full block" />
               <div className="flex items-center justify-between px-6 py-4 border-t border-green-500/10 bg-gray-900/50">
-                <div className="text-center"><div className="text-2xl font-bold text-white">{repCount}</div><div className="text-xs text-gray-500">Reps</div></div>
-                <div className="text-center"><div className="text-2xl font-bold" style={{color:currentFeedback.color}}>{currentFeedback.score}</div><div className="text-xs text-gray-500">Form Score</div></div>
-                <div className="text-center"><div className="text-2xl font-bold text-white">10</div><div className="text-xs text-gray-500">Exercises</div></div>
+                <div className="text-center"><div className="text-2xl font-bold text-white">{repCount}</div><div className="text-xs text-gray-500">{t("landing.formRepsLabel")}</div></div>
+                <div className="text-center"><div className="text-2xl font-bold" style={{color:currentFeedback.color}}>{currentFeedback.score}</div><div className="text-xs text-gray-500">{t("landing.formScoreLabel")}</div></div>
+                <div className="text-center"><div className="text-2xl font-bold text-white">10</div><div className="text-xs text-gray-500">{t("landing.formExercisesLabel")}</div></div>
                 <button onClick={handlePlayPause} className="px-4 py-2 rounded-lg text-xs font-semibold border transition-all"
                   style={{borderColor:"rgba(34,197,94,0.3)",color:isPlaying?"#f59e0b":"#22c55e",background:"rgba(34,197,94,0.05)"}}>
-                  {isPlaying ? "\u23f8 Pause" : "\u25b6 Play"}
+                  {isPlaying ? t("landing.formPauseBtn") : t("landing.formPlayBtn")}
                 </button>
               </div>
             </div>
             <div className="bg-gray-900/80 border border-green-500/20 rounded-2xl overflow-hidden shadow-xl">
               <div className="flex items-center justify-between px-4 py-3 border-b border-green-500/10">
                 <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{t("landing.formRepFeedbackLabel")}</span>
-                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 session started`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t("landing.formClearBtn")}</button>
+                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 ${t("landing.formSessionStarted")}`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t("landing.formClearBtn")}</button>
               </div>
               <div className="h-40 overflow-y-auto px-4 py-3 space-y-2">
                 {feedbackHistory.map((entry,i)=>(

@@ -148,14 +148,14 @@ export default function MedicationShowcase() {
             <div className="bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">YFIT AI — Provider Report</div>
+                  <div className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">{t("landing.medProviderReportTitle")}</div>
                   <div className="text-white font-bold text-lg">John Smith</div>
                   <div className="text-white/70 text-sm">Generated April 3, 2026</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white/70 text-xs mb-1">Shared with</div>
+                  <div className="text-white/70 text-xs mb-1">{t("landing.medSharedWith")}</div>
                   <div className="text-white font-semibold text-sm">Dr. Emily Carter</div>
-                  <div className="text-white/70 text-xs">Family Medicine</div>
+                  <div className="text-white/70 text-xs">{t("landing.medFamilyMedicine")}</div>
                 </div>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function MedicationShowcase() {
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-gray-900 text-sm">{med.name}</span>
                             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{med.dosage}</span>
-                            <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" title="Active" />
+                            <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" title={t("landing.medActiveLabel")} />
                           </div>
                           <div className="text-xs text-gray-500">{med.frequency} · {med.purpose}</div>
                           {med.interaction && (
