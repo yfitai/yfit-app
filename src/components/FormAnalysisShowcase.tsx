@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 type Joints = Record<string, number[]>;
 type FrameData = { joints: Joints; feedback: { text: string; color: string; score: number; type: string } };
@@ -140,6 +141,7 @@ function lerpJoints(from: Joints, to: Joints, t: number): Joints {
 }
 
 export default function FormAnalysisShowcase() {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const isPlayingRef = useRef(true);
@@ -293,14 +295,14 @@ export default function FormAnalysisShowcase() {
         <div className="text-center mb-16">
           <span className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-semibold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            AI Form Analysis \u2014 Live Demo
+            {t("landing.formShowcaseBadge")}
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Your AI spotter{" "}
-            <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">never blinks.</span>
+            {t("landing.formShowcaseHeadline")}{" "}
+            <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">{t("landing.formShowcaseHeadlineAccent")}</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Real-time pose tracking catches form errors before they cause injury. Most apps count reps. YFIT coaches every single one.
+            {t("landing.formShowcaseStat")}
           </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
@@ -326,8 +328,8 @@ export default function FormAnalysisShowcase() {
             </div>
             <div className="bg-gray-900/80 border border-green-500/20 rounded-2xl overflow-hidden shadow-xl">
               <div className="flex items-center justify-between px-4 py-3 border-b border-green-500/10">
-                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Rep Feedback</span>
-                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 session started`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Clear</button>
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{t("landing.formRepFeedback")}</span>
+                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 session started`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t("landing.formClear")}</button>
               </div>
               <div className="h-40 overflow-y-auto px-4 py-3 space-y-2">
                 {feedbackHistory.map((entry,i)=>(
@@ -345,10 +347,10 @@ export default function FormAnalysisShowcase() {
           </div>
           <div className="space-y-8 lg:pt-4">
             {[
-              {icon:"\ud83c\udfaf",title:"10 Exercises Supported",desc:"Squat, push-up, plank, sit-up, deadlift, bench press, lateral raise, preacher curl, bicep curl, and bent-over row \u2014 all analysed in real time using your device camera.",color:"#22c55e"},
-              {icon:"\u26a1",title:"Real-Time Form Corrections",desc:"Feedback fires every frame \u2014 \u2018Go deeper\u2019, \u2018Keep chest up\u2019, \u2018Knees too far forward\u2019. You correct the issue before the rep is even finished.",color:"#f59e0b"},
-              {icon:"\ud83d\udccb",title:"Per-Rep Feedback History",desc:"Every rep gets a summary \u2014 the worst issue or a \u2018Good squat!\u2019 if your form was clean. Scroll back through your session to see exactly where you improved.",color:"#a78bfa"},
-              {icon:"\ud83d\udee1\ufe0f",title:"Injury Prevention",desc:"Patterns that lead to injury \u2014 knee cave, forward lean, hip drop \u2014 are flagged before they become chronic problems. Your joints will thank you.",color:"#38bdf8"},
+              {icon:"\ud83c\udfaf",title:t("landing.formF1Title"),desc:t("landing.formF1Desc"),color:"#22c55e"},
+              {icon:"\u26a1",title:t("landing.formF2Title"),desc:t("landing.formF2Desc"),color:"#f59e0b"},
+              {icon:"\ud83d\udccb",title:t("landing.formF3Title"),desc:t("landing.formF3Desc"),color:"#a78bfa"},
+              {icon:"\ud83d\udee1\ufe0f",title:t("landing.formF4Title"),desc:t("landing.formF4Desc"),color:"#38bdf8"},
             ].map(item=>(
               <div key={item.title} className="flex gap-4">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:item.color+"15",border:`1px solid ${item.color}30`}}>{item.icon}</div>
@@ -356,7 +358,7 @@ export default function FormAnalysisShowcase() {
               </div>
             ))}
             <div className="pt-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Click any exercise to preview its animation</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">{t("landing.formClickExercise")}</p>
               <div className="flex flex-wrap gap-2">
                 {EXERCISES.map((ex,i)=>(
                   <button key={ex.name} onClick={()=>handleSelectExercise(i)}
@@ -369,10 +371,10 @@ export default function FormAnalysisShowcase() {
             </div>
             <div className="pt-2">
               <a href="https://app.yfitai.com" className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-green-500/25">
-                Try Form Analysis Free
+                {t("landing.formShowcaseCta")}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </a>
-              <p className="text-xs text-gray-600 mt-3">3 free sessions/month on the Free plan</p>
+              <p className="text-xs text-gray-600 mt-3">{t("landing.formShowcaseNote")}</p>
             </div>
           </div>
         </div>

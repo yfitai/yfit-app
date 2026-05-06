@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const MEDICATIONS = [
   {
@@ -67,6 +68,7 @@ const DRUG_INTERACTIONS = [
 ];
 
 export default function MedicationShowcase() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"report" | "interactions">("report");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -90,16 +92,16 @@ export default function MedicationShowcase() {
         <div className="text-center mb-16">
           <span className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 text-pink-600 text-sm font-semibold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-pink-500 rounded-full animate-pulse" />
-            Medication Tracking — Only on YFIT
+            {t("landing.medShowcaseBadge")}
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            The only fitness app your{" "}
+            {t("landing.medShowcaseHeadline")}{" "}
             <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              doctor will thank you for.
+              {t("landing.medShowcaseHeadlineAccent")}
             </span>
           </h2>
           <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-            66% of adults take at least one prescription medication. No other fitness app accounts for how your meds affect your workouts — until now.
+            {t("landing.medShowcaseStat")}
           </p>
         </div>
 
@@ -107,30 +109,10 @@ export default function MedicationShowcase() {
           {/* Left — feature list */}
           <div className="space-y-8 lg:pt-8">
             {[
-              {
-                icon: "💊",
-                title: "Track Every Medication",
-                desc: "Prescriptions, supplements, vitamins — all in one place. Set reminders so you never miss a dose.",
-                color: "#ec4899",
-              },
-              {
-                icon: "⚡",
-                title: "Drug Interaction Alerts",
-                desc: "YFIT checks your full medication list for known interactions and flags combinations that may affect your health or training.",
-                color: "#a855f7",
-              },
-              {
-                icon: "📋",
-                title: "Provider Reports",
-                desc: "One tap generates a clean, printable PDF showing your medications, dosages, frequencies, and interaction warnings — ready to hand to your doctor.",
-                color: "#3b82f6",
-              },
-              {
-                icon: "🔬",
-                title: "Holistic Health View",
-                desc: "See your fitness data alongside your medication schedule. Spot patterns — like how your energy dips on certain dosing days.",
-                color: "#10b981",
-              },
+              { icon: "💊", title: t("landing.medF1Title"), desc: t("landing.medF1Desc"), color: "#ec4899" },
+              { icon: "⚡", title: t("landing.medF2Title"), desc: t("landing.medF2Desc"), color: "#a855f7" },
+              { icon: "📋", title: t("landing.medF3Title"), desc: t("landing.medF3Desc"), color: "#3b82f6" },
+              { icon: "🔬", title: t("landing.medF4Title"), desc: t("landing.medF4Desc"), color: "#10b981" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4">
                 <div
@@ -151,12 +133,12 @@ export default function MedicationShowcase() {
                 href="https://app.yfitai.com"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/25"
               >
-                Start Tracking Free
+                {t("landing.medShowcaseCta")}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </a>
-              <p className="text-xs text-gray-400 mt-3">Medication tracking included in Pro plan</p>
+              <p className="text-xs text-gray-400 mt-3">{t("landing.medShowcaseNote")}</p>
             </div>
           </div>
 
@@ -188,7 +170,7 @@ export default function MedicationShowcase() {
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
-                💊 Medications
+                💊 {t("landing.medTabMedications")}
               </button>
               <button
                 onClick={() => setActiveTab("interactions")}
@@ -198,7 +180,7 @@ export default function MedicationShowcase() {
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
-                ⚡ Interactions
+                ⚡ {t("landing.medTabInteractions")}
               </button>
             </div>
 
@@ -230,7 +212,7 @@ export default function MedicationShowcase() {
                           )}
                         </div>
                         <div className="text-xs text-gray-400 flex-shrink-0 text-right">
-                          Since<br />{med.startDate}
+                          {t("landing.medSince")}<br />{med.startDate}
                         </div>
                       </div>
                     </div>
@@ -279,17 +261,17 @@ export default function MedicationShowcase() {
                   opacity: sending ? 0.7 : 1,
                 }}
               >
-                {sent ? "✓ Sent to Dr. Carter!" : sending ? "Sending…" : "📧 Send to Provider"}
+                {sent ? t("landing.medSentConfirm") : sending ? t("landing.medSending") : `📧 ${t("landing.medSendBtn")}`}
               </button>
               <button className="px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
-                🖨️ Print PDF
+                🖨️ {t("landing.medPrintBtn")}
               </button>
             </div>
 
             {/* Footer note */}
             <div className="px-5 pb-4 text-center">
               <p className="text-xs text-gray-400">
-                Report includes all active medications, dosages, frequencies, and AI-detected drug interactions
+                {t("landing.medReportNote")}
               </p>
             </div>
           </div>

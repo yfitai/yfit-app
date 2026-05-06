@@ -182,7 +182,7 @@ export default function LandingPage() {
     {
       name: t("landing.plan2Name"),
       price: "$12.99",
-      period: "/month",
+      period: t("landing.periodMonth"),
       description: t("landing.plan2Desc"),
       badge: null,
       badgeColor: null,
@@ -203,7 +203,7 @@ export default function LandingPage() {
     {
       name: t("landing.plan3Name"),
       price: "$99.99",
-      period: "/year",
+      period: t("landing.periodYear"),
       description: t("landing.plan3Desc"),
       badge: t("landing.plan3Badge"),
       badgeColor: "bg-green-600",
@@ -222,7 +222,7 @@ export default function LandingPage() {
     {
       name: t("landing.plan4Name"),
       price: "$249.99",
-      period: " one-time",
+      period: t("landing.periodOneTime"),
       description: t("landing.plan4Desc"),
       badge: t("landing.plan4Badge"),
       badgeColor: "bg-violet-600",
@@ -647,7 +647,7 @@ export default function LandingPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-900 text-white">
-                  <th className="text-left px-5 py-4 font-semibold w-52">Feature</th>
+                  <th className="text-left px-5 py-4 font-semibold w-52">{t("landing.tableFeatureHeader")}</th>
                   <th className="text-center px-4 py-4 font-semibold">{t("landing.pricing.colFree")}</th>
                   <th className="text-center px-4 py-4 font-semibold">{t("landing.pricing.colMonthly")}</th>
                   <th className="text-center px-4 py-4 font-semibold bg-green-700">{t("landing.pricing.colYearly")}</th>
@@ -742,24 +742,24 @@ export default function LandingPage() {
                 ))}
                 {/* CTA row */}
                 <tr className="bg-gray-900">
-                  <td className="px-5 py-4 text-white font-semibold text-sm">Ready to start?</td>
+                  <td className="px-5 py-4 text-white font-semibold text-sm">{t("landing.tableReadyToStart")}</td>
                   <td className="text-center px-4 py-4">
-                    <button onClick={() => window.location.href='/signup'} className="text-xs bg-white text-gray-900 font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">Get Free</button>
+                    <button onClick={() => window.location.href='/signup'} className="text-xs bg-white text-gray-900 font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">{t("landing.tableBtnFree")}</button>
                   </td>
                   <td className="text-center px-4 py-4">
-                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-blue-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors">Choose Monthly</button>
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-blue-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors">{t("landing.tableBtnMonthly")}</button>
                   </td>
                   <td className="text-center px-4 py-4 bg-green-900">
-                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-green-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-green-400 transition-colors">Best Value</button>
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-green-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-green-400 transition-colors">{t("landing.tableBtnYearly")}</button>
                   </td>
                   <td className="text-center px-4 py-4 bg-violet-900">
-                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-violet-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-violet-400 transition-colors">Own Forever</button>
+                    <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'})} className="text-xs bg-violet-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-violet-400 transition-colors">{t("landing.tableBtnLifetime")}</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p className="text-center text-xs text-muted-foreground mt-4">All prices in USD. Taxes calculated at checkout. Cancel anytime for monthly and yearly plans.</p>
+          <p className="text-center text-xs text-muted-foreground mt-4">{t("landing.tablePriceNote")}</p>
         </div>
       </section>
 
@@ -767,9 +767,9 @@ export default function LandingPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">Complete Fitness Ecosystem</h2>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.featuresSectionTitle")}</h2>
             <p className="text-lg text-muted-foreground">
-              Powered by cutting-edge AI to deliver the most personalized fitness experience ever created.
+              {t("landing.featuresSectionSubtitle")}
             </p>
           </div>
 
