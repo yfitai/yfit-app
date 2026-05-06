@@ -95,13 +95,13 @@ export default function MedicationShowcase() {
             {t("landing.medShowcaseBadge")}
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            {t("landing.medShowcaseHeadline")}{" "}
+            {t("landing.medShowcaseHeadline1")}{" "}
             <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              {t("landing.medShowcaseHeadlineAccent")}
+              {t("landing.medShowcaseHeadlineHighlight")}
             </span>
           </h2>
           <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-            {t("landing.medShowcaseStat")}
+            {t("landing.medShowcaseSubtext")}
           </p>
         </div>
 
@@ -109,10 +109,10 @@ export default function MedicationShowcase() {
           {/* Left — feature list */}
           <div className="space-y-8 lg:pt-8">
             {[
-              { icon: "💊", title: t("landing.medF1Title"), desc: t("landing.medF1Desc"), color: "#ec4899" },
-              { icon: "⚡", title: t("landing.medF2Title"), desc: t("landing.medF2Desc"), color: "#a855f7" },
-              { icon: "📋", title: t("landing.medF3Title"), desc: t("landing.medF3Desc"), color: "#3b82f6" },
-              { icon: "🔬", title: t("landing.medF4Title"), desc: t("landing.medF4Desc"), color: "#10b981" },
+              { icon: "💊", title: t("landing.medFeature1Title"), desc: t("landing.medFeature1Desc"), color: "#ec4899" },
+              { icon: "⚡", title: t("landing.medFeature2Title"), desc: t("landing.medFeature2Desc"), color: "#a855f7" },
+              { icon: "📋", title: t("landing.medFeature3Title"), desc: t("landing.medFeature3Desc"), color: "#3b82f6" },
+              { icon: "🔬", title: t("landing.medFeature4Title"), desc: t("landing.medFeature4Desc"), color: "#10b981" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4">
                 <div
@@ -133,12 +133,12 @@ export default function MedicationShowcase() {
                 href="https://app.yfitai.com"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/25"
               >
-                {t("landing.medShowcaseCta")}
+                {t("landing.medBtnSendProvider")}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </a>
-              <p className="text-xs text-gray-400 mt-3">{t("landing.medShowcaseNote")}</p>
+              <p className="text-xs text-gray-400 mt-3">{t("landing.medReportNote")}</p>
             </div>
           </div>
 
@@ -261,7 +261,7 @@ export default function MedicationShowcase() {
                   opacity: sending ? 0.7 : 1,
                 }}
               >
-                {sent ? t("landing.medSentConfirm") : sending ? t("landing.medSending") : `📧 ${t("landing.medSendBtn")}`}
+                {sent ? t("landing.medBtnSent") : sending ? t("landing.medBtnSending") : `📧 ${t("landing.medBtnSendProvider")}`}
               </button>
               <button className="px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
                 🖨️ {t("landing.medPrintBtn")}

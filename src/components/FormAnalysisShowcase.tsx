@@ -298,11 +298,11 @@ export default function FormAnalysisShowcase() {
             {t("landing.formShowcaseBadge")}
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            {t("landing.formShowcaseHeadline")}{" "}
-            <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">{t("landing.formShowcaseHeadlineAccent")}</span>
+            {t("landing.formShowcaseHeadline1")}{" "}
+            <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">{t("landing.formShowcaseHeadlineHighlight")}</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            {t("landing.formShowcaseStat")}
+            {t("landing.formShowcaseSubtext")}
           </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
@@ -328,8 +328,8 @@ export default function FormAnalysisShowcase() {
             </div>
             <div className="bg-gray-900/80 border border-green-500/20 rounded-2xl overflow-hidden shadow-xl">
               <div className="flex items-center justify-between px-4 py-3 border-b border-green-500/10">
-                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{t("landing.formRepFeedback")}</span>
-                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 session started`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t("landing.formClear")}</button>
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{t("landing.formRepFeedbackLabel")}</span>
+                <button onClick={()=>setFeedbackHistory([{type:"success",message:`${EXERCISES[activeExercise].name} \u2014 session started`,time:"0:00"}])} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t("landing.formClearBtn")}</button>
               </div>
               <div className="h-40 overflow-y-auto px-4 py-3 space-y-2">
                 {feedbackHistory.map((entry,i)=>(
@@ -347,10 +347,10 @@ export default function FormAnalysisShowcase() {
           </div>
           <div className="space-y-8 lg:pt-4">
             {[
-              {icon:"\ud83c\udfaf",title:t("landing.formF1Title"),desc:t("landing.formF1Desc"),color:"#22c55e"},
-              {icon:"\u26a1",title:t("landing.formF2Title"),desc:t("landing.formF2Desc"),color:"#f59e0b"},
-              {icon:"\ud83d\udccb",title:t("landing.formF3Title"),desc:t("landing.formF3Desc"),color:"#a78bfa"},
-              {icon:"\ud83d\udee1\ufe0f",title:t("landing.formF4Title"),desc:t("landing.formF4Desc"),color:"#38bdf8"},
+              {icon:"\ud83c\udfaf",title:t("landing.formFeature0Title"),desc:t("landing.formFeature0Desc"),color:"#22c55e"},
+              {icon:"\u26a1",title:t("landing.formFeature1Title"),desc:t("landing.formFeature1Desc"),color:"#f59e0b"},
+              {icon:"\ud83d\udccb",title:t("landing.formFeature2Title"),desc:t("landing.formFeature2Desc"),color:"#a78bfa"},
+              {icon:"\ud83d\udee1\ufe0f",title:t("landing.formFeature3Title"),desc:t("landing.formFeature3Desc"),color:"#38bdf8"},
             ].map(item=>(
               <div key={item.title} className="flex gap-4">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:item.color+"15",border:`1px solid ${item.color}30`}}>{item.icon}</div>
@@ -371,10 +371,10 @@ export default function FormAnalysisShowcase() {
             </div>
             <div className="pt-2">
               <a href="https://app.yfitai.com" className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-green-500/25">
-                {t("landing.formShowcaseCta")}
+                {t("landing.formTryFree")}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </a>
-              <p className="text-xs text-gray-600 mt-3">{t("landing.formShowcaseNote")}</p>
+              <p className="text-xs text-gray-600 mt-3">{t("landing.formFreeSessions")}</p>
             </div>
           </div>
         </div>
