@@ -58,6 +58,35 @@ const LANGUAGE_NAMES = {
 };
 
 /**
+ * Static multilingual reply templates — used when language is known from the frontend.
+ * These are always available regardless of LLM API key availability.
+ * The LLM is only used for unknown languages or when the message needs a personalised reply.
+ */
+function getStaticReply(name, lang, faqUrl) {
+  const templates = {
+    en: `Thanks for reaching out, ${name}! We received your message and our support team will get back to you within 4-6 hours during business hours. You can also find quick answers at ${faqUrl}.`,
+    fr: `Merci de nous avoir contactés, ${name} ! Nous avons bien reçu votre message et notre équipe de support vous répondra dans les 4 à 6 heures pendant les heures ouvrables. Vous pouvez également trouver des réponses rapides sur notre page FAQ : ${faqUrl}.`,
+    es: `¡Gracias por contactarnos, ${name}! Hemos recibido tu mensaje y nuestro equipo de soporte te responderá en un plazo de 4 a 6 horas durante el horario laboral. También puedes encontrar respuestas rápidas en nuestra página de preguntas frecuentes: ${faqUrl}.`,
+    pt: `Obrigado por entrar em contato, ${name}! Recebemos sua mensagem e nossa equipe de suporte responderá em até 4 a 6 horas durante o horário comercial. Você também pode encontrar respostas rápidas em nossa página de perguntas frequentes: ${faqUrl}.`,
+    zh: `感谢您联系我们，${name}！我们已收到您的消息，我们的支持团队将在工作时间内的4到6小时内回复您。您也可以在我们的常见问题页面找到快速解答：${faqUrl}。`,
+    hi: `${name}, हमसे संपर्क करने के लिए धन्यवाद! हमें आपका संदेश मिल गया है और हमारी सहायता टीम कार्य घंटों के दौरान 4 से 6 घंटों के भीतर आपसे संपर्क करेगी। आप हमारे FAQ पृष्ठ पर भी त्वरित उत्तर पा सकते हैं: ${faqUrl}।`,
+    de: `Vielen Dank für Ihre Nachricht, ${name}! Wir haben Ihre Anfrage erhalten und unser Support-Team wird sich innerhalb von 4 bis 6 Stunden während der Geschäftszeiten bei Ihnen melden. Schnelle Antworten finden Sie auch auf unserer FAQ-Seite: ${faqUrl}.`,
+    ja: `${name}様、お問い合わせいただきありがとうございます！メッセージを受け取りました。サポートチームが営業時間内に4〜6時間以内にご返答いたします。よくある質問のページでも素早く回答が見つかります：${faqUrl}。`,
+    ar: `شكراً لتواصلك معنا، ${name}! لقد استلمنا رسالتك وسيرد عليك فريق الدعم خلال 4 إلى 6 ساعات خلال ساعات العمل. يمكنك أيضاً العثور على إجابات سريعة في صفحة الأسئلة الشائعة: ${faqUrl}.`,
+    ko: `${name}님, 문의해 주셔서 감사합니다! 메시지를 받았으며 지원팀이 영업시간 내 4~6시간 이내에 답변드리겠습니다. FAQ 페이지에서도 빠른 답변을 찾을 수 있습니다: ${faqUrl}.`,
+    it: `Grazie per averci contattato, ${name}! Abbiamo ricevuto il tuo messaggio e il nostro team di supporto ti risponderà entro 4-6 ore durante l'orario lavorativo. Puoi trovare risposte rapide anche nella nostra pagina FAQ: ${faqUrl}.`,
+    ru: `Спасибо за обращение, ${name}! Мы получили ваше сообщение, и наша служба поддержки ответит вам в течение 4–6 часов в рабочее время. Быстрые ответы вы также найдёте на нашей странице FAQ: ${faqUrl}.`,
+    nl: `Bedankt voor uw bericht, ${name}! We hebben uw bericht ontvangen en ons supportteam zal binnen 4 tot 6 uur tijdens kantooruren reageren. Snelle antwoorden vindt u ook op onze FAQ-pagina: ${faqUrl}.`,
+    tr: `Bize ulaştığınız için teşekkürler, ${name}! Mesajınızı aldık ve destek ekibimiz iş saatleri içinde 4-6 saat içinde size geri dönecektir. Hızlı cevaplar için SSS sayfamızı da ziyaret edebilirsiniz: ${faqUrl}.`,
+    pl: `Dziękujemy za kontakt, ${name}! Otrzymaliśmy Twoją wiadomość i nasz zespół wsparcia odpowie w ciągu 4–6 godzin w godzinach pracy. Szybkie odpowiedzi znajdziesz też na naszej stronie FAQ: ${faqUrl}.`,
+    uk: `Дякуємо за звернення, ${name}! Ми отримали ваше повідомлення, і наша служба підтримки відповість протягом 4–6 годин у робочий час. Швидкі відповіді також можна знайти на нашій сторінці FAQ: ${faqUrl}.`,
+    vi: `Cảm ơn bạn đã liên hệ, ${name}! Chúng tôi đã nhận được tin nhắn của bạn và đội hỗ trợ sẽ phản hồi trong vòng 4-6 giờ trong giờ làm việc. Bạn cũng có thể tìm câu trả lời nhanh tại trang FAQ: ${faqUrl}.`,
+    th: `ขอบคุณที่ติดต่อเรา, ${name}! เราได้รับข้อความของคุณแล้ว และทีมสนับสนุนจะตอบกลับภายใน 4-6 ชั่วโมงในเวลาทำการ คุณยังสามารถหาคำตอบได้ที่หน้า FAQ: ${faqUrl}.`,
+  };
+  return templates[lang] || templates.en;
+}
+
+/**
  * Call Manus LLM to detect language and generate a personalized reply.
  * Returns { detectedLanguage, languageName, replyText, isSpam }
  */
@@ -287,10 +316,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ── Step 1: LLM language detection + reply generation ────────────────────
+    // ── Step 1: Language detection + reply generation ────────────────────────
+    // Priority order:
+    //   1. If language hint from frontend is a known language → use static template (always works)
+    //   2. If LLM API key is available → call LLM for personalised reply
+    //   3. Fallback → English static template
     let detectedLanguage = language || "en";
     let languageName = LANGUAGE_NAMES[detectedLanguage] || "English";
-    let replyText = `Thanks for reaching out, ${name}! We received your message and our support team will get back to you within 4-6 hours during business hours. You can also find quick answers at ${FAQ_URL}.`;
+    // Use static template as the default — always available, no API key needed
+    let replyText = getStaticReply(name, detectedLanguage, FAQ_URL);
     let isSpam = false;
 
     if (manusApiKey) {
@@ -307,11 +341,12 @@ export default async function handler(req, res) {
         replyText = llmResult.replyText;
         isSpam = llmResult.isSpam;
       } catch (llmErr) {
-        // Non-fatal — fall back to English defaults
+        // Non-fatal — fall back to static template in the known language
         console.warn(
-          "[Contact] LLM call failed, using English fallback:",
+          "[Contact] LLM call failed, using static template fallback:",
           llmErr.message
         );
+        // replyText already set to static template above — no action needed
       }
     }
 
