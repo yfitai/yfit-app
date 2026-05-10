@@ -61,11 +61,15 @@ const LANGUAGE_NAMES = {
  * Call Manus LLM to detect language and generate a personalized reply.
  * Returns { detectedLanguage, languageName, replyText, isSpam }
  */
-async function generateMultilingualReply(name, message, subject, apiKey) {
+async function generateMultilingualReply(name, message, subject, apiKey, languageHint) {
+  const langInstruction = languageHint && languageHint !== 'en'
+    ? `The user's app is set to language code "${languageHint}". Write the reply in that language (${LANGUAGE_NAMES[languageHint] || languageHint}). Also set detectedLanguage to "${languageHint}" in your JSON response.`
+    : 'Detect the language of the user\'s message and write the reply in THAT SAME LANGUAGE.';
+
   const systemPrompt = `You are the friendly, warm, and helpful support assistant for YFIT AI — an AI-powered health and fitness app.
 Your job is to:
-1. Detect the language of the user's message.
-2. Generate a short, warm, personalized auto-reply in THAT SAME LANGUAGE.
+1. ${langInstruction}
+2. Generate a short, warm, personalized auto-reply in the correct language.
 3. Flag if the message looks like spam or automated junk.
 
 Reply guidelines:
@@ -86,7 +90,7 @@ Respond ONLY with valid JSON in this exact format:
   "isSpam": <true or false>
 }`;
 
-  const userPrompt = `User name: ${name}\nSubject: ${subject || "(none)"}\nMessage: ${message}`;
+  const userPrompt = `User name: ${name}\nSubject: ${subject || "(none)"}\nMessage: ${message}\nApp language: ${languageHint || "en"}`;
 
   const response = await fetch(MANUS_LLM_URL, {
     method: "POST",
@@ -295,7 +299,8 @@ export default async function handler(req, res) {
           name,
           message,
           subject,
-          manusApiKey
+          manusApiKey,
+          language
         );
         detectedLanguage = llmResult.detectedLanguage;
         languageName = llmResult.languageName;

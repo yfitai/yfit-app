@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
-import { supabase } from '../lib/supabase'
 
 export default function ContactSupportModal({ isOpen, onClose }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,24 +19,24 @@ export default function ContactSupportModal({ isOpen, onClose }) {
     setErrorMessage('')
 
     try {
-      // Get current user if logged in
-      const { data: { user } } = await supabase.auth.getUser()
-
-      // Call the handle-support-email Edge Function
-      const { data, error } = await supabase.functions.invoke('handle-support-email', {
-        body: {
-          from: formData.email,
-          from_name: formData.name,
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
           subject: formData.subject,
-          body_text: formData.message,
-          user_id: user?.id || null
-        }
+          message: formData.message,
+          source: 'app',
+          language: i18n.language,
+        }),
       })
 
-      if (error) throw error
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || t('support.failedToSend'))
 
       setStatus('success')
-      
+
       // Reset form after 3 seconds and close modal
       setTimeout(() => {
         setFormData({ name: '', email: '', subject: '', message: '' })
