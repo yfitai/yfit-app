@@ -1,26 +1,30 @@
 /**
  * PlateScan.jsx
  *
- * Hybrid Plate Scan — AI identifies foods, user sets serving sizes.
+ * Hybrid Plate Scan — camera-only, opens directly like the barcode scanner.
  *
  * Flow:
- *   1. User opens modal from a meal card (Breakfast / Lunch / Dinner / Snack)
- *   2. User takes a photo or picks one from their library
+ *   1. Modal opens → camera input triggers immediately (user taps "Take Photo" on mobile)
+ *   2. User takes a photo
  *   3. Image is sent to /api/food/plate-scan → GPT-4o Vision identifies foods
  *   4. Each identified food is shown as a card with a serving size selector
- *   5. User adjusts serving sizes → live calorie preview updates
+ *   5. User adjusts serving sizes → live calorie/macro preview updates
  *   6. User taps "Log All" to add all items to the meal, or "Save as Template"
+ *
+ * IMPORTANT: This component is completely isolated from BarcodeScannerSelfContained.jsx.
+ * It has its own file input ref, its own state, and shares NO code or state with the
+ * barcode scanner. Do not merge or share refs between these two components.
  *
  * Props:
  *   mealType       — 'breakfast' | 'lunch' | 'dinner' | 'snack'
  *   user           — Supabase user object
  *   selectedDate   — YYYY-MM-DD string
- *   onFoodsLogged  — callback(loggedMeals[]) called after successful log
+ *   onFoodsLogged  — callback called after successful log
  *   onClose        — callback to close the modal
  */
 
-import { useState, useRef, useCallback } from 'react'
-import { Camera, ImagePlus, X, ChevronDown, Loader2, CheckCircle2, AlertCircle, Trash2, UtensilsCrossed } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Camera, X, Loader2, CheckCircle2, AlertCircle, Trash2, UtensilsCrossed, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 // ── Serving unit definitions (mirrors NutritionEnhanced.jsx ServingSizeSelector) ──
@@ -68,7 +72,7 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="font-semibold text-gray-800 text-sm leading-tight">{food.name}</h4>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidenceColor}`}>
-              {food.confidence} confidence
+              {food.confidence}
             </span>
           </div>
           {food.searchName && food.searchName !== food.name && (
@@ -116,14 +120,14 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
         </select>
       </div>
 
-      {/* Nutrition preview */}
+      {/* Nutrition preview (only when included) */}
       {included && (
         <div className="grid grid-cols-4 gap-1 text-center">
           {[
-            { label: 'Cal',  value: nutrition.calories, color: 'text-gray-800' },
-            { label: 'Pro',  value: `${nutrition.protein}g`, color: 'text-blue-600' },
-            { label: 'Carb', value: `${nutrition.carbs}g`,  color: 'text-orange-600' },
-            { label: 'Fat',  value: `${nutrition.fat}g`,    color: 'text-purple-600' },
+            { label: 'Cal',  value: nutrition.calories,       color: 'text-gray-800' },
+            { label: 'Pro',  value: `${nutrition.protein}g`,  color: 'text-blue-600' },
+            { label: 'Carb', value: `${nutrition.carbs}g`,    color: 'text-orange-600' },
+            { label: 'Fat',  value: `${nutrition.fat}g`,      color: 'text-purple-600' },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-lg py-1 px-0.5">
               <div className={`font-semibold text-xs ${color}`}>{value}</div>
@@ -138,11 +142,11 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
 
 // ── Main PlateScan modal ──────────────────────────────────────────────────────
 export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged, onClose }) {
-  const [phase, setPhase] = useState('pick')   // 'pick' | 'scanning' | 'review' | 'logging' | 'done'
+  const [phase, setPhase] = useState('pick')   // 'pick' | 'preview' | 'scanning' | 'review' | 'logging' | 'done'
   const [previewUrl, setPreviewUrl] = useState(null)
   const [imageBase64, setImageBase64] = useState(null)
   const [imageMime, setImageMime] = useState('image/jpeg')
-  const [foodItems, setFoodItems] = useState([])   // [{ food, qty, unit, included }]
+  const [foodItems, setFoodItems] = useState([])
   const [scanNote, setScanNote] = useState('')
   const [error, setError] = useState('')
   const [logging, setLogging] = useState(false)
@@ -150,29 +154,34 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
   const [templateName, setTemplateName] = useState('')
   const [savingTemplate, setSavingTemplate] = useState(false)
 
-  const fileInputRef = useRef(null)
+  // Isolated camera input — completely separate from BarcodeScannerSelfContained
   const cameraInputRef = useRef(null)
 
-  // ── Image handling ──────────────────────────────────────────────────────────
-  const processImage = useCallback((file) => {
-    if (!file) return
-    const mime = file.type || 'image/jpeg'
-    setImageMime(mime)
-    const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      // Strip the data:image/...;base64, prefix
-      const base64 = e.target.result.split(',')[1]
-      setImageBase64(base64)
-    }
-    reader.readAsDataURL(file)
+  // Open camera automatically when modal mounts (same UX as barcode scanner)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      cameraInputRef.current?.click()
+    }, 100)
+    return () => clearTimeout(timer)
   }, [])
 
+  // ── Image handling ──────────────────────────────────────────────────────────
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
-    if (file) processImage(file)
+    if (!file) return
+
+    const mime = file.type || 'image/jpeg'
+    setImageMime(mime)
+    setPreviewUrl(URL.createObjectURL(file))
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      // Strip the data:image/...;base64, prefix
+      const base64 = ev.target.result.split(',')[1]
+      setImageBase64(base64)
+      setPhase('preview')
+    }
+    reader.readAsDataURL(file)
   }
 
   // ── Scan ────────────────────────────────────────────────────────────────────
@@ -200,7 +209,6 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
         return
       }
 
-      // Build initial food items with default serving sizes
       const items = data.foods.map(food => ({
         food,
         qty: 1,
@@ -214,11 +222,23 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
     } catch (err) {
       console.error('[PlateScan] Scan error:', err)
       setError(err.message || 'Something went wrong. Please try again.')
-      setPhase('pick')
+      setPhase('preview')
     }
   }
 
-  // ── Update a single food item ───────────────────────────────────────────────
+  // ── Retake photo ────────────────────────────────────────────────────────────
+  const handleRetake = () => {
+    setPreviewUrl(null)
+    setImageBase64(null)
+    setError('')
+    setScanNote('')
+    setPhase('pick')
+    // Reset the file input value so the same file can be re-selected
+    if (cameraInputRef.current) cameraInputRef.current.value = ''
+    setTimeout(() => cameraInputRef.current?.click(), 100)
+  }
+
+  // ── Update / remove food items ──────────────────────────────────────────────
   const updateItem = (idx, changes) => {
     setFoodItems(prev => prev.map((item, i) => i === idx ? { ...item, ...changes } : item))
   }
@@ -252,6 +272,8 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
       const rows = toLog.map(item => {
         const n = calcNutrition(item.food, item.qty, item.unit)
         const unitDef = SERVING_UNITS.find(u => u.value === item.unit) || { toGrams: 1 }
+        const totalGrams = (parseFloat(item.qty) || 0) * unitDef.toGrams
+        const m = totalGrams / 100
         return {
           user_id: user.id,
           meal_type: mealType,
@@ -261,9 +283,9 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
           protein_g: n.protein,
           carbs_g: n.carbs,
           fat_g: n.fat,
-          fiber: Math.round((item.food.fiber || 0) * (parseFloat(item.qty) * unitDef.toGrams / 100)),
-          sugar: Math.round((item.food.sugar || 0) * (parseFloat(item.qty) * unitDef.toGrams / 100)),
-          sodium: Math.round((item.food.sodium || 0) * (parseFloat(item.qty) * unitDef.toGrams / 100)),
+          fiber: Math.round((item.food.fiber || 0) * m),
+          sugar: Math.round((item.food.sugar || 0) * m),
+          sodium: Math.round((item.food.sodium || 0) * m),
           food_id: item.food.id || null,
           serving_quantity: parseFloat(item.qty),
           serving_unit: item.unit,
@@ -294,13 +316,15 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
     try {
       const meals = toSave.map(item => {
         const n = calcNutrition(item.food, item.qty, item.unit)
+        const unitDef = SERVING_UNITS.find(u => u.value === item.unit) || { toGrams: 1 }
+        const m = (parseFloat(item.qty) || 0) * unitDef.toGrams / 100
         return {
           food_name: item.food.name,
           calories: n.calories,
           protein: n.protein,
           carbs: n.carbs,
           fat: n.fat,
-          fiber: Math.round((item.food.fiber || 0) * (parseFloat(item.qty) * (SERVING_UNITS.find(u => u.value === item.unit)?.toGrams || 1) / 100)),
+          fiber: Math.round((item.food.fiber || 0) * m),
           sugar: 0,
           sodium: 0,
           serving_quantity: parseFloat(item.qty),
@@ -324,6 +348,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
 
       if (dbError) throw dbError
       setShowTemplatePrompt(false)
+      setTemplateName('')
       alert(`Template "${templateName.trim()}" saved!`)
     } catch (err) {
       console.error('[PlateScan] Template save error:', err)
@@ -354,107 +379,85 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
           </button>
         </div>
 
+        {/* Hidden camera input — isolated from barcode scanner */}
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
         {/* Body */}
         <div className="flex-1 overflow-y-auto">
 
-          {/* ── Phase: pick ── */}
-          {(phase === 'pick' || phase === 'scanning') && (
-            <div className="p-4 space-y-4">
-              {/* How it works */}
-              <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-sm text-teal-800">
-                <p className="font-semibold mb-1">📸 How it works</p>
-                <p>Take or upload a photo of your meal. AI identifies the foods, then you set the serving sizes before logging.</p>
+          {/* ── Phase: pick (waiting for camera) ── */}
+          {phase === 'pick' && (
+            <div className="p-6 flex flex-col items-center gap-4 text-center">
+              <div className="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center">
+                <Camera className="w-10 h-10 text-teal-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800">Take a photo of your meal</h3>
+                <p className="text-sm text-gray-500 mt-1">AI will identify the foods. You set the serving sizes.</p>
               </div>
 
-              {/* Image preview / pick area */}
-              {previewUrl ? (
-                <div className="relative">
-                  <img
-                    src={previewUrl}
-                    alt="Meal preview"
-                    className="w-full h-56 object-cover rounded-xl border border-gray-200"
-                  />
-                  <button
-                    onClick={() => { setPreviewUrl(null); setImageBase64(null) }}
-                    className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Camera */}
-                  <button
-                    onClick={() => cameraInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 py-6 border-2 border-dashed border-teal-300 rounded-xl hover:bg-teal-50 transition-colors"
-                  >
-                    <Camera className="w-8 h-8 text-teal-500" />
-                    <span className="text-sm font-medium text-teal-700">Take Photo</span>
-                  </button>
-                  {/* Library */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 py-6 border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    <ImagePlus className="w-8 h-8 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-600">Choose Photo</span>
-                  </button>
+              {/* Error or note */}
+              {(error || scanNote) && (
+                <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800 text-left w-full">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{error || scanNote}</span>
                 </div>
               )}
 
-              {/* Hidden file inputs */}
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
+              <button
+                onClick={() => {
+                  if (cameraInputRef.current) cameraInputRef.current.value = ''
+                  cameraInputRef.current?.click()
+                }}
+                className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2"
+              >
+                <Camera className="w-5 h-5" />
+                Open Camera
+              </button>
+            </div>
+          )}
 
-              {/* Error */}
+          {/* ── Phase: preview (photo taken, confirm before scanning) ── */}
+          {phase === 'preview' && (
+            <div className="p-4 space-y-4">
+              <img
+                src={previewUrl}
+                alt="Meal preview"
+                className="w-full h-56 object-cover rounded-xl border border-gray-200"
+              />
+              <p className="text-sm text-gray-600 text-center">Looks good? Tap <strong>Identify Foods</strong> to continue.</p>
+
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   {error}
                 </div>
               )}
+            </div>
+          )}
 
-              {/* Scan note (e.g. no foods found) */}
-              {scanNote && !error && (
-                <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  {scanNote}
-                </div>
-              )}
-
-              {/* Scan button */}
+          {/* ── Phase: scanning ── */}
+          {phase === 'scanning' && (
+            <div className="p-6 flex flex-col items-center gap-4 text-center">
               {previewUrl && (
-                <button
-                  onClick={handleScan}
-                  disabled={phase === 'scanning'}
-                  className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                >
-                  {phase === 'scanning' ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Identifying foods…
-                    </>
-                  ) : (
-                    <>
-                      <Camera className="w-5 h-5" />
-                      Identify Foods
-                    </>
-                  )}
-                </button>
+                <img
+                  src={previewUrl}
+                  alt="Meal"
+                  className="w-full h-40 object-cover rounded-xl border border-gray-200 opacity-60"
+                />
               )}
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+                <p className="text-gray-700 font-medium">Identifying foods…</p>
+              </div>
+              <p className="text-xs text-gray-400">This usually takes 5–10 seconds</p>
             </div>
           )}
 
@@ -473,7 +476,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {/* Instruction */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
                 <p className="font-semibold mb-0.5">Set your serving sizes</p>
-                <p>AI identified {foodItems.length} food{foodItems.length !== 1 ? 's' : ''}. Adjust the quantity and unit for each item, then tap <strong>Log All</strong>.</p>
+                <p>Found {foodItems.length} food{foodItems.length !== 1 ? 's' : ''}. Adjust quantities, then tap <strong>Log All</strong>.</p>
               </div>
 
               {/* Food cards */}
@@ -488,7 +491,6 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 ))}
               </div>
 
-              {/* Note from scan (e.g. partial failures) */}
               {scanNote && (
                 <p className="text-xs text-gray-400 text-center">{scanNote}</p>
               )}
@@ -496,7 +498,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {/* Totals bar */}
               {includedCount > 0 && (
                 <div className="bg-gray-800 text-white rounded-xl p-3">
-                  <p className="text-xs text-gray-400 mb-1">{includedCount} item{includedCount !== 1 ? 's' : ''} selected — total</p>
+                  <p className="text-xs text-gray-400 mb-1">{includedCount} item{includedCount !== 1 ? 's' : ''} — total</p>
                   <div className="grid grid-cols-4 gap-2 text-center">
                     {[
                       { label: 'Cal',  value: totals.calories,       color: 'text-white' },
@@ -513,7 +515,6 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 </div>
               )}
 
-              {/* Error */}
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
                   <AlertCircle className="w-4 h-4 shrink-0" />
@@ -572,16 +573,36 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
           )}
         </div>
 
-        {/* Footer actions (review phase only) */}
+        {/* Footer — preview phase */}
+        {phase === 'preview' && (
+          <div className="p-4 border-t border-gray-100 shrink-0 flex gap-2">
+            <button
+              onClick={handleRetake}
+              className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retake
+            </button>
+            <button
+              onClick={handleScan}
+              className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2"
+            >
+              <Camera className="w-5 h-5" />
+              Identify Foods
+            </button>
+          </div>
+        )}
+
+        {/* Footer — review phase */}
         {phase === 'review' && (
           <div className="p-4 border-t border-gray-100 shrink-0 space-y-2">
-            {/* Rescan / Save template row */}
             <div className="flex gap-2">
               <button
-                onClick={() => { setPhase('pick'); setPreviewUrl(null); setImageBase64(null); setFoodItems([]); setError(''); setScanNote('') }}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+                onClick={handleRetake}
+                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"
               >
-                Rescan
+                <RefreshCw className="w-4 h-4" />
+                Retake
               </button>
               <button
                 onClick={() => setShowTemplatePrompt(true)}
@@ -590,7 +611,6 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 Save as Template
               </button>
             </div>
-            {/* Log all */}
             <button
               onClick={handleLogAll}
               disabled={logging || includedCount === 0}
