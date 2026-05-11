@@ -1,34 +1,31 @@
-/**
- * Vercel Serverless Function: /api/contact
- *
- * Centralized multilingual email auto-responder for YFIT AI.
- * Handles contact submissions from all sources:
- *   - Marketing website (yfitai.com) — source: "marketing"
- *   - App chatbox (app.yfitai.com) — source: "app"
- *   - Social media DM handler — source: "social"
- *
- * Flow:
- *   1. Validate input
- *   2. Call Manus LLM to detect language and generate a personalized reply
- *   3. Send the reply to the user via Resend
- *   4. Notify support@yfitai.com with full context + detected language
- *
- * Accepted fields:
- *   name        {string}  required
- *   email       {string}  required
- *   message     {string}  required
- *   subject     {string}  optional
- *   source      {string}  optional — "marketing" | "app" | "social" (default: "marketing")
- *   language    {string}  optional — ISO 639-1 hint (e.g. "fr") — LLM still auto-detects
- */
+// ============================================================
+// Vercel Serverless Function: api/contact.js
+//
+// Centralized multilingual contact handler for ALL sources:
+//   - Marketing website contact form (source: "marketing")
+//   - In-app support modal (source: "app")
+//   - Social media DM handler (source: "social")
+//
+// SMART REPLY FLOW:
+//   1. Search faq_articles in Supabase for relevant answers
+//   2. If FAQ matches found → GPT-4o-mini writes a grounded answer using FAQ context
+//   3. If no FAQ matches → GPT-4o-mini writes a helpful general reply
+//   4. Reply is generated in the user's language (from frontend i18n.language)
+//   5. Static template fallback if GPT-4 is unavailable
+//   6. Sends reply to user + notification to support@yfitai.com
+// ============================================================
 
-const MANUS_LLM_URL = "https://forge.manus.ai/v1/chat/completions";
+import { createClient } from "@supabase/supabase-js";
+
+// ── Constants ────────────────────────────────────────────────────────────────
 const RESEND_URL = "https://api.resend.com/emails";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const SUPPORT_EMAIL = "support@yfitai.com";
+const FROM_ADDRESS = "YFIT Support Team <support@yfitai.com>";
+const FAQ_URL = "https://app.yfitai.com/faq";
+const SUPABASE_URL = "https://mxggxpoxgqubojvumjlt.supabase.co";
 const LOGO_URL =
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png";
-const FAQ_URL = "https://app.yfitai.com/faq";
-const SUPPORT_EMAIL = "support@yfitai.com";
-const FROM_ADDRESS = "YFIT AI Support <noreply@yfitai.com>";
 
 const SOURCE_LABELS = {
   marketing: "Marketing Website (yfitai.com)",
@@ -37,31 +34,172 @@ const SOURCE_LABELS = {
 };
 
 const LANGUAGE_NAMES = {
-  en: "English",
-  fr: "French",
-  es: "Spanish",
-  pt: "Portuguese",
-  zh: "Mandarin Chinese",
-  hi: "Hindi",
-  de: "German",
-  ja: "Japanese",
-  ar: "Arabic",
-  ko: "Korean",
-  it: "Italian",
-  ru: "Russian",
-  nl: "Dutch",
-  tr: "Turkish",
-  pl: "Polish",
-  uk: "Ukrainian",
-  vi: "Vietnamese",
-  th: "Thai",
+  en: "English", fr: "French", es: "Spanish", pt: "Portuguese",
+  zh: "Mandarin Chinese", hi: "Hindi", de: "German", ja: "Japanese",
+  ar: "Arabic", ko: "Korean", it: "Italian", ru: "Russian",
+  nl: "Dutch", tr: "Turkish", pl: "Polish", uk: "Ukrainian",
+  vi: "Vietnamese", th: "Thai",
 };
 
+// Stop words for FAQ keyword extraction (matches reference feedback-auto-reply implementation)
+const STOP_WORDS = new Set([
+  "the", "and", "for", "are", "but", "not", "you", "all", "can",
+  "her", "was", "one", "our", "out", "day", "get", "has", "him",
+  "his", "how", "its", "may", "new", "now", "old", "see", "two",
+  "way", "who", "did", "let", "put", "say", "she", "too", "use",
+  "that", "this", "with", "have", "from", "they", "will", "been",
+  "when", "what", "your", "does", "into", "more", "also", "than",
+  "then", "them", "some", "just", "like", "very", "even", "back",
+  "good", "know", "take", "want", "make", "give", "most", "help",
+  "need", "would", "could", "should", "about", "please", "hello",
+  "bonjour", "hola", "merci", "gracias", "thank", "thanks",
+]);
+
+// ── FAQ Search ───────────────────────────────────────────────────────────────
 /**
- * Static multilingual reply templates — used when language is known from the frontend.
- * These are always available regardless of LLM API key availability.
- * The LLM is only used for unknown languages or when the message needs a personalised reply.
+ * Search the faq_articles table for relevant answers to the user's message.
+ * Exact same algorithm as the original feedback-auto-reply Supabase Edge Function.
+ * Returns up to 3 most relevant FAQ articles.
  */
+async function searchFaq(supabase, message, subject) {
+  try {
+    const combined = `${subject || ""} ${message}`.toLowerCase();
+    const terms = combined
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3 && !STOP_WORDS.has(w))
+      .slice(0, 8);
+
+    if (terms.length === 0) return [];
+
+    const orConditions = terms
+      .map((t) => `question.ilike.%${t}%,answer.ilike.%${t}%`)
+      .join(",");
+
+    const { data, error } = await supabase
+      .from("faq_articles")
+      .select("id, question, answer, keywords")
+      .eq("is_published", true)
+      .or(orConditions)
+      .limit(6);
+
+    if (error) {
+      console.warn("[Contact] FAQ search error:", error.message);
+      return [];
+    }
+    if (!data || data.length === 0) return [];
+
+    // Score by how many search terms appear in the article
+    const scored = data.map((article) => {
+      const text = `${article.question} ${article.answer} ${(article.keywords ?? []).join(" ")}`.toLowerCase();
+      const score = terms.filter((t) => text.includes(t)).length;
+      return { article, score };
+    });
+
+    return scored
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((s) => s.article);
+  } catch (err) {
+    console.warn("[Contact] FAQ search failed (non-fatal):", err.message);
+    return [];
+  }
+}
+
+// ── GPT-4 Reply Generation ───────────────────────────────────────────────────
+/**
+ * Generate a smart reply using GPT-4o-mini, grounded in FAQ context when available.
+ * Always replies in the user's language. Same model/approach as feedback-auto-reply.
+ */
+async function generateSmartReply(name, message, subject, language, faqMatches, openaiKey) {
+  const langName = LANGUAGE_NAMES[language] || "English";
+  const hasFaq = faqMatches.length > 0;
+
+  const faqContext = hasFaq
+    ? faqMatches.map((f, i) => `FAQ ${i + 1}:\nQ: ${f.question}\nA: ${f.answer}`).join("\n\n")
+    : "";
+
+  const systemPrompt = hasFaq
+    ? `You are a friendly, warm customer support agent for YFIT AI — an AI-powered health and fitness app.
+A user has sent a message. You have been given relevant FAQ articles from the YFIT knowledge base to help answer them accurately.
+
+CRITICAL: You MUST write your entire reply in ${langName} (language code: ${language}). Do not use English unless the language is English.
+
+Rules:
+- Use the FAQ content provided to give a specific, accurate answer about YFIT
+- Use plain language (7th grade level) — keep it simple and friendly
+- Be warm and personal — use the user's first name: ${name}
+- Keep it to 3-4 short paragraphs
+- If the FAQ directly answers their question, explain the steps clearly
+- If the FAQ only partially answers it, answer what you can and invite them to reply for more help
+- End with encouragement to keep using the app
+- Do NOT promise specific features or timelines
+- Sign off as "The YFIT Team"
+- Do NOT include a subject line or email headers — just the body text
+- Do NOT include any HTML — plain text only
+
+YFIT FAQ Knowledge Base (use this to answer accurately):
+${faqContext}`
+    : `You are a friendly, warm customer support agent for YFIT AI — an AI-powered health and fitness app.
+A user has sent a message and there are no specific FAQ articles that match their question.
+
+CRITICAL: You MUST write your entire reply in ${langName} (language code: ${language}). Do not use English unless the language is English.
+
+Rules:
+- Use your general knowledge about fitness apps to give a helpful response
+- Use plain language (7th grade level) — keep it simple and friendly
+- Be warm and personal — use the user's first name: ${name}
+- Keep it to 3-4 short paragraphs
+- Acknowledge their specific question and provide the best answer you can
+- Let them know a human support agent will follow up within 4-6 hours if needed
+- Mention the FAQ page at ${FAQ_URL} as a quick resource
+- Sign off as "The YFIT Team"
+- Do NOT include a subject line or email headers — just the body text
+- Do NOT include any HTML — plain text only`;
+
+  const userPrompt = `User's message:
+Subject: ${subject || "(no subject)"}
+Message: ${message}
+
+Write a helpful reply in ${langName}.`;
+
+  const response = await fetch(OPENAI_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${openaiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      max_tokens: 500,
+      temperature: 0.6,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`OpenAI API error ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content?.trim() || null;
+}
+
+// ── Spam Detection ───────────────────────────────────────────────────────────
+function isSpamMessage(name, email, message) {
+  const spamPatterns = [
+    /\b(viagra|casino|lottery|winner|prize|click here|buy now|free money)\b/i,
+    /(.)\1{10,}/,
+  ];
+  const combined = `${name} ${email} ${message}`;
+  return spamPatterns.some((p) => p.test(combined));
+}
+
+// ── Static Fallback Templates ────────────────────────────────────────────────
 function getStaticReply(name, lang, faqUrl) {
   const templates = {
     en: `Thanks for reaching out, ${name}! We received your message and our support team will get back to you within 4-6 hours during business hours. You can also find quick answers at ${faqUrl}.`,
@@ -86,96 +224,68 @@ function getStaticReply(name, lang, faqUrl) {
   return templates[lang] || templates.en;
 }
 
-/**
- * Call Manus LLM to detect language and generate a personalized reply.
- * Returns { detectedLanguage, languageName, replyText, isSpam }
- */
-async function generateMultilingualReply(name, message, subject, apiKey, languageHint) {
-  const langInstruction = languageHint && languageHint !== 'en'
-    ? `The user's app is set to language code "${languageHint}". Write the reply in that language (${LANGUAGE_NAMES[languageHint] || languageHint}). Also set detectedLanguage to "${languageHint}" in your JSON response.`
-    : 'Detect the language of the user\'s message and write the reply in THAT SAME LANGUAGE.';
-
-  const systemPrompt = `You are the friendly, warm, and helpful support assistant for YFIT AI — an AI-powered health and fitness app.
-Your job is to:
-1. ${langInstruction}
-2. Generate a short, warm, personalized auto-reply in the correct language.
-3. Flag if the message looks like spam or automated junk.
-
-Reply guidelines:
-- Write at a 7th-grade reading level — clear, simple, friendly.
-- Keep the reply to 3-5 sentences maximum.
-- Acknowledge what they asked about specifically (if possible).
-- Let them know a human will follow up within 4-6 hours during business hours.
-- Mention the FAQ page at ${FAQ_URL} as a quick resource.
-- Do NOT include a greeting line like "Dear X" — start directly with the message body.
-- Do NOT include a sign-off like "Sincerely" — end naturally.
-- Do NOT include any HTML — plain text only.
-
-Respond ONLY with valid JSON in this exact format:
-{
-  "detectedLanguage": "<ISO 639-1 code, e.g. en, fr, es, zh>",
-  "languageName": "<human-readable name, e.g. English, French, Spanish>",
-  "replyText": "<the reply in the detected language>",
-  "isSpam": <true or false>
-}`;
-
-  const userPrompt = `User name: ${name}\nSubject: ${subject || "(none)"}\nMessage: ${message}\nApp language: ${languageHint || "en"}`;
-
-  const response = await fetch(MANUS_LLM_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      max_tokens: 600,
-      temperature: 0.4,
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.text().catch(() => "unknown");
-    throw new Error(`LLM API error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json();
-  const raw = data?.choices?.[0]?.message?.content || "";
-  const cleaned = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
-
-  let parsed;
-  try {
-    parsed = JSON.parse(cleaned);
-  } catch {
-    console.warn("[Contact] LLM response not valid JSON:", raw.substring(0, 200));
-    return {
-      detectedLanguage: "en",
-      languageName: "English",
-      replyText: `Thanks for reaching out, ${name}! We received your message and our support team will get back to you within 4-6 hours during business hours. You can also find quick answers at ${FAQ_URL}.`,
-      isSpam: false,
-    };
-  }
-
-  return {
-    detectedLanguage: parsed.detectedLanguage || "en",
-    languageName:
-      parsed.languageName ||
-      LANGUAGE_NAMES[parsed.detectedLanguage] ||
-      "Unknown",
-    replyText: parsed.replyText || "",
-    isSpam: parsed.isSpam === true,
-  };
-}
-
-function buildUserReplyHtml(name, replyText, message, detectedLanguage) {
-  const isRTL = ["ar", "he", "fa", "ur"].includes(detectedLanguage);
+// ── Email HTML Builders ──────────────────────────────────────────────────────
+function buildUserReplyHtml(name, replyText, originalMessage, lang) {
+  const isRTL = ["ar", "he", "fa", "ur"].includes(lang);
   const dir = isRTL ? 'dir="rtl"' : "";
   const year = new Date().getFullYear();
-  return `<!DOCTYPE html><html ${dir}><head><meta charset="UTF-8"/></head>
+
+  // Convert plain text reply to HTML paragraphs
+  const replyHtml = replyText
+    .split("\n\n")
+    .filter((p) => p.trim())
+    .map(
+      (p) =>
+        `<p style="margin:0 0 14px;font-size:15px;color:#374151;line-height:1.7;">${p.replace(
+          /\n/g,
+          "<br>"
+        )}</p>`
+    )
+    .join("");
+
+  const browseLabel =
+    {
+      fr: "Parcourir la FAQ →",
+      es: "Ver preguntas frecuentes →",
+      pt: "Ver FAQ →",
+      zh: "浏览常见问题 →",
+      hi: "FAQ देखें →",
+      de: "FAQ durchsuchen →",
+      ja: "FAQを見る →",
+      ar: "تصفح الأسئلة الشائعة →",
+      ko: "FAQ 보기 →",
+      it: "Sfoglia le FAQ →",
+      ru: "Просмотреть FAQ →",
+      nl: "FAQ bekijken →",
+      tr: "SSS'ye göz at →",
+      pl: "Przeglądaj FAQ →",
+      uk: "Переглянути FAQ →",
+      vi: "Xem FAQ →",
+      th: "ดู FAQ →",
+    }[lang] || "Browse FAQ →";
+
+  const yourMessageLabel =
+    {
+      fr: "VOTRE MESSAGE",
+      es: "TU MENSAJE",
+      pt: "SUA MENSAGEM",
+      zh: "您的消息",
+      hi: "आपका संदेश",
+      de: "IHRE NACHRICHT",
+      ja: "お問い合わせ内容",
+      ar: "رسالتك",
+      ko: "귀하의 메시지",
+      it: "IL TUO MESSAGGIO",
+      ru: "ВАШЕ СООБЩЕНИЕ",
+      nl: "UW BERICHT",
+      tr: "MESAJINIZ",
+      pl: "TWOJA WIADOMOŚĆ",
+      uk: "ВАШЕ ПОВІДОМЛЕННЯ",
+      vi: "TIN NHẮN CỦA BẠN",
+      th: "ข้อความของคุณ",
+    }[lang] || "YOUR MESSAGE";
+
+  return `<!DOCTYPE html><html ${dir}><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
@@ -184,22 +294,24 @@ function buildUserReplyHtml(name, replyText, message, detectedLanguage) {
 <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;">Support Team</p>
 </td></tr>
 <tr><td style="background:#ffffff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-<p style="font-size:16px;line-height:1.7;color:#374151;margin:0 0 20px;white-space:pre-wrap;">${replyText}</p>
+${replyHtml}
 <div style="background:#f9fafb;border-left:4px solid #0ea5e9;border-radius:0 8px 8px 0;padding:16px 20px;margin:24px 0;">
-<p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">Your message</p>
-<p style="font-size:14px;color:#4b5563;margin:0;line-height:1.6;white-space:pre-wrap;">${message}</p>
+<p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">${yourMessageLabel}</p>
+<p style="font-size:14px;color:#4b5563;margin:0;line-height:1.6;">${originalMessage
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}</p>
 </div>
 <table cellpadding="0" cellspacing="0" style="margin:24px 0;"><tr>
 <td style="background:#0ea5e9;border-radius:8px;padding:12px 28px;">
-<a href="${FAQ_URL}" style="color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">Browse FAQ &rarr;</a>
+<a href="${FAQ_URL}" style="color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">${browseLabel}</a>
 </td></tr></table>
 <p style="font-size:12px;color:#9ca3af;margin:24px 0 0;line-height:1.6;">
-&mdash; The YFIT AI Support Team<br/>
+&mdash; The YFIT Support Team<br/>
 <a href="mailto:${SUPPORT_EMAIL}" style="color:#0ea5e9;">${SUPPORT_EMAIL}</a>
 </p>
 </td></tr>
 <tr><td style="padding:16px 0;text-align:center;">
-<p style="font-size:11px;color:#9ca3af;margin:0;">&copy; ${year} YFIT AI &mdash; yfitai.com</p>
+<p style="font-size:11px;color:#9ca3af;margin:0;">&copy; ${year} YFIT AI &mdash; <a href="https://yfitai.com" style="color:#0ea5e9;">yfitai.com</a></p>
 </td></tr>
 </table></td></tr></table>
 </body></html>`;
@@ -211,16 +323,45 @@ function buildSupportNotificationHtml(
   subject,
   message,
   source,
-  detectedLanguage,
-  languageName,
-  replyText
+  lang,
+  langName,
+  replyText,
+  faqCount,
+  replyMode
 ) {
   const sourceLabel = SOURCE_LABELS[source] || source || "Unknown";
-  const langDisplay = `${languageName} (${detectedLanguage})`;
+  const langDisplay = `${langName} (${lang})`;
+
+  const modeBadgeStyle =
+    faqCount > 0
+      ? "background:#10b981;color:#fff;"
+      : replyMode === "gpt-general"
+      ? "background:#f59e0b;color:#fff;"
+      : "background:#6b7280;color:#fff;";
+
+  const modeBadgeText =
+    faqCount > 0
+      ? `✓ FAQ-grounded (${faqCount} match${faqCount > 1 ? "es" : ""})`
+      : replyMode === "gpt-general"
+      ? "GPT general (no FAQ match)"
+      : "Static template";
+
+  const replyHtml = replyText
+    .split("\n\n")
+    .filter((p) => p.trim())
+    .map(
+      (p) =>
+        `<p style="margin:0 0 10px;font-size:14px;color:#065f46;line-height:1.6;">${p.replace(
+          /\n/g,
+          "<br>"
+        )}</p>`
+    )
+    .join("");
+
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
-<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+<tr><td align="center"><table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
 <tr><td style="background:linear-gradient(135deg,#1e293b,#334155);padding:24px 32px;border-radius:12px 12px 0 0;">
 <img src="${LOGO_URL}" alt="YFIT AI" style="height:36px;width:auto;display:block;"/>
 <p style="color:#94a3b8;margin:8px 0 0;font-size:13px;">New Support Request &mdash; Auto-reply sent &#10003;</p>
@@ -244,24 +385,31 @@ function buildSupportNotificationHtml(
 <td style="padding:10px 12px;font-size:14px;color:#1e293b;border:1px solid #e2e8f0;">${langDisplay}</td>
 </tr>
 <tr style="background:#f8fafc;">
+<td style="padding:10px 12px;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border:1px solid #e2e8f0;">Reply Mode</td>
+<td style="padding:10px 12px;border:1px solid #e2e8f0;"><span style="${modeBadgeStyle}padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${modeBadgeText}</span></td>
+</tr>
+<tr>
 <td style="padding:10px 12px;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border:1px solid #e2e8f0;">Timestamp</td>
 <td style="padding:10px 12px;font-size:14px;color:#1e293b;border:1px solid #e2e8f0;">${new Date().toUTCString()}</td>
 </tr>
 </table>
 <div style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;padding:16px 20px;margin-bottom:20px;">
 <p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">User's Message</p>
-<p style="font-size:14px;color:#374151;margin:0;line-height:1.6;white-space:pre-wrap;">${message}</p>
+<p style="font-size:14px;color:#374151;margin:0;line-height:1.6;">${message
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}</p>
 </div>
 <div style="background:#ecfdf5;border-radius:8px;border:1px solid #a7f3d0;padding:16px 20px;">
-<p style="font-size:11px;color:#059669;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">&#10003; Auto-Reply Sent to User (in ${languageName})</p>
-<p style="font-size:14px;color:#065f46;margin:0;line-height:1.6;white-space:pre-wrap;">${replyText}</p>
+<p style="font-size:11px;color:#059669;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">&#10003; Auto-Reply Sent to User (in ${langName}) &nbsp;<span style="${modeBadgeStyle}padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${modeBadgeText}</span></p>
+${replyHtml}
 </div>
-<p style="font-size:12px;color:#9ca3af;margin:20px 0 0;">Reply directly to this email to respond to ${name} at ${email}.</p>
+<p style="font-size:12px;color:#9ca3af;margin:20px 0 0;">Reply directly to this email to respond to ${name} at <a href="mailto:${email}" style="color:#0ea5e9;">${email}</a>.</p>
 </td></tr>
 </table></td></tr></table>
 </body></html>`;
 }
 
+// ── Main Handler ─────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   // CORS — allow all origins so marketing site, app, and social integrations can POST
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -298,8 +446,15 @@ export default async function handler(req, res) {
       error: "Message is too long. Please keep it under 5000 characters.",
     });
 
+  // ── Spam check ──────────────────────────────────────────────────────────────
+  if (isSpamMessage(name, email, message)) {
+    console.warn("[Contact] Spam detected — suppressing:", { name, email });
+    return res.status(200).json({ success: true, message: "Message received." });
+  }
+
   const resendApiKey = process.env.RESEND_API_KEY;
-  const manusApiKey = process.env.BUILT_IN_FORGE_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   // ── No Resend key — acknowledge gracefully ──────────────────────────────────
   if (!resendApiKey) {
@@ -315,55 +470,55 @@ export default async function handler(req, res) {
     });
   }
 
-  try {
-    // ── Step 1: Language detection + reply generation ────────────────────────
-    // Priority order:
-    //   1. If language hint from frontend is a known language → use static template (always works)
-    //   2. If LLM API key is available → call LLM for personalised reply
-    //   3. Fallback → English static template
-    let detectedLanguage = language || "en";
-    let languageName = LANGUAGE_NAMES[detectedLanguage] || "English";
-    // Use static template as the default — always available, no API key needed
-    let replyText = getStaticReply(name, detectedLanguage, FAQ_URL);
-    let isSpam = false;
+  const detectedLanguage = language || "en";
+  const languageName = LANGUAGE_NAMES[detectedLanguage] || "English";
 
-    if (manusApiKey) {
+  try {
+    // ── Step 1: Search FAQ database ──────────────────────────────────────────
+    let faqMatches = [];
+    if (supabaseServiceKey) {
       try {
-        const llmResult = await generateMultilingualReply(
+        const supabase = createClient(SUPABASE_URL, supabaseServiceKey);
+        faqMatches = await searchFaq(supabase, message, subject);
+        console.log(
+          `[Contact] FAQ search: ${faqMatches.length} match(es) for "${message.substring(0, 60)}..."`
+        );
+      } catch (dbErr) {
+        console.warn("[Contact] FAQ search failed (non-fatal):", dbErr.message);
+      }
+    }
+
+    // ── Step 2: Generate smart reply ─────────────────────────────────────────
+    let replyText = getStaticReply(name, detectedLanguage, FAQ_URL);
+    let replyMode = "static";
+
+    if (openaiKey) {
+      try {
+        const smartReply = await generateSmartReply(
           name,
           message,
           subject,
-          manusApiKey,
-          language
+          detectedLanguage,
+          faqMatches,
+          openaiKey
         );
-        detectedLanguage = llmResult.detectedLanguage;
-        languageName = llmResult.languageName;
-        replyText = llmResult.replyText;
-        isSpam = llmResult.isSpam;
-      } catch (llmErr) {
-        // Non-fatal — fall back to static template in the known language
+        if (smartReply) {
+          replyText = smartReply;
+          replyMode = faqMatches.length > 0 ? "faq-grounded" : "gpt-general";
+          console.log(
+            `[Contact] GPT-4o-mini reply generated (mode=${replyMode}, lang=${detectedLanguage}, faqMatches=${faqMatches.length})`
+          );
+        }
+      } catch (gptErr) {
         console.warn(
-          "[Contact] LLM call failed, using static template fallback:",
-          llmErr.message
+          "[Contact] GPT-4o-mini failed, using static template:",
+          gptErr.message
         );
         // replyText already set to static template above — no action needed
       }
     }
 
-    // ── Step 2: Suppress spam silently ──────────────────────────────────────
-    if (isSpam) {
-      console.warn("[Contact] Spam detected — suppressing emails:", {
-        name,
-        email,
-        message: message.substring(0, 80),
-      });
-      return res.status(200).json({
-        success: true,
-        message: "Message received. We will get back to you shortly.",
-      });
-    }
-
-    // ── Step 3: Build emails ─────────────────────────────────────────────────
+    // ── Step 3: Build and send emails ────────────────────────────────────────
     const userEmailHtml = buildUserReplyHtml(
       name,
       replyText,
@@ -378,10 +533,11 @@ export default async function handler(req, res) {
       source,
       detectedLanguage,
       languageName,
-      replyText
+      replyText,
+      faqMatches.length,
+      replyMode
     );
 
-    // ── Step 4: Send both emails in parallel ─────────────────────────────────
     await Promise.allSettled([
       // Auto-reply to the user in their language
       fetch(RESEND_URL, {
@@ -401,7 +557,7 @@ export default async function handler(req, res) {
         console.warn("[Contact] User email failed:", err.message)
       ),
 
-      // Support team notification with full context
+      // Notification to support team with full context
       fetch(RESEND_URL, {
         method: "POST",
         headers: {
@@ -412,7 +568,9 @@ export default async function handler(req, res) {
           from: FROM_ADDRESS,
           to: [SUPPORT_EMAIL],
           reply_to: email,
-          subject: `[YFIT Support] ${subject || "New Contact"} — ${name} (${languageName}, via ${SOURCE_LABELS[source] || source})`,
+          subject: `[YFIT Support] ${subject || "New Contact"} — ${name} (${languageName}, ${replyMode}, via ${
+            SOURCE_LABELS[source] || source
+          })`,
           html: supportEmailHtml,
         }),
       }).catch((err) =>
@@ -425,6 +583,8 @@ export default async function handler(req, res) {
       message:
         "Message sent successfully. Check your inbox for a confirmation.",
       detectedLanguage,
+      replyMode,
+      faqMatchCount: faqMatches.length,
     });
   } catch (error) {
     console.error("[Contact] Unexpected error:", error);
