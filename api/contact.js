@@ -13,6 +13,11 @@
 //   4. Reply is generated in the user's language (from frontend i18n.language)
 //   5. Static template fallback if GPT-4 is unavailable
 //   6. Sends reply to user + notification to support@yfitai.com
+//
+// SUPPORT NOTIFICATION:
+//   - Always shows the auto-reply in ENGLISH (translated if needed) so owner can read it
+//   - Includes a "Reply in [Language]" button → opens api/reply-translate form
+//   - Owner writes reply in English → GPT translates → sends to user in their language
 // ============================================================
 
 import { createClient } from "@supabase/supabase-js";
@@ -24,6 +29,7 @@ const SUPPORT_EMAIL = "support@yfitai.com";
 const FROM_ADDRESS = "YFIT Support Team <support@yfitai.com>";
 const FAQ_URL = "https://app.yfitai.com/faq";
 const SUPABASE_URL = "https://mxggxpoxgqubojvumjlt.supabase.co";
+const APP_BASE_URL = "https://app.yfitai.com";
 const LOGO_URL =
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png";
 
@@ -48,51 +54,52 @@ const STOP_WORDS = new Set([
   "his", "how", "its", "may", "new", "now", "old", "see", "two",
   "way", "who", "did", "let", "put", "say", "she", "too", "use",
   "that", "this", "with", "have", "from", "they", "will", "been",
-  "when", "what", "your", "does", "into", "more", "also", "than",
-  "then", "them", "some", "just", "like", "very", "even", "back",
-  "good", "know", "take", "want", "make", "give", "most", "help",
-  "need", "would", "could", "should", "about", "please", "hello",
-  "bonjour", "hola", "merci", "gracias", "thank", "thanks",
+  "been", "into", "more", "also", "some", "than", "then", "when",
+  "your", "what", "just", "like", "time", "very", "make", "know",
+  "take", "year", "good", "much", "need", "even", "most", "tell",
+  "well", "also", "back", "come", "give", "most", "over", "such",
+  "want", "look", "only", "come", "over", "think", "also", "back",
+  "after", "first", "never", "these", "those", "about", "could",
+  "there", "their", "where", "which", "would", "other", "being",
+  "still", "while", "every", "under", "again", "found", "going",
+  "might", "place", "right", "since", "small", "start", "think",
+  "three", "today", "until", "using", "world", "years",
 ]);
 
 // ── FAQ Search ───────────────────────────────────────────────────────────────
 /**
- * Search the faq_articles table for relevant answers to the user's message.
- * Exact same algorithm as the original feedback-auto-reply Supabase Edge Function.
- * Returns up to 3 most relevant FAQ articles.
+ * Search faq_articles in Supabase using keyword extraction + ilike OR query.
+ * Same algorithm as the reference feedback-auto-reply Supabase Edge Function.
  */
-async function searchFaq(supabase, message, subject) {
+async function searchFaq(supabase, message, subject = "") {
+  const text = `${message} ${subject}`.toLowerCase();
+  const words = text.match(/\b[a-z]{3,}\b/g) || [];
+  const keywords = [...new Set(words.filter((w) => !STOP_WORDS.has(w)))].slice(0, 8);
+
+  if (keywords.length === 0) return [];
+
   try {
-    const combined = `${subject || ""} ${message}`.toLowerCase();
-    const terms = combined
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 3 && !STOP_WORDS.has(w))
-      .slice(0, 8);
-
-    if (terms.length === 0) return [];
-
-    const orConditions = terms
-      .map((t) => `question.ilike.%${t}%,answer.ilike.%${t}%`)
+    const orFilter = keywords
+      .map((k) => `question.ilike.%${k}%,answer.ilike.%${k}%`)
       .join(",");
 
     const { data, error } = await supabase
       .from("faq_articles")
-      .select("id, question, answer, keywords")
+      .select("id, question, answer, category")
       .eq("is_published", true)
-      .or(orConditions)
-      .limit(6);
+      .or(orFilter)
+      .limit(10);
 
-    if (error) {
-      console.warn("[Contact] FAQ search error:", error.message);
-      return [];
-    }
+    if (error) throw error;
     if (!data || data.length === 0) return [];
 
-    // Score by how many search terms appear in the article
+    // Score by keyword frequency
     const scored = data.map((article) => {
-      const text = `${article.question} ${article.answer} ${(article.keywords ?? []).join(" ")}`.toLowerCase();
-      const score = terms.filter((t) => text.includes(t)).length;
+      const articleText = `${article.question} ${article.answer}`.toLowerCase();
+      const score = keywords.reduce(
+        (acc, kw) => acc + (articleText.includes(kw) ? 1 : 0),
+        0
+      );
       return { article, score };
     });
 
@@ -189,6 +196,41 @@ Write a helpful reply in ${langName}.`;
   return data.choices?.[0]?.message?.content?.trim() || null;
 }
 
+/**
+ * Translate text to English for the support notification.
+ * Only called when the user's language is not English.
+ * Returns null on failure (notification will show original text with a note).
+ */
+async function translateToEnglish(text, openaiKey) {
+  try {
+    const response = await fetch(OPENAI_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a translator. Translate the following text to English. Output only the translated text — no explanations, no headers, no quotes.",
+          },
+          { role: "user", content: text },
+        ],
+        max_tokens: 600,
+        temperature: 0.2,
+      }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Spam Detection ───────────────────────────────────────────────────────────
 function isSpamMessage(name, email, message) {
   const spamPatterns = [
@@ -230,8 +272,7 @@ function buildUserReplyHtml(name, replyText, originalMessage, lang) {
   const dir = isRTL ? 'dir="rtl"' : "";
   const year = new Date().getFullYear();
 
-  // Convert plain text reply to HTML paragraphs
-  const replyHtml = replyText
+  const paragraphs = replyText
     .split("\n\n")
     .filter((p) => p.trim())
     .map(
@@ -243,72 +284,20 @@ function buildUserReplyHtml(name, replyText, originalMessage, lang) {
     )
     .join("");
 
-  const browseLabel =
-    {
-      fr: "Parcourir la FAQ →",
-      es: "Ver preguntas frecuentes →",
-      pt: "Ver FAQ →",
-      zh: "浏览常见问题 →",
-      hi: "FAQ देखें →",
-      de: "FAQ durchsuchen →",
-      ja: "FAQを見る →",
-      ar: "تصفح الأسئلة الشائعة →",
-      ko: "FAQ 보기 →",
-      it: "Sfoglia le FAQ →",
-      ru: "Просмотреть FAQ →",
-      nl: "FAQ bekijken →",
-      tr: "SSS'ye göz at →",
-      pl: "Przeglądaj FAQ →",
-      uk: "Переглянути FAQ →",
-      vi: "Xem FAQ →",
-      th: "ดู FAQ →",
-    }[lang] || "Browse FAQ →";
-
-  const yourMessageLabel =
-    {
-      fr: "VOTRE MESSAGE",
-      es: "TU MENSAJE",
-      pt: "SUA MENSAGEM",
-      zh: "您的消息",
-      hi: "आपका संदेश",
-      de: "IHRE NACHRICHT",
-      ja: "お問い合わせ内容",
-      ar: "رسالتك",
-      ko: "귀하의 메시지",
-      it: "IL TUO MESSAGGIO",
-      ru: "ВАШЕ СООБЩЕНИЕ",
-      nl: "UW BERICHT",
-      tr: "MESAJINIZ",
-      pl: "TWOJA WIADOMOŚĆ",
-      uk: "ВАШЕ ПОВІДОМЛЕННЯ",
-      vi: "TIN NHẮN CỦA BẠN",
-      th: "ข้อความของคุณ",
-    }[lang] || "YOUR MESSAGE";
-
-  return `<!DOCTYPE html><html ${dir}><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;" ${dir}>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-<tr><td style="background:linear-gradient(135deg,#0ea5e9,#10b981);padding:28px 32px;border-radius:12px 12px 0 0;">
-<img src="${LOGO_URL}" alt="YFIT AI" style="height:44px;width:auto;display:block;"/>
-<p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;">Support Team</p>
+<tr><td style="background:linear-gradient(135deg,#0f172a,#1e293b);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center;">
+<img src="${LOGO_URL}" alt="YFIT AI" style="height:40px;width:auto;display:inline-block;"/>
 </td></tr>
 <tr><td style="background:#ffffff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-${replyHtml}
-<div style="background:#f9fafb;border-left:4px solid #0ea5e9;border-radius:0 8px 8px 0;padding:16px 20px;margin:24px 0;">
-<p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">${yourMessageLabel}</p>
-<p style="font-size:14px;color:#4b5563;margin:0;line-height:1.6;">${originalMessage
+${paragraphs}
+<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;"/>
+<p style="font-size:12px;color:#9ca3af;margin:0;">Your original message: <em>${originalMessage
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")}</p>
-</div>
-<table cellpadding="0" cellspacing="0" style="margin:24px 0;"><tr>
-<td style="background:#0ea5e9;border-radius:8px;padding:12px 28px;">
-<a href="${FAQ_URL}" style="color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">${browseLabel}</a>
-</td></tr></table>
-<p style="font-size:12px;color:#9ca3af;margin:24px 0 0;line-height:1.6;">
-&mdash; The YFIT Support Team<br/>
-<a href="mailto:${SUPPORT_EMAIL}" style="color:#0ea5e9;">${SUPPORT_EMAIL}</a>
-</p>
+    .replace(/>/g, "&gt;")
+    .substring(0, 200)}${originalMessage.length > 200 ? "..." : ""}</em></p>
 </td></tr>
 <tr><td style="padding:16px 0;text-align:center;">
 <p style="font-size:11px;color:#9ca3af;margin:0;">&copy; ${year} YFIT AI &mdash; <a href="https://yfitai.com" style="color:#0ea5e9;">yfitai.com</a></p>
@@ -326,11 +315,13 @@ function buildSupportNotificationHtml(
   lang,
   langName,
   replyText,
+  replyTextEnglish,
   faqCount,
   replyMode
 ) {
   const sourceLabel = SOURCE_LABELS[source] || source || "Unknown";
   const langDisplay = `${langName} (${lang})`;
+  const year = new Date().getFullYear();
 
   const modeBadgeStyle =
     faqCount > 0
@@ -346,7 +337,11 @@ function buildSupportNotificationHtml(
       ? "GPT general (no FAQ match)"
       : "Static template";
 
-  const replyHtml = replyText
+  // The reply shown in the notification is always in English
+  const notificationReply = replyTextEnglish || replyText;
+  const isTranslated = replyTextEnglish && lang !== "en";
+
+  const replyHtml = notificationReply
     .split("\n\n")
     .filter((p) => p.trim())
     .map(
@@ -357,6 +352,17 @@ function buildSupportNotificationHtml(
         )}</p>`
     )
     .join("");
+
+  // Build the "Reply in [Language]" button URL
+  // Encodes user info as query params for the reply-translate form
+  const replyParams = new URLSearchParams({
+    to: email,
+    name: name,
+    lang: lang,
+    langName: langName,
+    subject: subject || "",
+  }).toString();
+  const replyFormUrl = `${APP_BASE_URL}/api/reply-translate?${replyParams}`;
 
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
@@ -394,16 +400,25 @@ function buildSupportNotificationHtml(
 </tr>
 </table>
 <div style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;padding:16px 20px;margin-bottom:20px;">
-<p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">User's Message</p>
+<p style="font-size:11px;color:#9ca3af;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;">User's Message (original)</p>
 <p style="font-size:14px;color:#374151;margin:0;line-height:1.6;">${message
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")}</p>
 </div>
-<div style="background:#ecfdf5;border-radius:8px;border:1px solid #a7f3d0;padding:16px 20px;">
-<p style="font-size:11px;color:#059669;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">&#10003; Auto-Reply Sent to User (in ${langName}) &nbsp;<span style="${modeBadgeStyle}padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${modeBadgeText}</span></p>
+<div style="background:#ecfdf5;border-radius:8px;border:1px solid #a7f3d0;padding:16px 20px;margin-bottom:20px;">
+<p style="font-size:11px;color:#059669;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">&#10003; Auto-Reply Sent to User (in ${langName}) &nbsp;<span style="${modeBadgeStyle}padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${modeBadgeText}</span>${isTranslated ? ' &nbsp;<span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">Shown in English below</span>' : ""}</p>
 ${replyHtml}
+${isTranslated ? `<p style="font-size:11px;color:#6b7280;margin:8px 0 0;font-style:italic;">Note: The actual reply was sent to the user in ${langName}. The text above is an English translation for your reference.</p>` : ""}
 </div>
-<p style="font-size:12px;color:#9ca3af;margin:20px 0 0;">Reply directly to this email to respond to ${name} at <a href="mailto:${email}" style="color:#0ea5e9;">${email}</a>.</p>
+<div style="background:#f0f9ff;border-radius:8px;border:1px solid #bae6fd;padding:16px 20px;margin-bottom:20px;">
+<p style="font-size:12px;color:#0369a1;margin:0 0 12px;font-weight:600;">&#128393; Need to reply manually?</p>
+<p style="font-size:13px;color:#374151;margin:0 0 12px;">Write your reply in English — YFIT will automatically translate it to ${langName} and send it to ${name}.</p>
+<a href="${replyFormUrl}" style="display:inline-block;background:#0ea5e9;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:600;">Reply in ${langName} &rarr;</a>
+</div>
+<p style="font-size:12px;color:#9ca3af;margin:0;">Or reply directly to this email to contact ${name} at <a href="mailto:${email}" style="color:#0ea5e9;">${email}</a> without translation.</p>
+</td></tr>
+<tr><td style="padding:16px 0;text-align:center;">
+<p style="font-size:11px;color:#9ca3af;margin:0;">&copy; ${year} YFIT AI &mdash; <a href="https://yfitai.com" style="color:#0ea5e9;">yfitai.com</a></p>
 </td></tr>
 </table></td></tr></table>
 </body></html>`;
@@ -518,7 +533,22 @@ export default async function handler(req, res) {
       }
     }
 
-    // ── Step 3: Build and send emails ────────────────────────────────────────
+    // ── Step 3: Translate reply to English for support notification ──────────
+    // The user always receives the reply in their language.
+    // The support notification always shows the reply in English so the owner can read it.
+    let replyTextEnglish = null;
+    if (detectedLanguage !== "en" && openaiKey) {
+      try {
+        replyTextEnglish = await translateToEnglish(replyText, openaiKey);
+        if (replyTextEnglish) {
+          console.log(`[Contact] Reply translated to English for support notification`);
+        }
+      } catch (translateErr) {
+        console.warn("[Contact] English translation failed (non-fatal):", translateErr.message);
+      }
+    }
+
+    // ── Step 4: Build and send emails ────────────────────────────────────────
     const userEmailHtml = buildUserReplyHtml(
       name,
       replyText,
@@ -534,6 +564,7 @@ export default async function handler(req, res) {
       detectedLanguage,
       languageName,
       replyText,
+      replyTextEnglish,  // English version for support notification (null if lang=en)
       faqMatches.length,
       replyMode
     );
@@ -557,7 +588,7 @@ export default async function handler(req, res) {
         console.warn("[Contact] User email failed:", err.message)
       ),
 
-      // Notification to support team with full context
+      // Notification to support team with full context (reply shown in English)
       fetch(RESEND_URL, {
         method: "POST",
         headers: {
