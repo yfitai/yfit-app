@@ -312,7 +312,7 @@ export default function SubscriptionPage({ user }) {
         <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-3">{t('subscription.manageSubscription', 'Manage Subscription')}</h3>
           <a
-            href="https://billing.stripe.com/p/login/test_00000000"
+            href="https://billing.stripe.com/p/login/bpc_1TXkpzD2YT6Pvz5WGnbrTZ7X"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between w-full p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"

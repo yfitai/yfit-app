@@ -10,11 +10,12 @@ const SUPABASE_URL = 'https://mxggxpoxgqubojvumjlt.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMjI5NjYsImV4cCI6MjA3MjY5ODk2Nn0.EWlmoH-_kw1A_gbs1rECLWkC30X50IOGx3GDSDNSYE4'
 
 // DB constraint: type IN ('bug', 'feature_request', 'general', 'praise')
+// labelKey maps to i18n keys in feedback namespace
 const FEEDBACK_TYPES = [
-  { value: 'bug',             label: 'Bug Report',       icon: <Bug className="w-4 h-4" />,         color: 'text-red-600 bg-red-50 border-red-200' },
-  { value: 'feature_request', label: 'Feature Request',  icon: <Lightbulb className="w-4 h-4" />,   color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
-  { value: 'general',         label: 'General Feedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  { value: 'praise',          label: 'Praise / Love It!', icon: <Heart className="w-4 h-4" />,      color: 'text-pink-600 bg-pink-50 border-pink-200' },
+  { value: 'bug',             labelKey: 'feedback.bugReport',       icon: <Bug className="w-4 h-4" />,         color: 'text-red-600 bg-red-50 border-red-200' },
+  { value: 'feature_request', labelKey: 'feedback.featureRequest',  icon: <Lightbulb className="w-4 h-4" />,   color: 'text-yellow-600 bg-yellow-50 border-yellow-200' },
+  { value: 'general',         labelKey: 'feedback.generalFeedback', icon: <MessageCircle className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+  { value: 'praise',          labelKey: 'feedback.praiseIt',        icon: <Heart className="w-4 h-4" />,      color: 'text-pink-600 bg-pink-50 border-pink-200' },
 ]
 
 const CATEGORIES = [
@@ -155,17 +156,17 @@ export default function FeedbackButton({ user }) {
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {/* Type selector */}
               <div className="grid grid-cols-2 gap-2">
-                {FEEDBACK_TYPES.map(t => (
+                {FEEDBACK_TYPES.map(type => (
                   <button
-                    key={t.value}
+                    key={type.value}
                     type="button"
-                    onClick={() => setFeedbackType(t.value)}
+                    onClick={() => setFeedbackType(type.value)}
                     className={`flex items-center gap-2 p-2 rounded-lg border text-xs font-medium transition-all ${
-                      feedbackType === t.value ? t.color + ' border-2' : 'border-gray-200 hover:bg-gray-50'
+                      feedbackType === type.value ? type.color + ' border-2' : 'border-gray-200 hover:bg-gray-50'
                     }`}
                   >
-                    {t.icon}
-                    {t.label}
+                    {type.icon}
+                    {t(type.labelKey)}
                   </button>
                 ))}
               </div>

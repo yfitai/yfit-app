@@ -1,9 +1,9 @@
 /**
  * Vercel Serverless Function - USDA Food Search Proxy
- * 
- * This endpoint proxies requests to USDA FoodData Central API to avoid CORS issues
- * when the app is loaded remotely from Vercel.
- * 
+ *
+ * Proxies requests to USDA FoodData Central API to avoid CORS issues.
+ * Uses GET (not POST) — the USDA /foods/search endpoint only supports GET.
+ *
  * Endpoint: /api/food/search?query=chicken&pageSize=25
  * Method: GET
  * Returns: Food search results from USDA FoodData Central
@@ -34,49 +34,51 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching USDA for: ${query}`);
 
-    // USDA FoodData Central API
-    // Note: Using demo key for now - should be replaced with actual API key in production
     const usdaApiKey = process.env.USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m';
-    const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}`;
-    
+
+    // Build GET query string — USDA /foods/search uses GET, not POST
+    const params = new URLSearchParams({
+      api_key: usdaApiKey,
+      query: query,
+      pageSize: parseInt(pageSize),
+      pageNumber: 1,
+      sortBy: 'score',
+      sortOrder: 'desc',
+    });
+    // Append multiple dataType values (URLSearchParams.append keeps duplicates)
+    ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'].forEach(dt =>
+      params.append('dataType', dt)
+    );
+
+    const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?${params.toString()}`;
+
     const response = await fetch(usdaUrl, {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)',
+        'User-Agent': 'YFIT-App/1.0 (https://app.yfitai.com)',
       },
-      body: JSON.stringify({
-        query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],  // Include all food types
-        pageSize: parseInt(pageSize),
-        pageNumber: 1,
-        sortBy: 'score',
-        sortOrder: 'desc'
-      })
     });
 
     if (!response.ok) {
       console.error(`[API] USDA API error: ${response.status}`);
       const errorText = await response.text();
-      console.error('[API] USDA error response:', errorText);
-      return res.status(response.status).json({ 
+      console.error('[API] USDA error response:', errorText.slice(0, 200));
+      return res.status(response.status).json({
         error: 'Failed to fetch from USDA FoodData Central',
-        status: response.status 
+        status: response.status,
       });
     }
 
     const data = await response.json();
-
     console.log(`[API] USDA search success, found ${data.foods?.length || 0} results`);
 
-    // Return the data
     return res.status(200).json(data);
 
   } catch (error) {
     console.error('[API] Error in USDA search:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Internal server error',
-      message: error.message 
+      message: error.message,
     });
   }
 }

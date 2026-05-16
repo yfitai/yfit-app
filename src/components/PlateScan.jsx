@@ -24,6 +24,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Camera, X, Loader2, CheckCircle2, AlertCircle, Trash2, UtensilsCrossed, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -55,6 +56,7 @@ function calcNutrition(food, qty, unit) {
 
 // ── Individual food item card ─────────────────────────────────────────────────
 function FoodItemCard({ item, onUpdate, onRemove }) {
+  const { t } = useTranslation()
   const { food, qty, unit, included } = item
   const nutrition = calcNutrition(food, qty, unit)
 
@@ -76,7 +78,7 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
             </span>
           </div>
           {food.searchName && food.searchName !== food.name && (
-            <p className="text-xs text-gray-400 mt-0.5">Searched as: {food.searchName}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{t('nutrition.plateScan.searchedAs', { name: food.searchName })}</p>
           )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -84,7 +86,7 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
           <button
             onClick={() => onUpdate({ included: !included })}
             className={`p-1.5 rounded-lg transition-colors ${included ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
-            title={included ? 'Exclude from log' : 'Include in log'}
+            title={included ? t('nutrition.plateScan.excludeFromLog') : t('nutrition.plateScan.includeInLog')}
           >
             <CheckCircle2 className="w-4 h-4" />
           </button>
@@ -92,7 +94,7 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
           <button
             onClick={onRemove}
             className="p-1.5 rounded-lg bg-red-100 text-red-500 hover:bg-red-200 transition-colors"
-            title="Remove this food"
+            title={t('nutrition.plateScan.removeFood')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -124,10 +126,10 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
       {included && (
         <div className="grid grid-cols-4 gap-1 text-center">
           {[
-            { label: 'Cal',  value: nutrition.calories,       color: 'text-gray-800' },
-            { label: 'Pro',  value: `${nutrition.protein}g`,  color: 'text-blue-600' },
-            { label: 'Carb', value: `${nutrition.carbs}g`,    color: 'text-orange-600' },
-            { label: 'Fat',  value: `${nutrition.fat}g`,      color: 'text-purple-600' },
+            { label: t('nutrition.plateScan.cal'),  value: nutrition.calories,       color: 'text-gray-800' },
+            { label: t('nutrition.plateScan.pro'),  value: `${nutrition.protein}g`,  color: 'text-blue-600' },
+            { label: t('nutrition.plateScan.carb'), value: `${nutrition.carbs}g`,    color: 'text-orange-600' },
+            { label: t('nutrition.plateScan.fat'),  value: `${nutrition.fat}g`,      color: 'text-purple-600' },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-lg py-1 px-0.5">
               <div className={`font-semibold text-xs ${color}`}>{value}</div>
@@ -142,6 +144,7 @@ function FoodItemCard({ item, onUpdate, onRemove }) {
 
 // ── Main PlateScan modal ──────────────────────────────────────────────────────
 export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged, onClose }) {
+  const { t } = useTranslation()
   const [phase, setPhase] = useState('pick')   // 'pick' | 'preview' | 'scanning' | 'review' | 'logging' | 'done'
   const [previewUrl, setPreviewUrl] = useState(null)
   const [imageBase64, setImageBase64] = useState(null)
@@ -200,11 +203,11 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
       const data = await res.json()
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to analyze image')
+        throw new Error(data.error || t('nutrition.plateScan.failedToAnalyze'))
       }
 
       if (data.foods.length === 0) {
-        setScanNote(data.note || 'No foods could be identified. Please try a clearer photo.')
+        setScanNote(data.note || t('nutrition.plateScan.noFoodsFound'))
         setPhase('pick')
         return
       }
@@ -221,7 +224,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
       setPhase('review')
     } catch (err) {
       console.error('[PlateScan] Scan error:', err)
-      setError(err.message || 'Something went wrong. Please try again.')
+      setError(err.message || t('nutrition.plateScan.somethingWentWrong'))
       setPhase('preview')
     }
   }
@@ -300,7 +303,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
       setPhase('done')
     } catch (err) {
       console.error('[PlateScan] Log error:', err)
-      setError('Failed to log meals. Please try again.')
+      setError(t('nutrition.plateScan.failedToLog'))
     } finally {
       setLogging(false)
     }
@@ -336,7 +339,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
         user_id: user.id,
         template_name: templateName.trim(),
         meal_type: mealType,
-        description: 'Created from Plate Scan',
+        description: t('nutrition.plateScan.createdFromPlateScan'),
         total_calories: totals.calories,
         total_protein: totals.protein.toString(),
         total_carbs: totals.carbs.toString(),
@@ -349,10 +352,10 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
       if (dbError) throw dbError
       setShowTemplatePrompt(false)
       setTemplateName('')
-      alert(`Template "${templateName.trim()}" saved!`)
+      alert(t('nutrition.plateScan.templateSaved', { name: templateName.trim() }))
     } catch (err) {
       console.error('[PlateScan] Template save error:', err)
-      alert('Failed to save template. Please try again.')
+      alert(t('nutrition.plateScan.failedToSaveTemplate'))
     } finally {
       setSavingTemplate(false)
     }
@@ -370,7 +373,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               <Camera className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-800 text-base leading-tight">Plate Scan</h2>
+              <h2 className="font-bold text-gray-800 text-base leading-tight">{t('nutrition.plateScan.plateScanTitle')}</h2>
               <p className="text-xs text-gray-500 capitalize">{mealType}</p>
             </div>
           </div>
@@ -399,8 +402,8 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 <Camera className="w-10 h-10 text-teal-400" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">Take a photo of your meal</h3>
-                <p className="text-sm text-gray-500 mt-1">AI will identify the foods. You set the serving sizes.</p>
+                <h3 className="font-semibold text-gray-800">{t('nutrition.plateScan.takePhotoPrompt')}</h3>
+                <p className="text-sm text-gray-500 mt-1">{t('nutrition.plateScan.aiWillIdentify')}</p>
               </div>
 
               {/* Error or note */}
@@ -419,7 +422,7 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2"
               >
                 <Camera className="w-5 h-5" />
-                Open Camera
+                {t('nutrition.plateScan.openCamera')}
               </button>
             </div>
           )}
@@ -429,10 +432,12 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
             <div className="p-4 space-y-4">
               <img
                 src={previewUrl}
-                alt="Meal preview"
+                alt={t('nutrition.plateScan.mealPreview')}
                 className="w-full h-56 object-cover rounded-xl border border-gray-200"
               />
-              <p className="text-sm text-gray-600 text-center">Looks good? Tap <strong>Identify Foods</strong> to continue.</p>
+              <p className="text-sm text-gray-600 text-center"
+                dangerouslySetInnerHTML={{ __html: t('nutrition.plateScan.confirmPrompt') }}
+              />
 
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
@@ -449,15 +454,15 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {previewUrl && (
                 <img
                   src={previewUrl}
-                  alt="Meal"
+                  alt={t('nutrition.plateScan.mealPreview')}
                   className="w-full h-40 object-cover rounded-xl border border-gray-200 opacity-60"
                 />
               )}
               <div className="flex items-center gap-3">
                 <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
-                <p className="text-gray-700 font-medium">Identifying foods…</p>
+                <p className="text-gray-700 font-medium">{t('nutrition.plateScan.identifyingFoods')}</p>
               </div>
-              <p className="text-xs text-gray-400">This usually takes 5–10 seconds</p>
+              <p className="text-xs text-gray-400">{t('nutrition.plateScan.takesSeconds')}</p>
             </div>
           )}
 
@@ -468,15 +473,15 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {previewUrl && (
                 <img
                   src={previewUrl}
-                  alt="Meal"
+                  alt={t('nutrition.plateScan.mealPreview')}
                   className="w-full h-32 object-cover rounded-xl border border-gray-200"
                 />
               )}
 
               {/* Instruction */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
-                <p className="font-semibold mb-0.5">Set your serving sizes</p>
-                <p>Found {foodItems.length} food{foodItems.length !== 1 ? 's' : ''}. Adjust quantities, then tap <strong>Log All</strong>.</p>
+                <p className="font-semibold mb-0.5">{t('nutrition.plateScan.setServingSizes')}</p>
+                <p>{t('nutrition.plateScan.foundFoods', { count: foodItems.length })}</p>
               </div>
 
               {/* Food cards */}
@@ -498,13 +503,13 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {/* Totals bar */}
               {includedCount > 0 && (
                 <div className="bg-gray-800 text-white rounded-xl p-3">
-                  <p className="text-xs text-gray-400 mb-1">{includedCount} item{includedCount !== 1 ? 's' : ''} — total</p>
+                  <p className="text-xs text-gray-400 mb-1">{t('nutrition.plateScan.itemsTotal', { count: includedCount })}</p>
                   <div className="grid grid-cols-4 gap-2 text-center">
                     {[
-                      { label: 'Cal',  value: totals.calories,       color: 'text-white' },
-                      { label: 'Pro',  value: `${totals.protein}g`,  color: 'text-blue-300' },
-                      { label: 'Carb', value: `${totals.carbs}g`,    color: 'text-orange-300' },
-                      { label: 'Fat',  value: `${totals.fat}g`,      color: 'text-purple-300' },
+                      { label: t('nutrition.plateScan.cal'),  value: totals.calories,       color: 'text-white' },
+                      { label: t('nutrition.plateScan.pro'),  value: `${totals.protein}g`,  color: 'text-blue-300' },
+                      { label: t('nutrition.plateScan.carb'), value: `${totals.carbs}g`,    color: 'text-orange-300' },
+                      { label: t('nutrition.plateScan.fat'),  value: `${totals.fat}g`,      color: 'text-purple-300' },
                     ].map(({ label, value, color }) => (
                       <div key={label}>
                         <div className={`font-bold text-sm ${color}`}>{value}</div>
@@ -525,10 +530,10 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {/* Template prompt */}
               {showTemplatePrompt && (
                 <div className="border border-purple-200 bg-purple-50 rounded-xl p-3 space-y-2">
-                  <p className="text-sm font-semibold text-purple-800">Save as Template</p>
+                  <p className="text-sm font-semibold text-purple-800">{t('nutrition.plateScan.saveAsTemplate')}</p>
                   <input
                     type="text"
-                    placeholder="Template name (e.g. My Chicken Bowl)"
+                    placeholder={t('nutrition.plateScan.templateNamePlaceholder')}
                     value={templateName}
                     onChange={e => setTemplateName(e.target.value)}
                     className="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-400 focus:border-transparent"
@@ -538,14 +543,14 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                       onClick={() => setShowTemplatePrompt(false)}
                       className="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300"
                     >
-                      Cancel
+                      {t('nutrition.plateScan.cancel')}
                     </button>
                     <button
                       onClick={handleSaveTemplate}
                       disabled={savingTemplate || !templateName.trim()}
                       className="flex-1 py-2 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 disabled:opacity-60 flex items-center justify-center gap-1"
                     >
-                      {savingTemplate ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+                      {savingTemplate ? <Loader2 className="w-4 h-4 animate-spin" /> : t('nutrition.plateScan.save')}
                     </button>
                   </div>
                 </div>
@@ -560,14 +565,14 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 <CheckCircle2 className="w-8 h-8 text-green-500" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-800 text-lg">Logged!</h3>
-                <p className="text-gray-500 text-sm mt-1">{includedCount} food{includedCount !== 1 ? 's' : ''} added to your {mealType}.</p>
+                <h3 className="font-bold text-gray-800 text-lg">{t('nutrition.plateScan.logged')}</h3>
+                <p className="text-gray-500 text-sm mt-1">{t('nutrition.plateScan.addedToMeal', { count: includedCount, meal: mealType })}</p>
               </div>
               <button
                 onClick={onClose}
                 className="px-6 py-2 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-colors"
               >
-                Done
+                {t('nutrition.plateScan.done')}
               </button>
             </div>
           )}
@@ -581,14 +586,14 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
             >
               <RefreshCw className="w-4 h-4" />
-              Retake
+              {t('nutrition.plateScan.retake')}
             </button>
             <button
               onClick={handleScan}
               className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2"
             >
               <Camera className="w-5 h-5" />
-              Identify Foods
+              {t('nutrition.plateScan.identifyFoods')}
             </button>
           </div>
         )}
@@ -602,13 +607,13 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
                 className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"
               >
                 <RefreshCw className="w-4 h-4" />
-                Retake
+                {t('nutrition.plateScan.retake')}
               </button>
               <button
                 onClick={() => setShowTemplatePrompt(true)}
                 className="flex-1 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:from-pink-600 hover:to-purple-600 transition-all"
               >
-                Save as Template
+                {t('nutrition.plateScan.saveAsTemplate')}
               </button>
             </div>
             <button
@@ -619,12 +624,14 @@ export default function PlateScan({ mealType, user, selectedDate, onFoodsLogged,
               {logging ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Logging…
+                  {t('nutrition.plateScan.logging')}
                 </>
               ) : (
                 <>
                   <UtensilsCrossed className="w-5 h-5" />
-                  Log {includedCount > 0 ? `${includedCount} Item${includedCount !== 1 ? 's' : ''}` : 'All'}
+                  {includedCount > 0
+                    ? t('nutrition.plateScan.logItems', { count: includedCount })
+                    : t('nutrition.plateScan.logAll')}
                 </>
               )}
             </button>
