@@ -197,6 +197,7 @@ export default function NutritionEnhanced({ user: propUser }) {
 
   const handleOpenFoodSearch = (mealType) => {
     setSelectedMealType(mealType)
+    setLastFoodSearchQuery('')  // always open fresh when triggered from meal card
     setShowFoodSearch(true)
   }
 
@@ -345,9 +346,10 @@ const handleBarcodeScanned = async (barcode) => {
     // Reload meals
     await loadTodaysMeals(user.id, selectedDate)
 
-    // Close serving selector
+    // Close serving selector and clear search state (ready for next fresh search)
     setShowServingSelector(false)
     setSelectedFood(null)
+    setLastFoodSearchQuery('')  // clear so next food search opens blank
   }
 
   const handleDeleteMeal = async (mealId) => {

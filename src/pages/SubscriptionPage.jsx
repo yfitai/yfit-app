@@ -326,6 +326,9 @@ export default function SubscriptionPage({ user }) {
           <p className="text-xs text-gray-400 mt-3 text-center">
             {t('subscription.cancelInPortal', 'To cancel or change your plan, visit the Stripe billing portal above.')}
           </p>
+          <p className="text-xs text-blue-500 mt-1 text-center">
+            {t('subscription.portalEmailHint', '💡 Enter your billing email address on the Stripe page to access your account.')}
+          </p>
         </div>
       )}
 

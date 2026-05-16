@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const openaiKey = process.env.OPENAI_API_KEY;
-  const usdaKey = process.env.USDA_API_KEY || "K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m";
+  const usdaKey = process.env.USDA_API_KEY || "DEMO_KEY";
 
   if (!openaiKey) {
     return res.status(500).json({ error: "OpenAI API key not configured" });
@@ -155,7 +155,7 @@ If the image does not contain food, return an empty foods array with a note expl
       identifiedFoods.map(async (identified) => {
         try {
           const searchUrl = `${USDA_SEARCH_URL}?api_key=${usdaKey}&query=${encodeURIComponent(identified.name)}&pageSize=5&dataType=Foundation,SR%20Legacy`;
-          const usdaRes = await fetch(searchUrl);
+          const usdaRes = await fetch(searchUrl, { headers: { 'Accept': 'application/json' } });
 
           if (!usdaRes.ok) {
             console.warn(`[PlateScan] USDA lookup failed for: ${identified.name}`);

@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching USDA for: ${query}`);
 
-    const usdaApiKey = process.env.USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m';
+    const usdaApiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
 
     // Build GET query string — USDA /foods/search uses GET, not POST
     const params = new URLSearchParams({
@@ -55,6 +55,7 @@ export default async function handler(req, res) {
     const response = await fetch(usdaUrl, {
       method: 'GET',
       headers: {
+        'Accept': 'application/json',
         'User-Agent': 'YFIT-App/1.0 (https://app.yfitai.com)',
       },
     });
