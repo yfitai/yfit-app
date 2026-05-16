@@ -98,7 +98,7 @@ async function searchUSDA(query, limit) {
   try {
     // Use CapacitorHttp to bypass Android WebView CORS restrictions
     // (same pattern as getFoodByBarcode — fetch() is blocked on native)
-    const apiUrl = `https://yfit-deploy.vercel.app/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
+    const apiUrl = `https://app.yfitai.com/api/food/search?query=${encodeURIComponent(query)}&pageSize=${limit * 2}`
 
     const response = await CapacitorHttp.get({
       url: apiUrl,
@@ -262,7 +262,7 @@ function transformUSDAFood(usdaFood, relevanceScore = 0) {
 async function searchOpenFoodFacts(query, limit, language = 'en') {
   try {
     // Use CapacitorHttp to bypass Android WebView CORS restrictions
-    const apiUrl = `https://yfit-deploy.vercel.app/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}&language=${encodeURIComponent(language)}`
+    const apiUrl = `https://app.yfitai.com/api/food/search-openfoodfacts?query=${encodeURIComponent(query)}&pageSize=${limit * 5}&language=${encodeURIComponent(language)}`
 
     const response = await CapacitorHttp.get({
       url: apiUrl,
