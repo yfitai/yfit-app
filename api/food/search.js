@@ -34,42 +34,51 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching USDA for: ${query}`);
 
-    // USDA FoodData Central API
-    // Note: Using demo key for now - should be replaced with actual API key in production
     const usdaApiKey = process.env.USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m';
     const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}`;
-    
-    const response = await fetch(usdaUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)',
-      },
-      body: JSON.stringify({
-        query: query,
-        dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],  // Include all food types
-        pageSize: parseInt(pageSize),
-        pageNumber: 1,
-        sortBy: 'score',
-        sortOrder: 'desc'
-      })
+
+    const body = JSON.stringify({
+      query: query,
+      dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],
+      pageSize: parseInt(pageSize),
+      pageNumber: 1,
+      sortBy: 'score',
+      sortOrder: 'desc'
     });
 
-    if (!response.ok) {
-      console.error(`[API] USDA API error: ${response.status}`);
-      const errorText = await response.text();
-      console.error('[API] USDA error response:', errorText);
-      return res.status(response.status).json({ 
+    // Retry up to 3 times with short backoff to handle intermittent USDA rate limits from shared IPs
+    let response;
+    let lastStatus = 500;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await fetch(usdaUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'YFIT-App/1.0 (https://yfit-deploy.vercel.app)',
+          },
+          body,
+        });
+        if (response.ok) break;
+        lastStatus = response.status;
+        const errorText = await response.text();
+        console.error(`[API] USDA attempt ${attempt} failed: ${response.status} — ${errorText.slice(0, 100)}`);
+        if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 300));
+      } catch (fetchErr) {
+        console.error(`[API] USDA fetch error attempt ${attempt}:`, fetchErr.message);
+        if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 300));
+      }
+    }
+
+    if (!response || !response.ok) {
+      return res.status(lastStatus).json({
         error: 'Failed to fetch from USDA FoodData Central',
-        status: response.status 
+        status: lastStatus,
       });
     }
 
     const data = await response.json();
-
     console.log(`[API] USDA search success, found ${data.foods?.length || 0} results`);
-
-    // Return the data
     return res.status(200).json(data);
 
   } catch (error) {
