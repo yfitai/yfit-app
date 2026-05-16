@@ -52,21 +52,33 @@ export default async function handler(req, res) {
 
     const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?${params.toString()}`;
 
-    const response = await fetch(usdaUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'YFIT-App/1.0 (https://app.yfitai.com)',
-      },
-    });
+    // Retry up to 3 times with short backoff to handle intermittent USDA rate limits
+    // Note: Do NOT send Accept: application/json — USDA ignores it and it can cause issues
+    let response;
+    let lastStatus = 500;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await fetch(usdaUrl, {
+          method: 'GET',
+          headers: {
+            'User-Agent': 'YFIT-App/1.0 (https://app.yfitai.com)',
+          },
+        });
+        if (response.ok) break; // success — exit retry loop
+        lastStatus = response.status;
+        const errorText = await response.text();
+        console.error(`[API] USDA attempt ${attempt} failed: ${response.status} — ${errorText.slice(0, 100)}`);
+        if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 300));
+      } catch (fetchErr) {
+        console.error(`[API] USDA fetch error attempt ${attempt}:`, fetchErr.message);
+        if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 300));
+      }
+    }
 
-    if (!response.ok) {
-      console.error(`[API] USDA API error: ${response.status}`);
-      const errorText = await response.text();
-      console.error('[API] USDA error response:', errorText.slice(0, 200));
-      return res.status(response.status).json({
+    if (!response || !response.ok) {
+      return res.status(lastStatus).json({
         error: 'Failed to fetch from USDA FoodData Central',
-        status: response.status,
+        status: lastStatus,
       });
     }
 
