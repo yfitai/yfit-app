@@ -1963,7 +1963,7 @@ export default function PredictionsUnified({ user }) {
               </div>
               <div>
                 <div className="text-sm opacity-90 mb-1">{t('predictions.status')}</div>
-                <div className="text-4xl font-bold capitalize">{predictions.deload.status}</div>
+                <div className="text-4xl font-bold capitalize">{predictions.bpGoal.status}</div>
                 <div className="text-sm opacity-75">Trend: {predictions.bpGoal.trend}</div>
               </div>
               <div>
