@@ -100,6 +100,17 @@ export default function SubscriptionPage({ user }) {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
 
+      {/* Page Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+          <Crown className="w-5 h-5 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">{t('nav.account', 'Account')}</h1>
+          <p className="text-sm text-gray-500">{t('subscription.manageYourPlan', 'Manage your plan and billing')}</p>
+        </div>
+      </div>
+
       {/* Current Plan Card */}
       <div className={`rounded-2xl p-5 mb-6 text-white shadow-lg ${
         isPro && !isTrialing
