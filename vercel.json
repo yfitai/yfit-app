@@ -1,6 +1,5 @@
 {
   "buildCommand": "node update-version.js && CI=false npm run build",
-  "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
   "headers": [

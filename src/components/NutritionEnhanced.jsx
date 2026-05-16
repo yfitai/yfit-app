@@ -12,6 +12,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import UpgradeModal from './UpgradeModal'
 import { Target, Plus, Scan, Utensils, TrendingUp, Coffee, Sun, Moon, Cookie, Star, Trash2, Settings, BookmarkPlus, ChevronLeft, ChevronRight, CalendarDays, Pencil } from 'lucide-react'
 import NutrientProgressCard from './NutrientProgressCard'
+import PlateScan from './PlateScan'
 
 export default function NutritionEnhanced({ user: propUser }) {
   const { t } = useTranslation()
@@ -71,6 +72,9 @@ export default function NutritionEnhanced({ user: propUser }) {
   const [selectedMealType, setSelectedMealType] = useState('breakfast')
   const [lastFoodSearchQuery, setLastFoodSearchQuery] = useState('')  // for back-to-results
   
+  // Plate Scan state
+  const [showPlateScan, setShowPlateScan] = useState(false)
+
   // Template state
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false)
@@ -193,6 +197,7 @@ export default function NutritionEnhanced({ user: propUser }) {
 
   const handleOpenFoodSearch = (mealType) => {
     setSelectedMealType(mealType)
+    setLastFoodSearchQuery('')  // always open fresh when triggered from meal card
     setShowFoodSearch(true)
   }
 
@@ -341,9 +346,10 @@ const handleBarcodeScanned = async (barcode) => {
     // Reload meals
     await loadTodaysMeals(user.id, selectedDate)
 
-    // Close serving selector
+    // Close serving selector and clear search state (ready for next fresh search)
     setShowServingSelector(false)
     setSelectedFood(null)
+    setLastFoodSearchQuery('')  // clear so next food search opens blank
   }
 
   const handleDeleteMeal = async (mealId) => {
@@ -461,6 +467,12 @@ const handleBarcodeScanned = async (barcode) => {
     } else {
       alert('Failed to save to My Foods. Please try again.')
     }
+  }
+
+  // Handle plate scan
+  const handleOpenPlateScan = (mealType) => {
+    setSelectedMealType(mealType)
+    setShowPlateScan(true)
   }
 
   // Handle template quick-add
@@ -895,6 +907,7 @@ const handleBarcodeScanned = async (barcode) => {
             onEditMeal={handleEditMeal}
             onUseTemplate={() => handleUseTemplate(mealType)}
             onSaveAsTemplate={() => handleSaveAsTemplate(mealType)}
+            onPlateScan={() => handleOpenPlateScan(mealType)}
           />
         ))}
 
@@ -985,6 +998,20 @@ const handleBarcodeScanned = async (barcode) => {
           />
         )}
 
+        {/* Plate Scan Modal */}
+        {showPlateScan && (
+          <PlateScan
+            mealType={selectedMealType}
+            user={user}
+            selectedDate={selectedDate}
+            onFoodsLogged={async () => {
+              await loadTodaysMeals(user.id, selectedDate)
+              setShowPlateScan(false)
+            }}
+            onClose={() => setShowPlateScan(false)}
+          />
+        )}
+
         {/* Subscription Upgrade Modal */}
         <UpgradeModal
           isOpen={showUpgradeModal}
@@ -1011,7 +1038,7 @@ const handleBarcodeScanned = async (barcode) => {
   )
 }
 // Meal Type Section Component
-function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onEditMeal, onUseTemplate, onSaveAsTemplate }) {
+function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMeal, onEditMeal, onUseTemplate, onSaveAsTemplate, onPlateScan }) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(true)
 
@@ -1125,6 +1152,15 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                 <span>{t('nutrition.mealPlan')}</span>
               </button>
             </div>
+
+            {/* Plate Scan button */}
+            <button
+              onClick={onPlateScan}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg hover:from-teal-600 hover:to-cyan-600 transition-all font-medium text-sm"
+            >
+              <span>📸</span>
+              <span>Plate Scan</span>
+            </button>
             
             {/* Accuracy note */}
             <p className="text-center text-xs text-gray-400 mt-1">

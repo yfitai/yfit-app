@@ -78,12 +78,12 @@ class ErrorBoundary extends Component {
               We apologize for the inconvenience.
             </p>
             
-            {import.meta.env.DEV && this.state.error && (
-              <details className="text-left mb-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600 overflow-auto max-h-32">
-                <summary className="cursor-pointer font-medium mb-1">Error details (dev only)</summary>
-                <pre className="whitespace-pre-wrap">{this.state.error.message}</pre>
+            {this.state.error && (
+              <details className="text-left mb-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600 overflow-auto max-h-48">
+                <summary className="cursor-pointer font-medium mb-1">Error details (tap to expand)</summary>
+                <pre className="whitespace-pre-wrap break-all">{this.state.error.message}</pre>
                 {this.state.errorInfo && (
-                  <pre className="whitespace-pre-wrap mt-2 text-gray-400">
+                  <pre className="whitespace-pre-wrap break-all mt-2 text-gray-400">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}

@@ -100,6 +100,17 @@ export default function SubscriptionPage({ user }) {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
 
+      {/* Page Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+          <Crown className="w-5 h-5 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">{t('nav.account', 'Account')}</h1>
+          <p className="text-sm text-gray-500">{t('subscription.manageYourPlan', 'Manage your plan and billing')}</p>
+        </div>
+      </div>
+
       {/* Current Plan Card */}
       <div className={`rounded-2xl p-5 mb-6 text-white shadow-lg ${
         isPro && !isTrialing
@@ -312,7 +323,7 @@ export default function SubscriptionPage({ user }) {
         <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-3">{t('subscription.manageSubscription', 'Manage Subscription')}</h3>
           <a
-            href="https://billing.stripe.com/p/login/test_00000000"
+            href="https://billing.stripe.com/p/login/cNi6oGbHBgYD2S5bOZ3sI00"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between w-full p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -325,6 +336,9 @@ export default function SubscriptionPage({ user }) {
           </a>
           <p className="text-xs text-gray-400 mt-3 text-center">
             {t('subscription.cancelInPortal', 'To cancel or change your plan, visit the Stripe billing portal above.')}
+          </p>
+          <p className="text-xs text-blue-500 mt-1 text-center">
+            {t('subscription.portalEmailHint', '💡 Enter your billing email address on the Stripe page to access your account.')}
           </p>
         </div>
       )}

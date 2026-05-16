@@ -1,4 +1,4 @@
-import { Home, Target, Utensils, Calendar, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut, Ruler } from 'lucide-react'
+import { Home, Target, Utensils, Calendar, Dumbbell, Pill, TrendingUp, Sparkles, MessageCircle, LogOut, Ruler, UserCircle } from 'lucide-react'
 import { signOut } from '../lib/supabase'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -23,6 +23,7 @@ export default function Navigation({ user }) {
     { path: '/predictions', label: t('nav.predictions'), icon: Sparkles },
     { path: '/body-recomp', label: 'Recomp', icon: Ruler },
     { path: '/ai-coach-faq', label: t('nav.aiCoach'), icon: MessageCircle },
+    { path: '/subscription', label: t('nav.account', 'Account'), icon: UserCircle },
   ]
 
   return (
@@ -72,8 +73,8 @@ export default function Navigation({ user }) {
           </div>
         </div>
 
-        {/* Mobile nav links (2 rows of 5, shown below top bar on mobile only) */}
-        <div className="grid grid-cols-5 gap-1 pb-2 sm:hidden">
+        {/* Mobile nav links (2 rows, shown below top bar on mobile only) */}
+        <div className="grid grid-cols-6 gap-1 pb-2 sm:hidden">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
