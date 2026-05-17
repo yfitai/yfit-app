@@ -1100,7 +1100,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
                     </div>
                     {meal.serving_quantity && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {meal.serving_quantity} {meal.serving_unit}
+                        {meal.serving_quantity} {meal.serving_unit === 'label_serving' ? t('nutrition.labelServing', 'label serving') : meal.serving_unit}
                       </p>
                     )}
                   </div>
@@ -1159,7 +1159,7 @@ function MealTypeSection({ mealType, meals, onAddFood, onScanBarcode, onDeleteMe
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg hover:from-teal-600 hover:to-cyan-600 transition-all font-medium text-sm"
             >
               <span>📸</span>
-              <span>Plate Scan</span>
+              <span>{t('nutrition.plateScan.plateScan', 'Plate Scan')}</span>
             </button>
             
             {/* Accuracy note */}
