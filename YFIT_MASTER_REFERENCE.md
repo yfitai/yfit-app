@@ -158,10 +158,42 @@ All were in the `"en"` section of `i18nResources.js`:
 ## 📱 Social Media Automation
 
 ### Current Setup
-- **Platform:** n8n workflow (self-hosted or cloud)
+- **Platform:** n8n workflow (self-hosted or cloud) — `YFIT Social Media Automation v2` (workflow ID: `h7bRds9UOUfmP36F`)
 - **Video generation:** Railway service (`yfitai-yfit-video-service`) — Node/Express + ffmpeg + Pexels + ElevenLabs
 - **Platforms posting to:** TikTok, Instagram, YouTube Shorts, Facebook, Pinterest, LinkedIn (6 total)
 - **Current language:** English only
+- **Content angle:** Personal story — GPT-4 writes from first-person "I used to struggle..." perspective
+- **Workflow version:** v3.7.0 (deployed May 18, 2026)
+
+### Platform-Specific Caption CTAs (v3.7.0)
+
+| Platform | Caption CTA | First Comment (via Upload-Post) |
+|---|---|---|
+| TikTok | `👉 Link in bio → yfitai.com` | `👉 Try YFIT AI free → https://yfitai.com` |
+| Instagram | `🔗 Link in bio → yfitai.com` | `🔗 Get your free AI fitness plan → https://yfitai.com` |
+| YouTube | `⬇️ Try YFIT AI free → https://yfitai.com` | `⬇️ Try YFIT AI free → https://yfitai.com` |
+| LinkedIn | `🚀 Try YFIT AI free → https://yfitai.com` | `🚀 Try YFIT AI free → https://yfitai.com` |
+| Pinterest | `📌 Get your personalised AI fitness plan → https://yfitai.com` | `📌 Get your personalised plan → https://yfitai.com` |
+| Facebook | `💪 Try YFIT AI free — comment below or search "YFIT AI"` (NO URL in caption — FB reach penalty) | `💪 Try YFIT AI free → https://yfitai.com` |
+
+**Key design decisions:**
+- TikTok and Instagram: URL is NOT in the caption (platform algorithms deprioritise posts with links). The link is delivered via first comment only.
+- Facebook: Same — URL in first comment only, caption uses soft CTA without URL.
+- YouTube, LinkedIn, Pinterest: Full URL in both caption and first comment (these platforms do not penalise links).
+- `first_comment` is delivered via Upload-Post's native `first_comment` parameter (posts immediately after video goes live).
+
+### GPT-4 Content Prompt — Personal Story Angle (v2.1.0)
+
+The `generate-social-content` Supabase Edge Function was updated to write from a **first-person personal story** perspective:
+
+- Story arc: **struggle → discovery → transformation → YFIT as the tool**
+- Opener style: "I used to think crunches were the answer. Then I found out they were making things worse..."
+- NOT: "Did you know..." or "Here are 5 tips..." (generic informational — avoid)
+- Each platform gets a distinct tone, length, and hook style (see CTA table above)
+- Voiceover script: 60-90 seconds, first-person, ends with soft spoken CTA
+
+**Function file:** `/home/ubuntu/yfit-updates/generate-social-content/index.ts`
+**Deploy:** Paste into Supabase Dashboard → Edge Functions → `generate-social-content` → Edit
 
 ### Multilingual Social Media — Decision Pending (May 16, 2026)
 User is considering adding multilingual captions to social posts. Plan discussed:
@@ -220,6 +252,27 @@ When starting a new session, always:
 
 ## 📝 Session Change Log
 
+### May 18, 2026
+
+**Social Media Pipeline — v3.7.0 (6 Platform CTAs + First Comment + Personal Story):**
+- Updated  n8n node (v3.7.0):
+  - TikTok: caption CTA = "👉 Link in bio → yfitai.com" (no URL in caption)
+  - Instagram: caption CTA = "🔗 Link in bio → yfitai.com" (no URL in caption)
+  - YouTube: full URL in caption + first comment
+  - LinkedIn: full URL in caption + first comment
+  - Pinterest: full URL in caption + first comment
+  - Facebook: NO URL in caption (avoids reach penalty) — URL in first comment only
+  - Added  — all 6 platforms now post link as first comment
+- Added  body parameter to  n8n node
+  - Uses Upload-Post native feature — posts comment immediately after video goes live
+- Updated  Supabase Edge Function (v2.1.0):
+  - GPT-4 prompt now writes from first-person personal story perspective
+  - Story arc: struggle → discovery → transformation → YFIT as the tool
+  - Each platform gets distinct tone, length, hook style
+- Checked TikTok bio link (visible on profile page)
+- Instagram bio link requires manual check (login required)
+- All changes committed to yfit-app GitHub repo
+
 ### May 16, 2026
 
 **Food Search — Complete Fix (6 bugs resolved):**
@@ -253,7 +306,7 @@ When starting a new session, always:
 
 | Issue | Status | Notes |
 |---|---|---|
-| Social media monitoring — verify all 6 platforms posting | Pending | Scheduled for next session |
+| Social media monitoring — verify all 6 platforms posting | ✅ Done | v3.7.0 deployed May 18, 2026 — 6 platform CTAs + first_comment |
 | Multilingual social media captions | Pending decision | Plan documented above |
 | `yfit-deploy.vercel.app` still active | Intentional | Live update bundles served from here |
 | USDA rate limiting from Vercel shared IPs | Mitigated | Dedicated API key added + retry logic |
