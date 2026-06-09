@@ -41,7 +41,7 @@ export default function Goals({ user: propUser }) {
   const [heightCm, setHeightCm] = useState('')
   const [weight, setWeight] = useState('')
   const [gender, setGender] = useState('male')
-  const [activityLevel, setActivityLevel] = useState('moderate')
+  const [activityLevel, setActivityLevel] = useState('light')
   const [goalType, setGoalType] = useState('lose_weight')
   const [weightChangeRate, setWeightChangeRate] = useState('1') // lbs per week
   
@@ -651,7 +651,7 @@ export default function Goals({ user: propUser }) {
       setHeightFeet('')
       setHeightInches('')
       setGender('male')
-      setActivityLevel('moderate')
+      setActivityLevel('light')
       setGoalType('lose_weight')
       setWeightChangeRate('1')
       
@@ -910,6 +910,13 @@ export default function Goals({ user: propUser }) {
                 <option value="active">{t('goals.veryActive')}</option>
                 <option value="very_active">{t('goals.extraActive')}</option>
               </select>
+              <div className="mt-2 text-xs text-gray-500">
+                {activityLevel === 'sedentary' && <p>🪑 <strong>Sedentary:</strong> Desk job, little or no exercise. Most daily movement is walking to/from car.</p>}
+                {activityLevel === 'light' && <p>🚶 <strong>Lightly Active:</strong> Exercise 1–3×/week but otherwise sit most of the day. <em>This fits most gym-goers with office jobs.</em></p>}
+                {activityLevel === 'moderate' && <p>🏃 <strong>Moderately Active:</strong> Exercise 3–5×/week AND an active job or daily walking (5,000+ steps outside gym). If you sit most of the day, choose Lightly Active instead.</p>}
+                {activityLevel === 'active' && <p>💪 <strong>Very Active:</strong> Hard exercise 6–7 days/week or a physically demanding job (construction, nursing, etc.).</p>}
+                {activityLevel === 'very_active' && <p>🔥 <strong>Extra Active:</strong> Intense training twice daily, elite athlete, or extremely physical job. Rare — most people overestimate this level.</p>}
+              </div>
             </div>
 
             {/* Goal Type */}
