@@ -5,6 +5,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import FormAnalysisShowcase from "@/components/FormAnalysisShowcase";
 import AppTourSection from "@/components/AppTourSection";
+import QuickSetupCalculator from "@/components/QuickSetupCalculator";
 import MedicationShowcase from "@/components/MedicationShowcase";
 import { Check, ArrowRight, Activity, Zap, Smartphone, BarChart3, Pill, Eye, Target, Dumbbell, TrendingUp, Apple, Calendar, Brain, Loader2, X, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -412,6 +413,54 @@ export default function LandingPage() {
 
       {/* App Tour Section — interactive phone mockups */}
       <AppTourSection />
+
+      {/* Quick Setup / TDEE Calculator */}
+      <section id="quick-setup" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left: copy */}
+            <div className="lg:sticky lg:top-24">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
+                <span>⚡</span> Free — No Account Needed
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                See your exact numbers<br />
+                <span className="text-green-600">in 60 seconds</span>
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                Enter your stats and get a personalized calorie target and macro split — calculated using the same Katch-McArdle formula used by professional coaches.
+              </p>
+              <div className="space-y-3 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
+                  Katch-McArdle formula (more accurate than Mifflin-St Jeor)
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
+                  Goal-adjusted calorie target (not just TDEE)
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
+                  Protein, carb &amp; fat breakdown included
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
+                  Save your results to the free app in one click
+                </div>
+              </div>
+              <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <p className="text-xs text-blue-700 font-medium">
+                  💡 <strong>Why these numbers matter:</strong> Most people eat 300–500 calories more than they think. Knowing your exact target is the single biggest predictor of whether a diet works.
+                </p>
+              </div>
+            </div>
+            {/* Right: calculator */}
+            <div>
+              <QuickSetupCalculator />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Differentiator Showcase: Form Analysis */}
       <FormAnalysisShowcase />
