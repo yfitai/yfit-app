@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import FormAnalysisShowcase from "@/components/FormAnalysisShowcase";
+import AppTourSection from "@/components/AppTourSection";
 import MedicationShowcase from "@/components/MedicationShowcase";
 import { Check, ArrowRight, Activity, Zap, Smartphone, BarChart3, Pill, Eye, Target, Dumbbell, TrendingUp, Apple, Calendar, Brain, Loader2, X, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -311,12 +312,13 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 text-white shadow-lg">
-                  {t("landing.hero.ctaPrimary")}
+                  Try Free — See Your Dashboard
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-                <Button onClick={scrollToPricing} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
-                  {t("landing.hero.ctaSecondary")}
+                <Button onClick={() => document.getElementById('app-tour')?.scrollIntoView({ behavior: 'smooth' })} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
+                  See the App →
                 </Button>
+                <p className="text-xs text-muted-foreground">No credit card · Free plan available · Cancel anytime</p>
               </div>
               {/* Social proof strip */}
               <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -407,6 +409,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* App Tour Section — interactive phone mockups */}
+      <AppTourSection />
 
       {/* Differentiator Showcase: Form Analysis */}
       <FormAnalysisShowcase />
@@ -857,13 +862,14 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-white text-green-700 hover:bg-gray-100 shadow-lg font-semibold">
-              {t("landing.cta.primary")}
+              Try Free — See Your Dashboard
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button onClick={scrollToPricing} size="lg" variant="outline" className="text-lg px-8 border-white text-white hover:bg-white/10">
-              {t("landing.cta.secondary")}
+              View Pricing Plans
             </Button>
           </div>
+          <p className="text-sm text-white/60 mt-4">No credit card required · Free plan available forever · Cancel paid plans anytime</p>
         </div>
       </section>
 
@@ -914,13 +920,12 @@ export default function LandingPage() {
       {/* Mobile Sticky CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 shadow-2xl px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <p className="text-xs font-semibold text-foreground">{t("landing.mobileCta.title")}</p>
-            <p className="text-xs text-muted-foreground">{t("landing.mobileCta.subtitle")}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground truncate">Free plan available</p>
+            <p className="text-xs text-muted-foreground truncate">No credit card required</p>
           </div>
-          <Button onClick={goToSignUp} size="sm" className="bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold px-5 flex-shrink-0">
-            {t("landing.mobileCta.button")}
-            <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+          <Button onClick={goToSignUp} size="sm" className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 flex-shrink-0 whitespace-nowrap">
+            Start Free →
           </Button>
         </div>
       </div>
