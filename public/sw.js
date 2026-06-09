@@ -1,126 +1,68 @@
 /**
- * YFIT AI - Service Worker for Cache Management
- * This service worker ensures users always get the latest version
+ * YFIT AI - Service Worker
+ * Strategy: Network-first for everything.
+ * This ensures new Vercel deployments are always picked up immediately.
+ * Assets are still cached as a fallback for offline use.
  */
 
-// Static cache name - old caches are cleared on activate
-const CACHE_NAME = 'yfit-cache-v8'; // bumped Jun 9 2026 - force clear for Quick Setup calculator
+const CACHE_NAME = 'yfit-cache-v9'; // Jun 9 2026 - switched to network-first strategy
 
-// PWA icon filenames that must NEVER be cached (always fetch fresh so
-// the home-screen icon updates when the user re-installs the PWA)
-const NEVER_CACHE = [
-  '/icon-76x76.png',
-  '/icon-120x120.png',
-  '/icon-152x152.png',
-  '/icon-180x180.png',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  '/icon-maskable-512x512.png',
-  '/apple-touch-icon.png',
-  '/manifest.json',
-];
-
-// Install event - skip waiting to activate immediately
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing new service worker...');
-  self.skipWaiting();
+self.addEventListener('install', () => {
+  console.log('[SW] Installing...');
+  self.skipWaiting(); // Activate immediately without waiting
 });
 
-// Activate event - clear old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating new service worker...');
-  
+  console.log('[SW] Activating, clearing old caches...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          // Delete all old caches
-          if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
+    caches.keys().then((names) =>
+      Promise.all(
+        names.map((name) => {
+          if (name !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', name);
+            return caches.delete(name);
           }
         })
-      );
-    }).then(() => {
-      console.log('[SW] Old caches cleared');
-      return self.clients.claim();
-    })
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
-// Fetch event - network first strategy for HTML, cache for assets
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
-  // Skip non-GET and chrome-extension requests
-  if (event.request.method !== 'GET' || url.protocol === 'chrome-extension:') {
+
+  // Skip non-GET and non-http(s) requests
+  if (event.request.method !== 'GET' || !url.protocol.startsWith('http')) {
     return;
   }
 
-  // Never cache PWA icons or manifest — always fetch fresh from network
-  if (NEVER_CACHE.includes(url.pathname)) {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .catch(() => caches.match(event.request))
-    );
+  // Skip API calls entirely — always go to network
+  if (url.pathname.includes('/api/')) {
     return;
   }
 
-  // Network-first (no caching) for HTML navigation and API calls
-  if (
-    event.request.mode === 'navigate' ||
-    url.pathname.endsWith('.html') ||
-    url.pathname === '/' ||
-    url.pathname.includes('/api/') ||
-    url.pathname === '/version.json'
-  ) {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .catch(() => caches.match(event.request))
-    );
-  } 
-  // Cache-first for assets (JS, CSS, images)
-  else if (
-    url.pathname.includes('/assets/') ||
-    url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$/)
-  ) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
+  // Network-first for everything: try network, fall back to cache
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // Cache a copy of the successful response
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
-        
-        return fetch(event.request).then((response) => {
-          // Cache the fetched asset
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-          
-          return response;
-        });
+        return response;
       })
-    );
-  }
-  // Default: network only for everything else
-  else {
-    event.respondWith(fetch(event.request));
-  }
+      .catch(() => {
+        // Network failed — serve from cache if available
+        return caches.match(event.request);
+      })
+  );
 });
 
-// Message event - allow manual cache clearing
+// Allow manual cache clearing from the app
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      })
-    );
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.type === 'CLEAR_CACHE') {
+    caches.keys().then((names) => Promise.all(names.map((n) => caches.delete(n))));
   }
 });
