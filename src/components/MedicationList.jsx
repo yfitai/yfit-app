@@ -12,6 +12,7 @@ const _FREQUENCY_KEY_MAP = {
   'Four times daily': 'medications.fourTimesDaily',
   'Every other day': 'medications.everyOtherDay',
   'Once weekly': 'medications.onceWeekly',
+  'Twice weekly': 'medications.twiceWeekly',
   'As needed': 'medications.asNeeded',
 }
 const FREQUENCY_KEY_MAP = new Proxy(_FREQUENCY_KEY_MAP, {
@@ -194,6 +195,7 @@ export default function MedicationList({ user, onAddMedication }) {
                 <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
                 <option value="Every other day">{t('medications.everyOtherDay')}</option>
                 <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                <option value="Twice weekly">{t('medications.twiceWeekly')}</option>
                 <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
             </div>

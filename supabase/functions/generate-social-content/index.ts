@@ -1,4 +1,10 @@
-// generate-social-content — v2.1.0
+// generate-social-content — v2.1.2
+// Changes from v2.1.1:
+//   - BUGFIX: fetchLatestArticle() was selecting 'content' column which does not exist in scraped_articles.
+//     Removed 'content' from SELECT — table only has title, summary, url, source_name, etc.
+// Changes from v2.1.0:
+//   - BUGFIX: fetchLatestArticle() was ordering by scraped_at (column does not exist).
+//     Corrected to created_at. This caused "No scraped articles found" on every run since May 18.
 // Changes from v2.0:
 //   - Personal story angle: GPT-4 now writes from a first-person "I used to struggle..." perspective
 //   - 6 platform-specific captions: each platform gets a distinct tone, length, and CTA style
@@ -40,7 +46,7 @@ async function fetchLatestArticle(): Promise<{
   summary: string;
 } | null> {
   const resp = await fetch(
-    `${SUPABASE_URL}/rest/v1/scraped_articles?order=scraped_at.desc&limit=1&select=title,url,summary,content`,
+    `${SUPABASE_URL}/rest/v1/scraped_articles?order=created_at.desc&limit=1&select=title,url,summary`,
     {
       headers: {
         Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,

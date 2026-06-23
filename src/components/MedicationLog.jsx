@@ -107,7 +107,12 @@ export default function MedicationLog({ user }) {
       for (const med of allMeds) {
         let dosesPerDay = 1
         const freq = (med.frequency || '').toLowerCase()
-        if (freq.includes('twice') || freq.includes('2')) {
+        // 'twice weekly' = 2 doses/week → ~0.29/day → schedule 1 log every ~3.5 days; for daily log purposes treat as 1 per day on scheduled days
+        if (freq.includes('twice weekly') || freq.includes('twice a week')) {
+          dosesPerDay = 1 // handled as non-daily; log once on scheduled days
+        } else if (freq.includes('once weekly') || freq.includes('every other day') || freq.includes('as needed')) {
+          dosesPerDay = 1
+        } else if (freq.includes('twice') || freq.includes('2')) {
           dosesPerDay = 2
         } else if (freq.includes('three') || freq.includes('3')) {
           dosesPerDay = 3
@@ -203,7 +208,12 @@ export default function MedicationLog({ user }) {
         let dosesPerDay = 1
         const freq = (med.frequency || '').toLowerCase()
         console.log(`[DEBUG] Med: ${med.custom_name || med.medication?.name}, Frequency: "${med.frequency}", Lowercase: "${freq}"`)
-        if (freq.includes('twice') || freq.includes('2')) {
+        if (freq.includes('twice weekly') || freq.includes('twice a week')) {
+          dosesPerDay = 1 // 2x/week — schedule 1 dose on applicable days
+          console.log(`[DEBUG] Matched twice weekly, dosesPerDay = 1 (non-daily)`)
+        } else if (freq.includes('once weekly') || freq.includes('every other day') || freq.includes('as needed')) {
+          dosesPerDay = 1
+        } else if (freq.includes('twice') || freq.includes('2')) {
           dosesPerDay = 2
           console.log(`[DEBUG] Matched twice daily, dosesPerDay = 2`)
         } else if (freq.includes('three') || freq.includes('3')) {
@@ -343,7 +353,11 @@ export default function MedicationLog({ user }) {
           // Determine how many doses per day
           let dosesPerDay = 1;
           const freq = (med.frequency || '').toLowerCase();
-          if (freq.includes('twice') || freq.includes('2')) {
+          if (freq.includes('twice weekly') || freq.includes('twice a week')) {
+            dosesPerDay = 1; // 2x/week — 1 dose on scheduled days
+          } else if (freq.includes('once weekly') || freq.includes('every other day') || freq.includes('as needed')) {
+            dosesPerDay = 1;
+          } else if (freq.includes('twice') || freq.includes('2')) {
             dosesPerDay = 2;
           } else if (freq.includes('three') || freq.includes('3')) {
             dosesPerDay = 3;

@@ -365,6 +365,7 @@ export default function MedicationSearch({ user }) {
                     <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
                     <option value="Every other day">{t('medications.everyOtherDay')}</option>
                     <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                    <option value="Twice weekly">{t('medications.twiceWeekly')}</option>
                     <option value="As needed">{t('medications.asNeeded')}</option>
                   </select>
                 </div>
@@ -561,6 +562,7 @@ export default function MedicationSearch({ user }) {
                 <option value="Four times daily">{t('medications.fourTimesDaily')}</option>
                 <option value="Every other day">{t('medications.everyOtherDay')}</option>
                 <option value="Once weekly">{t('medications.onceWeekly')}</option>
+                <option value="Twice weekly">{t('medications.twiceWeekly')}</option>
                 <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
             </div>
