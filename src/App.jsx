@@ -188,6 +188,8 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              {/* /go = social media link-in-bio — always shows marketing page, never redirects */}
+              <Route path="/go" element={<LandingPage />} />
               <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/reset-password" element={<ResetPassword />} />
@@ -212,6 +214,8 @@ function App() {
                   <Routes>
                     {/* Redirect / to dashboard when logged in */}
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    {/* /go = social media link-in-bio — always shows marketing page even for logged-in users */}
+                    <Route path="/go" element={<LandingPage />} />
                     <Route path="/login" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
