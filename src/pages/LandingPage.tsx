@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +52,18 @@ export default function LandingPage() {
     setWaitlistLoading(false);
     setWaitlistSubmitted(true);
   };
+
+  // Auto-scroll to hash anchor on arrival (e.g. /go#quick-setup from social media links)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(hash.replace('#', ''));
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const goToContact = () => navigate('/contact');
   const goToFAQ = () => navigate('/faq');
