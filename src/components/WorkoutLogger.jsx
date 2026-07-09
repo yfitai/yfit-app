@@ -245,6 +245,11 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
         setRestTimer(currentExercise.rest_seconds || 60);
         setIsResting(true);
       } else if (type === 'cardio') {
+        const distanceMiles = isDistanceMetric
+          ? parseFloat(cardioData.distance) * 0.621371  // km → miles
+          : parseFloat(cardioData.distance);
+        const calculatedSteps = Math.round(distanceMiles * 2000);
+
         await supabase.from('exercise_sets').insert({
           session_exercise_id: sessionExercises.id,
           set_number: 1,
@@ -253,6 +258,32 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
           distance: parseFloat(cardioData.distance),
           rpe: 5
         });
+
+        // Auto-sync steps to daily_logs: accumulate with any existing steps for today
+        if (calculatedSteps > 0 && user) {
+          const today = new Date().toISOString().split('T')[0];
+          const startOfDay = new Date(today + 'T00:00:00.000Z').toISOString();
+          const endOfDay = new Date(today + 'T23:59:59.999Z').toISOString();
+          const { data: todayLog } = await supabase
+            .from('daily_logs')
+            .select('id, steps')
+            .eq('user_id', user.id)
+            .gte('logged_at', startOfDay)
+            .lte('logged_at', endOfDay)
+            .order('logged_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (todayLog) {
+            const newSteps = (todayLog.steps || 0) + calculatedSteps;
+            await supabase.from('daily_logs').update({ steps: newSteps }).eq('id', todayLog.id);
+          } else {
+            await supabase.from('daily_logs').insert({
+              user_id: user.id,
+              logged_at: new Date().toISOString(),
+              steps: calculatedSteps
+            });
+          }
+        }
 
         // Update stats for cardio
         setSessionStats(prev => ({
@@ -872,7 +903,7 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                   </div>
 
                   {/* Distance Display (Auto-calculated) */}
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('fitness.distance')} ({isDistanceMetric ? 'km' : 'miles'})
                     </label>
@@ -880,6 +911,23 @@ const WorkoutLogger = ({ onNavigateToBuilder }) => {
                       {cardioData.distance || '0.00'}
                     </div>
                     <p className="text-xs text-gray-500 mt-1 text-center">{t('fitness.autoCalculated')}</p>
+                  </div>
+
+                  {/* Steps Display (Auto-calculated from distance) */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      🚶 {t('fitness.stepsCalculated')}
+                    </label>
+                    <div className="w-full text-center text-3xl font-bold p-4 bg-purple-50 border-2 border-purple-300 rounded-lg text-purple-700">
+                      {cardioData.distance
+                        ? Math.round(
+                            (isDistanceMetric
+                              ? parseFloat(cardioData.distance) * 0.621371
+                              : parseFloat(cardioData.distance)) * 2000
+                          ).toLocaleString()
+                        : '0'}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 text-center">{t('fitness.stepsAutoNote')}</p>
                   </div>
 
                   {/* Log Cardio Button */}

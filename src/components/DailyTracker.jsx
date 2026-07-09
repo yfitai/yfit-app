@@ -600,14 +600,44 @@ export default function DailyTracker({ user }) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   🚶 {t('dailyTracker.steps')}
                 </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={formData.steps}
-                  onChange={(e) => setFormData({...formData, steps: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                  placeholder="10000"
-                />
+                {/* Total steps display */}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex-1 px-4 py-2 bg-purple-50 border border-purple-300 rounded-lg text-purple-700 font-bold text-lg text-center">
+                    {formData.steps || 0}
+                  </div>
+                </div>
+                {/* Manual add steps */}
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    id="stepsAddInput"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    placeholder="Add steps..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const addInput = document.getElementById('stepsAddInput');
+                      const addVal = parseInt(addInput.value) || 0;
+                      if (addVal > 0) {
+                        setFormData(prev => ({ ...prev, steps: (parseInt(prev.steps) || 0) + addVal }));
+                        addInput.value = '';
+                      }
+                    }}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" /> Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, steps: 0 }))}
+                    className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition"
+                  >
+                    Reset
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Treadmill steps auto-added when you log cardio. Tap Add to include any extra steps.</p>
               </div>
             </div>
 

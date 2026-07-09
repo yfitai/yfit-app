@@ -27,6 +27,7 @@ export default function Progress({ user: propUser }) {
   const [measurementsData, setMeasurementsData] = useState([])
   const [healthMetricsData, setHealthMetricsData] = useState([])
   const [nutritionComplianceData, setNutritionComplianceData] = useState([])
+  const [stepsData, setStepsData] = useState([])
   // const [fitnessData, setFitnessData] = useState([]) // Removed - WorkoutAnalyticsDashboard handles this
   
   // Current vs Goal
@@ -55,6 +56,7 @@ export default function Progress({ user: propUser }) {
           loadMeasurementsProgress(currentUser.id),
           loadHealthMetrics(currentUser.id),
           loadNutritionCompliance(currentUser.id),
+          loadStepsProgress(currentUser.id),
           // loadFitnessProgress(currentUser.id), // Removed - WorkoutAnalyticsDashboard handles this now
           loadGoals(currentUser.id)
         ])
@@ -173,6 +175,24 @@ export default function Progress({ user: propUser }) {
           timestamp: d.logged_at
         }
       }))
+    }
+  }
+
+  const loadStepsProgress = async (userId) => {
+    const { data } = await supabase
+      .from('daily_logs')
+      .select('logged_at, steps')
+      .eq('user_id', userId)
+      .not('steps', 'is', null)
+      .gt('steps', 0)
+      .gte('logged_at', new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString())
+      .order('logged_at', { ascending: true })
+    if (data) {
+      setStepsData(data.map(d => ({
+        date: new Date(d.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        steps: d.steps,
+        timestamp: d.logged_at
+      })))
     }
   }
 
@@ -543,6 +563,22 @@ export default function Progress({ user: propUser }) {
                     name={`Water (${waterUnit === 'oz' ? 'oz' : waterUnit === 'cups' ? 'cups' : 'L'})`}
                     dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          )}
+
+          {/* Daily Steps */}
+          {stepsData.length > 0 && (
+            <ChartCard title={t('dailyTracker.steps')} icon={<Zap className="w-5 h-5 text-purple-500" />}>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={stepsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [value.toLocaleString(), 'Steps']} />
+                  <Legend />
+                  <Bar dataKey="steps" fill="#9333ea" name="Steps" radius={[4, 4, 0, 0]} />
+                </BarChart>
               </ResponsiveContainer>
             </ChartCard>
           )}
