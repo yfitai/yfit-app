@@ -1,6 +1,28 @@
 import { useState, useEffect } from "react";
 
-const COOKIE_KEY = "yfit_cookie_consent";
+export const COOKIE_KEY = "yfit_cookie_consent";
+
+/**
+ * Inject the Umami analytics script into <head> only when the user has accepted cookies.
+ * GDPR/PIPEDA compliance: analytics must not fire before explicit consent.
+ * AUDIT FIX (Session 20, Jul 15 2026): audit item 2.1 — cookie consent gate for analytics.
+ */
+function injectUmamiScript() {
+  if (document.getElementById("umami-analytics")) return; // already injected
+  const script = document.createElement("script");
+  script.id = "umami-analytics";
+  script.async = true;
+  script.src = "https://manus-analytics.com/script.js";
+  script.setAttribute("data-website-id", "9d198333-8322-4848-9258-0476c99e5df5");
+  document.head.appendChild(script);
+}
+
+/** On app load, if consent was previously accepted, inject analytics immediately. */
+export function initAnalyticsFromConsent() {
+  if (localStorage.getItem(COOKIE_KEY) === "accepted") {
+    injectUmamiScript();
+  }
+}
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -10,12 +32,15 @@ export default function CookieConsent() {
     const timer = setTimeout(() => {
       const consent = localStorage.getItem(COOKIE_KEY);
       if (!consent) setVisible(true);
+      // If already accepted, ensure analytics is running
+      if (consent === "accepted") injectUmamiScript();
     }, 1500);
     return () => clearTimeout(timer);
   }, []);
 
   const accept = () => {
     localStorage.setItem(COOKIE_KEY, "accepted");
+    injectUmamiScript();
     setVisible(false);
   };
 
@@ -46,7 +71,7 @@ export default function CookieConsent() {
         {/* Text */}
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-200 leading-relaxed">
-            We use cookies to improve your experience, analyze site traffic, and support our analytics. 
+            We use cookies to improve your experience, analyze site traffic, and support our analytics.
             By clicking <strong className="text-white">Accept</strong>, you agree to our use of cookies.{" "}
             <a
               href="/privacy"

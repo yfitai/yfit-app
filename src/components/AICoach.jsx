@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Send, ThumbsUp, ThumbsDown, Loader2, Sparkles, RefreshCw } from 'lucide-react'
 
 export default function AICoach({ userId }) {
   const { t } = useTranslation()
+  // AUDIT FIX 2.2-F: refresh usage counter after each AI query (Session 20 Jul 15 2026)
+  const { refreshSubscription } = useSubscription()
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -147,6 +150,9 @@ export default function AICoach({ userId }) {
           .update({ title: userMessage.content.substring(0, 50) })
           .eq('id', conversationId)
       }
+
+      // AUDIT FIX 2.2-F: refresh usage counter so the Subscription page shows updated quota
+      refreshSubscription()
 
     } catch (err) {
       console.error('Error sending message:', err)

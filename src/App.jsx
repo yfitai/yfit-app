@@ -5,7 +5,11 @@ import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { LiveUpdateService } from './services/liveUpdate'
 import { setAnalyticsUser, Analytics } from './lib/analytics'
+import { initAnalyticsFromConsent } from './components/CookieConsent'
 import './App.css'
+
+// GDPR/PIPEDA: inject Umami analytics only if user previously accepted cookies
+initAnalyticsFromConsent()
 
 // Always-needed components loaded eagerly (small, needed immediately)
 import Navigation from './components/Navigation'
