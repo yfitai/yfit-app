@@ -5,7 +5,8 @@ import { supabase } from '../lib/supabase'
  * InstallGuide — shown once to new users after signup.
  * Detects Android / iPhone / desktop and shows the correct
  * "Add to Home Screen" steps for that device.
- * Ends with a clear call-to-action to go back and sign in.
+ * Context-aware: if user is already signed in, the final step
+ * reflects that instead of asking them to sign in again.
  *
  * Props:
  *   user       — Supabase user object
@@ -49,6 +50,8 @@ const STEPS = {
       icon: '5️⃣',
       title: 'Sign in to get started',
       detail: 'Once the app opens, tap "Sign In", enter your email and password, and you\'re in!',
+      signedInTitle: 'You\'re already signed in!',
+      signedInDetail: 'Tap the YFIT AI icon on your home screen — your account opens automatically. No sign-in needed.',
     },
   ],
   ios: [
@@ -76,6 +79,8 @@ const STEPS = {
       icon: '5️⃣',
       title: 'Sign in to get started',
       detail: 'Once the app opens, tap "Sign In", enter your email and password, and you\'re in!',
+      signedInTitle: 'You\'re already signed in!',
+      signedInDetail: 'Tap the YFIT AI icon on your home screen — your account opens automatically. No sign-in needed.',
     },
   ],
   desktop: [
@@ -98,6 +103,8 @@ const STEPS = {
       icon: '4️⃣',
       title: 'Sign in to get started',
       detail: 'When the app opens, click "Sign In", enter your email and password, and you\'re all set!',
+      signedInTitle: 'You\'re already signed in!',
+      signedInDetail: 'Click the YFIT AI icon in your taskbar or Start menu — your account opens automatically. No sign-in needed.',
     },
   ],
 }
@@ -135,6 +142,7 @@ export default function InstallGuide({ user, onComplete }) {
 
   const deviceType = isAndroid ? 'android' : isIOS ? 'ios' : 'desktop'
   const steps = STEPS[deviceType]
+  const isLoggedIn = !!user
 
   const deviceLabel = isAndroid
     ? 'Android'
@@ -164,15 +172,20 @@ export default function InstallGuide({ user, onComplete }) {
 
         {/* Steps */}
         <ol className="space-y-4 mb-6">
-          {steps.map((step, i) => (
-            <li key={i} className={`flex gap-3 items-start ${i === steps.length - 1 ? 'bg-green-50 border border-green-200 rounded-xl p-3 -mx-1' : ''}`}>
-              <span className="text-xl leading-none mt-0.5 flex-shrink-0">{step.icon}</span>
-              <div>
-                <p className={`font-semibold text-sm ${i === steps.length - 1 ? 'text-green-800' : 'text-gray-800'}`}>{step.title}</p>
-                <p className={`text-sm mt-0.5 ${i === steps.length - 1 ? 'text-green-700' : 'text-gray-500'}`}>{step.detail}</p>
-              </div>
-            </li>
-          ))}
+          {steps.map((step, i) => {
+            const isLastStep = i === steps.length - 1
+            const title = isLastStep && isLoggedIn && step.signedInTitle ? step.signedInTitle : step.title
+            const detail = isLastStep && isLoggedIn && step.signedInDetail ? step.signedInDetail : step.detail
+            return (
+              <li key={i} className={`flex gap-3 items-start ${isLastStep ? 'bg-green-50 border border-green-200 rounded-xl p-3 -mx-1' : ''}`}>
+                <span className="text-xl leading-none mt-0.5 flex-shrink-0">{step.icon}</span>
+                <div>
+                  <p className={`font-semibold text-sm ${isLastStep ? 'text-green-800' : 'text-gray-800'}`}>{title}</p>
+                  <p className={`text-sm mt-0.5 ${isLastStep ? 'text-green-700' : 'text-gray-500'}`}>{detail}</p>
+                </div>
+              </li>
+            )
+          })}
         </ol>
 
         {/* Samsung note */}
@@ -196,7 +209,7 @@ export default function InstallGuide({ user, onComplete }) {
             disabled={saving}
             className="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-60"
           >
-            {saving ? 'Saving...' : "Got it — take me to sign in ✓"}
+            {saving ? 'Saving...' : isLoggedIn ? 'Got it — take me to my dashboard ✓' : 'Got it — take me to sign in ✓'}
           </button>
           <button
             onClick={markShownAndComplete}

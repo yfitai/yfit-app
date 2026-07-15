@@ -17,12 +17,20 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Zap, Check, Star, Crown, ArrowRight, Lock } from 'lucide-react'
+import { getCurrentUser } from '../lib/supabase'
 
-// Stripe Checkout URLs
+// Stripe Checkout URLs (fallback only — dynamic sessions used when possible)
 const STRIPE_LINKS = {
   pro_monthly:  'https://buy.stripe.com/cNi6oGbHBgYD2S5bOZ3sI00',
   pro_yearly:   'https://buy.stripe.com/6oU5kCaDxbEj3W98CN3sI01',
   pro_lifetime: 'https://buy.stripe.com/aFadR8bHB9wbfERdX73sI02',
+}
+
+// Map UpgradeModal plan IDs to checkout session plan keys
+const PLAN_KEY_MAP = {
+  pro_monthly:  'proMonthly',
+  pro_yearly:   'proYearly',
+  pro_lifetime: 'proLifetime',
 }
 
 const PLANS = [
@@ -91,15 +99,48 @@ export default function UpgradeModal({
 }) {
   const { t } = useTranslation()
   const [selectedPlan, setSelectedPlan] = useState('pro_yearly')
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!isOpen) return null
 
-  const handleUpgrade = () => {
+  const handleUpgrade = async () => {
+    setIsLoading(true)
+    try {
+      // Get the logged-in user's email for prefill
+      const user = await getCurrentUser()
+      const userEmail = user?.email || null
+
+      // Try dynamic checkout session first (supports email prefill + Canada billing)
+      const planKey = PLAN_KEY_MAP[selectedPlan]
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: planKey,
+          customerEmail: userEmail,
+          successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/#pricing`,
+        }),
+      })
+
+      if (response.ok) {
+        const { url } = await response.json()
+        if (url) {
+          window.location.href = url
+          return
+        }
+      }
+    } catch (err) {
+      console.warn('[UpgradeModal] Dynamic checkout failed, falling back to static link:', err)
+    } finally {
+      setIsLoading(false)
+    }
+
+    // Fallback to static Stripe Payment Link
     const url = STRIPE_LINKS[selectedPlan]
-    if (url && !url.includes('YOUR_')) {
+    if (url) {
       window.open(url, '_blank')
     } else {
-      // Fallback: redirect to marketing pricing page
       window.open('https://www.yfitai.com/#pricing', '_blank')
     }
   }
@@ -211,10 +252,23 @@ export default function UpgradeModal({
         <div className="px-6 pb-6">
           <button
             onClick={handleUpgrade}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-base shadow-lg shadow-blue-500/25"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-base shadow-lg shadow-blue-500/25 disabled:opacity-70 disabled:cursor-wait"
           >
-            {t('subscription.upgradeToPro')}
-            <ArrowRight className="w-5 h-5" />
+            {isLoading ? (
+              <>
+                <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                Preparing checkout...
+              </>
+            ) : (
+              <>
+                {t('subscription.upgradeToPro')}
+                <ArrowRight className="w-5 h-5" />
+              </>
+            )}
           </button>
           <p className="text-center text-xs text-gray-400 mt-3">
             {t('subscription.securePaymentStripe')}

@@ -19,6 +19,27 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+// ============================================================
+// CONTENT SAFETY: Keywords that indicate medical/pharmaceutical/recall
+// content that is inappropriate for a fitness app and could cause user anxiety.
+// Articles matching ANY of these are rejected before GPT scoring.
+// AUDIT FIX: Session 19, Jul 15 2026 (audit section 2.2 / 5.2)
+// ============================================================
+const BLOCKED_KEYWORDS = [
+  "recall", "recalled", "fda recall", "health canada recall",
+  "drug recall", "medication recall", "product recall",
+  "cancer risk", "cancer-causing", "carcinogen", "carcinogenic",
+  "antidepressant", "antipsychotic", "opioid", "fentanyl",
+  "pharmaceutical", "prescription drug", "over-the-counter drug",
+  "side effects", "adverse effects", "drug interaction",
+  "health warning", "safety warning", "contamination",
+  "overdose", "addiction", "withdrawal",
+  "cancer diagnosis", "tumor", "chemotherapy",
+  "heart attack risk", "stroke risk", "blood clot",
+  "hospital", "emergency room", "surgery",
+  "disease outbreak", "epidemic", "pandemic",
+];
+
 // YFIT-relevant keywords for quick pre-filter before GPT scoring
 const YFIT_KEYWORDS = [
   "nutrition", "fitness", "workout", "exercise", "weight loss", "muscle",
@@ -84,6 +105,11 @@ function parseRssFeed(xml: string, source: RssSource): ParsedArticle[] {
     const combined = (title + " " + description).toLowerCase();
     const hasKeyword = YFIT_KEYWORDS.some((kw) => combined.includes(kw));
     if (!hasKeyword) continue;
+
+    // Content safety filter — reject medical/recall/pharmaceutical content
+    // that is inappropriate for a fitness app (audit fix 2.2 / 5.2)
+    const isBlocked = BLOCKED_KEYWORDS.some((kw) => combined.includes(kw));
+    if (isBlocked) continue;
 
     // Strip HTML from description
     const cleanSummary = description

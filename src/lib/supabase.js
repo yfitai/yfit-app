@@ -72,24 +72,25 @@ export const signUp = async (email, password, firstName, lastName) => {
       // Don't fail signup if profile creation fails - can be retried
     }
 
-    // 🎉 Queue welcome email using database template system
+    // 🎉 Send welcome email directly via send-welcome-email edge function
+    // AUDIT FIX: Changed from 'queue-email' (missing) to 'send-welcome-email' (deployed)
     try {
-      const { error: emailError } = await supabase.functions.invoke('queue-email', {
+      const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
         body: {
-          user_id: data.user.id,
-          template_name: 'welcome_email',
-          recipient_email: email
+          email: email,
+          firstName: firstName,
+          lastName: lastName
         }
       })
       
       if (emailError) {
-        console.error('Error queueing welcome email:', emailError)
+        console.error('Error sending welcome email:', emailError)
         // Don't fail signup if email fails - it's not critical
       } else {
-        console.log('✅ Welcome email queued for', email)
+        console.log('✅ Welcome email sent to', email)
       }
     } catch (emailError) {
-      console.error('Error invoking queue-email function:', emailError)
+      console.error('Error invoking send-welcome-email function:', emailError)
       // Continue with signup even if email fails
     }
   }

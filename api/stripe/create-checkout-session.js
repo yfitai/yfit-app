@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   const stripe = new Stripe(secretKey, { apiVersion: '2023-10-16' });
 
-  const { plan, successUrl, cancelUrl } = req.body;
+  const { plan, successUrl, cancelUrl, customerEmail } = req.body;
 
   try {
     // Handle free trial / signup — no payment needed
@@ -44,10 +44,20 @@ export default async function handler(req, res) {
       cancel_url: cancelUrl || `${req.headers.origin}/#pricing`,
       automatic_tax: { enabled: true },
       allow_promotion_codes: true,
-      billing_address_collection: 'auto',
+      billing_address_collection: 'required',
+      // Pre-fill email from logged-in session to reduce checkout friction
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
+      // Default billing country to Canada (most users are Canadian)
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic',
+        },
+      },
+      locale: 'auto',
       metadata: {
         plan,
-        source: 'yfit-app-landing',
+        source: 'yfit-app',
+        ...(customerEmail ? { customer_email: customerEmail } : {}),
       },
     };
 
