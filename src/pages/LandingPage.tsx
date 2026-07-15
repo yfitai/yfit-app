@@ -195,7 +195,7 @@ export default function LandingPage() {
     },
     {
       name: t("landing.plan2Name"),
-      price: "$12.99",
+      price: "$12.99 USD",
       period: t("landing.periodMonth"),
       description: t("landing.plan2Desc"),
       badge: null,
@@ -216,7 +216,7 @@ export default function LandingPage() {
     },
     {
       name: t("landing.plan3Name"),
-      price: "$99.99",
+      price: "$99.99 USD",
       period: t("landing.periodYear"),
       description: t("landing.plan3Desc"),
       badge: t("landing.plan3Badge"),
@@ -235,7 +235,7 @@ export default function LandingPage() {
     },
     {
       name: t("landing.plan4Name"),
-      price: "$249.99",
+      price: "$249.99 USD",
       period: t("landing.periodOneTime"),
       description: t("landing.plan4Desc"),
       badge: t("landing.plan4Badge"),
@@ -277,11 +277,6 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page min-h-screen flex flex-col">
-      {/* Limited Time Offer Banner */}
-      <div className="w-full bg-gradient-to-r from-primary to-accent text-white py-3 text-center font-semibold text-sm md:text-base">
-        {t("landing.banner")}
-      </div>
-
       {/* Navigation */}
       <nav className="sticky top-0 w-full z-50 border-b border-primary/20 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
@@ -377,51 +372,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-12 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-6">
-          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">{t("landing.testimonials.sectionTitle")}</p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                quote: t("landing.testimonials.quote1"),
-                name: t("landing.testimonials.name1"),
-                role: t("landing.testimonials.role1"),
-                avatar: "S",
-                color: "bg-green-500"
-              },
-              {
-                quote: t("landing.testimonials.quote2"),
-                name: t("landing.testimonials.name2"),
-                role: t("landing.testimonials.role2"),
-                avatar: "J",
-                color: "bg-blue-500"
-              },
-              {
-                quote: t("landing.testimonials.quote3"),
-                name: t("landing.testimonials.name3"),
-                role: t("landing.testimonials.role3"),
-                avatar: "M",
-                color: "bg-violet-500"
-              }
-            ].map((testimonial, i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 flex flex-col gap-4">
-                <div className="flex gap-1">
-                  {[1,2,3,4,5].map(s => <span key={s} className="text-yellow-400 text-sm">★</span>)}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed italic">"{testimonial.quote}"</p>
-                <div className="flex items-center gap-3 mt-auto">
-                  <div className={`w-9 h-9 rounded-full ${testimonial.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>{testimonial.avatar}</div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* App Tour Section — interactive phone mockups */}
       <AppTourSection />
@@ -722,9 +672,9 @@ export default function LandingPage() {
                 <tr className="bg-gray-800 text-gray-300 text-xs">
                   <td className="px-5 py-2 text-gray-400">{t("landing.pricing.rowPrice")}</td>
                   <td className="text-center px-4 py-2 font-medium text-white">$0</td>
-                  <td className="text-center px-4 py-2 font-medium text-white">$12.99/mo</td>
-                  <td className="text-center px-4 py-2 font-medium text-white bg-green-900">$99.99/yr</td>
-                  <td className="text-center px-4 py-2 font-medium text-white bg-violet-900">$249.99 once</td>
+                  <td className="text-center px-4 py-2 font-medium text-white">$12.99 USD/mo</td>
+                  <td className="text-center px-4 py-2 font-medium text-white bg-green-900">$99.99 USD/yr</td>
+                  <td className="text-center px-4 py-2 font-medium text-white bg-violet-900">$249.99 USD once</td>
                 </tr>
                 <tr className="bg-orange-50 text-xs border-b border-orange-100">
                   <td className="px-5 py-2 text-gray-500 italic">{t("landing.pricing.rowPromo")}</td>

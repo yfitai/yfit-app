@@ -3,7 +3,7 @@ const resources = {
   "en": {
     "translation": {
       "landing": {
-        "banner": "🎉 LIMITED TIME OFFER: Get 1 Month FREE on All Pro Plans! 🎉",
+        "banner": "🎉 First Month FREE on All Pro Plans for New Users 🎉",
         "nav": {
           "features": "Features",
           "pricing": "Pricing",
@@ -31,18 +31,6 @@ const resources = {
           "previewFormSub": "Real-time coaching",
           "previewMeds": "Track Medications",
           "previewMedsSub": "Provider reports"
-        },
-        "testimonials": {
-          "sectionTitle": "What early users are saying",
-          "quote1": "Finally an app that lets me track my blood pressure meds alongside my workouts. My doctor loves the reports it generates.",
-          "name1": "Sarah M.",
-          "role1": "Beta Tester · Vancouver, BC",
-          "quote2": "The AI form analysis caught my squat form issue that was causing knee pain. Three weeks in and the pain is gone.",
-          "name2": "James R.",
-          "role2": "Beta Tester · Toronto, ON",
-          "quote3": "I've tried MyFitnessPal, Noom, and five others. YFIT is the first one that actually connects everything — nutrition, meds, and workouts in one place.",
-          "name3": "Maria T.",
-          "role3": "Beta Tester · Calgary, AB"
         },
         "features": {
           "sectionTitle": "Everything You Need",
@@ -135,7 +123,7 @@ const resources = {
           "androidCta": "View Plans"
         },
         "pricing": {
-          "offerBadge": "Limited Time: Get 1 Month FREE on any Pro plan",
+          "offerBadge": "First Month FREE on any Pro plan — new users",
           "sectionTitle": "Start Free. Upgrade When Ready.",
           "sectionSubtitle": "No credit card required to start. Cancel anytime. Your first Pro month is on us.",
           "processing": "Processing...",
@@ -267,9 +255,9 @@ const resources = {
         "plan4F5": "Direct developer access",
         "plan4F6": "No recurring charges ever",
         "plan4Btn": "Get Lifetime Access",
-        "plan5Name": "Limited Time Offer",
+        "plan5Name": "First Month Free",
         "plan5Desc": "Full featured Pro plan",
-        "plan5Badge": "LIMITED TIME",
+        "plan5Badge": "NEW USERS",
         "plan5F1": "Full Pro features included",
         "plan5F2": "No credit card required",
         "plan5F3": "Cancel anytime",
@@ -1805,7 +1793,7 @@ const resources = {
   "fr": {
     "translation": {
       "landing": {
-        "banner": "🎉 OFFRE LIMITÉE : Obtenez 1 mois GRATUIT sur tous les plans Pro ! 🎉",
+        "banner": "🎉 Premier mois GRATUIT sur tous les plans Pro pour les nouveaux utilisateurs 🎉",
         "nav": {
           "features": "Fonctionnalités",
           "pricing": "Tarifs",
@@ -1833,18 +1821,6 @@ const resources = {
           "previewFormSub": "Coaching en temps réel",
           "previewMeds": "Suivre les médicaments",
           "previewMedsSub": "Rapports fournisseurs"
-        },
-        "testimonials": {
-          "sectionTitle": "Ce que disent les premiers utilisateurs",
-          "quote1": "Enfin une application qui me permet de suivre mes médicaments pour la tension artérielle avec mes entraînements. Mon médecin adore les rapports qu'elle génère.",
-          "name1": "Sarah M.",
-          "role1": "Bêta-testeur · Vancouver, BC",
-          "quote2": "L'analyse de forme IA a détecté mon problème de squat qui causait des douleurs aux genoux. Trois semaines plus tard, la douleur a disparu.",
-          "name2": "James R.",
-          "role2": "Bêta-testeur · Toronto, ON",
-          "quote3": "J'ai essayé MyFitnessPal, Noom et cinq autres. YFIT est la première qui connecte vraiment tout — nutrition, médicaments et entraînements en un seul endroit.",
-          "name3": "Maria T.",
-          "role3": "Bêta-testeur · Calgary, AB"
         },
         "features": {
           "sectionTitle": "Tout ce dont vous avez besoin",
@@ -1937,7 +1913,7 @@ const resources = {
           "androidCta": "Voir les plans"
         },
         "pricing": {
-          "offerBadge": "Offre limitée : Obtenez 1 mois GRATUIT sur tout plan Pro",
+          "offerBadge": "Premier mois GRATUIT sur tout plan Pro — nouveaux utilisateurs",
           "sectionTitle": "Commencez gratuitement. Passez à la version supérieure quand vous êtes prêt.",
           "sectionSubtitle": "Aucune carte de crédit requise pour commencer. Annulez à tout moment. Votre premier mois Pro est offert.",
           "processing": "Traitement en cours...",
@@ -2069,9 +2045,9 @@ const resources = {
         "plan4F5": "Accès direct au développeur",
         "plan4F6": "Aucun frais récurrent",
         "plan4Btn": "Obtenir l'accès à vie",
-        "plan5Name": "Offre limitée",
+        "plan5Name": "Premier mois gratuit",
         "plan5Desc": "Plan Pro complet",
-        "plan5Badge": "TEMPS LIMITÉ",
+        "plan5Badge": "NOUVEAUX",
         "plan5F1": "Toutes les fonctionnalités Pro incluses",
         "plan5F2": "Aucune carte de crédit requise",
         "plan5F3": "Annulez à tout moment",
@@ -3621,7 +3597,7 @@ const resources = {
   "es": {
     "translation": {
       "landing": {
-        "banner": "🎉 OFERTA POR TIEMPO LIMITADO: ¡Obtén 1 mes GRATIS en todos los planes Pro! 🎉",
+        "banner": "🎉 Primer mes GRATIS en todos los planes Pro para nuevos usuarios 🎉",
         "nav": {
           "features": "Características",
           "pricing": "Precios",
@@ -3649,18 +3625,6 @@ const resources = {
           "previewFormSub": "Coaching en tiempo real",
           "previewMeds": "Rastrear medicamentos",
           "previewMedsSub": "Informes de proveedores"
-        },
-        "testimonials": {
-          "sectionTitle": "Lo que dicen los primeros usuarios",
-          "quote1": "Por fin una app que me permite rastrear mis medicamentos para la presión arterial junto con mis entrenamientos. A mi médico le encantan los informes que genera.",
-          "name1": "Sarah M.",
-          "role1": "Beta Tester · Vancouver, BC",
-          "quote2": "El análisis de forma IA detectó mi problema de sentadilla que causaba dolor de rodilla. Tres semanas después, el dolor desapareció.",
-          "name2": "James R.",
-          "role2": "Beta Tester · Toronto, ON",
-          "quote3": "He probado MyFitnessPal, Noom y otros cinco. YFIT es la primera que realmente conecta todo — nutrición, medicamentos y entrenamientos en un solo lugar.",
-          "name3": "Maria T.",
-          "role3": "Beta Tester · Calgary, AB"
         },
         "features": {
           "sectionTitle": "Todo lo que necesitas",
@@ -3753,7 +3717,7 @@ const resources = {
           "androidCta": "Ver planes"
         },
         "pricing": {
-          "offerBadge": "Tiempo limitado: Obtén 1 mes GRATIS en cualquier plan Pro",
+          "offerBadge": "Primer mes GRATIS en cualquier plan Pro — nuevos usuarios",
           "sectionTitle": "Comienza gratis. Actualiza cuando estés listo.",
           "sectionSubtitle": "No se requiere tarjeta de crédito para comenzar. Cancela en cualquier momento. Tu primer mes Pro es gratis.",
           "processing": "Procesando...",
@@ -3885,9 +3849,9 @@ const resources = {
         "plan4F5": "Acceso directo al desarrollador",
         "plan4F6": "Sin cargos recurrentes",
         "plan4Btn": "Obtener acceso de por vida",
-        "plan5Name": "Oferta por tiempo limitado",
+        "plan5Name": "Primer mes gratis",
         "plan5Desc": "Plan Pro completo",
-        "plan5Badge": "TIEMPO LIMITADO",
+        "plan5Badge": "NUEVOS",
         "plan5F1": "Todas las funciones Pro incluidas",
         "plan5F2": "Sin tarjeta de crédito requerida",
         "plan5F3": "Cancela en cualquier momento",
@@ -5395,7 +5359,7 @@ const resources = {
   "pt": {
     "translation": {
       "landing": {
-        "banner": "🎉 OFERTA POR TEMPO LIMITADO: Ganhe 1 mês GRÁTIS em todos os planos Pro! 🎉",
+        "banner": "🎉 Primeiro mês GRÁTIS em todos os planos Pro para novos usuários 🎉",
         "nav": {
           "features": "Recursos",
           "pricing": "Preços",
@@ -5423,18 +5387,6 @@ const resources = {
           "previewFormSub": "Coaching em tempo real",
           "previewMeds": "Rastrear medicamentos",
           "previewMedsSub": "Relatórios de provedores"
-        },
-        "testimonials": {
-          "sectionTitle": "O que os primeiros usuários estão dizendo",
-          "quote1": "Finalmente um app que me permite rastrear meus medicamentos para pressão arterial junto com meus treinos. Meu médico adora os relatórios que ele gera.",
-          "name1": "Sarah M.",
-          "role1": "Beta Tester · Vancouver, BC",
-          "quote2": "A análise de forma IA detectou meu problema de agachamento que causava dor no joelho. Três semanas depois, a dor sumiu.",
-          "name2": "James R.",
-          "role2": "Beta Tester · Toronto, ON",
-          "quote3": "Já testei MyFitnessPal, Noom e outros cinco. YFIT é o primeiro que realmente conecta tudo — nutrição, medicamentos e treinos em um só lugar.",
-          "name3": "Maria T.",
-          "role3": "Beta Tester · Calgary, AB"
         },
         "features": {
           "sectionTitle": "Tudo que você precisa",
@@ -5527,7 +5479,7 @@ const resources = {
           "androidCta": "Ver planos"
         },
         "pricing": {
-          "offerBadge": "Tempo limitado: Ganhe 1 mês GRÁTIS em qualquer plano Pro",
+          "offerBadge": "Primeiro mês GRÁTIS em qualquer plano Pro — novos usuários",
           "sectionTitle": "Comece grátis. Atualize quando estiver pronto.",
           "sectionSubtitle": "Nenhum cartão de crédito necessário para começar. Cancele a qualquer momento. Seu primeiro mês Pro é por nossa conta.",
           "processing": "Processando...",
@@ -5659,9 +5611,9 @@ const resources = {
         "plan4F5": "Acesso direto ao desenvolvedor",
         "plan4F6": "Sem cobranças recorrentes",
         "plan4Btn": "Obter acesso vitalício",
-        "plan5Name": "Oferta por tempo limitado",
+        "plan5Name": "Primeiro mês grátis",
         "plan5Desc": "Plano Pro completo",
-        "plan5Badge": "TEMPO LIMITADO",
+        "plan5Badge": "NOVOS",
         "plan5F1": "Todos os recursos Pro incluídos",
         "plan5F2": "Sem cartão de crédito necessário",
         "plan5F3": "Cancele a qualquer momento",
@@ -7160,7 +7112,7 @@ const resources = {
   "zh": {
     "translation": {
       "landing": {
-        "banner": "🎉 限时优惠：所有Pro计划免费获得1个月！🎉",
+        "banner": "🎉 新用户：所有Pro计划首月免费 🎉",
         "nav": {
           "features": "功能",
           "pricing": "定价",
@@ -7188,18 +7140,6 @@ const resources = {
           "previewFormSub": "实时教练",
           "previewMeds": "追踪药物",
           "previewMedsSub": "提供商报告"
-        },
-        "testimonials": {
-          "sectionTitle": "早期用户的评价",
-          "quote1": "终于有一款应用可以让我在锻炼的同时追踪血压药物。我的医生非常喜欢它生成的报告。",
-          "name1": "Sarah M.",
-          "role1": "Beta测试者 · 温哥华, BC",
-          "quote2": "AI动作分析发现了我导致膝盖疼痛的深蹲问题。三周后疼痛消失了。",
-          "name2": "James R.",
-          "role2": "Beta测试者 · 多伦多, ON",
-          "quote3": "我试过MyFitnessPal、Noom和其他五款应用。YFIT是第一个真正将一切连接起来的——营养、药物和锻炼都在一个地方。",
-          "name3": "Maria T.",
-          "role3": "Beta测试者 · 卡尔加里, AB"
         },
         "features": {
           "sectionTitle": "您所需要的一切",
@@ -7292,7 +7232,7 @@ const resources = {
           "androidCta": "查看计划"
         },
         "pricing": {
-          "offerBadge": "限时：在任何Pro计划上免费获得1个月",
+          "offerBadge": "新用户：任何Pro计划首月免费",
           "sectionTitle": "免费开始。准备好后升级。",
           "sectionSubtitle": "开始不需要信用卡。随时取消。您的第一个Pro月份由我们承担。",
           "processing": "处理中...",
@@ -7424,9 +7364,9 @@ const resources = {
         "plan4F5": "直接开发者访问",
         "plan4F6": "永不收取循环费用",
         "plan4Btn": "获取终身访问权",
-        "plan5Name": "限时优惠",
+        "plan5Name": "首月免费",
         "plan5Desc": "完整Pro计划",
-        "plan5Badge": "限时",
+        "plan5Badge": "新用户",
         "plan5F1": "包含所有Pro功能",
         "plan5F2": "无需信用卡",
         "plan5F3": "随时取消",
@@ -8867,7 +8807,7 @@ const resources = {
   "hi": {
     "translation": {
       "landing": {
-        "banner": "🎉 सीमित समय का ऑफर: सभी Pro प्लान पर 1 महीना मुफ्त पाएं! 🎉",
+        "banner": "🎉 नए उपयोगकर्ता: सभी Pro प्लान पर पहला महीना मुफ्त 🎉",
         "nav": {
           "features": "विशेषताएं",
           "pricing": "मूल्य निर्धारण",
@@ -8895,18 +8835,6 @@ const resources = {
           "previewFormSub": "रियल-टाइम कोचिंग",
           "previewMeds": "दवाएं ट्रैक करें",
           "previewMedsSub": "प्रदाता रिपोर्ट"
-        },
-        "testimonials": {
-          "sectionTitle": "शुरुआती उपयोगकर्ता क्या कह रहे हैं",
-          "quote1": "आखिरकार एक ऐप जो मुझे अपने वर्कआउट के साथ ब्लड प्रेशर की दवाएं ट्रैक करने देता है। मेरे डॉक्टर को इसकी बनाई रिपोर्ट बहुत पसंद है।",
-          "name1": "Sarah M.",
-          "role1": "बीटा टेस्टर · वैंकूवर, BC",
-          "quote2": "AI फॉर्म विश्लेषण ने मेरी स्क्वाट की समस्या पकड़ी जो घुटने में दर्द का कारण थी। तीन हफ्ते में दर्द गायब हो गया।",
-          "name2": "James R.",
-          "role2": "बीटा टेस्टर · टोरंटो, ON",
-          "quote3": "मैंने MyFitnessPal, Noom और पांच अन्य आजमाए। YFIT पहला है जो वास्तव में सब कुछ जोड़ता है — पोषण, दवाएं और वर्कआउट एक जगह।",
-          "name3": "Maria T.",
-          "role3": "बीटा टेस्टर · कैलगरी, AB"
         },
         "features": {
           "sectionTitle": "आपको जो चाहिए वो सब",
@@ -8999,7 +8927,7 @@ const resources = {
           "androidCta": "प्लान देखें"
         },
         "pricing": {
-          "offerBadge": "सीमित समय: किसी भी Pro प्लान पर 1 महीना मुफ्त पाएं",
+          "offerBadge": "नए उपयोगकर्ता: किसी भी Pro प्लान पर पहला महीना मुफ्त",
           "sectionTitle": "मुफ्त शुरू करें। तैयार होने पर अपग्रेड करें।",
           "sectionSubtitle": "शुरू करने के लिए क्रेडिट कार्ड की जरूरत नहीं। कभी भी रद्द करें। आपका पहला Pro महीना हमारी ओर से है।",
           "processing": "प्रसंस्करण हो रहा है...",
@@ -9131,9 +9059,9 @@ const resources = {
         "plan4F5": "डेवलपर तक सीधी पहुंच",
         "plan4F6": "कभी कोई आवर्ती शुल्क नहीं",
         "plan4Btn": "आजीवन एक्सेस प्राप्त करें",
-        "plan5Name": "सीमित समय ऑफर",
+        "plan5Name": "पहला महीना मुफ्त",
         "plan5Desc": "पूर्ण Pro योजना",
-        "plan5Badge": "सीमित समय",
+        "plan5Badge": "नए उपयोगकर्ता",
         "plan5F1": "सभी Pro सुविधाएं शामिल",
         "plan5F2": "क्रेडिट कार्ड की जरूरत नहीं",
         "plan5F3": "कभी भी रद्द करें",
@@ -10573,7 +10501,7 @@ const resources = {
   "de": {
     "translation": {
       "landing": {
-        "banner": "🎉 ZEITLICH BEGRENZTES ANGEBOT: Erhalte 1 Monat KOSTENLOS auf alle Pro-Pläne! 🎉",
+        "banner": "🎉 Erster Monat KOSTENLOS auf alle Pro-Pläne für neue Nutzer 🎉",
         "nav": {
           "features": "Funktionen",
           "pricing": "Preise",
@@ -10601,18 +10529,6 @@ const resources = {
           "previewFormSub": "Echtzeit-Coaching",
           "previewMeds": "Medikamente verfolgen",
           "previewMedsSub": "Anbieterberichte"
-        },
-        "testimonials": {
-          "sectionTitle": "Was frühe Nutzer sagen",
-          "quote1": "Endlich eine App, mit der ich meine Blutdruckmedikamente neben meinen Workouts verfolgen kann. Mein Arzt liebt die Berichte, die sie erstellt.",
-          "name1": "Sarah M.",
-          "role1": "Beta-Tester · Vancouver, BC",
-          "quote2": "Die KI-Formanalyse hat mein Kniebeugen-Problem erkannt, das Knieschmerzen verursachte. Drei Wochen später sind die Schmerzen weg.",
-          "name2": "James R.",
-          "role2": "Beta-Tester · Toronto, ON",
-          "quote3": "Ich habe MyFitnessPal, Noom und fünf andere ausprobiert. YFIT ist die erste, die wirklich alles verbindet — Ernährung, Medikamente und Workouts an einem Ort.",
-          "name3": "Maria T.",
-          "role3": "Beta-Tester · Calgary, AB"
         },
         "features": {
           "sectionTitle": "Alles was du brauchst",
@@ -10705,7 +10621,7 @@ const resources = {
           "androidCta": "Pläne ansehen"
         },
         "pricing": {
-          "offerBadge": "Begrenzte Zeit: Erhalte 1 Monat KOSTENLOS auf jeden Pro-Plan",
+          "offerBadge": "Erster Monat KOSTENLOS auf jeden Pro-Plan — neue Nutzer",
           "sectionTitle": "Kostenlos starten. Upgraden wenn bereit.",
           "sectionSubtitle": "Keine Kreditkarte zum Starten erforderlich. Jederzeit kündigen. Dein erster Pro-Monat geht auf uns.",
           "processing": "Verarbeitung...",
@@ -10837,9 +10753,9 @@ const resources = {
         "plan4F5": "Direkter Entwicklerzugang",
         "plan4F6": "Keine wiederkehrenden Gebühren",
         "plan4Btn": "Lebenslangen Zugang erhalten",
-        "plan5Name": "Zeitlich begrenztes Angebot",
+        "plan5Name": "Erster Monat kostenlos",
         "plan5Desc": "Vollständiger Pro-Plan",
-        "plan5Badge": "BEGRENZTE ZEIT",
+        "plan5Badge": "NEU",
         "plan5F1": "Alle Pro-Funktionen enthalten",
         "plan5F2": "Keine Kreditkarte erforderlich",
         "plan5F3": "Jederzeit kündigen",
@@ -12279,7 +12195,7 @@ const resources = {
   "ja": {
     "translation": {
       "landing": {
-        "banner": "🎉 期間限定オファー：全Proプランで1ヶ月無料！🎉",
+        "banner": "🎉 新規ユーザー：全Proプランで初月無料 🎉",
         "nav": {
           "features": "機能",
           "pricing": "料金",
@@ -12307,18 +12223,6 @@ const resources = {
           "previewFormSub": "リアルタイムコーチング",
           "previewMeds": "薬を追跡",
           "previewMedsSub": "プロバイダーレポート"
-        },
-        "testimonials": {
-          "sectionTitle": "早期ユーザーの声",
-          "quote1": "ついにワークアウトと一緒に血圧の薬を追跡できるアプリが見つかりました。医師が生成されるレポートをとても気に入っています。",
-          "name1": "Sarah M.",
-          "role1": "ベータテスター · バンクーバー, BC",
-          "quote2": "AIフォーム分析が膝の痛みを引き起こしていたスクワットの問題を発見しました。3週間後、痛みは消えました。",
-          "name2": "James R.",
-          "role2": "ベータテスター · トロント, ON",
-          "quote3": "MyFitnessPal、Noom、その他5つを試しました。YFITは栄養、薬、ワークアウトを1か所で本当につなげた最初のアプリです。",
-          "name3": "Maria T.",
-          "role3": "ベータテスター · カルガリー, AB"
         },
         "features": {
           "sectionTitle": "必要なものがすべて揃っています",
@@ -12411,7 +12315,7 @@ const resources = {
           "androidCta": "プランを見る"
         },
         "pricing": {
-          "offerBadge": "期間限定：任意のProプランで1ヶ月無料",
+          "offerBadge": "新規ユーザー：任意のProプランで初月無料",
           "sectionTitle": "無料で始める。準備ができたらアップグレード。",
           "sectionSubtitle": "開始にクレジットカードは不要。いつでもキャンセル可能。最初のProの月は私たちが負担します。",
           "processing": "処理中...",
@@ -12543,9 +12447,9 @@ const resources = {
         "plan4F5": "開発者への直接アクセス",
         "plan4F6": "定期料金なし",
         "plan4Btn": "生涯アクセスを取得",
-        "plan5Name": "期間限定オファー",
+        "plan5Name": "初月無料",
         "plan5Desc": "フル機能Proプラン",
-        "plan5Badge": "期間限定",
+        "plan5Badge": "新規",
         "plan5F1": "すべてのPro機能を含む",
         "plan5F2": "クレジットカード不要",
         "plan5F3": "いつでもキャンセル",
