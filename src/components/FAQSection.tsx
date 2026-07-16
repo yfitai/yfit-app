@@ -64,6 +64,8 @@ export default function FAQSection({ onSignUp }: FAQSectionProps) {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="mailto:support@yfitai.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 text-gray-700 bg-transparent hover:bg-gray-100 transition-colors text-sm font-medium"
             >
               {t("landing.landingFaq.emailSupport")}
