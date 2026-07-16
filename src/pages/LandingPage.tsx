@@ -8,6 +8,7 @@ import FormAnalysisShowcase from "@/components/FormAnalysisShowcase";
 import AppTourSection from "@/components/AppTourSection";
 import QuickSetupCalculator from "@/components/QuickSetupCalculator";
 import MedicationShowcase from "@/components/MedicationShowcase";
+import FAQSection from "@/components/FAQSection";
 import { Check, ArrowRight, Activity, Zap, Smartphone, BarChart3, Pill, Eye, Target, Dumbbell, TrendingUp, Apple, Calendar, Brain, Loader2, X, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
@@ -329,20 +330,19 @@ export default function LandingPage() {
                 </Button>
                 <p className="text-xs text-muted-foreground">No credit card · Free plan available · Cancel anytime</p>
               </div>
-              {/* Social proof strip */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="flex -space-x-2">
-                    {["bg-green-500","bg-blue-500","bg-violet-500","bg-orange-500"].map((c,i) => (
-                      <div key={i} className={`w-7 h-7 rounded-full ${c} border-2 border-white flex items-center justify-center text-white text-xs font-bold`}>{["J","S","M","A"][i]}</div>
-                    ))}
-                  </div>
-                  <span><strong className="text-foreground">{t("landing.hero.socialProof")}</strong> {t("landing.hero.socialProofSub")}</span>
-                </div>
-                <div className="flex items-center gap-1 text-sm">
-                  {[1,2,3,4,5].map(i => <span key={i} className="text-yellow-400">★</span>)}
-                  <span className="text-muted-foreground ml-1">{t("landing.hero.earlyAccess")}</span>
-                </div>
+              {/* Honest feature badges — no fake social proof */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {[
+                  { icon: "💪", label: "No gym needed" },
+                  { icon: "💊", label: "Medication-aware" },
+                  { icon: "🧠", label: "AI form coach" },
+                  { icon: "✅", label: "Free to start" },
+                ].map((badge, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm">
+                    <span>{badge.icon}</span>
+                    {badge.label}
+                  </span>
+                ))}
               </div>
             </div>
 
@@ -462,91 +462,6 @@ export default function LandingPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* What Makes YFIT Different */}
-      <section id="unique" className="py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-block mb-4 px-4 py-2 rounded-full bg-violet-100 border border-violet-200 text-violet-700 text-sm font-bold">
-              {t("landing.unique.badge")}
-            </div>
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.unique.sectionTitle")}</h2>
-            <p className="text-lg text-muted-foreground">
-              {t("landing.unique.sectionSubtitle")}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Medication Tracking */}
-            <div className="bg-blue-700 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Pill className="w-8 h-8 text-white" />
-                </div>
-                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">{t("landing.unique.medBadge")}</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-2">{t("landing.unique.medTitle")}</h3>
-              <p className="text-white/80 text-sm mb-4">{t("landing.unique.medSubtitle")}</p>
-              <div className="bg-white/10 rounded-xl p-4 mb-6">
-                <p className="text-white/90 text-sm leading-relaxed">
-                  <strong>{t("landing.unique.medStat")}</strong> {t("landing.unique.medStatText")}
-                </p>
-              </div>
-              <ul className="space-y-2">
-                {[
-                  t("landing.unique.medF1"),
-                  t("landing.unique.medF2"),
-                  t("landing.unique.medF3"),
-                  t("landing.unique.medF4"),
-                  t("landing.unique.medF5"),
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-white/90">
-                    <Check className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Button onClick={goToSignUp} className="mt-6 w-full bg-white text-blue-700 hover:bg-blue-50 font-semibold">
-                {t("landing.unique.medCta")}
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Form Analysis */}
-            <div className="bg-teal-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Eye className="w-8 h-8 text-white" />
-                </div>
-                <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">{t("landing.unique.formBadge")}</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-2">{t("landing.unique.formTitle")}</h3>
-              <p className="text-white/80 text-sm mb-4">{t("landing.unique.formSubtitle")}</p>
-              <div className="bg-white/10 rounded-xl p-4 mb-6">
-                <p className="text-white/90 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t("landing.formStat") }} />
-              </div>
-              <ul className="space-y-2">
-                {[
-                  t("landing.formF1"),
-                  t("landing.formF2"),
-                  t("landing.formF3"),
-                  t("landing.formF4"),
-                  t("landing.formF5"),
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-white/90">
-                    <Check className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Button onClick={goToSignUp} className="mt-6 w-full bg-white text-teal-700 hover:bg-teal-50 font-semibold">
-                {t("landing.unique.medCta")}
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </div>
       </section>
@@ -780,86 +695,66 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Core Features Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">{t("landing.featuresSectionTitle")}</h2>
-            <p className="text-lg text-muted-foreground">
-              {t("landing.featuresSectionSubtitle")}
-            </p>
+      {/* Competitor Comparison Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">How YFIT Compares</h2>
+            <p className="text-muted-foreground text-lg">The only app that combines medication tracking, AI form analysis, and full fitness coaching in one place.</p>
           </div>
-
-          {/* YFIT Overview Card */}
-          <div className="mb-10">
-            <div className="bg-gray-900 rounded-2xl p-8 md:p-10 text-white shadow-xl border border-gray-700">
-              <div className="flex flex-col md:flex-row md:items-start gap-8">
-                {/* Left side: logo + decorative block */}
-                <div className="flex-shrink-0 flex flex-col items-center gap-4 md:w-48">
-                  <div className="bg-white rounded-2xl p-4 w-full flex items-center justify-center shadow-md">
-                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png" alt="YFIT AI" className="w-36 object-contain" />
-                  </div>
-                  <div className="hidden md:flex flex-col items-center gap-2 w-full">
-                    <div className="w-full h-1 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-pink-500 opacity-60" />
-                    <div className="grid grid-cols-3 gap-1.5 w-full mt-1">
-                      {["bg-green-500","bg-purple-500","bg-blue-500","bg-orange-500","bg-pink-500","bg-teal-500","bg-indigo-500","bg-violet-500","bg-cyan-500"].map((c,i) => (
-                        <div key={i} className={`h-2 rounded-full ${c} opacity-70`} />
-                      ))}
+          <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-900 text-white">
+                  <th className="text-left px-5 py-4 font-semibold w-56">Feature</th>
+                  <th className="text-center px-4 py-4 font-semibold bg-green-700">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">YOU ARE HERE</span>
+                      <span>YFIT AI</span>
                     </div>
-                    <p className="text-gray-500 text-xs text-center mt-2 leading-relaxed">{t("landing.infoPanelModules")}</p>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-300 text-base leading-relaxed mb-6">
-                    {t("landing.infoPanelIntro")}
-                  </p>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {[
-                      { color: "bg-green-500", label: t("landing.moduleNutritionLabel"), detail: t("landing.moduleNutritionDetail") },
-                      { color: "bg-purple-500", label: t("landing.moduleFitnessLabel"), detail: t("landing.moduleFitnessDetail") },
-                      { color: "bg-blue-500", label: t("landing.moduleBodyLabel"), detail: t("landing.moduleBodyDetail") },
-                      { color: "bg-orange-500", label: t("landing.moduleActivityLabel"), detail: t("landing.moduleActivityDetail") },
-                      { color: "bg-pink-500", label: t("landing.moduleMedsLabel"), detail: t("landing.moduleMedsDetail") },
-                      { color: "bg-teal-500", label: t("landing.moduleProgressLabel"), detail: t("landing.moduleProgressDetail") },
-                      { color: "bg-indigo-500", label: t("landing.moduleAILabel"), detail: t("landing.moduleAIDetail") },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
-                        <div className={`w-2.5 h-2.5 rounded-full ${item.color} flex-shrink-0 mt-1.5`} />
-                        <div>
-                          <span className="font-semibold text-white text-sm">{item.label}:</span>
-                          <span className="text-gray-400 text-xs ml-1 leading-relaxed">{item.detail}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-6 text-gray-300 text-sm leading-relaxed border-t border-white/10 pt-4">
-                    <span className="text-white font-semibold">{t("landing.infoPanelConnected")}</span> {t("landing.infoPanelConnectedSuffix")}
-                  </p>
-                </div>
-              </div>
-            </div>
+                  </th>
+                  <th className="text-center px-4 py-4 font-semibold text-gray-300">MyFitnessPal</th>
+                  <th className="text-center px-4 py-4 font-semibold text-gray-300">Noom</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: "Calorie & macro tracking", yfit: "✅", mfp: "✅", noom: "✅" },
+                  { feature: "Workout logging", yfit: "✅", mfp: "✅", noom: "❌" },
+                  { feature: "AI coaching chat", yfit: "✅", mfp: "❌", noom: "✅" },
+                  { feature: "Barcode food scanner", yfit: "✅", mfp: "✅", noom: "❌" },
+                  { feature: "Progress photo tracking", yfit: "✅", mfp: "❌", noom: "❌" },
+                  { feature: "Medication tracking", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
+                  { feature: "Medication–exercise interaction alerts", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
+                  { feature: "AI real-time form analysis", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
+                  { feature: "Provider-ready medication reports", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
+                ].map((row, i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-5 py-3 text-gray-700 font-medium">{row.feature}</td>
+                    <td className={`text-center px-4 py-3 font-semibold bg-green-50 ${
+                      row.yfit.includes('Exclusive') ? 'text-green-700' : 'text-gray-700'
+                    }`}>{row.yfit}</td>
+                    <td className="text-center px-4 py-3 text-gray-500">{row.mfp}</td>
+                    <td className="text-center px-4 py-3 text-gray-500">{row.noom}</td>
+                  </tr>
+                ))}
+                <tr className="bg-gray-900">
+                  <td className="px-5 py-4 text-white font-semibold text-sm">Ready to switch?</td>
+                  <td className="text-center px-4 py-4 bg-green-900">
+                    <button onClick={goToSignUp} className="text-xs bg-green-500 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-green-400 transition-colors">Start Free</button>
+                  </td>
+                  <td className="text-center px-4 py-4 text-gray-500 text-xs">—</td>
+                  <td className="text-center px-4 py-4 text-gray-500 text-xs">—</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: Smartphone, color: "bg-blue-600", title: t("landing.card1Title"), desc: t("landing.card1Desc"), bg: "bg-blue-50" },
-              { icon: Activity, color: "bg-violet-600", title: t("landing.card2Title"), desc: t("landing.card2Desc"), bg: "bg-violet-50" },
-              { icon: BarChart3, color: "bg-teal-600", title: t("landing.card3Title"), desc: t("landing.card3Desc"), bg: "bg-teal-50" },
-            ].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i} className={`${item.bg} rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all duration-300`}>
-                  <div className={`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
+          <p className="text-center text-xs text-muted-foreground mt-4">✅ Exclusive = feature only available in YFIT AI. Comparison based on publicly available feature lists as of 2025.</p>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQSection onSignUp={goToSignUp} />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-green-600 to-teal-600 text-white">
@@ -914,7 +809,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><button onClick={goToContact} className="hover:text-primary transition-colors">{t("landing.footer.contactUs")}</button></li>
                 <li><button onClick={goToFAQ} className="hover:text-primary transition-colors">{t("landing.footer.supportCenter")}</button></li>
-                <li><p className="text-xs">support@yfitai.com</p></li>
+                <li><a href="mailto:support@yfitai.com" className="text-xs hover:text-primary transition-colors">support@yfitai.com</a></li>
               </ul>
             </div>
           </div>

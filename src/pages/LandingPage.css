@@ -10,8 +10,8 @@
    NOT the --color-* aliases, within the .landing-page scope.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Import Space Grotesk font for headings */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+/* Import Syne font for headings (bold, geometric, premium fitness feel) */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 /* ── Root-level overrides scoped to .landing-page ────────────────────────── */
 .landing-page {
@@ -63,9 +63,9 @@
 .landing-page h4,
 .landing-page h5,
 .landing-page h6 {
-  font-family: 'Space Grotesk', sans-serif !important;
+  font-family: 'Syne', sans-serif !important;
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: oklch(0.15 0.02 220);
 }
 
