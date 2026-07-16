@@ -900,7 +900,7 @@ export const APP_TOUR_SCREENS = [
     component: NutritionMockup,
   },
   {
-    id: "tracker",
+    id: "dailyTracker",
     label: "Daily Tracker",
     icon: Calendar,
     color: "bg-orange-500",
@@ -954,7 +954,7 @@ export const APP_TOUR_SCREENS = [
     component: RecompMockup,
   },
   {
-    id: "ai-coach",
+    id: "aiCoach",
     label: "AI Coach",
     icon: Sparkles,
     color: "bg-violet-600",
