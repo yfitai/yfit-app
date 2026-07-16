@@ -580,7 +580,7 @@ const WorkoutAnalyticsDashboard = ({ userId, timeRange: parentTimeRange = '30' }
             <Tooltip 
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               labelStyle={{ color: '#374151', fontWeight: 'bold' }}
-              formatter={(value) => [value.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' lbs', 'Volume']}
+              formatter={(value) => [value.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' lbs']}
             />
             <Line 
               type="monotone" 

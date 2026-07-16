@@ -81,6 +81,9 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
   }, [article])
 
   const fetchDailyInsight = async () => {
+    // Allowlisted categories — exclude medical recalls, drug warnings, and non-fitness content
+    const ALLOWED_CATEGORIES = ['fitness', 'nutrition', 'wellness', 'motivation', 'recovery', 'mental_health']
+
     try {
       // Try to get a fresh article added today first
       const today = new Date()
@@ -89,6 +92,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
       let { data: todayData } = await supabase
         .from('scraped_articles')
         .select('id, title, summary, url, source_name, category, relevance_score')
+        .in('category', ALLOWED_CATEGORIES)
         .gte('created_at', today.toISOString())
         .order('relevance_score', { ascending: false })
         .limit(1)
@@ -104,6 +108,7 @@ export default function DailyInsight({ variant = 'strip', className = '' }) {
       const { data: allArticles } = await supabase
         .from('scraped_articles')
         .select('id, title, summary, url, source_name, category, relevance_score')
+        .in('category', ALLOWED_CATEGORIES)
         .order('relevance_score', { ascending: false })
         .limit(60) // fetch top 60 by relevance to rotate through
 

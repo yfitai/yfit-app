@@ -19,6 +19,13 @@ interface WelcomeEmailData {
 }
 
 async function sendWelcomeEmail(to: string, firstName: string): Promise<string | null> {
+  // Calculate trial expiry date (30 days from now)
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 30);
+  const trialEndFormatted = trialEnd.toLocaleDateString('en-CA', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+
   try {
     const html = `
       <html>
@@ -33,6 +40,12 @@ async function sendWelcomeEmail(to: string, firstName: string): Promise<string |
             <!-- Content -->
             <div style="padding: 40px 30px;">
               <h2 style="color: #1f2937; margin-top: 0;">Hi ${firstName}! 👋</h2>
+
+              <!-- Trial confirmation banner -->
+              <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 10px; padding: 18px 22px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 16px; color: #065f46; font-weight: bold;">🎉 Your 30-day free trial has started!</p>
+                <p style="margin: 6px 0 0 0; font-size: 14px; color: #047857;">Your trial expires on <strong>${trialEndFormatted}</strong>. Enjoy full Pro access — no credit card needed.</p>
+              </div>
               
               <p style="font-size: 16px; color: #4b5563; margin: 20px 0;">
                 We're thrilled to have you join the YFIT family! You're now part of a community that's transforming fitness with AI-powered coaching.
@@ -59,7 +72,7 @@ async function sendWelcomeEmail(to: string, firstName: string): Promise<string |
               </div>
               
               <div style="text-align: center; margin: 40px 0;">
-                <a href="https://yfit-app.vercel.app" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #10b981 100% ); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <a href="https://yfitai.com" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #10b981 100% ); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
                   Launch YFIT App →
                 </a>
               </div>
@@ -95,6 +108,9 @@ async function sendWelcomeEmail(to: string, firstName: string): Promise<string |
 
 Welcome to YFIT AI! 🎉
 
+🎉 Your 30-day free trial has started!
+Your trial expires on ${trialEndFormatted}. Enjoy full Pro access — no credit card needed.
+
 We're thrilled to have you join the YFIT family! You're now part of a community that's transforming fitness with AI-powered coaching.
 
 Get Started in 3 Easy Steps:
@@ -109,7 +125,7 @@ Your Free Month Includes:
 ✅ Progress analytics & insights
 ✅ 24/7 AI coaching support
 
-Launch YFIT App: https://yfit-app.vercel.app
+Launch YFIT App: https://yfitai.com
 
 Need help? Our AI support team is here 24/7. Just tap the "Contact Support" button in the app!
 
