@@ -322,21 +322,21 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 text-white shadow-lg">
-                  Try Free — See Your Dashboard
+                  {t("landing.hero.ctaTryFree")}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <Button onClick={() => document.getElementById('app-tour')?.scrollIntoView({ behavior: 'smooth' })} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
-                  See the App →
+                  {t("landing.hero.ctaSeeApp")}
                 </Button>
-                <p className="text-xs text-muted-foreground">No credit card · Free plan available · Cancel anytime</p>
+                <p className="text-xs text-muted-foreground">{t("landing.hero.ctaDisclaimer")}</p>
               </div>
               {/* Honest feature badges — no fake social proof */}
               <div className="flex flex-wrap gap-2 pt-2">
                 {[
-                  { icon: "💪", label: "No gym needed" },
-                  { icon: "💊", label: "Medication-aware" },
-                  { icon: "🧠", label: "AI form coach" },
-                  { icon: "✅", label: "Free to start" },
+                  { icon: "💪", label: t("landing.hero.badge1") },
+                  { icon: "💊", label: t("landing.hero.badge2") },
+                  { icon: "🧠", label: t("landing.hero.badge3") },
+                  { icon: "✅", label: t("landing.hero.badge4") },
                 ].map((badge, i) => (
                   <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm">
                     <span>{badge.icon}</span>

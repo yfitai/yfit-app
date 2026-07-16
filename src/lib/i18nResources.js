@@ -31,6 +31,14 @@ const resources = {
           "previewFormSub": "Real-time coaching",
           "previewMeds": "Track Medications",
           "previewMedsSub": "Provider reports"
+        ,
+          "ctaTryFree": "Try Free — See Your Dashboard",
+          "ctaSeeApp": "See the App →",
+          "ctaDisclaimer": "No credit card · Free plan available · Cancel anytime",
+          "badge1": "No gym needed",
+          "badge2": "Medication-aware",
+          "badge3": "AI form coach",
+          "badge4": "Free to start"
         },
         "features": {
           "sectionTitle": "Everything You Need",
@@ -2023,6 +2031,14 @@ const resources = {
           "previewFormSub": "Coaching en temps réel",
           "previewMeds": "Suivre les médicaments",
           "previewMedsSub": "Rapports fournisseurs"
+        ,
+          "ctaTryFree": "Essai gratuit — Voir votre tableau de bord",
+          "ctaSeeApp": "Voir l'application →",
+          "ctaDisclaimer": "Pas de carte bancaire · Plan gratuit disponible · Annulez à tout moment",
+          "badge1": "Sans salle de sport",
+          "badge2": "Conscient des médicaments",
+          "badge3": "Coach de forme IA",
+          "badge4": "Gratuit pour commencer"
         },
         "features": {
           "sectionTitle": "Tout ce dont vous avez besoin",
@@ -4029,6 +4045,14 @@ const resources = {
           "previewFormSub": "Coaching en tiempo real",
           "previewMeds": "Rastrear medicamentos",
           "previewMedsSub": "Informes de proveedores"
+        ,
+          "ctaTryFree": "Prueba gratis — Ver tu panel",
+          "ctaSeeApp": "Ver la app →",
+          "ctaDisclaimer": "Sin tarjeta de crédito · Plan gratuito disponible · Cancela en cualquier momento",
+          "badge1": "Sin gimnasio",
+          "badge2": "Consciente de medicamentos",
+          "badge3": "Entrenador de forma IA",
+          "badge4": "Gratis para empezar"
         },
         "features": {
           "sectionTitle": "Todo lo que necesitas",
@@ -5993,6 +6017,14 @@ const resources = {
           "previewFormSub": "Coaching em tempo real",
           "previewMeds": "Rastrear medicamentos",
           "previewMedsSub": "Relatórios de provedores"
+        ,
+          "ctaTryFree": "Experimente grátis — Ver seu painel",
+          "ctaSeeApp": "Ver o app →",
+          "ctaDisclaimer": "Sem cartão de crédito · Plano gratuito disponível · Cancele a qualquer momento",
+          "badge1": "Sem academia",
+          "badge2": "Consciente de medicamentos",
+          "badge3": "Treinador de forma IA",
+          "badge4": "Grátis para começar"
         },
         "features": {
           "sectionTitle": "Tudo que você precisa",
@@ -7948,6 +7980,14 @@ const resources = {
           "previewFormSub": "实时教练",
           "previewMeds": "追踪药物",
           "previewMedsSub": "提供商报告"
+        ,
+          "ctaTryFree": "免费试用 — 查看您的仪表板",
+          "ctaSeeApp": "查看应用 →",
+          "ctaDisclaimer": "无需信用卡 · 提供免费计划 · 随时取消",
+          "badge1": "无需健身房",
+          "badge2": "药物感知",
+          "badge3": "AI动作教练",
+          "badge4": "免费开始"
         },
         "features": {
           "sectionTitle": "您所需要的一切",
@@ -9845,6 +9885,14 @@ const resources = {
           "previewFormSub": "रियल-टाइम कोचिंग",
           "previewMeds": "दवाएं ट्रैक करें",
           "previewMedsSub": "प्रदाता रिपोर्ट"
+        ,
+          "ctaTryFree": "मुफ्त आज़माएं — अपना डैशबोर्ड देखें",
+          "ctaSeeApp": "ऐप देखें →",
+          "ctaDisclaimer": "क्रेडिट कार्ड नहीं · मुफ्त प्लान उपलब्ध · कभी भी रद्द करें",
+          "badge1": "जिम की जरूरत नहीं",
+          "badge2": "दवा-जागरूक",
+          "badge3": "AI फॉर्म कोच",
+          "badge4": "मुफ्त शुरू करें"
         },
         "features": {
           "sectionTitle": "आपको जो चाहिए वो सब",
@@ -11741,6 +11789,14 @@ const resources = {
           "previewFormSub": "Echtzeit-Coaching",
           "previewMeds": "Medikamente verfolgen",
           "previewMedsSub": "Anbieterberichte"
+        ,
+          "ctaTryFree": "Kostenlos testen — Dashboard ansehen",
+          "ctaSeeApp": "App ansehen →",
+          "ctaDisclaimer": "Keine Kreditkarte · Kostenloser Plan verfügbar · Jederzeit kündigen",
+          "badge1": "Kein Fitnessstudio nötig",
+          "badge2": "Medikamenten-bewusst",
+          "badge3": "KI-Formtrainer",
+          "badge4": "Kostenlos starten"
         },
         "features": {
           "sectionTitle": "Alles was du brauchst",
@@ -13637,6 +13693,14 @@ const resources = {
           "previewFormSub": "リアルタイムコーチング",
           "previewMeds": "薬を追跡",
           "previewMedsSub": "プロバイダーレポート"
+        ,
+          "ctaTryFree": "無料で試す — ダッシュボードを見る",
+          "ctaSeeApp": "アプリを見る →",
+          "ctaDisclaimer": "クレジットカード不要 · 無料プランあり · いつでもキャンセル可能",
+          "badge1": "ジム不要",
+          "badge2": "薬物対応",
+          "badge3": "AIフォームコーチ",
+          "badge4": "無料で始める"
         },
         "features": {
           "sectionTitle": "必要なものがすべて揃っています",
