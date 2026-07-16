@@ -7,7 +7,8 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Contact() {
-  const { t, i18n } = useTranslation("support");
+  // Use default "translation" namespace — keys are under "support.*"
+  const { t, i18n } = useTranslation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -43,24 +44,24 @@ export default function Contact() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t("failedToSend"));
+        setError(data.error || t("support.failedToSend"));
       } else {
         setSubmitted(true);
         setFormData({ name: "", email: "", subject: "", message: "" });
         setTimeout(() => setSubmitted(false), 8000);
       }
     } catch {
-      setError(t("networkError"));
+      setError(t("support.networkError"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const faqs = [
-    { q: t("q_resetPassword"), a: t("a_resetPassword") },
-    { q: t("q_cancelSubscription"), a: t("a_cancelSubscription") },
-    { q: t("q_dataSecurity"), a: t("a_dataSecurity") },
-    { q: t("q_refund"), a: t("a_refund") },
+    { q: t("support.q_resetPassword"), a: t("support.a_resetPassword") },
+    { q: t("support.q_cancelSubscription"), a: t("support.a_cancelSubscription") },
+    { q: t("support.q_dataSecurity"), a: t("support.a_dataSecurity") },
+    { q: t("support.q_refund"), a: t("support.a_refund") },
   ];
 
   return (
@@ -80,7 +81,7 @@ export default function Contact() {
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {t("backToHome")}
+            {t("support.backToHome")}
           </a>
         </div>
       </nav>
@@ -90,9 +91,9 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 text-foreground">{t("getInTouch")}</h1>
+            <h1 className="text-4xl font-bold mb-4 text-foreground">{t("support.getInTouch")}</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t("pageSubtitle")}
+              {t("support.pageSubtitle")}
             </p>
           </div>
 
@@ -103,11 +104,16 @@ export default function Contact() {
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle>{t("emailCardTitle")}</CardTitle>
+                <CardTitle>{t("support.emailCardTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">{t("emailCardDesc")}</p>
-                <p className="text-primary font-medium">support@yfitai.com</p>
+                <p className="text-muted-foreground mb-4">{t("support.emailCardDesc")}</p>
+                <a
+                  href="mailto:support@yfitai.com"
+                  className="text-primary font-medium hover:underline"
+                >
+                  support@yfitai.com
+                </a>
               </CardContent>
             </Card>
 
@@ -116,10 +122,10 @@ export default function Contact() {
                 <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
                   <Zap className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle>{t("supportCardTitle")}</CardTitle>
+                <CardTitle>{t("support.supportCardTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">{t("supportCardDesc")}</p>
+                <p className="text-muted-foreground mb-4">{t("support.supportCardDesc")}</p>
               </CardContent>
             </Card>
 
@@ -128,10 +134,10 @@ export default function Contact() {
                 <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
                   <MessageSquare className="w-6 h-6 text-green-600" />
                 </div>
-                <CardTitle>{t("chatCardTitle")}</CardTitle>
+                <CardTitle>{t("support.chatCardTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">{t("chatCardDesc")}</p>
+                <p className="text-muted-foreground mb-4">{t("support.chatCardDesc")}</p>
               </CardContent>
             </Card>
           </div>
@@ -139,13 +145,13 @@ export default function Contact() {
           {/* Contact Form */}
           <Card className="glass-card border-primary/20 mb-12">
             <CardHeader>
-              <CardTitle>{t("contactSupport")}</CardTitle>
+              <CardTitle>{t("support.contactSupport")}</CardTitle>
             </CardHeader>
             <CardContent>
               {submitted && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                  <p className="font-medium">✅ {t("messageSentSuccessfully")}</p>
-                  <p className="text-sm mt-1">{t("aiResponseAtEmail", { email: formData.email || "your inbox" })}</p>
+                  <p className="font-medium">✅ {t("support.messageSentSuccessfully")}</p>
+                  <p className="text-sm mt-1">{t("support.aiResponseAtEmail", { email: formData.email || "your inbox" })}</p>
                 </div>
               )}
 
@@ -158,12 +164,12 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">{t("yourName")}</Label>
+                    <Label htmlFor="name" className="text-sm font-medium">{t("support.yourName")}</Label>
                     <Input
                       id="name"
                       name="name"
                       type="text"
-                      placeholder={t("namePlaceholder")}
+                      placeholder={t("support.namePlaceholder")}
                       value={formData.name}
                       onChange={handleChange}
                       className="border-primary/20 focus:border-primary"
@@ -176,7 +182,7 @@ export default function Contact() {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder={t("emailPlaceholder")}
+                      placeholder={t("support.emailPlaceholder")}
                       value={formData.email}
                       onChange={handleChange}
                       className="border-primary/20 focus:border-primary"
@@ -186,12 +192,12 @@ export default function Contact() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject" className="text-sm font-medium">{t("subject")}</Label>
+                  <Label htmlFor="subject" className="text-sm font-medium">{t("support.subject")}</Label>
                   <Input
                     id="subject"
                     name="subject"
                     type="text"
-                    placeholder={t("subjectPlaceholder")}
+                    placeholder={t("support.subjectPlaceholder")}
                     value={formData.subject}
                     onChange={handleChange}
                     className="border-primary/20 focus:border-primary"
@@ -200,11 +206,11 @@ export default function Contact() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message" className="text-sm font-medium">{t("message")}</Label>
+                  <Label htmlFor="message" className="text-sm font-medium">{t("support.message")}</Label>
                   <textarea
                     id="message"
                     name="message"
-                    placeholder={t("messagePlaceholder")}
+                    placeholder={t("support.messagePlaceholder")}
                     value={formData.message}
                     onChange={handleChange}
                     rows={6}
@@ -218,7 +224,7 @@ export default function Contact() {
                   className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? t("sending") : t("sendMessage")}
+                  {isSubmitting ? t("support.sending") : t("support.sendMessage")}
                 </Button>
               </form>
             </CardContent>
@@ -226,7 +232,7 @@ export default function Contact() {
 
           {/* FAQ Section */}
           <div id="faq">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">{t("faqSectionTitle")}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-foreground">{t("support.faqSectionTitle")}</h2>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <Card key={index} className="glass-card border-primary/20">
