@@ -9,9 +9,11 @@ import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { APP_TOUR_SCREENS } from "./AppTourMockups";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function AppTourSection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
@@ -78,13 +80,13 @@ export default function AppTourSection() {
         {/* Section header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 border border-green-300 text-green-700 text-sm font-bold mb-4">
-            <span>📱</span> See the App in Action
+            <span>📱</span> {t("landing.appTour.badge")}
           </div>
           <h2 className="text-3xl lg:text-5xl font-bold mb-4 text-gray-900">
-            Every screen, built for <span className="text-green-600">your goals</span>
+            {t("landing.appTour.headline")} <span className="text-green-600">{t("landing.appTour.headlineHighlight")}</span>
           </h2>
           <p className="text-lg text-gray-500">
-            Explore all 11 features of YFIT AI — tap any tab to see exactly what you'll get.
+            {t("landing.appTour.subtext")}
           </p>
         </div>
 
@@ -108,7 +110,7 @@ export default function AppTourSection() {
                   }`}
                 >
                   <TabIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{s.label}</span>
+                  <span className="whitespace-nowrap">{t(`landing.appTour.screens.${s.id}.label`, s.label)}</span>
                 </button>
               );
             })}
@@ -153,15 +155,15 @@ export default function AppTourSection() {
               {/* Screen badge */}
               <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${screen.color} text-white text-sm font-semibold mb-4`}>
                 <IconComp className="w-4 h-4" />
-                {screen.label}
+                {t(`landing.appTour.screens.${screen.id}.label`, screen.label)}
               </div>
 
               <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">
-                {screen.title}
+                {t(`landing.appTour.screens.${screen.id}.title`, screen.title)}
               </h3>
 
               <p className="text-gray-600 text-base lg:text-lg leading-relaxed mb-6">
-                {screen.description}
+                {t(`landing.appTour.screens.${screen.id}.description`, screen.description)}
               </p>
 
               {/* Progress dots */}
@@ -197,18 +199,18 @@ export default function AppTourSection() {
                   onClick={() => navigate('/signup')}
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5"
                 >
-                  Try Free — No Credit Card
+                  {t("landing.appTour.ctaBtn")}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Free forever plan available · Cancel paid plans anytime</p>
+              <p className="text-xs text-gray-400 mt-2">{t("landing.appTour.ctaNote")}</p>
             </div>
           </div>
         </div>
 
         {/* Screen counter */}
         <div className="text-center mt-8 text-sm text-gray-400">
-          {activeIndex + 1} / {APP_TOUR_SCREENS.length} features
+          {activeIndex + 1} / {APP_TOUR_SCREENS.length} {t("landing.appTour.counter")}
         </div>
       </div>
     </section>

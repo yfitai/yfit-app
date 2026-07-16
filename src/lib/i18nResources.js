@@ -143,6 +143,156 @@ const resources = {
           "sectionAnalytics": "ANALYTICS",
           "sectionSupport": "SUPPORT & PERKS"
         },
+        "appTour": {
+                "badge": "See the App in Action",
+                "headline": "Every screen, built for",
+                "headlineHighlight": "your goals",
+                "subtext": "Explore all 11 features of YFIT AI — tap any tab to see exactly what you'll get.",
+                "tryFree": "Try Free — No Credit Card",
+                "freeNote": "Free forever plan available · Cancel paid plans anytime",
+                "counter": "features",
+                "screens": {
+                        "dashboard": {
+                                "label": "Dashboard",
+                                "title": "Everything in one place",
+                                "description": "Your complete health picture at a glance — calorie ring, macro bars, today's workout, and 8 quick-action shortcuts. No more switching between 5 different apps."
+                        },
+                        "goals": {
+                                "label": "Goals",
+                                "title": "Know your exact numbers",
+                                "description": "Enter your measurements and YFIT automatically calculates your BMI, body fat %, TDEE, and target calories using the Katch-McArdle formula — more accurate than any other fitness app."
+                        },
+                        "nutrition": {
+                                "label": "Nutrition",
+                                "title": "Track every meal effortlessly",
+                                "description": "Log meals by searching, scanning barcodes, or letting AI identify your food from a photo. Your TDEE from Goals auto-populates your daily calorie target so you never have to do the math."
+                        },
+                        "dailyTracker": {
+                                "label": "Daily Tracker",
+                                "title": "Log everything that matters",
+                                "description": "Track steps, water, sleep, blood pressure, and glucose in one place. Mint-green progress cards show you exactly where you stand against your daily targets — at a glance."
+                        },
+                        "fitness": {
+                                "label": "Fitness",
+                                "title": "Smart workout planning",
+                                "description": "Push/Pull/Legs, full-body, or custom splits — YFIT builds your program and tracks every set in real-time. Active exercises are highlighted so you never lose your place mid-workout."
+                        },
+                        "medications": {
+                                "label": "Medications",
+                                "title": "Fitness-aware medication tracking",
+                                "description": "The only fitness app that understands your medications. YFIT flags workout interactions (e.g., Metformin + intense cardio), tracks adherence, and generates printable provider reports."
+                        },
+                        "progress": {
+                                "label": "Progress",
+                                "title": "See your transformation",
+                                "description": "Weight trend charts, body fat %, measurement history, and progress photos in one timeline. Three summary cards — blue for weight, green for body fat, pink for BMI — give instant visual feedback."
+                        },
+                        "predictions": {
+                                "label": "Predictions",
+                                "title": "Know when you'll reach your goal",
+                                "description": "AI analyzes your pace and predicts your goal date, body fat at target weight, injury risk, and metabolic rate change. The green timeline banner updates every day as your data improves."
+                        },
+                        "recomp": {
+                                "label": "Recomp",
+                                "title": "Lose fat and build muscle simultaneously",
+                                "description": "Body recomposition is the hardest goal to achieve — YFIT's Recomp Score (0–100) tells you exactly how optimal your conditions are, and gives AI-powered macro targets to make it happen."
+                        },
+                        "aiCoach": {
+                                "label": "AI Coach",
+                                "title": "Your personal AI fitness coach",
+                                "description": "Ask anything — workout modifications, nutrition advice, recovery tips. YFIT's AI Coach knows your medications, goals, and history, so its advice is always personalized to you specifically."
+                        },
+                        "language": {
+                                "label": "Language",
+                                "title": "Available in 8 languages",
+                                "description": "YFIT AI is fully translated into English, Spanish, French, German, Portuguese, Japanese, Chinese, and Arabic. Switch languages instantly — every screen, every label, every AI response."
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "Free TDEE Calculator",
+                "headline": "See your exact numbers",
+                "headlineHighlight": "in 60 seconds",
+                "subtext": "Get your personalized calorie target, macro split, and goal timeline — free, no account needed.",
+                "stepLabels": [
+                        "Body Info",
+                        "Activity",
+                        "Your Goal"
+                ],
+                "step0Title": "Tell us about yourself",
+                "biologicalSex": "Biological Sex",
+                "male": "Male",
+                "female": "Female",
+                "age": "Age",
+                "agePlaceholder": "e.g. 32",
+                "height": "Height",
+                "currentWeight": "Current Weight",
+                "nextActivity": "Next: Activity Level →",
+                "step1Title": "How active are you?",
+                "back": "← Back",
+                "step2Title": "What's your primary goal?",
+                "calculateBtn": "Calculate My Numbers →",
+                "resultsTitle": "Your personalized daily target",
+                "caloriesPerDay": "calories/day to",
+                "tdeeMaintenance": "TDEE/Maintenance",
+                "estBodyFat": "Est. Body Fat",
+                "dailyMacros": "Daily Macro Targets",
+                "protein": "Protein",
+                "carbs": "Carbs",
+                "fat": "Fat",
+                "saveResultsTitle": "Save your results — get the full picture",
+                "saveResultsCta": "Save My Results — Create Free Account →",
+                "noCreditCard": "No credit card · Free forever plan · Takes 30 seconds",
+                "recalculate": "← Recalculate with different numbers",
+                "saveFeatures": [
+                        "📊 Track your actual food intake against these targets",
+                        "🎯 Precise body fat % from your real measurements",
+                        "📈 Weekly progress charts and predictions",
+                        "🤖 AI Coach adapts your plan as you progress",
+                        "💊 Medication interaction checker",
+                        "🌍 Available in 8 languages"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "Lose Weight",
+                                "desc": "Steady fat loss (~1 lb/week)"
+                        },
+                        "lose_fast": {
+                                "label": "Lose Faster",
+                                "desc": "Aggressive cut (~1.5 lb/week)"
+                        },
+                        "maintain": {
+                                "label": "Maintain",
+                                "desc": "Stay at current weight"
+                        },
+                        "gain_muscle": {
+                                "label": "Build Muscle",
+                                "desc": "Lean bulk (+300 cal)"
+                        },
+                        "build_strength": {
+                                "label": "Build Strength",
+                                "desc": "Performance focus"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "Sedentary",
+                                "desc": "Desk job, little exercise"
+                        },
+                        "light": {
+                                "label": "Lightly Active",
+                                "desc": "Gym 1–3×/week, desk job"
+                        },
+                        "moderate": {
+                                "label": "Moderately Active",
+                                "desc": "Gym 3–5×/week + active job"
+                        },
+                        "active": {
+                                "label": "Very Active",
+                                "desc": "Hard exercise 6–7 days/week"
+                        }
+                }
+        },
         "cta": {
           "badge": "No credit card required · Free forever plan available",
           "headline": "The fitness app that actually knows you.",
@@ -1975,6 +2125,156 @@ const resources = {
           "sectionPlanning": "PLANIFICATION",
           "sectionAnalytics": "ANALYSES",
           "sectionSupport": "SUPPORT & AVANTAGES"
+        },
+        "appTour": {
+                "badge": "Voir l'application en action",
+                "headline": "Chaque écran, conçu pour",
+                "headlineHighlight": "vos objectifs",
+                "subtext": "Explorez les 11 fonctionnalités de YFIT AI — appuyez sur un onglet pour voir exactement ce que vous obtiendrez.",
+                "tryFree": "Essayer gratuitement — Sans carte bancaire",
+                "freeNote": "Plan gratuit à vie · Annulez les plans payants à tout moment",
+                "counter": "fonctionnalités",
+                "screens": {
+                        "dashboard": {
+                                "label": "Tableau de bord",
+                                "title": "Tout en un seul endroit",
+                                "description": "Votre tableau de santé complet en un coup d'œil — anneau calorique, barres de macros, entraînement du jour et 8 raccourcis rapides."
+                        },
+                        "goals": {
+                                "label": "Objectifs",
+                                "title": "Connaissez vos chiffres exacts",
+                                "description": "Entrez vos mesures et YFIT calcule automatiquement votre IMC, % de graisse corporelle, TDEE et calories cibles."
+                        },
+                        "nutrition": {
+                                "label": "Nutrition",
+                                "title": "Suivez chaque repas sans effort",
+                                "description": "Enregistrez les repas par recherche, scan de code-barres ou en laissant l'IA identifier vos aliments depuis une photo."
+                        },
+                        "dailyTracker": {
+                                "label": "Suivi quotidien",
+                                "title": "Enregistrez tout ce qui compte",
+                                "description": "Suivez les pas, l'eau, le sommeil, la tension artérielle et la glycémie en un seul endroit."
+                        },
+                        "fitness": {
+                                "label": "Fitness",
+                                "title": "Planification intelligente des entraînements",
+                                "description": "Push/Pull/Jambes, corps entier ou fractionnements personnalisés — YFIT construit votre programme et suit chaque série en temps réel."
+                        },
+                        "medications": {
+                                "label": "Médicaments",
+                                "title": "Suivi des médicaments adapté au fitness",
+                                "description": "La seule application fitness qui comprend vos médicaments. YFIT signale les interactions avec les entraînements et génère des rapports pour votre médecin."
+                        },
+                        "progress": {
+                                "label": "Progrès",
+                                "title": "Voyez votre transformation",
+                                "description": "Graphiques de tendance de poids, % de graisse corporelle, historique des mesures et photos de progrès en une seule chronologie."
+                        },
+                        "predictions": {
+                                "label": "Prédictions",
+                                "title": "Sachez quand vous atteindrez votre objectif",
+                                "description": "L'IA analyse votre rythme et prédit votre date d'objectif, la graisse corporelle au poids cible, le risque de blessure et le changement du taux métabolique."
+                        },
+                        "recomp": {
+                                "label": "Recomp",
+                                "title": "Perdre de la graisse et développer les muscles simultanément",
+                                "description": "La recomposition corporelle est l'objectif le plus difficile — le Score Recomp de YFIT (0–100) vous indique exactement à quel point vos conditions sont optimales."
+                        },
+                        "aiCoach": {
+                                "label": "Coach IA",
+                                "title": "Votre coach fitness IA personnel",
+                                "description": "Posez n'importe quelle question — modifications d'entraînement, conseils nutritionnels, conseils de récupération. Le Coach IA de YFIT connaît vos médicaments, objectifs et historique."
+                        },
+                        "language": {
+                                "label": "Langue",
+                                "title": "Disponible en 8 langues",
+                                "description": "YFIT AI est entièrement traduit en anglais, espagnol, français, allemand, portugais, japonais, chinois et arabe."
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "Calculateur TDEE gratuit",
+                "headline": "Voyez vos chiffres exacts",
+                "headlineHighlight": "en 60 secondes",
+                "subtext": "Obtenez votre objectif calorique personnalisé, votre répartition en macros et votre calendrier d'objectifs — gratuit, sans compte requis.",
+                "stepLabels": [
+                        "Infos corporelles",
+                        "Activité",
+                        "Votre objectif"
+                ],
+                "step0Title": "Parlez-nous de vous",
+                "biologicalSex": "Sexe biologique",
+                "male": "Homme",
+                "female": "Femme",
+                "age": "Âge",
+                "agePlaceholder": "ex. 32",
+                "height": "Taille",
+                "currentWeight": "Poids actuel",
+                "nextActivity": "Suivant : Niveau d'activité →",
+                "step1Title": "Quelle est votre activité ?",
+                "back": "← Retour",
+                "step2Title": "Quel est votre objectif principal ?",
+                "calculateBtn": "Calculer mes chiffres →",
+                "resultsTitle": "Votre objectif calorique quotidien personnalisé",
+                "caloriesPerDay": "calories/jour pour",
+                "tdeeMaintenance": "TDEE/Maintenance",
+                "estBodyFat": "% graisse estimé",
+                "dailyMacros": "Objectifs de macros quotidiens",
+                "protein": "Protéines",
+                "carbs": "Glucides",
+                "fat": "Lipides",
+                "saveResultsTitle": "Sauvegardez vos résultats — obtenez le tableau complet",
+                "saveResultsCta": "Sauvegarder mes résultats — Créer un compte gratuit →",
+                "noCreditCard": "Sans carte bancaire · Plan gratuit à vie · 30 secondes",
+                "recalculate": "← Recalculer avec d'autres chiffres",
+                "saveFeatures": [
+                        "📊 Suivez votre apport alimentaire réel par rapport à ces objectifs",
+                        "🎯 % de graisse corporelle précis à partir de vos vraies mesures",
+                        "📈 Graphiques de progrès hebdomadaires et prédictions",
+                        "🤖 Le Coach IA adapte votre plan au fur et à mesure",
+                        "💊 Vérificateur d'interactions médicamenteuses",
+                        "🌍 Disponible en 8 langues"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "Perdre du poids",
+                                "desc": "Perte de graisse régulière (~0,5 kg/semaine)"
+                        },
+                        "lose_fast": {
+                                "label": "Perdre plus vite",
+                                "desc": "Coupe agressive (~0,7 kg/semaine)"
+                        },
+                        "maintain": {
+                                "label": "Maintenir",
+                                "desc": "Rester au poids actuel"
+                        },
+                        "gain_muscle": {
+                                "label": "Développer les muscles",
+                                "desc": "Prise de masse propre (+300 cal)"
+                        },
+                        "build_strength": {
+                                "label": "Développer la force",
+                                "desc": "Axé sur la performance"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "Sédentaire",
+                                "desc": "Bureau, peu d'exercice"
+                        },
+                        "light": {
+                                "label": "Légèrement actif",
+                                "desc": "Gym 1–3×/semaine, bureau"
+                        },
+                        "moderate": {
+                                "label": "Modérément actif",
+                                "desc": "Gym 3–5×/semaine + travail actif"
+                        },
+                        "active": {
+                                "label": "Très actif",
+                                "desc": "Exercice intense 6–7 jours/semaine"
+                        }
+                }
         },
         "cta": {
           "badge": "Aucune carte de crédit requise · Plan gratuit à vie disponible",
@@ -3823,6 +4123,156 @@ const resources = {
           "sectionAnalytics": "ANÁLISIS",
           "sectionSupport": "SOPORTE Y VENTAJAS"
         },
+        "appTour": {
+                "badge": "Ver la app en acción",
+                "headline": "Cada pantalla, creada para",
+                "headlineHighlight": "tus objetivos",
+                "subtext": "Explora las 11 funciones de YFIT AI — toca cualquier pestaña para ver exactamente lo que obtendrás.",
+                "tryFree": "Probar gratis — Sin tarjeta de crédito",
+                "freeNote": "Plan gratuito para siempre · Cancela planes de pago en cualquier momento",
+                "counter": "funciones",
+                "screens": {
+                        "dashboard": {
+                                "label": "Panel",
+                                "title": "Todo en un solo lugar",
+                                "description": "Tu panorama de salud completo de un vistazo — anillo calórico, barras de macros, entrenamiento de hoy y 8 accesos rápidos."
+                        },
+                        "goals": {
+                                "label": "Objetivos",
+                                "title": "Conoce tus números exactos",
+                                "description": "Ingresa tus medidas y YFIT calcula automáticamente tu IMC, % de grasa corporal, TDEE y calorías objetivo."
+                        },
+                        "nutrition": {
+                                "label": "Nutrición",
+                                "title": "Registra cada comida sin esfuerzo",
+                                "description": "Registra comidas buscando, escaneando códigos de barras o dejando que la IA identifique tu comida desde una foto."
+                        },
+                        "dailyTracker": {
+                                "label": "Seguimiento diario",
+                                "title": "Registra todo lo que importa",
+                                "description": "Rastrea pasos, agua, sueño, presión arterial y glucosa en un solo lugar."
+                        },
+                        "fitness": {
+                                "label": "Fitness",
+                                "title": "Planificación inteligente de entrenamientos",
+                                "description": "Push/Pull/Piernas, cuerpo completo o divisiones personalizadas — YFIT construye tu programa y rastrea cada serie en tiempo real."
+                        },
+                        "medications": {
+                                "label": "Medicamentos",
+                                "title": "Seguimiento de medicamentos adaptado al fitness",
+                                "description": "La única app de fitness que entiende tus medicamentos. YFIT señala interacciones con entrenamientos y genera informes para tu médico."
+                        },
+                        "progress": {
+                                "label": "Progreso",
+                                "title": "Ve tu transformación",
+                                "description": "Gráficos de tendencia de peso, % de grasa corporal, historial de medidas y fotos de progreso en una sola línea de tiempo."
+                        },
+                        "predictions": {
+                                "label": "Predicciones",
+                                "title": "Sabe cuándo alcanzarás tu objetivo",
+                                "description": "La IA analiza tu ritmo y predice tu fecha de objetivo, grasa corporal al peso objetivo, riesgo de lesiones y cambio en la tasa metabólica."
+                        },
+                        "recomp": {
+                                "label": "Recomp",
+                                "title": "Pierde grasa y desarrolla músculo simultáneamente",
+                                "description": "La recomposición corporal es el objetivo más difícil — el Puntaje Recomp de YFIT (0–100) te dice exactamente qué tan óptimas son tus condiciones."
+                        },
+                        "aiCoach": {
+                                "label": "Coach IA",
+                                "title": "Tu entrenador personal de fitness con IA",
+                                "description": "Pregunta cualquier cosa — modificaciones de entrenamiento, consejos de nutrición, consejos de recuperación. El Coach IA de YFIT conoce tus medicamentos, objetivos e historial."
+                        },
+                        "language": {
+                                "label": "Idioma",
+                                "title": "Disponible en 8 idiomas",
+                                "description": "YFIT AI está completamente traducido al inglés, español, francés, alemán, portugués, japonés, chino y árabe."
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "Calculadora TDEE gratuita",
+                "headline": "Ve tus números exactos",
+                "headlineHighlight": "en 60 segundos",
+                "subtext": "Obtén tu objetivo calórico personalizado, distribución de macros y cronograma de objetivos — gratis, sin cuenta requerida.",
+                "stepLabels": [
+                        "Info corporal",
+                        "Actividad",
+                        "Tu objetivo"
+                ],
+                "step0Title": "Cuéntanos sobre ti",
+                "biologicalSex": "Sexo biológico",
+                "male": "Masculino",
+                "female": "Femenino",
+                "age": "Edad",
+                "agePlaceholder": "ej. 32",
+                "height": "Altura",
+                "currentWeight": "Peso actual",
+                "nextActivity": "Siguiente: Nivel de actividad →",
+                "step1Title": "¿Qué tan activo eres?",
+                "back": "← Atrás",
+                "step2Title": "¿Cuál es tu objetivo principal?",
+                "calculateBtn": "Calcular mis números →",
+                "resultsTitle": "Tu objetivo calórico diario personalizado",
+                "caloriesPerDay": "calorías/día para",
+                "tdeeMaintenance": "TDEE/Mantenimiento",
+                "estBodyFat": "Grasa corporal estimada",
+                "dailyMacros": "Objetivos de macros diarios",
+                "protein": "Proteína",
+                "carbs": "Carbohidratos",
+                "fat": "Grasa",
+                "saveResultsTitle": "Guarda tus resultados — obtén el panorama completo",
+                "saveResultsCta": "Guardar mis resultados — Crear cuenta gratuita →",
+                "noCreditCard": "Sin tarjeta de crédito · Plan gratuito para siempre · 30 segundos",
+                "recalculate": "← Recalcular con números diferentes",
+                "saveFeatures": [
+                        "📊 Rastrea tu ingesta real de alimentos frente a estos objetivos",
+                        "🎯 % de grasa corporal preciso de tus medidas reales",
+                        "📈 Gráficos de progreso semanales y predicciones",
+                        "🤖 El Coach IA adapta tu plan a medida que progresas",
+                        "💊 Verificador de interacciones medicamentosas",
+                        "🌍 Disponible en 8 idiomas"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "Perder peso",
+                                "desc": "Pérdida de grasa constante (~0,5 kg/semana)"
+                        },
+                        "lose_fast": {
+                                "label": "Perder más rápido",
+                                "desc": "Corte agresivo (~0,7 kg/semana)"
+                        },
+                        "maintain": {
+                                "label": "Mantener",
+                                "desc": "Mantener el peso actual"
+                        },
+                        "gain_muscle": {
+                                "label": "Desarrollar músculo",
+                                "desc": "Volumen limpio (+300 cal)"
+                        },
+                        "build_strength": {
+                                "label": "Desarrollar fuerza",
+                                "desc": "Enfoque en rendimiento"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "Sedentario",
+                                "desc": "Trabajo de escritorio, poco ejercicio"
+                        },
+                        "light": {
+                                "label": "Ligeramente activo",
+                                "desc": "Gimnasio 1–3×/semana, escritorio"
+                        },
+                        "moderate": {
+                                "label": "Moderadamente activo",
+                                "desc": "Gimnasio 3–5×/semana + trabajo activo"
+                        },
+                        "active": {
+                                "label": "Muy activo",
+                                "desc": "Ejercicio intenso 6–7 días/semana"
+                        }
+                }
+        },
         "cta": {
           "badge": "No se requiere tarjeta de crédito · Plan gratuito para siempre disponible",
           "headline": "La app fitness que realmente te conoce.",
@@ -5628,6 +6078,156 @@ const resources = {
           "sectionAnalytics": "ANÁLISES",
           "sectionSupport": "SUPORTE E VANTAGENS"
         },
+        "appTour": {
+                "badge": "Ver o app em ação",
+                "headline": "Cada tela, criada para",
+                "headlineHighlight": "seus objetivos",
+                "subtext": "Explore todos os 11 recursos do YFIT AI — toque em qualquer aba para ver exatamente o que você vai obter.",
+                "tryFree": "Experimentar grátis — Sem cartão de crédito",
+                "freeNote": "Plano gratuito para sempre · Cancele planos pagos a qualquer momento",
+                "counter": "recursos",
+                "screens": {
+                        "dashboard": {
+                                "label": "Painel",
+                                "title": "Tudo em um só lugar",
+                                "description": "Seu panorama de saúde completo de relance — anel calórico, barras de macros, treino de hoje e 8 atalhos rápidos."
+                        },
+                        "goals": {
+                                "label": "Objetivos",
+                                "title": "Conheça seus números exatos",
+                                "description": "Insira suas medidas e o YFIT calcula automaticamente seu IMC, % de gordura corporal, TDEE e calorias alvo."
+                        },
+                        "nutrition": {
+                                "label": "Nutrição",
+                                "title": "Registre cada refeição sem esforço",
+                                "description": "Registre refeições pesquisando, escaneando códigos de barras ou deixando a IA identificar sua comida a partir de uma foto."
+                        },
+                        "dailyTracker": {
+                                "label": "Rastreador diário",
+                                "title": "Registre tudo que importa",
+                                "description": "Rastreie passos, água, sono, pressão arterial e glicose em um só lugar."
+                        },
+                        "fitness": {
+                                "label": "Fitness",
+                                "title": "Planejamento inteligente de treinos",
+                                "description": "Push/Pull/Pernas, corpo inteiro ou divisões personalizadas — o YFIT cria seu programa e rastreia cada série em tempo real."
+                        },
+                        "medications": {
+                                "label": "Medicamentos",
+                                "title": "Rastreamento de medicamentos adaptado ao fitness",
+                                "description": "O único app de fitness que entende seus medicamentos. O YFIT sinaliza interações com treinos e gera relatórios para seu médico."
+                        },
+                        "progress": {
+                                "label": "Progresso",
+                                "title": "Veja sua transformação",
+                                "description": "Gráficos de tendência de peso, % de gordura corporal, histórico de medidas e fotos de progresso em uma única linha do tempo."
+                        },
+                        "predictions": {
+                                "label": "Previsões",
+                                "title": "Saiba quando atingirá seu objetivo",
+                                "description": "A IA analisa seu ritmo e prevê sua data de objetivo, gordura corporal no peso alvo, risco de lesões e mudança na taxa metabólica."
+                        },
+                        "recomp": {
+                                "label": "Recomp",
+                                "title": "Perder gordura e ganhar músculo simultaneamente",
+                                "description": "A recomposição corporal é o objetivo mais difícil — o Recomp Score do YFIT (0–100) diz exatamente quão ótimas são suas condições."
+                        },
+                        "aiCoach": {
+                                "label": "Coach IA",
+                                "title": "Seu personal trainer de fitness com IA",
+                                "description": "Pergunte qualquer coisa — modificações de treino, conselhos nutricionais, dicas de recuperação. O Coach IA do YFIT conhece seus medicamentos, objetivos e histórico."
+                        },
+                        "language": {
+                                "label": "Idioma",
+                                "title": "Disponível em 8 idiomas",
+                                "description": "O YFIT AI está totalmente traduzido para inglês, espanhol, francês, alemão, português, japonês, chinês e árabe."
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "Calculadora TDEE gratuita",
+                "headline": "Veja seus números exatos",
+                "headlineHighlight": "em 60 segundos",
+                "subtext": "Obtenha seu objetivo calórico personalizado, divisão de macros e cronograma de objetivos — grátis, sem conta necessária.",
+                "stepLabels": [
+                        "Info corporal",
+                        "Atividade",
+                        "Seu objetivo"
+                ],
+                "step0Title": "Conte-nos sobre você",
+                "biologicalSex": "Sexo biológico",
+                "male": "Masculino",
+                "female": "Feminino",
+                "age": "Idade",
+                "agePlaceholder": "ex. 32",
+                "height": "Altura",
+                "currentWeight": "Peso atual",
+                "nextActivity": "Próximo: Nível de atividade →",
+                "step1Title": "Quão ativo você é?",
+                "back": "← Voltar",
+                "step2Title": "Qual é seu objetivo principal?",
+                "calculateBtn": "Calcular meus números →",
+                "resultsTitle": "Seu objetivo calórico diário personalizado",
+                "caloriesPerDay": "calorias/dia para",
+                "tdeeMaintenance": "TDEE/Manutenção",
+                "estBodyFat": "Gordura corporal estimada",
+                "dailyMacros": "Metas diárias de macros",
+                "protein": "Proteína",
+                "carbs": "Carboidratos",
+                "fat": "Gordura",
+                "saveResultsTitle": "Salve seus resultados — obtenha o panorama completo",
+                "saveResultsCta": "Salvar meus resultados — Criar conta gratuita →",
+                "noCreditCard": "Sem cartão de crédito · Plano gratuito para sempre · 30 segundos",
+                "recalculate": "← Recalcular com números diferentes",
+                "saveFeatures": [
+                        "📊 Rastreie sua ingestão real de alimentos em relação a essas metas",
+                        "🎯 % de gordura corporal preciso de suas medidas reais",
+                        "📈 Gráficos de progresso semanais e previsões",
+                        "🤖 O Coach IA adapta seu plano à medida que você progride",
+                        "💊 Verificador de interações medicamentosas",
+                        "🌍 Disponível em 8 idiomas"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "Perder peso",
+                                "desc": "Perda de gordura constante (~0,5 kg/semana)"
+                        },
+                        "lose_fast": {
+                                "label": "Perder mais rápido",
+                                "desc": "Corte agressivo (~0,7 kg/semana)"
+                        },
+                        "maintain": {
+                                "label": "Manter",
+                                "desc": "Manter o peso atual"
+                        },
+                        "gain_muscle": {
+                                "label": "Ganhar músculo",
+                                "desc": "Bulking limpo (+300 cal)"
+                        },
+                        "build_strength": {
+                                "label": "Desenvolver força",
+                                "desc": "Foco em desempenho"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "Sedentário",
+                                "desc": "Trabalho de escritório, pouco exercício"
+                        },
+                        "light": {
+                                "label": "Levemente ativo",
+                                "desc": "Academia 1–3×/semana, escritório"
+                        },
+                        "moderate": {
+                                "label": "Moderadamente ativo",
+                                "desc": "Academia 3–5×/semana + trabalho ativo"
+                        },
+                        "active": {
+                                "label": "Muito ativo",
+                                "desc": "Exercício intenso 6–7 dias/semana"
+                        }
+                }
+        },
         "cta": {
           "badge": "Nenhum cartão de crédito necessário · Plano gratuito para sempre disponível",
           "headline": "O app fitness que realmente te conhece.",
@@ -7424,6 +8024,156 @@ const resources = {
           "sectionAnalytics": "分析",
           "sectionSupport": "支持与福利"
         },
+        "appTour": {
+                "badge": "查看应用实际效果",
+                "headline": "每个界面，专为",
+                "headlineHighlight": "您的目标而设计",
+                "subtext": "探索 YFIT AI 的全部 11 项功能 — 点击任意标签查看您将获得的内容。",
+                "tryFree": "免费试用 — 无需信用卡",
+                "freeNote": "永久免费计划 · 随时取消付费计划",
+                "counter": "项功能",
+                "screens": {
+                        "dashboard": {
+                                "label": "仪表板",
+                                "title": "一目了然",
+                                "description": "您的完整健康概览 — 卡路里环、宏量营养素条、今日训练和 8 个快速操作快捷方式。"
+                        },
+                        "goals": {
+                                "label": "目标",
+                                "title": "了解您的精确数据",
+                                "description": "输入您的测量数据，YFIT 自动计算您的 BMI、体脂率、TDEE 和目标卡路里。"
+                        },
+                        "nutrition": {
+                                "label": "营养",
+                                "title": "轻松追踪每餐",
+                                "description": "通过搜索、扫描条形码或让 AI 从照片识别食物来记录餐食。"
+                        },
+                        "dailyTracker": {
+                                "label": "每日追踪",
+                                "title": "记录所有重要事项",
+                                "description": "在一个地方追踪步数、饮水、睡眠、血压和血糖。"
+                        },
+                        "fitness": {
+                                "label": "健身",
+                                "title": "智能训练计划",
+                                "description": "推/拉/腿、全身或自定义分组 — YFIT 构建您的计划并实时追踪每组。"
+                        },
+                        "medications": {
+                                "label": "药物",
+                                "title": "健身感知药物追踪",
+                                "description": "唯一了解您药物的健身应用。YFIT 标记训练相互作用并生成医生报告。"
+                        },
+                        "progress": {
+                                "label": "进度",
+                                "title": "见证您的蜕变",
+                                "description": "体重趋势图、体脂率、测量历史和进度照片在一条时间线上。"
+                        },
+                        "predictions": {
+                                "label": "预测",
+                                "title": "了解何时达到目标",
+                                "description": "AI 分析您的进度并预测目标日期、目标体重时的体脂、受伤风险和代谢率变化。"
+                        },
+                        "recomp": {
+                                "label": "重组",
+                                "title": "同时减脂和增肌",
+                                "description": "身体重组是最难实现的目标 — YFIT 的重组评分 (0–100) 准确告诉您条件的最优程度。"
+                        },
+                        "aiCoach": {
+                                "label": "AI 教练",
+                                "title": "您的个人 AI 健身教练",
+                                "description": "问任何问题 — 训练调整、营养建议、恢复技巧。YFIT 的 AI 教练了解您的药物、目标和历史。"
+                        },
+                        "language": {
+                                "label": "语言",
+                                "title": "支持 8 种语言",
+                                "description": "YFIT AI 已完整翻译为英语、西班牙语、法语、德语、葡萄牙语、日语、中文和阿拉伯语。"
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "免费 TDEE 计算器",
+                "headline": "60 秒内查看",
+                "headlineHighlight": "您的精确数据",
+                "subtext": "获取您的个性化卡路里目标、宏量营养素分配和目标时间表 — 免费，无需账户。",
+                "stepLabels": [
+                        "身体信息",
+                        "活动量",
+                        "您的目标"
+                ],
+                "step0Title": "告诉我们您的情况",
+                "biologicalSex": "生理性别",
+                "male": "男性",
+                "female": "女性",
+                "age": "年龄",
+                "agePlaceholder": "例如 32",
+                "height": "身高",
+                "currentWeight": "当前体重",
+                "nextActivity": "下一步：活动水平 →",
+                "step1Title": "您的活动量如何？",
+                "back": "← 返回",
+                "step2Title": "您的主要目标是什么？",
+                "calculateBtn": "计算我的数据 →",
+                "resultsTitle": "您的个性化每日目标",
+                "caloriesPerDay": "卡路里/天，目标",
+                "tdeeMaintenance": "TDEE/维持",
+                "estBodyFat": "估计体脂率",
+                "dailyMacros": "每日宏量营养素目标",
+                "protein": "蛋白质",
+                "carbs": "碳水化合物",
+                "fat": "脂肪",
+                "saveResultsTitle": "保存结果 — 获取完整图片",
+                "saveResultsCta": "保存我的结果 — 创建免费账户 →",
+                "noCreditCard": "无需信用卡 · 永久免费计划 · 30 秒",
+                "recalculate": "← 用不同数字重新计算",
+                "saveFeatures": [
+                        "📊 追踪您的实际食物摄入与这些目标的对比",
+                        "🎯 来自您真实测量数据的精确体脂率",
+                        "📈 每周进度图表和预测",
+                        "🤖 AI 教练随您进步调整计划",
+                        "💊 药物相互作用检查器",
+                        "🌍 支持 8 种语言"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "减重",
+                                "desc": "稳定减脂（约 0.5 kg/周）"
+                        },
+                        "lose_fast": {
+                                "label": "快速减重",
+                                "desc": "积极减脂（约 0.7 kg/周）"
+                        },
+                        "maintain": {
+                                "label": "维持",
+                                "desc": "保持当前体重"
+                        },
+                        "gain_muscle": {
+                                "label": "增肌",
+                                "desc": "精益增肌（+300 卡）"
+                        },
+                        "build_strength": {
+                                "label": "增强力量",
+                                "desc": "以表现为重点"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "久坐",
+                                "desc": "办公室工作，少量运动"
+                        },
+                        "light": {
+                                "label": "轻度活跃",
+                                "desc": "健身房 1–3 次/周，办公室"
+                        },
+                        "moderate": {
+                                "label": "中度活跃",
+                                "desc": "健身房 3–5 次/周 + 活跃工作"
+                        },
+                        "active": {
+                                "label": "非常活跃",
+                                "desc": "每周 6–7 天高强度运动"
+                        }
+                }
+        },
         "cta": {
           "badge": "无需信用卡 · 永久免费计划可用",
           "headline": "真正了解您的健身应用。",
@@ -9162,6 +9912,156 @@ const resources = {
           "sectionAnalytics": "विश्लेषण",
           "sectionSupport": "समर्थन और लाभ"
         },
+        "appTour": {
+                "badge": "ऐप को एक्शन में देखें",
+                "headline": "हर स्क्रीन, बनाई गई है",
+                "headlineHighlight": "आपके लक्ष्यों के लिए",
+                "subtext": "YFIT AI की सभी 11 सुविधाएं एक्सप्लोर करें — किसी भी टैब पर टैप करें और देखें कि आपको क्या मिलेगा।",
+                "tryFree": "मुफ्त आज़माएं — क्रेडिट कार्ड की जरूरत नहीं",
+                "freeNote": "हमेशा के लिए मुफ्त प्लान · किसी भी समय पेड प्लान रद्द करें",
+                "counter": "सुविधाएं",
+                "screens": {
+                        "dashboard": {
+                                "label": "डैशबोर्ड",
+                                "title": "सब कुछ एक जगह",
+                                "description": "एक नज़र में आपकी पूरी स्वास्थ्य तस्वीर — कैलोरी रिंग, मैक्रो बार, आज का वर्कआउट और 8 क्विक-एक्शन शॉर्टकट।"
+                        },
+                        "goals": {
+                                "label": "लक्ष्य",
+                                "title": "अपने सटीक नंबर जानें",
+                                "description": "अपनी माप दर्ज करें और YFIT स्वचालित रूप से आपका BMI, बॉडी फैट %, TDEE और लक्ष्य कैलोरी की गणना करता है।"
+                        },
+                        "nutrition": {
+                                "label": "पोषण",
+                                "title": "हर भोजन आसानी से ट्रैक करें",
+                                "description": "खोज कर, बारकोड स्कैन करके या AI को फोटो से खाना पहचानने देकर भोजन लॉग करें।"
+                        },
+                        "dailyTracker": {
+                                "label": "दैनिक ट्रैकर",
+                                "title": "जो मायने रखता है वो लॉग करें",
+                                "description": "एक जगह कदम, पानी, नींद, रक्तचाप और ग्लूकोज ट्रैक करें।"
+                        },
+                        "fitness": {
+                                "label": "फिटनेस",
+                                "title": "स्मार्ट वर्कआउट प्लानिंग",
+                                "description": "पुश/पुल/लेग्स, फुल-बॉडी या कस्टम स्प्लिट — YFIT आपका प्रोग्राम बनाता है और हर सेट को रियल-टाइम में ट्रैक करता है।"
+                        },
+                        "medications": {
+                                "label": "दवाएं",
+                                "title": "फिटनेस-जागरूक दवा ट्रैकिंग",
+                                "description": "एकमात्र फिटनेस ऐप जो आपकी दवाओं को समझता है। YFIT वर्कआउट इंटरेक्शन को फ्लैग करता है और डॉक्टर के लिए रिपोर्ट जनरेट करता है।"
+                        },
+                        "progress": {
+                                "label": "प्रगति",
+                                "title": "अपना परिवर्तन देखें",
+                                "description": "वजन ट्रेंड चार्ट, बॉडी फैट %, माप इतिहास और प्रगति फोटो एक टाइमलाइन में।"
+                        },
+                        "predictions": {
+                                "label": "भविष्यवाणियां",
+                                "title": "जानें कब पहुंचेंगे लक्ष्य तक",
+                                "description": "AI आपकी गति का विश्लेषण करता है और आपकी लक्ष्य तिथि, लक्ष्य वजन पर बॉडी फैट, चोट के जोखिम और मेटाबॉलिक दर परिवर्तन की भविष्यवाणी करता है।"
+                        },
+                        "recomp": {
+                                "label": "रिकॉम्प",
+                                "title": "एक साथ फैट घटाएं और मसल बनाएं",
+                                "description": "बॉडी रिकंपोजिशन सबसे कठिन लक्ष्य है — YFIT का रिकॉम्प स्कोर (0–100) आपको बताता है कि आपकी स्थितियां कितनी इष्टतम हैं।"
+                        },
+                        "aiCoach": {
+                                "label": "AI कोच",
+                                "title": "आपका व्यक्तिगत AI फिटनेस कोच",
+                                "description": "कुछ भी पूछें — वर्कआउट संशोधन, पोषण सलाह, रिकवरी टिप्स। YFIT का AI कोच आपकी दवाओं, लक्ष्यों और इतिहास को जानता है।"
+                        },
+                        "language": {
+                                "label": "भाषा",
+                                "title": "8 भाषाओं में उपलब्ध",
+                                "description": "YFIT AI पूरी तरह से अंग्रेजी, स्पेनिश, फ्रेंच, जर्मन, पुर्तगाली, जापानी, चीनी और अरबी में अनुवादित है।"
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "मुफ्त TDEE कैलकुलेटर",
+                "headline": "60 सेकंड में देखें",
+                "headlineHighlight": "अपने सटीक नंबर",
+                "subtext": "अपना व्यक्तिगत कैलोरी लक्ष्य, मैक्रो स्प्लिट और लक्ष्य समयरेखा प्राप्त करें — मुफ्त, बिना खाते के।",
+                "stepLabels": [
+                        "शरीर की जानकारी",
+                        "गतिविधि",
+                        "आपका लक्ष्य"
+                ],
+                "step0Title": "हमें अपने बारे में बताएं",
+                "biologicalSex": "जैविक लिंग",
+                "male": "पुरुष",
+                "female": "महिला",
+                "age": "उम्र",
+                "agePlaceholder": "जैसे 32",
+                "height": "ऊंचाई",
+                "currentWeight": "वर्तमान वजन",
+                "nextActivity": "अगला: गतिविधि स्तर →",
+                "step1Title": "आप कितने सक्रिय हैं?",
+                "back": "← वापस",
+                "step2Title": "आपका प्राथमिक लक्ष्य क्या है?",
+                "calculateBtn": "मेरे नंबर कैलकुलेट करें →",
+                "resultsTitle": "आपका व्यक्तिगत दैनिक लक्ष्य",
+                "caloriesPerDay": "कैलोरी/दिन",
+                "tdeeMaintenance": "TDEE/रखरखाव",
+                "estBodyFat": "अनुमानित बॉडी फैट",
+                "dailyMacros": "दैनिक मैक्रो लक्ष्य",
+                "protein": "प्रोटीन",
+                "carbs": "कार्बोहाइड्रेट",
+                "fat": "वसा",
+                "saveResultsTitle": "अपने परिणाम सहेजें — पूरी तस्वीर पाएं",
+                "saveResultsCta": "मेरे परिणाम सहेजें — मुफ्त खाता बनाएं →",
+                "noCreditCard": "क्रेडिट कार्ड नहीं · हमेशा के लिए मुफ्त प्लान · 30 सेकंड",
+                "recalculate": "← अलग नंबरों से पुनः कैलकुलेट करें",
+                "saveFeatures": [
+                        "📊 इन लक्ष्यों के विरुद्ध अपना वास्तविक भोजन सेवन ट्रैक करें",
+                        "🎯 आपकी वास्तविक माप से सटीक बॉडी फैट %",
+                        "📈 साप्ताहिक प्रगति चार्ट और भविष्यवाणियां",
+                        "🤖 AI कोच आपकी प्रगति के साथ आपकी योजना अनुकूलित करता है",
+                        "💊 दवा इंटरेक्शन चेकर",
+                        "🌍 8 भाषाओं में उपलब्ध"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "वजन घटाएं",
+                                "desc": "स्थिर फैट लॉस (~0.5 kg/सप्ताह)"
+                        },
+                        "lose_fast": {
+                                "label": "तेजी से घटाएं",
+                                "desc": "आक्रामक कट (~0.7 kg/सप्ताह)"
+                        },
+                        "maintain": {
+                                "label": "बनाए रखें",
+                                "desc": "वर्तमान वजन पर रहें"
+                        },
+                        "gain_muscle": {
+                                "label": "मसल बनाएं",
+                                "desc": "लीन बल्क (+300 कैल)"
+                        },
+                        "build_strength": {
+                                "label": "ताकत बनाएं",
+                                "desc": "प्रदर्शन पर ध्यान"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "गतिहीन",
+                                "desc": "डेस्क जॉब, कम व्यायाम"
+                        },
+                        "light": {
+                                "label": "हल्का सक्रिय",
+                                "desc": "जिम 1–3×/सप्ताह, डेस्क"
+                        },
+                        "moderate": {
+                                "label": "मध्यम सक्रिय",
+                                "desc": "जिम 3–5×/सप्ताह + सक्रिय काम"
+                        },
+                        "active": {
+                                "label": "बहुत सक्रिय",
+                                "desc": "सप्ताह में 6–7 दिन कठिन व्यायाम"
+                        }
+                }
+        },
         "cta": {
           "badge": "क्रेडिट कार्ड की जरूरत नहीं · हमेशा के लिए मुफ्त प्लान उपलब्ध",
           "headline": "फिटनेस ऐप जो वास्तव में आपको जानता है।",
@@ -10899,6 +11799,156 @@ const resources = {
           "sectionAnalytics": "ANALYSEN",
           "sectionSupport": "SUPPORT & VORTEILE"
         },
+        "appTour": {
+                "badge": "App in Aktion sehen",
+                "headline": "Jeder Bildschirm, erstellt für",
+                "headlineHighlight": "deine Ziele",
+                "subtext": "Entdecke alle 11 Funktionen von YFIT AI — tippe auf einen Tab, um genau zu sehen, was du bekommst.",
+                "tryFree": "Kostenlos testen — Keine Kreditkarte",
+                "freeNote": "Kostenloser Plan für immer · Bezahlte Pläne jederzeit kündigen",
+                "counter": "Funktionen",
+                "screens": {
+                        "dashboard": {
+                                "label": "Dashboard",
+                                "title": "Alles an einem Ort",
+                                "description": "Dein vollständiges Gesundheitsbild auf einen Blick — Kalorienring, Makro-Balken, heutiges Training und 8 Schnellzugriff-Shortcuts."
+                        },
+                        "goals": {
+                                "label": "Ziele",
+                                "title": "Kenne deine genauen Zahlen",
+                                "description": "Gib deine Maße ein und YFIT berechnet automatisch deinen BMI, Körperfettanteil, TDEE und Kalorienziel."
+                        },
+                        "nutrition": {
+                                "label": "Ernährung",
+                                "title": "Jede Mahlzeit mühelos verfolgen",
+                                "description": "Mahlzeiten per Suche, Barcode-Scan oder KI-Fotoerkennung protokollieren."
+                        },
+                        "dailyTracker": {
+                                "label": "Tages-Tracker",
+                                "title": "Alles Wichtige protokollieren",
+                                "description": "Schritte, Wasser, Schlaf, Blutdruck und Glukose an einem Ort verfolgen."
+                        },
+                        "fitness": {
+                                "label": "Fitness",
+                                "title": "Intelligente Trainingsplanung",
+                                "description": "Push/Pull/Beine, Ganzkörper oder individuelle Splits — YFIT erstellt dein Programm und verfolgt jeden Satz in Echtzeit."
+                        },
+                        "medications": {
+                                "label": "Medikamente",
+                                "title": "Fitness-bewusstes Medikamenten-Tracking",
+                                "description": "Die einzige Fitness-App, die deine Medikamente versteht. YFIT markiert Trainingsinteraktionen und erstellt Arztberichte."
+                        },
+                        "progress": {
+                                "label": "Fortschritt",
+                                "title": "Sieh deine Transformation",
+                                "description": "Gewichtstrend-Diagramme, Körperfettanteil, Messungshistorie und Fortschrittsfotos in einer Zeitleiste."
+                        },
+                        "predictions": {
+                                "label": "Vorhersagen",
+                                "title": "Wisse, wann du dein Ziel erreichst",
+                                "description": "KI analysiert dein Tempo und sagt Zieldatum, Körperfett beim Zielgewicht, Verletzungsrisiko und Stoffwechselrate voraus."
+                        },
+                        "recomp": {
+                                "label": "Recomp",
+                                "title": "Gleichzeitig Fett verlieren und Muskeln aufbauen",
+                                "description": "Körper-Rekomposition ist das schwierigste Ziel — YFITs Recomp-Score (0–100) zeigt dir genau, wie optimal deine Bedingungen sind."
+                        },
+                        "aiCoach": {
+                                "label": "KI-Coach",
+                                "title": "Dein persönlicher KI-Fitness-Coach",
+                                "description": "Frag alles — Trainingsanpassungen, Ernährungsratschläge, Erholungstipps. YFITs KI-Coach kennt deine Medikamente, Ziele und Geschichte."
+                        },
+                        "language": {
+                                "label": "Sprache",
+                                "title": "In 8 Sprachen verfügbar",
+                                "description": "YFIT AI ist vollständig in Englisch, Spanisch, Französisch, Deutsch, Portugiesisch, Japanisch, Chinesisch und Arabisch übersetzt."
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "Kostenloser TDEE-Rechner",
+                "headline": "Sieh deine genauen Zahlen",
+                "headlineHighlight": "in 60 Sekunden",
+                "subtext": "Erhalte dein persönliches Kalorienziel, Makro-Aufteilung und Ziel-Zeitplan — kostenlos, kein Konto erforderlich.",
+                "stepLabels": [
+                        "Körperinfo",
+                        "Aktivität",
+                        "Dein Ziel"
+                ],
+                "step0Title": "Erzähl uns von dir",
+                "biologicalSex": "Biologisches Geschlecht",
+                "male": "Männlich",
+                "female": "Weiblich",
+                "age": "Alter",
+                "agePlaceholder": "z.B. 32",
+                "height": "Größe",
+                "currentWeight": "Aktuelles Gewicht",
+                "nextActivity": "Weiter: Aktivitätslevel →",
+                "step1Title": "Wie aktiv bist du?",
+                "back": "← Zurück",
+                "step2Title": "Was ist dein Hauptziel?",
+                "calculateBtn": "Meine Zahlen berechnen →",
+                "resultsTitle": "Dein personalisiertes tägliches Ziel",
+                "caloriesPerDay": "Kalorien/Tag für",
+                "tdeeMaintenance": "TDEE/Erhaltung",
+                "estBodyFat": "Geschätzter Körperfettanteil",
+                "dailyMacros": "Tägliche Makro-Ziele",
+                "protein": "Protein",
+                "carbs": "Kohlenhydrate",
+                "fat": "Fett",
+                "saveResultsTitle": "Ergebnisse speichern — das vollständige Bild erhalten",
+                "saveResultsCta": "Meine Ergebnisse speichern — Kostenloses Konto erstellen →",
+                "noCreditCard": "Keine Kreditkarte · Kostenloser Plan für immer · 30 Sekunden",
+                "recalculate": "← Mit anderen Zahlen neu berechnen",
+                "saveFeatures": [
+                        "📊 Verfolge deine tatsächliche Nahrungsaufnahme gegen diese Ziele",
+                        "🎯 Präziser Körperfettanteil aus deinen echten Messungen",
+                        "📈 Wöchentliche Fortschrittsdiagramme und Vorhersagen",
+                        "🤖 KI-Coach passt deinen Plan an, während du Fortschritte machst",
+                        "💊 Medikamenten-Interaktionsprüfer",
+                        "🌍 In 8 Sprachen verfügbar"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "Gewicht verlieren",
+                                "desc": "Stetiger Fettverlust (~0,5 kg/Woche)"
+                        },
+                        "lose_fast": {
+                                "label": "Schneller abnehmen",
+                                "desc": "Aggressiver Schnitt (~0,7 kg/Woche)"
+                        },
+                        "maintain": {
+                                "label": "Halten",
+                                "desc": "Aktuelles Gewicht halten"
+                        },
+                        "gain_muscle": {
+                                "label": "Muskeln aufbauen",
+                                "desc": "Lean Bulk (+300 kcal)"
+                        },
+                        "build_strength": {
+                                "label": "Kraft aufbauen",
+                                "desc": "Leistungsfokus"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "Sitzend",
+                                "desc": "Bürojob, wenig Bewegung"
+                        },
+                        "light": {
+                                "label": "Leicht aktiv",
+                                "desc": "Gym 1–3×/Woche, Büro"
+                        },
+                        "moderate": {
+                                "label": "Mäßig aktiv",
+                                "desc": "Gym 3–5×/Woche + aktiver Job"
+                        },
+                        "active": {
+                                "label": "Sehr aktiv",
+                                "desc": "Hartes Training 6–7 Tage/Woche"
+                        }
+                }
+        },
         "cta": {
           "badge": "Keine Kreditkarte erforderlich · Kostenloser Plan für immer verfügbar",
           "headline": "Die Fitness-App, die dich wirklich kennt.",
@@ -12635,6 +13685,156 @@ const resources = {
           "sectionPlanning": "プランニング",
           "sectionAnalytics": "アナリティクス",
           "sectionSupport": "サポートと特典"
+        },
+        "appTour": {
+                "badge": "アプリの実際の動作を見る",
+                "headline": "すべての画面が",
+                "headlineHighlight": "あなたの目標のために",
+                "subtext": "YFIT AIの11の機能をすべて探索 — タブをタップして何が得られるかを正確に確認してください。",
+                "tryFree": "無料で試す — クレジットカード不要",
+                "freeNote": "永久無料プラン · 有料プランはいつでもキャンセル可能",
+                "counter": "機能",
+                "screens": {
+                        "dashboard": {
+                                "label": "ダッシュボード",
+                                "title": "すべてが一か所に",
+                                "description": "一目でわかる完全な健康状態 — カロリーリング、マクロバー、今日のワークアウト、8つのクイックアクションショートカット。"
+                        },
+                        "goals": {
+                                "label": "目標",
+                                "title": "正確な数値を知る",
+                                "description": "測定値を入力すると、YFITが自動的にBMI、体脂肪率、TDEE、目標カロリーを計算します。"
+                        },
+                        "nutrition": {
+                                "label": "栄養",
+                                "title": "毎食を簡単に記録",
+                                "description": "検索、バーコードスキャン、またはAIに写真から食べ物を識別させて食事を記録します。"
+                        },
+                        "dailyTracker": {
+                                "label": "デイリートラッカー",
+                                "title": "重要なことをすべて記録",
+                                "description": "歩数、水分、睡眠、血圧、血糖値を一か所で追跡します。"
+                        },
+                        "fitness": {
+                                "label": "フィットネス",
+                                "title": "スマートなワークアウトプランニング",
+                                "description": "プッシュ/プル/レッグ、全身、またはカスタム分割 — YFITがプログラムを構築し、各セットをリアルタイムで追跡します。"
+                        },
+                        "medications": {
+                                "label": "薬",
+                                "title": "フィットネス対応の薬管理",
+                                "description": "あなたの薬を理解する唯一のフィットネスアプリ。YFITはワークアウトの相互作用を警告し、医師向けレポートを生成します。"
+                        },
+                        "progress": {
+                                "label": "進捗",
+                                "title": "変化を見る",
+                                "description": "体重トレンドチャート、体脂肪率、測定履歴、進捗写真が一つのタイムラインに。"
+                        },
+                        "predictions": {
+                                "label": "予測",
+                                "title": "目標達成時期を知る",
+                                "description": "AIがペースを分析し、目標日、目標体重での体脂肪、怪我のリスク、代謝率の変化を予測します。"
+                        },
+                        "recomp": {
+                                "label": "リコンプ",
+                                "title": "脂肪を落としながら筋肉をつける",
+                                "description": "ボディリコンポジションは最も難しい目標 — YFITのリコンプスコア（0–100）が条件の最適度を正確に示します。"
+                        },
+                        "aiCoach": {
+                                "label": "AIコーチ",
+                                "title": "あなたのパーソナルAIフィットネスコーチ",
+                                "description": "何でも聞いてください — ワークアウトの調整、栄養アドバイス、回復のヒント。YFITのAIコーチはあなたの薬、目標、履歴を知っています。"
+                        },
+                        "language": {
+                                "label": "言語",
+                                "title": "8言語に対応",
+                                "description": "YFIT AIは英語、スペイン語、フランス語、ドイツ語、ポルトガル語、日本語、中国語、アラビア語に完全翻訳されています。"
+                        }
+                }
+        },
+        "calculator": {
+                "badge": "無料TDEEカリキュレーター",
+                "headline": "60秒で確認",
+                "headlineHighlight": "正確な数値を",
+                "subtext": "個人化されたカロリー目標、マクロ分割、目標タイムラインを取得 — 無料、アカウント不要。",
+                "stepLabels": [
+                        "体の情報",
+                        "活動量",
+                        "あなたの目標"
+                ],
+                "step0Title": "あなたについて教えてください",
+                "biologicalSex": "生物学的性別",
+                "male": "男性",
+                "female": "女性",
+                "age": "年齢",
+                "agePlaceholder": "例：32",
+                "height": "身長",
+                "currentWeight": "現在の体重",
+                "nextActivity": "次へ：活動レベル →",
+                "step1Title": "どのくらい活動的ですか？",
+                "back": "← 戻る",
+                "step2Title": "主な目標は何ですか？",
+                "calculateBtn": "数値を計算する →",
+                "resultsTitle": "あなたの個人化された1日の目標",
+                "caloriesPerDay": "カロリー/日",
+                "tdeeMaintenance": "TDEE/維持",
+                "estBodyFat": "推定体脂肪率",
+                "dailyMacros": "1日のマクロ目標",
+                "protein": "タンパク質",
+                "carbs": "炭水化物",
+                "fat": "脂質",
+                "saveResultsTitle": "結果を保存 — 完全な情報を得る",
+                "saveResultsCta": "結果を保存 — 無料アカウントを作成 →",
+                "noCreditCard": "クレジットカード不要 · 永久無料プラン · 30秒",
+                "recalculate": "← 別の数値で再計算",
+                "saveFeatures": [
+                        "📊 これらの目標に対する実際の食事摂取量を追跡",
+                        "🎯 実際の測定値から正確な体脂肪率",
+                        "📈 週次進捗チャートと予測",
+                        "🤖 AIコーチが進捗に合わせてプランを調整",
+                        "💊 薬物相互作用チェッカー",
+                        "🌍 8言語に対応"
+                ],
+                "goals": {
+                        "lose_weight": {
+                                "label": "減量",
+                                "desc": "安定した脂肪燃焼（約0.5kg/週）"
+                        },
+                        "lose_fast": {
+                                "label": "速く減量",
+                                "desc": "積極的なカット（約0.7kg/週）"
+                        },
+                        "maintain": {
+                                "label": "維持",
+                                "desc": "現在の体重を維持"
+                        },
+                        "gain_muscle": {
+                                "label": "筋肉をつける",
+                                "desc": "リーンバルク（+300kcal）"
+                        },
+                        "build_strength": {
+                                "label": "筋力をつける",
+                                "desc": "パフォーマンス重視"
+                        }
+                },
+                "activity": {
+                        "sedentary": {
+                                "label": "座りがち",
+                                "desc": "デスクワーク、運動少なめ"
+                        },
+                        "light": {
+                                "label": "軽度に活動的",
+                                "desc": "ジム週1–3回、デスクワーク"
+                        },
+                        "moderate": {
+                                "label": "中程度に活動的",
+                                "desc": "ジム週3–5回 + 活動的な仕事"
+                        },
+                        "active": {
+                                "label": "非常に活動的",
+                                "desc": "週6–7日ハードな運動"
+                        }
+                }
         },
         "cta": {
           "badge": "クレジットカード不要 · 永久無料プラン利用可能",

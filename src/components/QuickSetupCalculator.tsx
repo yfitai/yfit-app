@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // ─── TDEE Calculation (Katch-McArdle with Navy BF estimate) ──────────────────
 function estimateBodyFat(
@@ -71,24 +72,16 @@ function getMacros(calories: number, goal: string) {
   };
 }
 
-// ─── Step data ───────────────────────────────────────────────────────────────
-const GOALS = [
-  { value: "lose_weight", label: "Lose Weight", emoji: "🔥", desc: "Steady fat loss (~1 lb/week)" },
-  { value: "lose_fast", label: "Lose Faster", emoji: "⚡", desc: "Aggressive cut (~1.5 lb/week)" },
-  { value: "maintain", label: "Maintain", emoji: "⚖️", desc: "Stay at current weight" },
-  { value: "gain_muscle", label: "Build Muscle", emoji: "💪", desc: "Lean bulk (+300 cal)" },
-  { value: "build_strength", label: "Build Strength", emoji: "🏋️", desc: "Performance focus" },
-];
-
-const ACTIVITY = [
-  { value: "sedentary", label: "Sedentary", desc: "Desk job, little exercise" },
-  { value: "light", label: "Lightly Active", desc: "Gym 1–3×/week, desk job" },
-  { value: "moderate", label: "Moderately Active", desc: "Gym 3–5×/week + active job" },
-  { value: "active", label: "Very Active", desc: "Hard exercise 6–7 days/week" },
-];
+// ─── Static data (values only — labels come from i18n) ───────────────────────
+const GOAL_VALUES = ["lose_weight", "lose_fast", "maintain", "gain_muscle", "build_strength"];
+const GOAL_EMOJIS: Record<string, string> = {
+  lose_weight: "🔥", lose_fast: "⚡", maintain: "⚖️", gain_muscle: "💪", build_strength: "🏋️",
+};
+const ACTIVITY_VALUES = ["sedentary", "light", "moderate", "active"];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function QuickSetupCalculator() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0); // 0=body, 1=activity, 2=goal, 3=results
   const [gender, setGender] = useState<"male" | "female">("male");
   const [age, setAge] = useState("");
@@ -118,15 +111,30 @@ export default function QuickSetupCalculator() {
     setStep(3);
   }
 
-  const goalLabel = GOALS.find(g => g.value === goal)?.label ?? goal;
+  const goalLabel = t(`landing.calculator.goals.${goal}.label`, goal);
   const appUrl = "https://app.yfitai.com/signup";
+
+  const stepLabels = [
+    t("landing.calculator.stepLabels.0", "Body Info"),
+    t("landing.calculator.stepLabels.1", "Activity"),
+    t("landing.calculator.stepLabels.2", "Your Goal"),
+  ];
+
+  const saveFeatures = [
+    t("landing.calculator.saveFeatures.0", "📊 Track your actual food intake against these targets"),
+    t("landing.calculator.saveFeatures.1", "🎯 Precise body fat % from your real measurements"),
+    t("landing.calculator.saveFeatures.2", "📈 Weekly progress charts and predictions"),
+    t("landing.calculator.saveFeatures.3", "🤖 AI Coach adapts your plan as you progress"),
+    t("landing.calculator.saveFeatures.4", "💊 Medication interaction checker"),
+    t("landing.calculator.saveFeatures.5", "🌍 Available in 8 languages"),
+  ];
 
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* Step indicator */}
       {step < 3 && (
         <div className="flex items-center justify-center gap-2 mb-8">
-          {["Your Body", "Activity", "Your Goal"].map((label, i) => (
+          {stepLabels.map((label, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-all ${
                 i === step
@@ -149,11 +157,11 @@ export default function QuickSetupCalculator() {
       {/* ── Step 0: Body Info ── */}
       {step === 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
-          <h3 className="text-lg font-semibold text-gray-900">Tell us about yourself</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t("landing.calculator.step0Title")}</h3>
 
           {/* Gender */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Biological Sex</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("landing.calculator.biologicalSex")}</label>
             <div className="grid grid-cols-2 gap-3">
               {(["male", "female"] as const).map(g => (
                 <button
@@ -165,7 +173,7 @@ export default function QuickSetupCalculator() {
                       : "border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                 >
-                  {g === "male" ? "♂ Male" : "♀ Female"}
+                  {g === "male" ? `♂ ${t("landing.calculator.male")}` : `♀ ${t("landing.calculator.female")}`}
                 </button>
               ))}
             </div>
@@ -173,10 +181,10 @@ export default function QuickSetupCalculator() {
 
           {/* Age */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("landing.calculator.age")}</label>
             <input
               type="number"
-              placeholder="e.g. 32"
+              placeholder={t("landing.calculator.agePlaceholder")}
               value={age}
               onChange={e => setAge(e.target.value)}
               min={15}
@@ -187,7 +195,7 @@ export default function QuickSetupCalculator() {
 
           {/* Height */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Height</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("landing.calculator.height")}</label>
             <div className="grid grid-cols-2 gap-3">
               <div className="relative">
                 <input
@@ -216,7 +224,7 @@ export default function QuickSetupCalculator() {
 
           {/* Weight */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Current Weight</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("landing.calculator.currentWeight")}</label>
             <div className="relative">
               <input
                 type="number"
@@ -240,7 +248,7 @@ export default function QuickSetupCalculator() {
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
-            Next: Activity Level →
+            {t("landing.calculator.nextActivity")}
           </button>
         </div>
       )}
@@ -248,22 +256,22 @@ export default function QuickSetupCalculator() {
       {/* ── Step 1: Activity ── */}
       {step === 1 && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">How active are you?</h3>
-          <p className="text-sm text-gray-500">Be honest — most people overestimate their activity level.</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t("landing.calculator.step1Title")}</h3>
+          <p className="text-sm text-gray-500">{t("landing.calculator.step1Subtitle", "Be honest — most people overestimate their activity level.")}</p>
 
           <div className="space-y-3">
-            {ACTIVITY.map(a => (
+            {ACTIVITY_VALUES.map(val => (
               <button
-                key={a.value}
-                onClick={() => setActivity(a.value)}
+                key={val}
+                onClick={() => setActivity(val)}
                 className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
-                  activity === a.value
+                  activity === val
                     ? "border-green-500 bg-green-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <div className="font-medium text-gray-900 text-sm">{a.label}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{a.desc}</div>
+                <div className="font-medium text-gray-900 text-sm">{t(`landing.calculator.activity.${val}.label`, val)}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t(`landing.calculator.activity.${val}.desc`, "")}</div>
               </button>
             ))}
           </div>
@@ -273,13 +281,13 @@ export default function QuickSetupCalculator() {
               onClick={() => setStep(0)}
               className="flex-1 py-3.5 rounded-xl border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-all"
             >
-              ← Back
+              {t("landing.calculator.back")}
             </button>
             <button
               onClick={() => setStep(2)}
               className="flex-[2] py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
             >
-              Next: Your Goal →
+              {t("landing.calculator.nextGoal", "Next: Your Goal →")}
             </button>
           </div>
         </div>
@@ -288,25 +296,25 @@ export default function QuickSetupCalculator() {
       {/* ── Step 2: Goal ── */}
       {step === 2 && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">What's your primary goal?</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t("landing.calculator.step2Title")}</h3>
 
           <div className="space-y-2.5">
-            {GOALS.map(g => (
+            {GOAL_VALUES.map(val => (
               <button
-                key={g.value}
-                onClick={() => setGoal(g.value)}
+                key={val}
+                onClick={() => setGoal(val)}
                 className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all flex items-center gap-3 ${
-                  goal === g.value
+                  goal === val
                     ? "border-green-500 bg-green-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <span className="text-xl">{g.emoji}</span>
+                <span className="text-xl">{GOAL_EMOJIS[val]}</span>
                 <div>
-                  <div className="font-medium text-gray-900 text-sm">{g.label}</div>
-                  <div className="text-xs text-gray-500">{g.desc}</div>
+                  <div className="font-medium text-gray-900 text-sm">{t(`landing.calculator.goals.${val}.label`, val)}</div>
+                  <div className="text-xs text-gray-500">{t(`landing.calculator.goals.${val}.desc`, "")}</div>
                 </div>
-                {goal === g.value && (
+                {goal === val && (
                   <span className="ml-auto w-5 h-5 rounded-full bg-green-600 flex items-center justify-center text-white text-xs">✓</span>
                 )}
               </button>
@@ -318,13 +326,13 @@ export default function QuickSetupCalculator() {
               onClick={() => setStep(1)}
               className="flex-1 py-3.5 rounded-xl border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-all"
             >
-              ← Back
+              {t("landing.calculator.back")}
             </button>
             <button
               onClick={handleCalculate}
               className="flex-[2] py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
             >
-              Calculate My Numbers →
+              {t("landing.calculator.calculateBtn")}
             </button>
           </div>
         </div>
@@ -335,31 +343,31 @@ export default function QuickSetupCalculator() {
         <div className="space-y-4">
           {/* Header card */}
           <div className="bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl p-6 text-white text-center shadow-lg">
-            <p className="text-green-100 text-sm font-medium mb-1">Your personalized daily target</p>
+            <p className="text-green-100 text-sm font-medium mb-1">{t("landing.calculator.resultsTitle")}</p>
             <div className="text-6xl font-bold mb-1">{results.calories.toLocaleString()}</div>
-            <p className="text-green-100 text-sm">calories/day to <strong className="text-white">{goalLabel.toLowerCase()}</strong></p>
+            <p className="text-green-100 text-sm">{t("landing.calculator.caloriesPerDay")} <strong className="text-white">{goalLabel.toLowerCase()}</strong></p>
             <div className="mt-3 text-xs text-green-200">
-              TDEE/Maintenance: {results.tdee.toLocaleString()} cal · Est. Body Fat: ~{results.bf}%
+              {t("landing.calculator.tdeeMaintenance")}: {results.tdee.toLocaleString()} cal · {t("landing.calculator.estBodyFat")}: ~{results.bf}%
             </div>
           </div>
 
           {/* Macros */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-            <h4 className="text-sm font-semibold text-gray-700 mb-4">Daily Macro Targets</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-4">{t("landing.calculator.dailyMacros")}</h4>
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-3 bg-blue-50 rounded-xl">
                 <div className="text-2xl font-bold text-blue-700">{results.protein}g</div>
-                <div className="text-xs text-blue-600 font-medium mt-0.5">Protein</div>
+                <div className="text-xs text-blue-600 font-medium mt-0.5">{t("landing.calculator.protein")}</div>
                 <div className="text-xs text-gray-400">{Math.round(results.protein * 4)} cal</div>
               </div>
               <div className="text-center p-3 bg-orange-50 rounded-xl">
                 <div className="text-2xl font-bold text-orange-700">{results.carbs}g</div>
-                <div className="text-xs text-orange-600 font-medium mt-0.5">Carbs</div>
+                <div className="text-xs text-orange-600 font-medium mt-0.5">{t("landing.calculator.carbs")}</div>
                 <div className="text-xs text-gray-400">{Math.round(results.carbs * 4)} cal</div>
               </div>
               <div className="text-center p-3 bg-purple-50 rounded-xl">
                 <div className="text-2xl font-bold text-purple-700">{results.fat}g</div>
-                <div className="text-xs text-purple-600 font-medium mt-0.5">Fat</div>
+                <div className="text-xs text-purple-600 font-medium mt-0.5">{t("landing.calculator.fat")}</div>
                 <div className="text-xs text-gray-400">{Math.round(results.fat * 9)} cal</div>
               </div>
             </div>
@@ -367,16 +375,9 @@ export default function QuickSetupCalculator() {
 
           {/* What you get in the app */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Save your results — get the full picture</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">{t("landing.calculator.saveResultsTitle")}</h4>
             <ul className="space-y-2 text-sm text-gray-600">
-              {[
-                "📊 Track your actual food intake against these targets",
-                "🎯 Precise body fat % from your real measurements",
-                "📈 Weekly progress charts and predictions",
-                "🤖 AI Coach adapts your plan as you progress",
-                "💊 Medication interaction checker",
-                "🌍 Available in 8 languages",
-              ].map((item, i) => (
+              {saveFeatures.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <span>{item}</span>
                 </li>
@@ -389,17 +390,17 @@ export default function QuickSetupCalculator() {
             href={`${appUrl}?tdee=${results.tdee}&goal=${goal}&calories=${results.calories}`}
             className="block w-full py-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-center shadow-lg hover:shadow-xl transition-all text-lg"
           >
-            Save My Results — Create Free Account →
+            {t("landing.calculator.saveResultsCta")}
           </a>
           <p className="text-center text-xs text-gray-400">
-            No credit card · Free forever plan · Takes 30 seconds
+            {t("landing.calculator.noCreditCard")}
           </p>
 
           <button
             onClick={() => { setStep(0); setResults(null); setAge(""); setWeightLbs(""); }}
             className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            ← Recalculate with different numbers
+            {t("landing.calculator.recalculate")}
           </button>
         </div>
       )}
