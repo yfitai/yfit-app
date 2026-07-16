@@ -389,10 +389,11 @@ Deno.serve(async (_req) => {
       );
     }
 
-    // Insert new articles into database using correct column names
+    // Upsert new articles — ON CONFLICT (url) DO NOTHING prevents duplicate key errors
+    // (Session 23 fix: changed from .insert() to .upsert() with ignoreDuplicates)
     const { error: insertError } = await supabase
       .from("scraped_articles")
-      .insert(
+      .upsert(
         newArticles.map((a) => ({
           source_name: a.source_name,
           source_url: a.source_url,   // source website origin
@@ -403,7 +404,8 @@ Deno.serve(async (_req) => {
           relevance_score: a.relevance_score,
           category: a.category,
           is_processed: false,
-        }))
+        })),
+        { onConflict: 'url', ignoreDuplicates: true }
       );
 
     if (insertError) {

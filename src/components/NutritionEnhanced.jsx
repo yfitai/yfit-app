@@ -748,11 +748,21 @@ const handleBarcodeScanned = async (barcode) => {
                 style={{ width: `${calorieProgress}%` }}
               />
             </div>
-            <div className="flex items-center justify-between mt-2 text-sm">
-              <span className="text-gray-600">{t('nutrition.consumed')}: {Math.round(totalCalories)} kcal</span>
-              <span className={remainingCalories >= 0 ? 'text-green-600' : 'text-red-600'}>
-                {remainingCalories >= 0 ? t('nutrition.remaining') : t('common.over')}: {Math.abs(Math.round(remainingCalories))} kcal
-              </span>
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="bg-white rounded-xl p-3 border border-teal-100 text-center">
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{t('nutrition.consumed')}</div>
+                <div className="text-2xl font-bold text-gray-900">{Math.round(totalCalories)}</div>
+                <div className="text-xs text-gray-400">kcal</div>
+              </div>
+              <div className="bg-white rounded-xl p-3 border border-teal-100 text-center">
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                  {remainingCalories >= 0 ? t('nutrition.remaining') : t('common.over')}
+                </div>
+                <div className={`text-2xl font-bold ${remainingCalories >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {Math.abs(Math.round(remainingCalories))}
+                </div>
+                <div className="text-xs text-gray-400">kcal</div>
+              </div>
             </div>
           </div>
 

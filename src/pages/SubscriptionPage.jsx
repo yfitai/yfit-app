@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSubscription } from '../contexts/SubscriptionContext'
+import { supabase } from '../lib/supabase'
 import UpgradeModal from '../components/UpgradeModal'
 import {
   Crown, Zap, Star, Check, Lock, BarChart3, Dumbbell,
@@ -79,6 +80,8 @@ export default function SubscriptionPage({ user }) {
 
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState('pro_yearly')
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError]   = useState(null)
 
   const formUsage    = checkUsage('form_analysis')
   const aiUsage      = checkUsage('ai_coach')
@@ -87,6 +90,32 @@ export default function SubscriptionPage({ user }) {
   const handleUpgrade = (planId) => {
     const url = STRIPE_LINKS[planId]
     if (url) window.open(url, '_blank')
+  }
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true)
+    setPortalError(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token
+      if (!accessToken) throw new Error('Not authenticated')
+
+      const res = await fetch('/api/stripe/create-portal-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to open billing portal')
+      window.open(json.url, '_blank')
+    } catch (err) {
+      console.error('[Portal]', err)
+      setPortalError(err.message || 'Unable to open billing portal. Please try again.')
+    } finally {
+      setPortalLoading(false)
+    }
   }
 
   if (loading) {
@@ -322,23 +351,26 @@ export default function SubscriptionPage({ user }) {
       {isPro && !isTrialing && (
         <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-3">{t('subscription.manageSubscription', 'Manage Subscription')}</h3>
-          <a
-            href="https://billing.stripe.com/p/login/bpc_1TXkpzD2YT6Pvz5WGnbrTZ7X"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between w-full p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+          <button
+            onClick={handleManageBilling}
+            disabled={portalLoading}
+            className="flex items-center justify-between w-full p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
-              <RefreshCw className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">{t('subscription.manageBilling', 'Manage billing & invoices')}</span>
+              <RefreshCw className={`w-4 h-4 text-gray-500 ${portalLoading ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium text-gray-700">
+                {portalLoading
+                  ? t('common.loading', 'Loading…')
+                  : t('subscription.manageBilling', 'Manage billing & invoices')}
+              </span>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </a>
+            {!portalLoading && <ChevronRight className="w-4 h-4 text-gray-400" />}
+          </button>
+          {portalError && (
+            <p className="text-xs text-red-500 mt-2 text-center">{portalError}</p>
+          )}
           <p className="text-xs text-gray-400 mt-3 text-center">
             {t('subscription.cancelInPortal', 'To cancel or change your plan, visit the Stripe billing portal above.')}
-          </p>
-          <p className="text-xs text-blue-500 mt-1 text-center">
-            {t('subscription.portalEmailHint', '💡 Enter your billing email address on the Stripe page to access your account.')}
           </p>
         </div>
       )}
