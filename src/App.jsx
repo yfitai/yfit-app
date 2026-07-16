@@ -63,6 +63,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
+  const [isNewUser, setIsNewUser] = useState(false)
   const [showInstallGuide, setShowInstallGuide] = useState(false)
 
   useEffect(() => {
@@ -146,6 +147,14 @@ function App() {
       if (!data || !data.install_guide_shown) {
         setShowInstallGuide(true)
       }
+      // New user detection: if no user_goals row exists, redirect to Goals page on first visit.
+      // Use localStorage to avoid redirecting on every refresh (only redirect once per device).
+      if (!data) {
+        const goalsVisited = localStorage.getItem(`yfit_goals_visited_${userId}`)
+        if (!goalsVisited) {
+          setIsNewUser(true)
+        }
+      }
     } catch {
       // If table doesn't exist yet, skip gracefully
       setNeedsOnboarding(false)
@@ -216,12 +225,12 @@ function App() {
 
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
-                    {/* Redirect / to dashboard when logged in */}
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    {/* Redirect / to Goals for new users (no profile yet), Dashboard for returning users */}
+                    <Route path="/" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
                     {/* /go = social media link-in-bio — always shows marketing page even for logged-in users */}
                     <Route path="/go" element={<LandingPage />} />
-                    <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/login" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
+                    <Route path="/signup" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/legal" element={<Legal />} />
                     <Route path="/faq" element={<FAQ />} />
@@ -229,7 +238,12 @@ function App() {
 
                     {/* Free + Pro routes */}
                     <Route path="/dashboard" element={<Dashboard user={user} />} />
-                    <Route path="/goals" element={<Goals user={user} />} />
+                    <Route path="/goals" element={<Goals user={user} onFirstVisit={() => {
+                      if (isNewUser && user) {
+                        localStorage.setItem(`yfit_goals_visited_${user.id}`, '1')
+                        setIsNewUser(false)
+                      }
+                    }} />} />
                     <Route path="/nutrition" element={<NutritionUnified user={user} />} />
                     <Route path="/daily-tracker" element={<DailyTracker user={user} />} />
                     <Route path="/fitness" element={<Fitness user={user} />} />

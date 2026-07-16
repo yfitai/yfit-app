@@ -1,19 +1,24 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Camera as CameraIcon, Upload, X, ChevronLeft, ChevronRight, Calendar, TrendingUp, Eye } from 'lucide-react'
+import { Camera as CameraIcon, Upload, X, Calendar, TrendingUp, Lock, Zap } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { useSubscription } from '../../contexts/SubscriptionContext'
+import UpgradeModal from '../UpgradeModal'
 import Webcam from 'react-webcam'
+
+const FREE_PHOTO_LIMIT = 5
 
 export default function ProgressPhotos({ userId }) {
   const { t } = useTranslation()
+  const { isPro } = useSubscription()
   const [photos, setPhotos] = useState([])
   const [uploading, setUploading] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [compareMode, setCompareMode] = useState(false)
   const [comparePhotos, setComparePhotos] = useState({ before: null, after: null })
   const [viewMode, setViewMode] = useState('grid') // grid, timeline, compare
   const [showCamera, setShowCamera] = useState(false)
   const [currentViewType, setCurrentViewType] = useState(null)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const webcamRef = useRef(null)
 
   useEffect(() => {
@@ -21,55 +26,63 @@ export default function ProgressPhotos({ userId }) {
   }, [userId])
 
   const loadPhotos = async () => {
-    // Load from Supabase
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('progress_photos')
       .select('*')
       .eq('user_id', userId)
       .order('taken_at', { ascending: false })
 
-    if (data) {
-      setPhotos(data)
+    if (data) setPhotos(data)
+  }
+
+  // Check if user can upload more photos
+  const canUpload = isPro || photos.length < FREE_PHOTO_LIMIT
+  const photosRemaining = isPro ? null : Math.max(0, FREE_PHOTO_LIMIT - photos.length)
+  const atLimit = !isPro && photos.length >= FREE_PHOTO_LIMIT
+
+  const handleUploadAttempt = (action) => {
+    if (atLimit) {
+      setShowUpgradeModal(true)
+      return false
     }
+    return true
   }
 
   const handlePhotoUpload = async (event, viewType) => {
+    if (!handleUploadAttempt()) return
     const file = event.target.files[0]
     if (!file) return
 
     setUploading(true)
     try {
-      // Upload to Supabase Storage
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${userId}/${Date.now()}.${fileExt}`
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('progress-photos')
-          .upload(fileName, file)
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${userId}/${Date.now()}.${fileExt}`
 
-        if (uploadError) throw uploadError
+      const { error: uploadError } = await supabase.storage
+        .from('progress-photos')
+        .upload(fileName, file)
 
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('progress-photos')
-          .getPublicUrl(fileName)
+      if (uploadError) throw uploadError
 
-        // Save to database
-        const { data: photoData, error: dbError } = await supabase
-          .from('progress_photos')
-          .insert({
-            user_id: userId,
-            image_url: publicUrl,
-            view_type: viewType,
-            taken_at: new Date().toISOString()
-          })
-          .select()
-          .single()
+      const { data: { publicUrl } } = supabase.storage
+        .from('progress-photos')
+        .getPublicUrl(fileName)
 
-        if (dbError) throw dbError
+      const { data: photoData, error: dbError } = await supabase
+        .from('progress_photos')
+        .insert({
+          user_id: userId,
+          image_url: publicUrl,
+          view_type: viewType,
+          taken_at: new Date().toISOString()
+        })
+        .select()
+        .single()
 
-        setPhotos([photoData, ...photos])
-        alert('Photo uploaded successfully!')
+      if (dbError) throw dbError
+
+      setPhotos([photoData, ...photos])
+      alert('Photo uploaded successfully!')
     } catch (error) {
       console.error('Error uploading photo:', error)
       alert('Error uploading photo. Please try again.')
@@ -79,64 +92,44 @@ export default function ProgressPhotos({ userId }) {
   }
 
   const handleCameraCapture = (viewType) => {
-    console.log('🔴 CAMERA BUTTON CLICKED! viewType:', viewType);
-    setCurrentViewType(viewType);
-    setShowCamera(true);
-  };
+    if (!handleUploadAttempt()) return
+    setCurrentViewType(viewType)
+    setShowCamera(true)
+  }
 
   const capturePhoto = async () => {
     if (!webcamRef.current) {
-      alert('Camera not ready. Please try again.');
-      return;
+      alert('Camera not ready. Please try again.')
+      return
     }
 
-    setUploading(true);
-    console.log('📸 Capturing photo from webcam...');
+    setUploading(true)
 
     try {
-      // Capture image from webcam
-      const imageSrc = webcamRef.current.getScreenshot();
-      
-      if (!imageSrc) {
-        throw new Error('Failed to capture image');
-      }
+      const imageSrc = webcamRef.current.getScreenshot()
+      if (!imageSrc) throw new Error('Failed to capture image')
 
-      console.log('✅ Photo captured from webcam');
-      console.log('Connecting to', `'${imageSrc.substring(0, 100)}...'`);
-
-      // Convert base64 to blob (without fetch to avoid CSP violation)
-      const base64Data = imageSrc.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
+      const base64Data = imageSrc.split(',')[1]
+      const byteCharacters = atob(base64Data)
+      const byteNumbers = new Array(byteCharacters.length)
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/jpeg' });
-      
-      console.log('✅ Blob created successfully');
-      console.log('Blob size:', blob.size, 'bytes');
-        
-      // Upload to Supabase Storage
-      const fileName = `${userId}/${Date.now()}.jpg`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: 'image/jpeg' })
+
+      const fileName = `${userId}/${Date.now()}.jpg`
+
+      const { error: uploadError } = await supabase.storage
         .from('progress-photos')
-        .upload(fileName, blob);
+        .upload(fileName, blob)
 
-      if (uploadError) {
-        console.error('❌ Storage upload error:', uploadError);
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError
 
-      console.log('✅ Storage upload successful');
-
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('progress-photos')
-        .getPublicUrl(fileName);
+        .getPublicUrl(fileName)
 
-      // Save to database
       const { data: photoData, error: dbError } = await supabase
         .from('progress_photos')
         .insert({
@@ -146,31 +139,25 @@ export default function ProgressPhotos({ userId }) {
           taken_at: new Date().toISOString()
         })
         .select()
-        .single();
+        .single()
 
-      if (dbError) {
-        console.error('❌ Database insert error:', dbError);
-        throw dbError;
-      }
+      if (dbError) throw dbError
 
-      console.log('✅ Photo saved successfully');
-
-      setPhotos([photoData, ...photos]);
-      alert('Photo captured and uploaded successfully!');
-      setShowCamera(false);
-      
+      setPhotos([photoData, ...photos])
+      alert('Photo captured and uploaded successfully!')
+      setShowCamera(false)
     } catch (error) {
-      console.error('❌ Error capturing photo:', error);
-      alert(`Error: ${error.message}. Please try again.`);
+      console.error('Error capturing photo:', error)
+      alert(`Error: ${error.message}. Please try again.`)
     } finally {
-      setUploading(false);
+      setUploading(false)
     }
-  };
+  }
 
   const closeCamera = () => {
-    setShowCamera(false);
-    setCurrentViewType(null);
-  };
+    setShowCamera(false)
+    setCurrentViewType(null)
+  }
 
   const handleDeletePhoto = async (photoId) => {
     if (!confirm('Are you sure you want to delete this photo?')) return
@@ -212,46 +199,79 @@ export default function ProgressPhotos({ userId }) {
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <CameraIcon className="w-6 h-6 text-blue-600" />
           <h2 className="text-2xl font-bold text-gray-900">{t('progress.progressPhotos', 'Progress Photos')}</h2>
         </div>
-        
+
         {/* View Mode Toggle */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              viewMode === 'grid'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('progress.gridView', 'Grid')}
-          </button>
-          <button
-            onClick={() => setViewMode('timeline')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              viewMode === 'timeline'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('progress.timelineView', 'Timeline')}
-          </button>
-          <button
-            onClick={() => setViewMode('compare')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              viewMode === 'compare'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {t('progress.compareView', 'Compare')}
-          </button>
+          {['grid', 'timeline', 'compare'].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+                viewMode === mode
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t(`progress.${mode}View`, mode.charAt(0).toUpperCase() + mode.slice(1))}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Upgrade Banner — shown to free users who have 3+ photos or are at limit */}
+      {!isPro && photos.length >= 3 && (
+        <div className={`mb-5 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+          atLimit
+            ? 'bg-gradient-to-r from-red-50 to-orange-50 border border-red-200'
+            : 'bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200'
+        }`}>
+          <div className="flex items-start gap-3">
+            <div className={`p-2 rounded-lg flex-shrink-0 ${atLimit ? 'bg-red-100' : 'bg-purple-100'}`}>
+              {atLimit ? (
+                <Lock className="w-5 h-5 text-red-600" />
+              ) : (
+                <Zap className="w-5 h-5 text-purple-600" />
+              )}
+            </div>
+            <div>
+              {atLimit ? (
+                <>
+                  <p className="font-semibold text-red-800 text-sm">
+                    You've reached your free limit of {FREE_PHOTO_LIMIT} photos
+                  </p>
+                  <p className="text-red-600 text-xs mt-0.5">
+                    Upgrade to Pro for unlimited progress photo storage
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-purple-800 text-sm">
+                    {photosRemaining} free photo{photosRemaining !== 1 ? 's' : ''} remaining
+                  </p>
+                  <p className="text-purple-600 text-xs mt-0.5">
+                    Upgrade to Pro for unlimited storage, side-by-side comparisons &amp; AI insights
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all shadow-sm hover:shadow-md ${
+              atLimit
+                ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600'
+                : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600'
+            }`}
+          >
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
 
       {/* Analytics Summary */}
       {analytics && (
@@ -270,7 +290,7 @@ export default function ProgressPhotos({ userId }) {
               <div className="text-sm text-gray-600">{t('progress.consistency', 'Consistency')}</div>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
@@ -295,28 +315,62 @@ export default function ProgressPhotos({ userId }) {
             <button
               onClick={() => handleCameraCapture(viewType)}
               disabled={uploading}
-              className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className={`w-full px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                atLimit
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              }`}
             >
-              <CameraIcon className="w-5 h-5" />
-              {viewType === 'front' ? t('progress.takeFront', 'Take Front') : viewType === 'side' ? t('progress.takeSide', 'Take Side') : t('progress.takeBack', 'Take Back')}
+              {atLimit ? <Lock className="w-5 h-5" /> : <CameraIcon className="w-5 h-5" />}
+              {viewType === 'front'
+                ? t('progress.takeFront', 'Take Front')
+                : viewType === 'side'
+                ? t('progress.takeSide', 'Take Side')
+                : t('progress.takeBack', 'Take Back')}
             </button>
-            
-            <label className="block">
+
+            <label className={atLimit ? 'block cursor-not-allowed' : 'block'}>
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handlePhotoUpload(e, viewType)}
-                disabled={uploading}
+                disabled={uploading || atLimit}
                 className="hidden"
               />
-              <div className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer text-center flex items-center justify-center gap-2">
-                <Upload className="w-4 h-4" />
-                {viewType === 'front' ? t('progress.uploadFront', 'Upload Front') : viewType === 'side' ? t('progress.uploadSide', 'Upload Side') : t('progress.uploadBack', 'Upload Back')}
+              <div
+                onClick={atLimit ? () => setShowUpgradeModal(true) : undefined}
+                className={`w-full px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer text-center flex items-center justify-center gap-2 ${
+                  atLimit
+                    ? 'bg-gray-50 text-gray-400 border border-gray-200'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {atLimit ? <Lock className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+                {viewType === 'front'
+                  ? t('progress.uploadFront', 'Upload Front')
+                  : viewType === 'side'
+                  ? t('progress.uploadSide', 'Upload Side')
+                  : t('progress.uploadBack', 'Upload Back')}
               </div>
             </label>
           </div>
         ))}
       </div>
+
+      {/* Free tier photo counter — shown when < 3 photos (before banner kicks in) */}
+      {!isPro && photos.length < 3 && photos.length > 0 && (
+        <div className="mb-4 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between">
+          <span className="text-sm text-gray-600">
+            {photos.length} of {FREE_PHOTO_LIMIT} free photos used
+          </span>
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className="text-xs text-purple-600 hover:text-purple-700 font-medium underline"
+          >
+            Upgrade for unlimited
+          </button>
+        </div>
+      )}
 
       {uploading && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -326,7 +380,7 @@ export default function ProgressPhotos({ userId }) {
         </div>
       )}
 
-      {/* Photos Display */}
+      {/* Photos Display — Grid */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {photos.map((photo) => (
@@ -354,6 +408,7 @@ export default function ProgressPhotos({ userId }) {
         </div>
       )}
 
+      {/* Photos Display — Timeline */}
       {viewMode === 'timeline' && (
         <div className="space-y-6">
           {photos.map((photo, idx) => (
@@ -401,54 +456,37 @@ export default function ProgressPhotos({ userId }) {
         </div>
       )}
 
+      {/* Photos Display — Compare */}
       {viewMode === 'compare' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-3">{t('progress.before', 'Before')}</h3>
-              {comparePhotos.before ? (
-                <div className="relative">
-                  <img
-                    src={comparePhotos.before.image_url}
-                    alt="Before"
-                    className="w-full h-96 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => setComparePhotos({ ...comparePhotos, before: null })}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Select a "before" photo from below</p>
-                </div>
-              )}
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-3">{t('progress.after', 'After')}</h3>
-              {comparePhotos.after ? (
-                <div className="relative">
-                  <img
-                    src={comparePhotos.after.image_url}
-                    alt="After"
-                    className="w-full h-96 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => setComparePhotos({ ...comparePhotos, after: null })}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Select an "after" photo from below</p>
-                </div>
-              )}
-            </div>
+            {[
+              { key: 'before', label: t('progress.before', 'Before') },
+              { key: 'after', label: t('progress.after', 'After') }
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <h3 className="text-lg font-semibold mb-3">{label}</h3>
+                {comparePhotos[key] ? (
+                  <div className="relative">
+                    <img
+                      src={comparePhotos[key].image_url}
+                      alt={label}
+                      className="w-full h-96 object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => setComparePhotos({ ...comparePhotos, [key]: null })}
+                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                    <p className="text-gray-500">Select a "{key}" photo from below</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <div className="border-t pt-4">
@@ -476,7 +514,10 @@ export default function ProgressPhotos({ userId }) {
 
       {/* Photo Modal */}
       {selectedPhoto && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setSelectedPhoto(null)}>
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedPhoto(null)}
+        >
           <div className="relative max-w-4xl w-full">
             <button
               onClick={() => setSelectedPhoto(null)}
@@ -519,6 +560,7 @@ export default function ProgressPhotos({ userId }) {
         </div>
       )}
 
+      {/* Empty State */}
       {photos.length === 0 && (
         <div className="text-center py-12">
           <CameraIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -526,27 +568,29 @@ export default function ProgressPhotos({ userId }) {
           <p className="text-gray-500 text-sm">
             Start tracking your journey by taking your first progress photo!
           </p>
+          {!isPro && (
+            <p className="text-purple-600 text-sm mt-3 font-medium">
+              Free users can store up to {FREE_PHOTO_LIMIT} photos. <button onClick={() => setShowUpgradeModal(true)} className="underline hover:text-purple-700">Upgrade for unlimited.</button>
+            </p>
+          )}
         </div>
       )}
 
       {/* Camera Overlay */}
       {showCamera && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          {/* Camera Preview */}
           <div className="flex-1 relative">
             <Webcam
               ref={webcamRef}
               audio={false}
               screenshotFormat="image/jpeg"
               videoConstraints={{
-                facingMode: 'environment', // Rear camera for progress photos
+                facingMode: 'environment',
                 width: 1080,
                 height: 1920
               }}
               className="w-full h-full object-cover"
             />
-            
-            {/* View Type Label */}
             <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
               {currentViewType === 'front' && t('progress.frontView', 'Front View')}
               {currentViewType === 'side' && t('progress.sideView', 'Side View')}
@@ -554,9 +598,7 @@ export default function ProgressPhotos({ userId }) {
             </div>
           </div>
 
-          {/* Camera Controls */}
           <div className="bg-black p-6 flex items-center justify-between">
-            {/* Cancel Button */}
             <button
               onClick={closeCamera}
               disabled={uploading}
@@ -564,8 +606,6 @@ export default function ProgressPhotos({ userId }) {
             >
               Cancel
             </button>
-
-            {/* Capture Button */}
             <button
               onClick={capturePhoto}
               disabled={uploading}
@@ -577,12 +617,19 @@ export default function ProgressPhotos({ userId }) {
                 <div className="w-16 h-16 rounded-full bg-white" />
               )}
             </button>
-
-            {/* Placeholder for symmetry */}
             <div className="w-20" />
           </div>
         </div>
       )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="progress_photos"
+        featureLabel="Unlimited Progress Photos"
+        featureDescription="Store unlimited progress photos, track your transformation over time, and compare before/after side by side."
+      />
     </div>
   )
 }

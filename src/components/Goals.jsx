@@ -21,7 +21,7 @@ import GoalsResults from './GoalsResults'
 import GoalsEnhancement from './GoalsEnhancement'
 import { getUserProfile } from '../lib/supabase'
 
-export default function Goals({ user: propUser }) {
+export default function Goals({ user: propUser, onFirstVisit }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { unitSystem, isMetric } = useUnitPreference()
@@ -31,6 +31,12 @@ export default function Goals({ user: propUser }) {
   const [resetting, setResetting] = useState(false)
   const [resetKey, setResetKey] = useState(0) // Used to force GoalsEnhancement remount
   const [user, setUser] = useState(propUser || null)
+
+  // Notify App.jsx that a new user has visited Goals (clears first-time redirect)
+  useEffect(() => {
+    if (onFirstVisit) onFirstVisit()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [userProfile, setUserProfile] = useState(null)
   const [calculatedMetrics, setCalculatedMetrics] = useState(null)
   
