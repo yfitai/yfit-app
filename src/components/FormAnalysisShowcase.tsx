@@ -370,7 +370,7 @@ export default function FormAnalysisShowcase() {
               </div>
             </div>
             <div className="pt-2">
-              <a href="https://app.yfitai.com" className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-green-500/25">
+              <a href="https://app.yfitai.com/signup" className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-green-500/25">
                 {t("landing.formTryFree")}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </a>

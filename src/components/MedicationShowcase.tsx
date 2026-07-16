@@ -130,7 +130,7 @@ export default function MedicationShowcase() {
 
             <div className="pt-4">
               <a
-                href="https://app.yfitai.com"
+                href="https://app.yfitai.com/signup"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/25"
               >
                 {t("landing.medBtnSendProvider")}
@@ -250,19 +250,13 @@ export default function MedicationShowcase() {
 
             {/* Action bar */}
             <div className="px-5 pb-5 flex gap-3">
-              <button
-                onClick={handleSend}
-                disabled={sending || sent}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold text-white transition-all"
-                style={{
-                  background: sent
-                    ? "linear-gradient(135deg, #10b981, #059669)"
-                    : "linear-gradient(135deg, #ec4899, #9333ea)",
-                  opacity: sending ? 0.7 : 1,
-                }}
+              <a
+                href="https://app.yfitai.com/signup"
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-white transition-all text-center inline-flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #ec4899, #9333ea)" }}
               >
-                {sent ? t("landing.medBtnSent") : sending ? t("landing.medBtnSending") : `📧 ${t("landing.medBtnSendProvider")}`}
-              </button>
+                📧 {t("landing.medBtnSendProvider")}
+              </a>
               <button className="px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
                 🖨️ {t("landing.medPrintBtn")}
               </button>

@@ -699,49 +699,49 @@ export default function LandingPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-6">
           <div className="text-center max-w-3xl mx-auto mb-10">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">How YFIT Compares</h2>
-            <p className="text-muted-foreground text-lg">The only app that combines medication tracking, AI form analysis, and full fitness coaching in one place.</p>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">{t("landing.compare.sectionTitle")}</h2>
+            <p className="text-muted-foreground text-lg">{t("landing.compare.sectionSubtitle")}</p>
           </div>
           <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-900 text-white">
-                  <th className="text-left px-5 py-4 font-semibold w-56">Feature</th>
+                  <th className="text-left px-5 py-4 font-semibold w-56">{t("landing.compare.colFeature")}</th>
                   <th className="text-center px-4 py-4 font-semibold bg-green-700">
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">YOU ARE HERE</span>
-                      <span>YFIT AI</span>
+                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">{t("landing.compare.youAreHere")}</span>
+                      <span>{t("landing.compare.colYfit")}</span>
                     </div>
                   </th>
-                  <th className="text-center px-4 py-4 font-semibold text-gray-300">MyFitnessPal</th>
-                  <th className="text-center px-4 py-4 font-semibold text-gray-300">Noom</th>
+                  <th className="text-center px-4 py-4 font-semibold text-gray-300">{t("landing.compare.colMfp")}</th>
+                  <th className="text-center px-4 py-4 font-semibold text-gray-300">{t("landing.compare.colNoom")}</th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { feature: "Calorie & macro tracking", yfit: "✅", mfp: "✅", noom: "✅" },
-                  { feature: "Workout logging", yfit: "✅", mfp: "✅", noom: "❌" },
-                  { feature: "AI coaching chat", yfit: "✅", mfp: "❌", noom: "✅" },
-                  { feature: "Barcode food scanner", yfit: "✅", mfp: "✅", noom: "❌" },
-                  { feature: "Progress photo tracking", yfit: "✅", mfp: "❌", noom: "❌" },
-                  { feature: "Medication tracking", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
-                  { feature: "Medication–exercise interaction alerts", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
-                  { feature: "AI real-time form analysis", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
-                  { feature: "Provider-ready medication reports", yfit: "✅ Exclusive", mfp: "❌", noom: "❌" },
+{[
+                  { featureKey: "row1", isExclusive: false },
+                  { featureKey: "row2", isExclusive: false },
+                  { featureKey: "row3", isExclusive: false },
+                  { featureKey: "row4", isExclusive: false },
+                  { featureKey: "row5", isExclusive: false },
+                  { featureKey: "row6", isExclusive: true },
+                  { featureKey: "row7", isExclusive: true },
+                  { featureKey: "row8", isExclusive: true },
+                  { featureKey: "row9", isExclusive: true },
                 ].map((row, i) => (
                   <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-5 py-3 text-gray-700 font-medium">{row.feature}</td>
-                    <td className={`text-center px-4 py-3 font-semibold bg-green-50 ${
-                      row.yfit.includes('Exclusive') ? 'text-green-700' : 'text-gray-700'
-                    }`}>{row.yfit}</td>
-                    <td className="text-center px-4 py-3 text-gray-500">{row.mfp}</td>
-                    <td className="text-center px-4 py-3 text-gray-500">{row.noom}</td>
+                    <td className="px-5 py-3 text-gray-700 font-medium">{t(`landing.compare.${row.featureKey}`)}</td>
+                    <td className={`text-center px-4 py-3 font-semibold bg-green-50 ${row.isExclusive ? 'text-green-700' : 'text-gray-700'}`}>
+                      {row.isExclusive ? t("landing.compare.exclusive") : t("landing.compare.yes")}
+                    </td>
+                    <td className="text-center px-4 py-3 text-gray-500">{row.isExclusive ? t("landing.compare.no") : (row.featureKey === 'row2' || row.featureKey === 'row4' ? t("landing.compare.yes") : (row.featureKey === 'row3' ? t("landing.compare.no") : (row.featureKey === 'row5' ? t("landing.compare.no") : t("landing.compare.yes"))))}</td>
+                    <td className="text-center px-4 py-3 text-gray-500">{row.isExclusive ? t("landing.compare.no") : (row.featureKey === 'row3' ? t("landing.compare.yes") : (row.featureKey === 'row2' || row.featureKey === 'row4' || row.featureKey === 'row5' ? t("landing.compare.no") : t("landing.compare.yes")))}</td>
                   </tr>
                 ))}
                 <tr className="bg-gray-900">
-                  <td className="px-5 py-4 text-white font-semibold text-sm">Ready to switch?</td>
+                  <td className="px-5 py-4 text-white font-semibold text-sm">{t("landing.compare.readyToSwitch")}</td>
                   <td className="text-center px-4 py-4 bg-green-900">
-                    <button onClick={goToSignUp} className="text-xs bg-green-500 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-green-400 transition-colors">Start Free</button>
+                    <button onClick={goToSignUp} className="text-xs bg-green-500 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-green-400 transition-colors">{t("landing.compare.startFree")}</button>
                   </td>
                   <td className="text-center px-4 py-4 text-gray-500 text-xs">—</td>
                   <td className="text-center px-4 py-4 text-gray-500 text-xs">—</td>
@@ -749,7 +749,7 @@ export default function LandingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-center text-xs text-muted-foreground mt-4">✅ Exclusive = feature only available in YFIT AI. Comparison based on publicly available feature lists as of 2025.</p>
+          <p className="text-center text-xs text-muted-foreground mt-4">{t("landing.compare.disclaimer")}</p>
         </div>
       </section>
 
