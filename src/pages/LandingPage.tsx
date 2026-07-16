@@ -384,37 +384,37 @@ export default function LandingPage() {
             {/* Left: copy */}
             <div className="lg:sticky lg:top-24">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
-                <span>⚡</span> Free — No Account Needed
+                <span>⚡</span> {t("landing.calculator.panelBadge")}
               </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                See your exact numbers<br />
-                <span className="text-green-600">in 60 seconds</span>
+                {t("landing.calculator.panelHeadline")}<br />
+                <span className="text-green-600">{t("landing.calculator.panelHeadlineHighlight")}</span>
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Enter your stats and get a personalized calorie target and macro split — calculated using the same Katch-McArdle formula used by professional coaches.
+                {t("landing.calculator.panelSubtext")}
               </p>
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
-                  Katch-McArdle formula (more accurate than Mifflin-St Jeor)
+                  {t("landing.calculator.panelBullet1")}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
-                  Goal-adjusted calorie target (not just TDEE)
+                  {t("landing.calculator.panelBullet2")}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
-                  Protein, carb &amp; fat breakdown included
+                  {t("landing.calculator.panelBullet3")}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">✓</span>
-                  Save your results to the free app in one click
+                  {t("landing.calculator.panelBullet4")}
                 </div>
               </div>
               <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <p className="text-xs text-blue-700 font-medium">
-                  💡 <strong>Why these numbers matter:</strong> Most people eat 300–500 calories more than they think. Knowing your exact target is the single biggest predictor of whether a diet works.
-                </p>
+                <p className="text-xs text-blue-700 font-medium"
+                  dangerouslySetInnerHTML={{ __html: t("landing.calculator.panelTip") }}
+                />
               </div>
             </div>
             {/* Right: calculator */}
