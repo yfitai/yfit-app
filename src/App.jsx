@@ -46,6 +46,7 @@ const ManualCleanup = lazy(() => import('./pages/ManualCleanup'))
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
 const FAQ = lazy(() => import('./pages/FAQ.tsx'))
 const Contact = lazy(() => import('./pages/Contact.tsx'))
+const GoPage = lazy(() => import('./pages/GoPage.tsx'))
 
 // Minimal page-level loading spinner shown while lazy chunks download
 function PageLoader() {
@@ -201,8 +202,8 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              {/* /go = social media link-in-bio — always shows marketing page, never redirects */}
-              <Route path="/go" element={<LandingPage />} />
+              {/* /go = social media link-in-bio — stripped-down problem-first page, never redirects */}
+              <Route path="/go" element={<GoPage />} />
               <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/reset-password" element={<ResetPassword />} />
@@ -227,8 +228,8 @@ function App() {
                   <Routes>
                     {/* Redirect / to Goals for new users (no profile yet), Dashboard for returning users */}
                     <Route path="/" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
-                    {/* /go = social media link-in-bio — always shows marketing page even for logged-in users */}
-                    <Route path="/go" element={<LandingPage />} />
+                    {/* /go = social media link-in-bio — always shows stripped-down page even for logged-in users */}
+                    <Route path="/go" element={<GoPage />} />
                     <Route path="/login" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
                     <Route path="/signup" element={<Navigate to={isNewUser ? "/goals" : "/dashboard"} replace />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
