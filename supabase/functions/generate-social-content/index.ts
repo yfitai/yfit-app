@@ -1,18 +1,17 @@
-// generate-social-content — v2.1.2
+// generate-social-content — v2.2.0
+// Changes from v2.1.1:
+// Changes from v2.1.2:
+//   - PROBLEM-FIRST hooks: GPT now leads with a sharp, specific pain point in the first 3 words
+//   - Rotating primary hooks: medication angle and form analysis angle alternate each run
+//   - Stronger urgency: hooks name the specific consequence, not just the struggle
+//   - Verbal CTA updated: ends with "Try YFIT AI free — it's at why-fit-a-i dot com"
 // Changes from v2.1.1:
 //   - BUGFIX: fetchLatestArticle() was selecting 'content' column which does not exist in scraped_articles.
-//     Removed 'content' from SELECT — table only has title, summary, url, source_name, etc.
 // Changes from v2.1.0:
 //   - BUGFIX: fetchLatestArticle() was ordering by scraped_at (column does not exist).
-//     Corrected to created_at. This caused "No scraped articles found" on every run since May 18.
 // Changes from v2.0:
 //   - Personal story angle: GPT-4 now writes from a first-person "I used to struggle..." perspective
 //   - 6 platform-specific captions: each platform gets a distinct tone, length, and CTA style
-//   - Link-in-bio CTAs: TikTok and Instagram explicitly say "link in bio"
-//   - Facebook: short caption (link goes in first comment via n8n)
-//   - LinkedIn: professional tone, full URL
-//   - YouTube: SEO-optimised description with full URL
-//   - Pinterest: discovery-focused, full URL
 // Deploy: paste this file into Supabase Dashboard → Edge Functions → generate-social-content → Edit
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -63,22 +62,46 @@ async function generateContent(
   article: { title: string; url: string; summary: string },
   runDate: string
 ): Promise<ContentItem[]> {
+  // Rotate primary hook angle by day of week — medication on even days, form analysis on odd days
+  const dayOfWeek = new Date().getDay(); // 0=Sun, 1=Mon, ...
+  const primaryHook = dayOfWeek % 2 === 0 ? 'medication' : 'form_analysis';
+
+  const hookGuidance = primaryHook === 'medication'
+    ? `PRIMARY HOOK ANGLE — MEDICATION:
+  Lead with the specific, named consequence of medications on fitness. The hook must name the medication category or effect in the first 3–5 words.
+  Strong hook examples:
+  - "My blood pressure meds were making me gain weight. Here's what I wish I knew sooner."
+  - "Metformin changed my metabolism. No one told me how to adjust my workouts."
+  - "I was exercising every day on SSRIs and getting weaker. This is why."
+  - "Beta blockers cap your heart rate. Every calorie calculator I used was wrong because of it."
+  The pain is SPECIFIC — not "medication affected my fitness" but "Metformin slowed my metabolism and I didn't know for 8 months."`
+    : `PRIMARY HOOK ANGLE — FORM ANALYSIS:
+  Lead with the specific, named consequence of bad form — injury, wasted effort, or invisible damage.
+  Strong hook examples:
+  - "I tore my rotator cuff doing lateral raises wrong. 6 months of physio could have been avoided."
+  - "My squats looked fine to me. The AI said my left knee was caving on every single rep."
+  - "I was doing planks for 2 years and building nothing. My hips were sagging 3 inches."
+  - "The gym mirror doesn't catch what a phone camera does. I had no idea my form was this bad."
+  The pain is SPECIFIC — not "bad form is dangerous" but "I was compensating with my lower back on every deadlift and didn't feel it until the injury."`;
+
   const systemPrompt = `You are a social media content writer for YFIT AI — an AI-powered fitness app for people over 40.
 
-Your writing style is:
-- FIRST-PERSON PERSONAL STORY: Always start from "I" — a real person sharing their own struggle and discovery.
-  Example opener: "I used to think crunches were the answer. Then I found out they were making things worse..."
-  NOT: "Did you know crunches aren't the best..." (that's the old style — avoid it)
-- Relatable and warm, not clinical or salesy
-- The person telling the story is a real YFIT user (over 40, health-conscious, busy life)
-- The story arc is always: struggle → discovery → transformation → YFIT as the tool that helped
-- End with a soft CTA that feels natural, not pushy
+Your writing style is PROBLEM-FIRST, not education-first:
+- Open with the SPECIFIC PROBLEM and its SPECIFIC CONSEQUENCE in the first 3–5 words — not a general statement
+- The hook must make someone stop scrolling because they recognise their own situation
+- Do NOT open with "Did you know..." or "Here's why..." or "The truth about..." — those are education hooks
+- DO open with the pain: "My medication was sabotaging my workouts." / "I tore my shoulder doing this wrong."
+- First-person always — a real YFIT user over 40 sharing what happened to them
+- Story arc: PROBLEM (specific, named) → FAILED ATTEMPTS → DISCOVERY → YFIT as the tool that fixed it
+- End with a soft verbal CTA that feels earned, not pushy
 
-YFIT AI features to weave in naturally:
-- Real-time AI form correction (watches your movement via phone camera)
-- Personalised workout plans that adapt to your health conditions and medications
-- AI nutrition scanner (point camera at food for instant macro breakdown)
-- Progress tracking with deep analytics
+${hookGuidance}
+
+YFIT AI features to weave in naturally (match to the hook angle):
+- Real-time AI form correction via phone camera — catches compensation patterns, caving knees, hip drop, shoulder imbalance
+- Medication-aware workout and calorie plans — adjusts for beta blockers, SSRIs, Metformin, statins, and 200+ others
+- AI nutrition scanner — point camera at food for instant macro breakdown adjusted to your medication profile
+- Progress tracking with deep analytics — shows what is actually working vs. what is wasted effort
 
 Platform-specific instructions are in the user prompt.`;
 
@@ -86,7 +109,7 @@ Platform-specific instructions are in the user prompt.`;
 Article summary: "${article.summary}"
 Run date: ${runDate}
 
-Write 6 platform-specific pieces of content based on this article. Each must use the PERSONAL STORY angle — write as if a real YFIT user is sharing their experience.
+Write 6 platform-specific pieces of content based on this article. Each must use the PROBLEM-FIRST angle — open with the specific pain and its consequence, then move to the discovery and solution. Write as if a real YFIT user over 40 is sharing what actually happened to them.
 
 Return a JSON object with a "content_items" array. Each item must have:
 - platform (string): one of tiktok, instagram, youtube, linkedin, pinterest, facebook
@@ -98,17 +121,19 @@ Return a JSON object with a "content_items" array. Each item must have:
 Platform-specific caption requirements:
 
 TIKTOK caption (max 150 chars):
-- Hook in first 5 words — must stop the scroll
-- First-person, punchy, conversational
+- PROBLEM in first 3 words — name the specific pain or consequence immediately
+- First-person, punchy, no warm-up
 - End mid-thought to create curiosity (no CTA — pipeline adds it)
-- Example: "I did crunches every day for 3 months and my muffin top got WORSE. Here's what actually worked 👇"
+- STRONG examples: "My meds were making me gain weight and I had no idea for 8 months 👇" / "I tore my shoulder doing this wrong. Here's what the AI caught that I missed 👇"
+- WEAK examples to AVOID: "I used to think..." / "Here's what I learned..." / "Did you know..."
 
 INSTAGRAM caption (max 300 chars):
-- Personal story hook, then 2-3 lines of value
-- Use line breaks for readability
-- 1-2 relevant emojis
+- PROBLEM in first line — specific and named, not vague
+- Second line: the failed attempt or the thing that made it worse
+- Third line: the discovery or turning point
+- Use line breaks for readability, 1-2 emojis
 - No CTA (pipeline adds "link in bio")
-- Example: "Three months of crunches. Zero results.\n\nTurns out I was targeting the wrong muscles the whole time.\n\nHere are the 5 moves that finally worked for me 👇"
+- STRONG example: "My beta blocker was capping my heart rate at 120bpm.\n\nEvery calorie calculator I used was built for a healthy heart — not mine.\n\nThis is what I changed when I found out 👇"
 
 YOUTUBE description (150-300 chars):
 - SEO-friendly title hook
@@ -135,12 +160,16 @@ FACEBOOK caption (max 200 chars):
 - Warm and inviting, like a post from a friend
 - No URL (pipeline adds it in a comment)
 
-VOICEOVER SCRIPT (same for all platforms — use the Instagram story as base):
-- 60-90 seconds when spoken at normal pace (~150-200 words)
-- First-person story arc: struggle → discovery → YFIT solution
-- Natural, conversational speech (not formal)
-- Mention YFIT AI once, naturally
-- End with a soft spoken CTA: "Try YFIT AI free — link in bio or find us at why-fit-a-i dot com"
+VOICEOVER SCRIPT (same for all platforms):
+- 45-60 seconds when spoken at normal pace (~120-150 words) — shorter holds attention better
+- OPEN with the specific problem and consequence — first sentence must name the pain (medication effect OR form injury)
+- Second beat: the failed attempt — what they tried that didn't work
+- Third beat: the discovery — what YFIT showed them that they couldn't see before
+- Fourth beat: the result — specific and measurable if possible
+- Natural, conversational speech — write how a real person talks, not how they write
+- Mention YFIT AI once by name, naturally woven in
+- End with a clear verbal CTA: "If this sounds familiar, try YFIT AI free — it's at why-fit-a-i dot com, or just tap the link in my bio"
+- Do NOT end with "I hope this helps" or "let me know in the comments" — end on the CTA
 
 Return ONLY valid JSON, no markdown fences.`;
 
