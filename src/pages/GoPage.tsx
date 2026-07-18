@@ -150,6 +150,20 @@ export default function GoPage() {
           <p className="text-xs text-gray-400 mt-3">
             {t("go.ctaNote", "Free plan available · Cancel anytime · Available in 8 languages")}
           </p>
+          <a
+            href="https://yfitai.com/#features"
+            className="inline-flex items-center gap-1.5 mt-4 text-sm text-teal-600 font-medium hover:text-teal-800 transition-colors"
+            onClick={() => {
+              if (typeof window !== "undefined" && (window as any).umami) {
+                (window as any).umami.track("go_page_features_click", {
+                  source: new URLSearchParams(window.location.search).get("utm_source") || "direct",
+                });
+              }
+            }}
+          >
+            {t("go.viewFeatures", "View app features")}
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
 
         {/* ── Social proof strip ── */}
