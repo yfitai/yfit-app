@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { FitnessMockup } from './AppTourMockups'
 import { demoFormAnalysis } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -22,6 +23,14 @@ function ScoreRing({ score, size = 80 }) {
   const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444'
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <FitnessMockup />
+        </div>
+      </div>
+
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#f3f4f6" strokeWidth="8" />
         <circle

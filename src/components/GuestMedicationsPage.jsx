@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { MedicationsMockup } from './AppTourMockups'
 import { demoMedications } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -19,6 +20,14 @@ function MedCard({ med, onAdd }) {
   const [expanded, setExpanded] = useState(false)
   return (
     <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <MedicationsMockup />
+        </div>
+      </div>
+
       <div
         className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-all"
         onClick={() => setExpanded(e => !e)}

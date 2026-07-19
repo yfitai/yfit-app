@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { NutritionMockup } from './AppTourMockups'
 import { demoNutrition, demoProfile } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -20,6 +21,14 @@ function MacroBar({ label, current, target, color }) {
   const pct = Math.min(100, Math.round((current / target) * 100))
   return (
     <div>
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <NutritionMockup />
+        </div>
+      </div>
+
       <div className="flex justify-between text-xs text-gray-600 mb-1">
         <span className="font-medium">{label}</span>
         <span>{current}g / {target}g</span>

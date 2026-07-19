@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { PredictionsMockup } from './AppTourMockups'
 import { demoPredictions, demoProfile } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -53,6 +54,14 @@ export default function GuestPredictionsPage({ onSignUp }) {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5 pb-24">
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <PredictionsMockup />
+        </div>
+      </div>
+
 
       {/* Header */}
       <div className="flex items-center justify-between">

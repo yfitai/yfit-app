@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { DailyTrackerMockup } from './AppTourMockups'
 import { demoDailyTracker } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -30,6 +31,14 @@ function RingProgress({ value, max, color, size = 80, strokeWidth = 8 }) {
 function EmojiRater({ label, value, emoji, onRate }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-3">
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <DailyTrackerMockup />
+        </div>
+      </div>
+
       <p className="text-xs font-bold text-gray-600 mb-2">{label}</p>
       <div className="flex gap-1.5 justify-between">
         {[1, 2, 3, 4, 5].map(n => (

@@ -6,6 +6,7 @@
  * so visitors see exactly what a real account looks like.
  */
 import { demoDashboard, demoProfile } from '../data/demoData'
+import { DashboardMockup } from './AppTourMockups'
 
 export default function GuestDashboard({ onSignUp }) {
   const d = demoDashboard
@@ -15,6 +16,14 @@ export default function GuestDashboard({ onSignUp }) {
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px 16px' }}>
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <DashboardMockup />
+        </div>
+      </div>
+
 
       {/* Welcome strip */}
       <div style={{ marginBottom: '24px' }}>

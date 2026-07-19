@@ -6,6 +6,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
+import { AICoachMockup } from './AppTourMockups'
 import { demoAICoach } from '../data/demoData'
 import { setGuestTrigger } from '../lib/guestSession'
 
@@ -14,6 +15,14 @@ function ChatBubble({ message }) {
   const time = new Date(message.timestamp).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })
   return (
     <div className={`flex gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+      {/* Phone mockup — matches marketing site */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px', background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)' }}>
+        <div style={{ maxWidth: '220px', width: '100%' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>📱 App Preview</p>
+          <AICoachMockup />
+        </div>
+      </div>
+
       {/* Avatar */}
       <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold ${
         isUser ? 'bg-blue-600 text-white' : 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white'
