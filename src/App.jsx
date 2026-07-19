@@ -13,6 +13,14 @@ import { initGuestSession, isGuestSession, clearGuestSession } from './lib/guest
 import GuestBanner from './components/GuestBanner'
 import GuestSignUpModal from './components/GuestSignUpModal'
 import GuestDashboard from './components/GuestDashboard'
+import GuestNutritionPage from './components/GuestNutritionPage'
+import GuestFitnessPage from './components/GuestFitnessPage'
+import GuestMedicationsPage from './components/GuestMedicationsPage'
+import GuestDailyTrackerPage from './components/GuestDailyTrackerPage'
+import GuestProgressPage from './components/GuestProgressPage'
+import GuestAICoachPage from './components/GuestAICoachPage'
+import GuestPredictionsPage from './components/GuestPredictionsPage'
+import GuestFormAnalysisPage from './components/GuestFormAnalysisPage'
 
 // GDPR/PIPEDA: inject Umami analytics only if user previously accepted cookies
 initAnalyticsFromConsent()
@@ -107,9 +115,22 @@ function GuestAppShell({ onSignUp, onLogin }) {
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Guest dashboard — pre-populated demo data */}
-          <Route path="/dashboard" element={<GuestDashboard onSignUp={() => openModal('default')} />} />
-          {/* All other app paths redirect to guest dashboard for now */}
+          {/* Guest pages — all pre-populated with interactive demo data */}
+          <Route path="/dashboard" element={<GuestDashboard onSignUp={(t) => openModal(t || 'default')} />} />
+          <Route path="/nutrition" element={<GuestNutritionPage onSignUp={(t) => openModal(t || 'log_nutrition')} />} />
+          <Route path="/fitness" element={<GuestFitnessPage onSignUp={(t) => openModal(t || 'log_workout')} />} />
+          <Route path="/medications" element={<GuestMedicationsPage onSignUp={(t) => openModal(t || 'medication_tracking')} />} />
+          <Route path="/daily-tracker" element={<GuestDailyTrackerPage onSignUp={(t) => openModal(t || 'track_daily')} />} />
+          <Route path="/progress" element={<GuestProgressPage onSignUp={(t) => openModal(t || 'log_progress')} />} />
+          <Route path="/ai-coach-faq" element={<GuestAICoachPage onSignUp={(t) => openModal(t || 'ai_coach')} />} />
+          <Route path="/predictions" element={<GuestPredictionsPage onSignUp={(t) => openModal(t || 'view_predictions')} />} />
+          <Route path="/fitness/form-analysis/:slug" element={<GuestFormAnalysisPage onSignUp={(t) => openModal(t || 'form_analysis')} />} />
+          <Route path="/fitness/form-analysis" element={<GuestFormAnalysisPage onSignUp={(t) => openModal(t || 'form_analysis')} />} />
+          {/* Goals, body recomp, subscription — redirect to dashboard (not part of demo) */}
+          <Route path="/goals" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/body-recomp" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/subscription" element={<Navigate to="/dashboard" replace />} />
+          {/* Fallback: redirect unknown paths to guest dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>
