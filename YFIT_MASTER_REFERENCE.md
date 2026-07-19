@@ -1,6 +1,6 @@
 # YFIT Master Project Reference
 
-**Last Updated:** May 16, 2026
+**Last Updated:** July 19, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
@@ -252,6 +252,47 @@ When starting a new session, always:
 
 ## 📝 Session Change Log
 
+### July 19, 2026
+
+**Supabase Storage Overage — Root Cause Fixed:**
+- Problem: Supabase storage at 164% (1.639 GB vs 1 GB free tier limit). Grace period until Aug 7, 2026.
+- Root cause: n8n `YFIT Daily Video Storage Cleanup` workflow (ID: `iS3cHV7jGazlktNy`) had been failing every day at 3:30 AM UTC because the Supabase credential was missing from n8n entirely.
+- Secondary bug: The `List Videos in Bucket` node was using GET — Supabase Storage requires POST to list objects. This caused a "Bad request" error even after the credential was added.
+- Fixes applied:
+  1. Created new `Supabase API` Header Auth credential in n8n with the project service role key (header name: `apikey`).
+  2. Updated `List Videos in Bucket` node from GET → POST with correct JSON body `{"prefix": "", "limit": 1000}`.
+  3. Manually deleted 47 files older than 7 days (~308 MB) via Python script to bring active storage down immediately.
+  4. Tested workflow manually — ran successfully, returned "No files older than 14 days found" (correct, since old files were just deleted).
+- Active file count after cleanup: ~34 files (~198 MB). Storage meter may show elevated for up to 24h while Supabase garbage-collects.
+- **Verify tomorrow:** Check Supabase usage at https://supabase.com/dashboard/org/meolkwuopgeironzqodt/usage to confirm storage dropped below 1 GB.
+
+**Supabase Service Role Key (stored in n8n):**
+- Key starts with: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2d4cG94Z3F1Ym9qdnVtamx0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ...`
+- If n8n credential is lost again, retrieve from: Supabase Dashboard → Project Settings → API Keys → service_role
+
+**Google OAuth — Verified Working:**
+- Tested `Continue with Google` button on https://yfit-deploy.vercel.app — redirects correctly to Google OAuth, callback goes to `mxggxpoxgqubojvumjlt.supabase.co/auth/v1/callback`. Flow is functional.
+- **Verify tomorrow:** Complete a full sign-in with a real Google account to confirm the callback completes and user lands in the app.
+
+**Google Cloud Console OAuth Branding — Updated:**
+- App name changed from "ROGA Drone application" → **"YFIT AI"**
+- Logo uploaded (YFIT blue logo, 119 KB PNG, 512×341px)
+- Application home page: `https://yfitai.com`
+- Application privacy policy: `https://yfitai.com/privacy`
+- Application terms of service: `https://yfitai.com/terms`
+- Authorized domain 2 changed from `rogadrone.com` → `yfitai.com`
+- User support email: `don@rogadrone.com` (only Google-account-linked emails available in dropdown — `support@yfitai.com` requires Google Workspace setup to appear)
+- Developer contact email: updated from `rogadroneemployee@gmail.com`
+- Verification status: branding changes pending re-verification by Google. OAuth login continues to work during review.
+- Google Cloud project name still shows "ROGA Drone application" in the top bar — this is the project name, not the OAuth app name, and does NOT affect users.
+
+**Supabase Google OAuth Provider — Configured:**
+- Google provider enabled in Supabase Auth → Providers → Google
+- Client ID: `668225302369-sui51m1bkbo706pku73sfjv1ais9srul.apps.googleusercontent.com`
+- Callback URL confirmed: `https://mxggxpoxgqubojvumjlt.supabase.co/auth/v1/callback`
+- Skip nonce check: OFF (correct for web apps)
+- Allow users without email: OFF (correct)
+
 ### May 18, 2026
 
 **Social Media Pipeline — v3.7.0 (6 Platform CTAs + First Comment + Personal Story):**
@@ -310,6 +351,9 @@ When starting a new session, always:
 | Multilingual social media captions | Pending decision | Plan documented above |
 | `yfit-deploy.vercel.app` still active | Intentional | Live update bundles served from here |
 | USDA rate limiting from Vercel shared IPs | Mitigated | Dedicated API key added + retry logic |
+| **Supabase storage overage (1.639 GB / 1 GB)** | ⚠️ Partially resolved | n8n cleanup workflow fixed July 19, 2026. Verify storage dropped below 1 GB on July 20. Grace period until Aug 7, 2026. |
+| **Google OAuth branding re-verification** | ⏳ Pending | Updated app name/logo/domains on July 19, 2026. Google review in progress. Login still works. |
+| **Full Google sign-in flow end-to-end test** | ⏳ Verify July 20 | Test complete sign-in with real Google account to confirm callback + user creation works |
 
 ---
 
