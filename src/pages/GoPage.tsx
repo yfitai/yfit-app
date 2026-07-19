@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const SIGNUP_URL = "https://app.yfitai.com/signup";
+const DEMO_URL = "https://app.yfitai.com/go?mode=guest";
 const MARKETING_URL = "https://yfitai.com";
 
 // Preserve UTM params when redirecting to signup
@@ -275,6 +276,19 @@ function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label
         >
           Full Marketing Site
           <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      {/* Explore without signing up */}
+      <div className="mt-4">
+        <a
+          href={DEMO_URL}
+          onClick={() => track(`go_cta_demo_${label}`)}
+          className="inline-flex items-center gap-2 text-sm text-teal-700 font-semibold hover:underline"
+        >
+          <span>👀</span>
+          <span>Explore the app first — no sign-up needed</span>
+          <span aria-hidden="true">→</span>
         </a>
       </div>
 

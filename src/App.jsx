@@ -1,5 +1,5 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { supabase, getCurrentUser } from './lib/supabase'
 import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
@@ -7,6 +7,12 @@ import { LiveUpdateService } from './services/liveUpdate'
 import { setAnalyticsUser, Analytics } from './lib/analytics'
 import { initAnalyticsFromConsent } from './components/CookieConsent'
 import './App.css'
+
+// Guest mode utilities
+import { initGuestSession, isGuestSession, clearGuestSession } from './lib/guestSession'
+import GuestBanner from './components/GuestBanner'
+import GuestSignUpModal from './components/GuestSignUpModal'
+import GuestDashboard from './components/GuestDashboard'
 
 // GDPR/PIPEDA: inject Umami analytics only if user previously accepted cookies
 initAnalyticsFromConsent()
@@ -60,12 +66,95 @@ function PageLoader() {
   )
 }
 
+// ─── Guest App Shell ─────────────────────────────────────────────────────────
+// Shown when visitor arrives via /go?mode=guest or /demo.
+// Renders the full navigation + demo data pages inside the real app shell.
+function GuestAppShell({ onSignUp, onLogin }) {
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalTrigger, setModalTrigger] = useState('default')
+
+  const openModal = useCallback((trigger = 'default') => {
+    setModalTrigger(trigger)
+    setModalOpen(true)
+  }, [])
+
+  const handleSignUp = () => {
+    setModalOpen(false)
+    clearGuestSession()
+    onSignUp()
+  }
+
+  const handleLogin = () => {
+    setModalOpen(false)
+    clearGuestSession()
+    onLogin()
+  }
+
+  // Synthetic guest user for Navigation
+  const guestUser = {
+    id: 'guest',
+    email: 'guest@demo.yfitai.com',
+    user_metadata: { full_name: 'Alex (Demo)' },
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      {/* Sticky guest banner — always visible */}
+      <GuestBanner onSignUp={() => openModal('default')} />
+
+      {/* Real navigation bar — guest sees the same nav as real users */}
+      <Navigation user={guestUser} isGuest />
+
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Guest dashboard — pre-populated demo data */}
+          <Route path="/dashboard" element={<GuestDashboard onSignUp={() => openModal('default')} />} />
+          {/* All other app paths redirect to guest dashboard for now */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
+
+      <Footer />
+
+      {/* Contextual sign-up modal */}
+      <GuestSignUpModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSignUp={handleSignUp}
+        onLogin={handleLogin}
+        trigger={modalTrigger}
+      />
+    </div>
+  )
+}
+
+// ─── Guest Mode Entry Handler ─────────────────────────────────────────────────
+// Detects ?mode=guest in the URL and initialises the guest session.
+// Wrapped inside BrowserRouter so it can use useLocation.
+function GuestModeDetector({ onGuestDetected }) {
+  const location = useLocation()
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('mode') === 'guest' || location.pathname === '/demo') {
+      if (!isGuestSession()) {
+        initGuestSession()
+      }
+      onGuestDetected()
+    }
+  }, [location, onGuestDetected])
+
+  return null
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
 function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsOnboarding, setNeedsOnboarding] = useState(false)
   const [isNewUser, setIsNewUser] = useState(false)
   const [showInstallGuide, setShowInstallGuide] = useState(false)
+  const [isGuestMode, setIsGuestMode] = useState(() => isGuestSession())
 
   useEffect(() => {
     // Initialize LiveUpdate service for OTA updates (non-blocking)
@@ -172,8 +261,14 @@ function App() {
   }
 
   const handleAuthSuccess = (authenticatedUser) => {
+    clearGuestSession()
+    setIsGuestMode(false)
     setUser(authenticatedUser)
   }
+
+  const handleGuestDetected = useCallback(() => {
+    setIsGuestMode(true)
+  }, [])
 
   if (loading) {
     return (
@@ -191,12 +286,21 @@ function App() {
   return (
     <ErrorBoundary userId={user?.id}>
       <BrowserRouter>
+        {/* Detects ?mode=guest in URL and activates guest mode */}
+        <GuestModeDetector onGuestDetected={handleGuestDetected} />
+
         {needsOnboarding && user ? (
           // New user onboarding — full-screen wizard, no nav
           <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
         ) : showInstallGuide && user ? (
           // Install guide — shown once after onboarding, before dashboard
           <InstallGuide user={user} onComplete={handleInstallGuideComplete} />
+        ) : isGuestMode && !user ? (
+          // Guest/demo mode — full app shell with demo data, no Supabase calls
+          <GuestAppShell
+            onSignUp={() => { window.location.href = '/signup' }}
+            onLogin={() => { window.location.href = '/login' }}
+          />
         ) : !user ? (
           // Logged-out: show public routes only
           <Suspense fallback={<PageLoader />}>
@@ -204,6 +308,8 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               {/* /go = social media link-in-bio — stripped-down problem-first page, never redirects */}
               <Route path="/go" element={<GoPage />} />
+              {/* /demo = direct entry to guest mode */}
+              <Route path="/demo" element={<Navigate to="/go?mode=guest" replace />} />
               <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/reset-password" element={<ResetPassword />} />
