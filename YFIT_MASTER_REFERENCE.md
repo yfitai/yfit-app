@@ -1,6 +1,6 @@
 # YFIT Master Project Reference
 
-**Last Updated:** July 19, 2026
+**Last Updated:** July 27–28, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
@@ -252,6 +252,57 @@ When starting a new session, always:
 
 ## 📝 Session Change Log
 
+### July 27–28, 2026
+
+**Supabase Storage Cleanup — Fully Automated (Replaces n8n):**
+
+**Emergency Manual Cleanup:**
+- Deleted 158 files (~271 MB) from `yfit-videos` and `yfit-voiceovers` buckets via Python script
+- Script: `/tmp/cleanup_both_buckets.py` (for reference only — not needed going forward)
+- Actual live storage after cleanup: ~88 MB. Billing meter may show elevated for 24-48h while Supabase garbage-collects soft-deleted objects.
+
+**New Supabase Edge Function `storage-cleanup` (replaces n8n):**
+- Deployed to Supabase project `mxggxpoxgqubojvumjlt` via Supabase CLI v2.110.0
+- Source: `/home/ubuntu/yfit-supabase/supabase/functions/storage-cleanup/index.ts`
+- Also saved to this repo at `supabase/functions/storage-cleanup/index.ts`
+- Function URL: `https://mxggxpoxgqubojvumjlt.supabase.co/functions/v1/storage-cleanup`
+- Cleans both `yfit-videos` and `yfit-voiceovers` buckets of files older than **7 days**
+- Handles subdirectory prefixes: `videos/`, `captions/`, `thumbnails/`, and root
+- Paginated (100 files per batch) — handles large buckets safely
+- Live test result: deleted 3 files (2 from yfit-videos, 1 from yfit-voiceovers), no errors
+
+**pg_cron Schedule:**
+- Job name: `yfit-storage-cleanup`
+- Schedule: `0 3 * * *` (3:00 AM UTC daily)
+- Job ID: 41, Status: active
+- Created via Supabase Management API using PAT (see Supabase Dashboard → Account → Access Tokens)
+- Script used: `/tmp/create_cron_job.py`
+- The cron job calls the Edge Function via `net.http_post()` with the service role key in the Authorization header
+
+**n8n Workflow — Deprecated:**
+- The `YFIT Daily Video Storage Cleanup` n8n workflow is now superseded by the Edge Function
+- Root causes identified (documented July 19): missing Supabase credential + GET instead of POST on List node
+- These were fixed but n8n is no longer the cleanup mechanism — do NOT attempt to re-fix or re-enable it
+- n8n URL: https://n8n-railway-production-fbfd.up.railway.app (can be disabled/deleted)
+
+**Supabase CLI — Installed:**
+- Version: v2.110.0 at `/usr/local/bin/supabase`
+- Project linked at `/home/ubuntu/yfit-supabase/` (project ref: `mxggxpoxgqubojvumjlt`)
+- PAT for CLI: stored in Supabase Dashboard → Account → Access Tokens (token name: "yfit-cli")
+- To redeploy the Edge Function: `cd /home/ubuntu/yfit-supabase && supabase functions deploy storage-cleanup`
+
+**Google OAuth Consent Screen — Completed (July 27):**
+- App name: **YFIT AI** (changed from "ROGA Drone application")
+- Logo: YFIT blue logo uploaded (119 KB PNG, compressed from original)
+- Authorized domains: `yfitai.com` (replaced `rogadrone.com`)
+- Application home page: `https://yfitai.com`
+- Application privacy policy: `https://yfitai.com/privacy`
+- Application terms of service: `https://yfitai.com/terms`
+- Google OAuth Client ID: `668225302369-sui51m1bkbo706pku73sfjv1ais9srul.apps.googleusercontent.com`
+- Verification status: branding changes pending re-verification by Google. OAuth login continues to work during review.
+
+---
+
 ### July 19, 2026
 
 **Supabase Storage Overage — Root Cause Fixed:**
@@ -351,9 +402,10 @@ When starting a new session, always:
 | Multilingual social media captions | Pending decision | Plan documented above |
 | `yfit-deploy.vercel.app` still active | Intentional | Live update bundles served from here |
 | USDA rate limiting from Vercel shared IPs | Mitigated | Dedicated API key added + retry logic |
-| **Supabase storage overage (1.639 GB / 1 GB)** | ⚠️ Partially resolved | n8n cleanup workflow fixed July 19, 2026. Verify storage dropped below 1 GB on July 20. Grace period until Aug 7, 2026. |
+| **Supabase storage overage** | ✅ Resolved | Emergency cleanup (158 files / 271 MB deleted July 27). Edge Function + pg_cron now auto-cleans daily at 3 AM UTC. Actual live files ~88 MB. Billing meter may show elevated for 24-48h. Grace period until Aug 7, 2026. |
 | **Google OAuth branding re-verification** | ⏳ Pending | Updated app name/logo/domains on July 19, 2026. Google review in progress. Login still works. |
-| **Full Google sign-in flow end-to-end test** | ⏳ Verify July 20 | Test complete sign-in with real Google account to confirm callback + user creation works |
+| **Full Google sign-in flow end-to-end test** | ⏳ Verify | Test complete sign-in with real Google account to confirm callback + user creation works |
+| **n8n storage cleanup workflow** | ✅ Deprecated | Replaced by Supabase Edge Function `storage-cleanup` (July 27, 2026). n8n workflow at https://n8n-railway-production-fbfd.up.railway.app can be disabled. |
 
 ---
 
