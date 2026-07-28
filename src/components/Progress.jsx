@@ -571,14 +571,15 @@ export default function Progress({ user: propUser }) {
           {stepsData.length > 0 && (
             <ChartCard title={t('dailyTracker.steps')} icon={<Zap className="w-5 h-5 text-purple-500" />}>
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={stepsData}>
+                <LineChart data={stepsData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip formatter={(value) => [value.toLocaleString(), 'Steps']} />
                   <Legend />
-                  <Bar dataKey="steps" fill="#9333ea" name="Steps" radius={[4, 4, 0, 0]} />
-                </BarChart>
+                  <Line type="monotone" dataKey="steps" stroke="#9333ea" strokeWidth={2}
+                    name="Steps" dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
               </ResponsiveContainer>
             </ChartCard>
           )}
