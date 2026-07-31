@@ -310,6 +310,44 @@ When starting a new session, always:
 
 ---
 
+### July 31, 2026
+
+**Steps Chart — Fixed (Build 104):**
+- Changed steps chart in Progress page from `BarChart` to `LineChart` matching all other progress charts
+- Same style: `type="monotone"`, `strokeWidth={2}`, `dot={{ r: 4 }}`, `activeDot={{ r: 6 }}`, purple `#9333ea`
+- File: `src/components/Progress.jsx`
+- Committed: `b87e087`
+
+**Go Page — Improvements (Build 105):**
+- "Explore the app first — no sign-up needed" promoted to large primary teal button at top of CTA section
+- Added interactive "See it in action" feature preview tabs (Dashboard, Nutrition, Workout, Meds, Progress)
+- Each tab shows a live mock of the screen with a "Try this feature live" link
+- File: `src/pages/GoPage.tsx`
+- Committed: `cd51cc9`
+
+**Weekly Analytics Reports — Fixed (yfit-admin):**
+- Removed broken "Website Analytics — yfitai.com" section (always showed 0 — Umami IP restriction blocks server-side API calls)
+- Executive Summary now shows: Total Engagement, Total Followers, Profile Views instead of website metrics
+- AI analysis prompt updated to focus purely on social media performance
+- Files: `server/reportGenerator.ts`, `server/analyticsRouter.ts`
+- Committed to yfit-admin: `118aff4`
+- Decision: Will add GA4 when traffic campaigns begin. No point tracking zero visits.
+
+**CRITICAL: Repo Confusion — Permanent Fix Applied:**
+- Root cause: `/home/ubuntu/yfit-marketing` local folder is actually `yfitai/yfit-admin` repo — misleading name
+- Session Start Checklist (Rules) updated with explicit repo-to-folder mapping and MONOPRO note
+- Committed: `5061d20`
+- See Rules section above for the full clarification
+
+**Permanent Fix Proposal — Sandbox Loss Problem:**
+- The sandbox resets between Manus sessions, losing all local files not in GitHub
+- Current mitigation: everything important is in GitHub repos (`yfit-app`, `yfit-admin`)
+- Remaining risk: any files created locally but not committed are lost on sandbox reset
+- **Action required:** At end of every session, confirm `git status` is clean in both repos before closing
+- **Future improvement to consider:** Create a `setup-sandbox.sh` script in `yfit-app` that clones all 4 repos, installs deps, and restores the full working environment in one command — so any new sandbox can be restored in under 5 minutes
+
+---
+
 ### July 19, 2026
 
 **Supabase Storage Overage — Root Cause Fixed:**
