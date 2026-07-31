@@ -237,16 +237,23 @@ User is considering adding multilingual captions to social posts. Plan discussed
 
 ---
 
-## 📋 Session Start Checklist
+## 📋 Session Start Checklist (RULES — READ EVERY SESSION)
 
 When starting a new session, always:
 
-1. **Read this file first** before making any changes
-2. **Check which repo** you are working in — yfit-app vs yfit-marketing are completely separate
+1. **Read this file first** before making any changes — do NOT skip this step
+2. **Check which repo you are working in** — there are 4 repos and they are COMPLETELY SEPARATE. Never mix them up:
+   - `/home/ubuntu/yfit-app-full` → `yfitai/yfit-app` → deploys to `app.yfitai.com` (main app)
+   - `/home/ubuntu/yfit-marketing` → **THIS IS ACTUALLY `yfitai/yfit-admin`** (accounting, analytics, weekly reports) — the local folder name is WRONG/MISLEADING
+   - `yfitai/yfit-marketing` → `www.yfitai.com` marketing site — NOT cloned locally, managed via Manus UI
+   - `yfitai/yfitai-yfit-video-service` → Railway video service — NOT cloned locally
+   - **NEVER save Manus webdev checkpoints for `yfit-admin` work** — it is a separate GitHub repo, not a Manus project
 3. **Check the current bundle build number** before creating a new bundle: `cat public/updates/bundle.json`
 4. **Do not add `outputDirectory` to vercel.json** — this was the root cause of the food search outage
 5. **Test food search** at `https://app.yfitai.com/api/food/search?query=apple` before and after any API changes
 6. **For translation fixes** — always check which language section the string is in before editing `i18nResources.js`
+
+> **MONOPRO STRUCTURE:** All main app work happens in `/home/ubuntu/yfit-app-full` (the `yfitai/yfit-app` monorepo). This is the single source of truth for the app. Admin/analytics work happens in `/home/ubuntu/yfit-marketing` (confusingly named — it is actually `yfitai/yfit-admin`). When in doubt, check `git remote -v` to confirm which GitHub repo you are in.
 
 ---
 
