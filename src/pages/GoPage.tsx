@@ -196,6 +196,244 @@ const FEATURES = [
   },
 ];
 
+// ─── App Preview Tabs ────────────────────────────────────────────────────────
+
+const APP_PREVIEWS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    emoji: "🏠",
+    color: "bg-teal-500",
+    activeColor: "bg-teal-500 text-white",
+    description: "Your daily command centre — calories, macros, workouts, steps, water and mood all in one glance.",
+    mockContent: (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-gray-500">Today's Calories</p>
+            <p className="text-2xl font-bold text-gray-900">1,420 <span className="text-sm font-normal text-gray-500">/ 2,100</span></p>
+          </div>
+          <div className="w-16 h-16 rounded-full border-4 border-teal-500 flex items-center justify-center">
+            <span className="text-sm font-bold text-teal-600">68%</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[{label:"Protein",val:"112g",color:"bg-blue-100 text-blue-700"},{label:"Carbs",val:"180g",color:"bg-amber-100 text-amber-700"},{label:"Fat",val:"48g",color:"bg-rose-100 text-rose-700"}].map((m,i)=>(
+            <div key={i} className={`rounded-xl p-2 text-center ${m.color}`}>
+              <p className="text-xs font-medium">{m.label}</p>
+              <p className="text-base font-bold">{m.val}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl bg-gray-50 p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">💧</span>
+            <div>
+              <p className="text-xs text-gray-500">Water</p>
+              <p className="text-sm font-bold text-gray-800">6 / 8 glasses</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">👟</span>
+            <div>
+              <p className="text-xs text-gray-500">Steps</p>
+              <p className="text-sm font-bold text-gray-800">7,240</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">😊</span>
+            <div>
+              <p className="text-xs text-gray-500">Mood</p>
+              <p className="text-sm font-bold text-gray-800">Good</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "nutrition",
+    label: "Nutrition",
+    emoji: "🥗",
+    color: "bg-lime-500",
+    activeColor: "bg-lime-500 text-white",
+    description: "Scan any barcode to log food instantly. Your calorie target is calculated from your personal TDEE — not a generic number.",
+    mockContent: (
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 rounded-xl bg-lime-50 border border-lime-200 p-3">
+          <span className="text-2xl">📷</span>
+          <div>
+            <p className="text-sm font-bold text-gray-900">Barcode Scanner</p>
+            <p className="text-xs text-gray-500">Point at any food package to log instantly</p>
+          </div>
+        </div>
+        {[
+          {name:"Greek Yogurt",cal:130,protein:"17g",carbs:"9g",fat:"0g",time:"8:30 AM"},
+          {name:"Chicken Breast",cal:280,protein:"52g",carbs:"0g",fat:"6g",time:"12:15 PM"},
+          {name:"Brown Rice",cal:215,protein:"5g",carbs:"45g",fat:"2g",time:"12:15 PM"},
+        ].map((food,i)=>(
+          <div key={i} className="flex items-center justify-between rounded-xl bg-white border border-gray-100 p-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{food.name}</p>
+              <p className="text-xs text-gray-400">{food.time} · P:{food.protein} C:{food.carbs} F:{food.fat}</p>
+            </div>
+            <p className="text-sm font-bold text-gray-700">{food.cal} kcal</p>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "workout",
+    label: "Workout",
+    emoji: "🏋️",
+    color: "bg-orange-500",
+    activeColor: "bg-orange-500 text-white",
+    description: "Log every set and rep with progressive overload tracking. Choose from push/pull/legs or upper/lower splits.",
+    mockContent: (
+      <div className="space-y-3">
+        <div className="rounded-xl bg-orange-50 border border-orange-200 p-3">
+          <p className="text-xs font-bold text-orange-700 uppercase tracking-wide">Today — Push Day A</p>
+          <p className="text-sm text-gray-600 mt-0.5">Chest · Shoulders · Triceps</p>
+        </div>
+        {[
+          {name:"Bench Press",sets:"4 × 8",weight:"80 kg",pr:true},
+          {name:"Incline DB Press",sets:"3 × 10",weight:"28 kg",pr:false},
+          {name:"Lateral Raises",sets:"3 × 15",weight:"12 kg",pr:false},
+          {name:"Tricep Pushdown",sets:"3 × 12",weight:"35 kg",pr:false},
+        ].map((ex,i)=>(
+          <div key={i} className="flex items-center justify-between rounded-xl bg-white border border-gray-100 p-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-gray-900">{ex.name}</p>
+                {ex.pr && <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">PR 🏆</span>}
+              </div>
+              <p className="text-xs text-gray-400">{ex.sets}</p>
+            </div>
+            <p className="text-sm font-bold text-gray-700">{ex.weight}</p>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "medications",
+    label: "Meds",
+    emoji: "💊",
+    color: "bg-pink-500",
+    activeColor: "bg-pink-500 text-white",
+    description: "The only fitness app that tracks your medications, flags dangerous workout interactions, and generates a PDF report for your doctor.",
+    mockContent: (
+      <div className="space-y-3">
+        <div className="rounded-xl bg-rose-50 border border-rose-200 p-3 flex items-start gap-3">
+          <span className="text-xl">⚠️</span>
+          <div>
+            <p className="text-sm font-bold text-rose-800">Interaction Alert</p>
+            <p className="text-xs text-rose-600 mt-0.5">Metformin + high-intensity cardio may cause hypoglycaemia. Consider a light snack before training.</p>
+          </div>
+        </div>
+        {[
+          {name:"Metformin",dose:"500mg",time:"Morning",taken:true},
+          {name:"Vitamin D3",dose:"2000 IU",time:"Morning",taken:true},
+          {name:"Omega-3",dose:"1000mg",time:"Evening",taken:false},
+        ].map((med,i)=>(
+          <div key={i} className="flex items-center justify-between rounded-xl bg-white border border-gray-100 p-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{med.name}</p>
+              <p className="text-xs text-gray-400">{med.dose} · {med.time}</p>
+            </div>
+            <span className={`text-xs font-bold px-2 py-1 rounded-full ${med.taken ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+              {med.taken ? "✓ Taken" : "Pending"}
+            </span>
+          </div>
+        ))}
+        <button className="w-full py-2.5 rounded-xl bg-rose-600 text-white text-sm font-bold flex items-center justify-center gap-2">
+          <span>📋</span> Generate Doctor's PDF Report
+        </button>
+      </div>
+    ),
+  },
+  {
+    id: "progress",
+    label: "Progress",
+    emoji: "📈",
+    color: "bg-violet-500",
+    activeColor: "bg-violet-500 text-white",
+    description: "See your transformation with body measurement charts, progress photos, and AI predictions for your goal date.",
+    mockContent: (
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            {label:"Current Weight",val:"82.4 kg",change:"-1.2 kg",positive:true},
+            {label:"Body Fat",val:"18.2%",change:"-0.8%",positive:true},
+            {label:"Muscle Mass",val:"63.1 kg",change:"+0.4 kg",positive:true},
+            {label:"Goal Weight",val:"78 kg",change:"Est. 9 weeks",positive:true},
+          ].map((s,i)=>(
+            <div key={i} className="rounded-xl bg-violet-50 border border-violet-100 p-3">
+              <p className="text-xs text-gray-500">{s.label}</p>
+              <p className="text-base font-bold text-gray-900">{s.val}</p>
+              <p className="text-xs text-emerald-600 font-semibold">{s.change}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl bg-white border border-gray-100 p-3">
+          <p className="text-xs font-bold text-gray-500 mb-2">WEIGHT TREND (last 4 weeks)</p>
+          <div className="flex items-end gap-1 h-12">
+            {[85.1,84.5,83.8,83.2,82.9,82.6,82.4].map((w,i)=>(
+              <div key={i} className="flex-1 rounded-t" style={{height:`${((w-81)/(86-81))*100}%`,background:`hsl(${262 - i*5},70%,60%)`}} />
+            ))}
+          </div>
+          <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+            <span>4 wks ago</span><span>Today</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+];
+
+function AppPreviewTabs({ signupUrl }: { signupUrl: string }) {
+  const [active, setActive] = useState(0);
+  const preview = APP_PREVIEWS[active];
+
+  return (
+    <div className="rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Tab bar */}
+      <div className="flex overflow-x-auto gap-1 p-2 bg-gray-50 border-b border-gray-200 scrollbar-hide">
+        {APP_PREVIEWS.map((p, i) => (
+          <button
+            key={p.id}
+            onClick={() => setActive(i)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 ${
+              active === i ? p.activeColor + " shadow-sm" : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <span>{p.emoji}</span>
+            <span>{p.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Preview content */}
+      <div className="p-4 space-y-3">
+        <p className="text-sm text-gray-600 leading-relaxed">{preview.description}</p>
+        <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
+          {preview.mockContent}
+        </div>
+        <a
+          href={DEMO_URL}
+          onClick={() => track(`go_preview_explore_${preview.id}`)}
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 text-sm font-bold hover:bg-teal-100 transition-all"
+        >
+          <span>👀</span>
+          <span>Try this feature live — no sign-up needed</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function FeatureCard({ feature, index }: { feature: typeof FEATURES[0]; index: number }) {
@@ -253,18 +491,43 @@ function FeatureCard({ feature, index }: { feature: typeof FEATURES[0]; index: n
 
 function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label?: string }) {
   return (
-    <div className="text-center">
+    <div className="space-y-3">
       {/* Offer badge */}
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold mb-4">
-        <span>🎁</span>
-        <span>Free plan + 1 month Premium free — no credit card needed</span>
+      <div className="flex justify-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold">
+          <span>🎁</span>
+          <span>Free plan + 1 month Premium free — no credit card needed</span>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      {/* Explore first — PRIMARY option, top of stack */}
+      <a
+        href={DEMO_URL}
+        onClick={() => track(`go_cta_demo_${label}`)}
+        className="flex items-center justify-between w-full px-6 py-5 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">👀</span>
+          <div className="text-left">
+            <p className="font-bold text-base leading-tight">Explore the app first</p>
+            <p className="text-teal-100 text-sm">No sign-up needed — browse all features now</p>
+          </div>
+        </div>
+        <span className="text-xl font-bold">→</span>
+      </a>
+
+      {/* Divider */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-xs text-gray-400 font-medium">or sign up free</span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3">
         <a
           href={signupUrl}
           onClick={() => track(`go_cta_signup_${label}`)}
-          className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-green-600 to-teal-600 text-white text-lg font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-green-600 to-teal-600 text-white text-base font-bold shadow hover:opacity-90 active:scale-95 transition-all"
         >
           Start Free — No Credit Card
           <span aria-hidden="true">→</span>
@@ -272,27 +535,13 @@ function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label
         <a
           href={MARKETING_URL}
           onClick={() => track(`go_cta_marketing_${label}`)}
-          className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 text-lg font-semibold hover:border-teal-400 hover:text-teal-700 transition-all"
+          className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 text-base font-semibold hover:border-teal-400 hover:text-teal-700 transition-all"
         >
-          Full Marketing Site
-          <span aria-hidden="true">↗</span>
+          Full Site ↗
         </a>
       </div>
 
-      {/* Explore without signing up */}
-      <div className="mt-4">
-        <a
-          href={DEMO_URL}
-          onClick={() => track(`go_cta_demo_${label}`)}
-          className="inline-flex items-center gap-2 text-sm text-teal-700 font-semibold hover:underline"
-        >
-          <span>👀</span>
-          <span>Explore the app first — no sign-up needed</span>
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
-
-      <p className="text-xs text-gray-400 mt-3">
+      <p className="text-xs text-gray-400 text-center">
         Free plan available · Cancel anytime · Available in 8 languages
       </p>
     </div>
@@ -378,6 +627,15 @@ export default function GoPage() {
           {FEATURES.map((feature, i) => (
             <FeatureCard key={i} feature={feature} index={i} />
           ))}
+        </section>
+
+        {/* ── Interactive App Preview Tabs ── */}
+        <section className="space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-gray-900">See it in action</h2>
+            <p className="text-sm text-gray-500 mt-1">Tap a feature to preview what it looks like inside the app</p>
+          </div>
+          <AppPreviewTabs signupUrl={signupUrl} />
         </section>
 
         {/* ── Why YFIT is different ── */}
