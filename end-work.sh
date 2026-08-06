@@ -58,14 +58,22 @@ echo ""
 echo "▶ [3/4] yfit-admin (accounting/analytics) status..."
 if [ -d "/home/ubuntu/yfit-marketing/.git" ]; then
   cd /home/ubuntu/yfit-marketing
+
+  # Ensure GitHub remote exists
+  git remote add github "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-admin.git" 2>/dev/null || \
+    git remote set-url github "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-admin.git"
+
   ADMIN_DIRTY=$(git status --short)
   if [ -n "$ADMIN_DIRTY" ]; then
     echo "  ⚠️  Uncommitted changes in yfit-admin:"
     git status --short
-    echo "  ℹ️  yfit-admin is Manus-managed — changes are auto-saved by Manus"
-    echo "  ℹ️  No git push needed here"
+    echo "  ℹ️  yfit-admin is Manus-managed — Manus auto-saves to S3"
+    echo "  ℹ️  Uncommitted changes cannot be pushed to GitHub — commit via Manus UI first"
   else
-    echo "  ✅ yfit-admin clean: $(git log --oneline -1)"
+    echo "  ✅ yfit-admin clean — pushing to GitHub backup..."
+    git push github main 2>/dev/null && \
+      echo "  ✅ yfit-admin pushed to GitHub: $(git log --oneline -1)" || \
+      echo "  ⚠️  GitHub push failed — check token or network"
   fi
 else
   echo "  ⚠️  yfit-admin not found — skipping"
@@ -88,4 +96,3 @@ echo "============================================================"
 echo "  ✅ End-work complete. Session saved."
 echo "============================================================"
 echo ""
-
