@@ -70,6 +70,23 @@ else
 fi
 echo ""
 
+# ── 3b. Reinstall pre-push git hook (safety — blocks wrong-repo pushes) ─
+echo "▶ [3b] Reinstalling pre-push safety hook..."
+cat > /home/ubuntu/yfit-app-full/.git/hooks/pre-push << 'HOOK'
+#!/bin/bash
+REMOTE_URL=$(git remote get-url "$1" 2>/dev/null || echo "")
+if echo "$REMOTE_URL" | grep -q "github.com"; then
+  if ! echo "$REMOTE_URL" | grep -q "yfit-app"; then
+    echo "🚫 PUSH BLOCKED — wrong repo. Expected yfit-app, got: $REMOTE_URL"
+    exit 1
+  fi
+fi
+exit 0
+HOOK
+chmod +x /home/ubuntu/yfit-app-full/.git/hooks/pre-push
+echo "  ✅ Pre-push hook installed (blocks accidental pushes to wrong repo)"
+echo ""
+
 # ── 4. Check yfit-admin (Manus-managed, misleadingly named) ─
 echo "▶ [4/6] Checking yfit-admin (accounting/analytics)..."
 if [ -d "/home/ubuntu/yfit-marketing/.git" ]; then
