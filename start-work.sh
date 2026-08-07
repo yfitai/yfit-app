@@ -8,9 +8,6 @@
 set -e
 
 # ── GitHub credentials ──────────────────────────────────────
-# Token stored in ~/.yfit-credentials (created on first run)
-# On a fresh sandbox, paste the GitHub PAT when prompted.
-# Get from: https://github.com/settings/tokens (yfitai account)
 GITHUB_USER="yfitai"
 GITHUB_EMAIL="don@yfitai.com"
 GITHUB_NAME="YFIT AI"
@@ -37,7 +34,7 @@ echo "============================================================"
 echo ""
 
 # ── 1. Configure git ────────────────────────────────────────
-echo "▶ [1/6] Configuring git..."
+echo "▶ [1/7] Configuring git..."
 git config --global user.name "$GITHUB_NAME"
 git config --global user.email "$GITHUB_EMAIL"
 git config --global credential.helper store
@@ -45,8 +42,8 @@ echo "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
 echo "  ✅ Git: $GITHUB_NAME <$GITHUB_EMAIL>"
 echo ""
 
-# ── 2. Clone or pull yfit-app (main app) ────────────────────
-echo "▶ [2/6] Setting up yfit-app (main app)..."
+# ── 2. Clone or pull yfit-app (main app + marketing site) ───
+echo "▶ [2/7] Setting up yfit-app (main app + www.yfitai.com)..."
 if [ -d "/home/ubuntu/yfit-app-full/.git" ]; then
   cd /home/ubuntu/yfit-app-full
   git pull origin main --quiet
@@ -56,10 +53,14 @@ else
   git clone "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-app.git" yfit-app-full
   echo "  ✅ yfit-app cloned: $(cd yfit-app-full && git log --oneline -1)"
 fi
+echo "  ⚠️  Marketing site (www.yfitai.com) is INSIDE this repo:"
+echo "     src/pages/LandingPage.tsx  ← marketing homepage"
+echo "     src/pages/GoPage.tsx       ← social funnel /go page"
+echo "     src/lib/i18nResources.js   ← ALL translations (8 languages)"
 echo ""
 
 # ── 3. Install dependencies ─────────────────────────────────
-echo "▶ [3/6] Checking npm dependencies..."
+echo "▶ [3/7] Checking npm dependencies..."
 cd /home/ubuntu/yfit-app-full
 if [ ! -d "node_modules" ]; then
   echo "  → Installing (first time, may take ~2 min)..."
@@ -70,8 +71,8 @@ else
 fi
 echo ""
 
-# ── 3b. Reinstall pre-push git hook (safety — blocks wrong-repo pushes) ─
-echo "▶ [3b] Reinstalling pre-push safety hook..."
+# ── 3b. Reinstall pre-push git hook ─────────────────────────
+echo "▶ [3b/7] Reinstalling pre-push safety hook..."
 cat > /home/ubuntu/yfit-app-full/.git/hooks/pre-push << 'HOOK'
 #!/bin/bash
 REMOTE_URL=$(git remote get-url "$1" 2>/dev/null || echo "")
@@ -88,20 +89,20 @@ echo "  ✅ Pre-push hook installed (blocks accidental pushes to wrong repo)"
 echo ""
 
 # ── 4. Check yfit-admin (Manus-managed, misleadingly named) ─
-echo "▶ [4/6] Checking yfit-admin (accounting/analytics)..."
+echo "▶ [4/7] Checking yfit-admin (accounting/analytics)..."
 if [ -d "/home/ubuntu/yfit-marketing/.git" ]; then
   cd /home/ubuntu/yfit-marketing
   echo "  ✅ Present: $(git log --oneline -1)"
   echo "  ⚠️  Folder is named 'yfit-marketing' but this is the yfit-admin repo"
-  echo "  ⚠️  Manus-managed (S3) — do NOT git push to GitHub from here"
+  echo "  ⚠️  Manus-managed — end-work.sh pushes it to GitHub automatically"
 else
   echo "  ⚠️  Not found at /home/ubuntu/yfit-marketing"
-  echo "  ⚠️  Normal in a fresh Manus session — it will appear once Manus loads the project"
+  echo "  ⚠️  Normal in a fresh Manus session — it appears once Manus loads the project"
 fi
 echo ""
 
 # ── 5. Show live bundle build number ────────────────────────
-echo "▶ [5/6] Current live update bundle:"
+echo "▶ [5/7] Current live update bundle:"
 if [ -f "/home/ubuntu/yfit-app-full/public/version.json" ]; then
   BUILD=$(python3 -c "import json; d=json.load(open('/home/ubuntu/yfit-app-full/public/version.json')); print(f\"Build {d['buildNumber']} — {d['timestamp'][:10]}\")" 2>/dev/null)
   echo "  ✅ $BUILD"
@@ -111,8 +112,22 @@ else
 fi
 echo ""
 
-# ── 6. Print Session Start Rules ────────────────────────────
-echo "▶ [6/6] Session Start Rules:"
+# ── 6. Pull yfit-ai monopro hub (docs) ──────────────────────
+echo "▶ [6/7] Setting up yfit-ai monopro hub (docs)..."
+if [ -d "/home/ubuntu/yfit-ai/.git" ]; then
+  cd /home/ubuntu/yfit-ai
+  git pull origin main --quiet 2>/dev/null || true
+  echo "  ✅ yfit-ai hub up to date: $(git log --oneline -1)"
+else
+  cd /home/ubuntu
+  git clone "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-ai.git" yfit-ai --quiet 2>/dev/null
+  echo "  ✅ yfit-ai hub cloned: $(cd yfit-ai && git log --oneline -1)"
+fi
+echo "  📖 Docs: /home/ubuntu/yfit-ai/docs/MASTER_REFERENCE.md"
+echo ""
+
+# ── 7. Print Session Start Rules ────────────────────────────
+echo "▶ [7/7] Session Start Rules:"
 echo ""
 echo "  ┌─────────────────────────────────────────────────────────┐"
 echo "  │  REPO MAP                                               │"
@@ -120,13 +135,18 @@ echo "  ├───────────────────────
 echo "  │  /home/ubuntu/yfit-app-full                             │"
 echo "  │    → github: yfitai/yfit-app                            │"
 echo "  │    → live:   app.yfitai.com  ← MAIN APP                │"
+echo "  │    → live:   www.yfitai.com  ← MARKETING SITE TOO!     │"
+echo "  │    → marketing: src/pages/LandingPage.tsx               │"
+echo "  │    → go page:   src/pages/GoPage.tsx                    │"
+echo "  │    → i18n:      src/lib/i18nResources.js                │"
 echo "  │                                                         │"
 echo "  │  /home/ubuntu/yfit-marketing  ← MISLEADING NAME!       │"
 echo "  │    → github: yfitai/yfit-admin (NOT yfit-marketing)    │"
 echo "  │    → live:   Manus-hosted admin/analytics/reports       │"
 echo "  │                                                         │"
-echo "  │  yfitai/yfit-marketing  (NOT cloned locally)            │"
-echo "  │    → live:   www.yfitai.com  (Manus UI only)           │"
+echo "  │  /home/ubuntu/yfit-ai  ← MONOPRO DOCS HUB              │"
+echo "  │    → github: yfitai/yfit-ai                             │"
+echo "  │    → docs:   /home/ubuntu/yfit-ai/docs/                 │"
 echo "  │                                                         │"
 echo "  │  yfitai/yfitai-yfit-video-service  (NOT cloned)        │"
 echo "  │    → live:   Railway                                    │"
@@ -139,13 +159,14 @@ echo "  3. Check bundle build number before creating a new bundle"
 echo "  4. NEVER add outputDirectory to vercel.json"
 echo "  5. Test food search after any API changes:"
 echo "     https://app.yfitai.com/api/food/search?query=apple"
-echo "  6. For translation fixes — check language section first"
-echo "     before editing i18nResources.js"
+echo "  6. For translation fixes — edit src/lib/i18nResources.js"
+echo "     NOT the JSON files in client/public/locales/"
 echo ""
 echo "  NEVER save Manus webdev checkpoints for yfit-admin work"
 echo ""
 echo "============================================================"
 echo "  ✅ Sandbox ready."
 echo "  📖 Next: cat /home/ubuntu/yfit-app-full/YFIT_MASTER_REFERENCE.md"
+echo "  📖 Docs: /home/ubuntu/yfit-ai/docs/MASTER_REFERENCE.md"
 echo "============================================================"
 echo ""
