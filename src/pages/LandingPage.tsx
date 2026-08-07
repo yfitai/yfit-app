@@ -320,15 +320,25 @@ export default function LandingPage() {
               <p className="text-xl text-muted-foreground max-w-lg leading-relaxed">
                 {t("landing.hero.subtext")}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 text-white shadow-lg">
-                  {t("landing.hero.ctaTryFree")}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-                <Button onClick={() => document.getElementById('app-tour')?.scrollIntoView({ behavior: 'smooth' })} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
-                  {t("landing.hero.ctaSeeApp")}
-                </Button>
-                <p className="text-xs text-muted-foreground">{t("landing.hero.ctaDisclaimer")}</p>
+             <div className="flex flex-col sm:flex-row gap-4">
+               <Button onClick={goToSignUp} size="lg" className="text-lg px-8 bg-gradient-to-r from-green-600 to-teal-600 hover:opacity-90 text-white shadow-lg">
+                 {t("landing.hero.ctaTryFree")}
+                 <ArrowRight className="ml-2 w-5 h-5" />
+               </Button>
+               <Button onClick={() => document.getElementById('app-tour')?.scrollIntoView({ behavior: 'smooth' })} size="lg" variant="outline" className="text-lg px-8 border-green-600/30 hover:bg-green-50">
+                 {t("landing.hero.ctaSeeApp")}
+               </Button>
+               <p className="text-xs text-muted-foreground">{t("landing.hero.ctaDisclaimer")}</p>
+             </div>
+              {/* Try it first — no sign-up needed */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Not ready to sign up?</span>
+                <a
+                  href="https://app.yfitai.com/go"
+                  className="text-sm font-semibold text-teal-600 hover:text-teal-700 underline underline-offset-2 transition-colors"
+                >
+                  Explore the app first — no account needed →
+                </a>
               </div>
               {/* Honest feature badges — no fake social proof */}
               <div className="flex flex-wrap gap-2 pt-2">
@@ -899,4 +909,3 @@ export default function LandingPage() {
     </div>
   );
 }
-

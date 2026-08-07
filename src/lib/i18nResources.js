@@ -210,13 +210,15 @@ const resources = {
                                 "title": "Your personal AI fitness coach",
                                 "description": "Ask anything — workout modifications, nutrition advice, recovery tips. YFIT's AI Coach knows your medications, goals, and history, so its advice is always personalized to you specifically."
                         },
-                        "language": {
-                                "label": "Language",
-                                "title": "Available in 8 languages",
-                                "description": "YFIT AI is fully translated into English, Spanish, French, German, Portuguese, Japanese, Chinese, and Arabic. Switch languages instantly — every screen, every label, every AI response."
-                        }
-                }
+                       "language": {
+                               "label": "Language",
+                               "title": "Available in 8 languages",
+                               "description": "YFIT AI is fully translated into English, Spanish, French, German, Portuguese, Japanese, Chinese, and Arabic. Switch languages instantly — every screen, every label, every AI response."
+                       }
+               }
         },
+        "ctaBtn": "Try YFIT Free — No Credit Card",
+        "ctaNote": "Free plan available · Cancel anytime · Available in 8 languages",
         "calculator": {
                 "panelBadge": "Free — No Account Needed",
                 "panelHeadline": "See your exact numbers",
