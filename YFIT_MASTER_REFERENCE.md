@@ -1,6 +1,6 @@
 # YFIT Master Project Reference
 
-**Last Updated:** July 27–28, 2026
+**Last Updated:** August 6–7, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
@@ -310,6 +310,60 @@ When starting a new session, always:
 
 ---
 
+### August 6–7, 2026
+**Steps Chart — Bar to Line (Build 104, earlier session):**
+- Changed steps chart in Progress page from BarChart to LineChart (already logged in July 31 entry)
+
+**Weekly Analytics — Investigated and Confirmed Working:**
+- Social media numbers (reach, impressions, engagement) are real and changing week to week
+- Website visitors section has always shown 0 — Umami API blocks server-side calls by IP
+- Decision: Remove website section from reports (done July 31). Add GA4 when traffic campaigns begin.
+- Reports confirmed arriving at support@yfitai.com every Monday 6 AM CDT as PDF
+
+**CRITICAL DISCOVERY: Marketing Site Is Inside yfit-app (NOT a separate repo):**
+- `www.yfitai.com` is served by the same Vercel `yfit-app` project as `app.yfitai.com`
+- Source: `yfitai/yfit-app` → `src/pages/LandingPage.tsx`
+- Go page: `src/pages/GoPage.tsx`
+- i18n translations (ALL 8 languages): `src/lib/i18nResources.js` — edit THIS, not JSON files
+- App tour component: `src/components/AppTourSection.tsx`
+- `yfitai/yfit-marketing` GitHub repo is stale (May 2026) — do NOT edit it
+- This discovery is now documented in `yfit-ai/README.md`, `yfit-ai/app/README.md`, `yfit-ai/marketing/README.md`
+
+**Fixed Broken Translation Keys on www.yfitai.com (Build 106):**
+- `landing.appTour.ctaBtn` and `landing.appTour.ctaNote` were missing from English translations
+- Fixed in `src/lib/i18nResources.js` — added after the `screens` object in the `appTour` section
+- Values: ctaBtn = "Try YFIT Free — No Credit Card", ctaNote = "Free plan available · Cancel anytime · Available in 8 languages"
+- Committed: `9ab54ce`
+
+**Completed 3-Step Social Funnel:**
+- Social post → `app.yfitai.com/go` → `www.yfitai.com` → `app.yfitai.com/signup`
+- Go page already had "Full Site ↗" button pointing to `yfitai.com` (no change needed)
+- Added "Explore the app first — no account needed →" link below hero CTAs on `LandingPage.tsx`
+- Committed: `9ab54ce`
+
+**yfit-admin → GitHub Sync Established:**
+- Added GitHub as a second remote on `/home/ubuntu/yfit-marketing` (yfit-admin)
+- `end-work.sh` now automatically pushes yfit-admin to `yfitai/yfit-admin` on GitHub every session end
+- 2 commits synced: marketing redesign + analytics report fix
+
+**Monopro Hub (yfit-ai) Restored and Updated:**
+- `yfit-ai/README.md` — complete rewrite with current repo map, 6 rules, funnel diagram, infrastructure table
+- `yfit-ai/app/README.md` — updated with marketing-inside-app discovery
+- `yfit-ai/marketing/README.md` — updated with warning that source is in yfit-app
+- Committed to yfit-ai: `44665fe`
+
+**start-work.sh Updated (now 7 steps):**
+- Step 6 now clones/pulls `yfit-ai` monopro hub at session start
+- Repo map in terminal output now shows `www.yfitai.com` is inside `yfit-app`
+- Rule 6 updated: edit `src/lib/i18nResources.js`, not JSON files
+- Committed: `1d56f5d`
+
+**Next Session TODO:**
+- Set up Google sign-in (Supabase OAuth + Auth.jsx button — need Google Cloud Console credentials)
+- Compare Google Analytics vs current admin analytics approach
+- Review social media strategy for improving page visits (currently 0 despite 7K+ weekly reach)
+
+---
 ### July 31, 2026
 
 **Steps Chart — Fixed (Build 104):**
