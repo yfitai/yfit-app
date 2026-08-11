@@ -695,3 +695,13 @@
 - [x] Add "No app store needed" note to landing page hero CTA
 - [ ] Test all 5 user flow scenarios (next session)
 - [ ] Add install_guide_shown column to Supabase user_profiles table (if not auto-created)
+
+---
+
+## Google Sign-In — August 2026
+- [x] Run start-work validation and read the current master references before changing authentication
+- [x] Verify the deployed authentication UI and existing OAuth implementation: provider configuration is documented as active, Google OAuth works in GuestSignUpModal, but the main Auth page has no Google entry point
+- [x] Add Google-first entry points to both tabs in `src/components/Auth.jsx`; production build and local visual verification passed
+- [x] Retain email/password as a clearly labeled fallback for existing users and account recovery
+- [ ] Perform an end-to-end Google account test on the deployed app and confirm the callback reaches the dashboard
+- [ ] Document the final Google OAuth configuration and test result in `YFIT_MASTER_REFERENCE.md`
