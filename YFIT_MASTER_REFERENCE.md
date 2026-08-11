@@ -274,6 +274,15 @@ When starting a new session, always:
 
 **Next action:** after Vercel deployment completes, open `https://app.yfitai.com/login`, select **Continue with Google**, and complete the Google account selection. Confirm the browser returns to the YFIT dashboard.
 
+**Google Branding Verification — Submitted:**
+- The unauthenticated OAuth redirect test reached Google successfully using the expected YFIT OAuth client and Supabase callback. It exposed stale published branding: **ROGA Drone Website** and `rogadrone.com` policy links.
+- In the existing Google Cloud project (internally still named **ROGA Drone application**, project number prefix `668225302369`), the active OAuth branding was updated to YFIT AI. App homepage, Privacy Policy, Terms, authorized domains, logo, and developer contact now use YFIT assets and `yfitai.com`.
+- Verified `yfitai.com` ownership in Google Search Console with a new GoDaddy DNS TXT record. **Do not remove this TXT record.** No existing DNS or Google Workspace SPF settings were altered.
+- Submitted a manual Google branding appeal after the automatic check referenced the pre-verification state. Verification Center now shows **branding under review** and confirms no sensitive/restricted scopes require data-access verification. Google indicated 2–3 business days for review.
+- Final verification questionnaire answers: **No** for personal-only, internal-only, development/testing-only, and WordPress Gmail SMTP plugin-only usage. The app is a public production YFIT AI service using standard Google identity scopes only.
+- The support email shown on the public consent details remains `don@rogadrone.com` because it is the only eligible User support email in the Cloud project. `support@yfitai.com` is set as the developer contact. Do not change the User support email unless the Workspace account is added to the Cloud project and becomes available in the selector.
+- Pending: Google review approval; confirm the live Google consent screen reads **YFIT AI**; complete a real account login and confirm return to `/dashboard`.
+
 ---
 
 ### July 27–28, 2026
