@@ -261,11 +261,11 @@ When starting a new session, always:
 
 ### August 11, 2026
 
-**Google Sign-In — Google First, Email Fallback (Build 107):**
+**Google Sign-In — Google First, Email Fallback (Build 108):**
 - Re-ran `start-work.sh`, confirmed Build 106 was live before changes, and read this reference before editing.
 - Confirmed prior provider setup remains documented as active: Supabase Google provider is enabled for project `mxggxpoxgqubojvumjlt`, with callback URL `https://mxggxpoxgqubojvumjlt.supabase.co/auth/v1/callback`.
 - Found that Google OAuth was already implemented and used in `src/components/GuestSignUpModal.jsx`, but the primary `/login` and `/signup` screen (`src/components/Auth.jsx`) offered only email/password.
-- Added a reusable Google button and `handleGoogleSignIn()` to the primary Auth component. Both Sign In and Sign Up now show **Continue with Google** first, above a clear divider.
+- Added a reusable Google button and hardened `handleGoogleSignIn()` to the primary Auth component. Both Sign In and Sign Up now show **Continue with Google** first, above a clear divider. Unexpected browser or network failures restore the form and show a safe error.
 - Kept email/password below the divider as a fallback. **Decision:** do not remove email authentication yet, because existing users and account recovery need a working fallback until the Google flow is fully verified in production.
 - Redirect after Google OAuth: `${window.location.origin}/dashboard`; this is recognized by `App.jsx` through the existing `supabase.auth.onAuthStateChange` handler.
 - Local production preview confirmed the button, divider, and email fallback render correctly. `npm run build` passed. `npm run lint` remains blocked by 334 pre-existing repository-wide lint errors, none reported in `Auth.jsx`.

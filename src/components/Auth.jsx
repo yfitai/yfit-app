@@ -153,20 +153,26 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
     setSuccess('')
     setIsLoading(true)
 
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
-      },
-    })
+      })
 
-    if (oauthError) {
-      console.error('Google sign-in error:', oauthError)
-      setError(oauthError.message || 'Google sign-in could not be started. Please try again.')
+      if (oauthError) {
+        console.error('Google sign-in error:', oauthError)
+        setError(oauthError.message || 'Google sign-in could not be started. Please try again.')
+        setIsLoading(false)
+      }
+    } catch (oauthError) {
+      console.error('Google sign-in failed:', oauthError)
+      setError('Google sign-in could not be started. Please check your connection and try again.')
       setIsLoading(false)
     }
   }
