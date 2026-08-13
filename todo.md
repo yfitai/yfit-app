@@ -716,3 +716,8 @@
 - [ ] Perform an end-to-end Google account test on the deployed app and confirm the callback reaches the dashboard
 - [ ] Add `support@yfitai.com` to Google Cloud project `southern-flash-298120` with Viewer access and confirm whether it becomes eligible as the consent-screen User support email
 - [x] Document the current Google OAuth configuration, verification submission, and pending test result in `YFIT_MASTER_REFERENCE.md`
+
+---
+
+## End-Work — August 13, 2026
+- [ ] Update the Master Reference, push yfit-app and yfit-admin, and confirm both repositories are clean
