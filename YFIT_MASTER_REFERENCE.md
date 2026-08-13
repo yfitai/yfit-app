@@ -297,6 +297,14 @@ When starting a new session, always:
 - Current billing cycle usage was healthy: **Storage 0.145 / 1 GB (14%)**, **Database 0.061 / 0.5 GB (12%)**, **Egress 0.009 / 5 GB (<1%)**, and **Edge Function invocations 4,294 / 500,000 (<1%)**.
 - The prior emergency storage deletion and daily `storage-cleanup` Edge Function are working. Do not delete further data or upgrade solely because of the generic grace-period banner.
 
+### August 13, 2026 — Five-Quarter Accounting Draft
+
+- Created a draft internal report at `yfit-admin/reports/YFIT_QUARTERLY_ACCOUNTING_Q2_2025_TO_Q2_2026.md` for calendar quarters **Q2 2025 through Q2 2026**.
+- CIBC expense data is sufficient from the stated June 2, 2025 start of business activity. The uploaded June 2026 CIBC file was checked but **not imported** because its two expense rows were already present and its June 30 entry was a card payment, preventing duplicate expenses.
+- Historical Stripe sync (April 2025–June 2026) found two March 2026 charges: one fully refunded $13.64 USD charge and one retained $104.99 USD charge. The report reflects $165.25 CAD gross, $19.00 CAD refunds, $5.63 CAD estimated Stripe fees, and $140.62 CAD net Stripe revenue in Q1 2026.
+- Five-quarter imported CIBC expenses total **$11,743.21 CAD**. Provisional GST ITCs total **$559.33 CAD**; these are not filing-ready because the importer assumes embedded 5% GST for transactions marked eligible and **64** transactions remain unreviewed.
+- Before tax filing or CPA reliance: review the 64 flagged transactions, remove ineligible/non-Canadian GST claims, confirm Stripe’s transaction-date FX and actual fees, and confirm any GST collected outside the current Stripe Tax import.
+
 ---
 
 ### July 27–28, 2026
