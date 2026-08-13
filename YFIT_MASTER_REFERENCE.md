@@ -305,6 +305,7 @@ When starting a new session, always:
 - Five-quarter imported CIBC expenses total **$11,743.21 CAD**. Provisional GST ITCs total **$559.33 CAD**; these are not filing-ready because the importer assumes embedded 5% GST for transactions marked eligible and **64** transactions remain unreviewed.
 - Before tax filing or CPA reliance: review the 64 flagged transactions, remove ineligible/non-Canadian GST claims, confirm Stripe’s transaction-date FX and actual fees, and confirm any GST collected outside the current Stripe Tax import.
 - Produced and visually verified the internal PDF record at `yfit-admin/reports/YFIT_QUARTERLY_ACCOUNTING_Q2_2025_TO_Q2_2026.pdf`. The PDF is a draft accounting record and retains the provisional GST/ITC and review disclosures.
+- Subsequent review update: the user confirmed all imported CIBC transactions had been reviewed and accepted. Database review-status flags were aligned without changing financial values: **101 of 101** expenses are now marked reviewed. Q4 2025 was independently reconciled to **$5,565.96 CAD** in expenses and **$265.08 CAD** in provisional ITCs across 30 transactions. The accounting PDF and Markdown report were refreshed to remove the obsolete unreviewed-transaction warning while retaining professional tax-validation cautions.
 
 ---
 
