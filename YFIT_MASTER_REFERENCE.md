@@ -304,6 +304,7 @@ When starting a new session, always:
 - Historical Stripe sync (April 2025–June 2026) found two March 2026 charges: one fully refunded $13.64 USD charge and one retained $104.99 USD charge. The report reflects $165.25 CAD gross, $19.00 CAD refunds, $5.63 CAD estimated Stripe fees, and $140.62 CAD net Stripe revenue in Q1 2026.
 - Five-quarter imported CIBC expenses total **$11,743.21 CAD**. Provisional GST ITCs total **$559.33 CAD**; these are not filing-ready because the importer assumes embedded 5% GST for transactions marked eligible and **64** transactions remain unreviewed.
 - Before tax filing or CPA reliance: review the 64 flagged transactions, remove ineligible/non-Canadian GST claims, confirm Stripe’s transaction-date FX and actual fees, and confirm any GST collected outside the current Stripe Tax import.
+- Produced and visually verified the internal PDF record at `yfit-admin/reports/YFIT_QUARTERLY_ACCOUNTING_Q2_2025_TO_Q2_2026.pdf`. The PDF is a draft accounting record and retains the provisional GST/ITC and review disclosures.
 
 ---
 
