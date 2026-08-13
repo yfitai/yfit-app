@@ -714,4 +714,5 @@
 - [x] Submit the manual YFIT AI branding appeal; Google Verification Center status is now “under review” and confirms no sensitive/restricted scope review is required
 - [x] Confirm Google’s unauthenticated homepage review accepts YFIT AI’s purpose after manual review; branding approval received
 - [ ] Perform an end-to-end Google account test on the deployed app and confirm the callback reaches the dashboard
+- [ ] Add `support@yfitai.com` to Google Cloud project `southern-flash-298120` with Viewer access and confirm whether it becomes eligible as the consent-screen User support email
 - [x] Document the current Google OAuth configuration, verification submission, and pending test result in `YFIT_MASTER_REFERENCE.md`
