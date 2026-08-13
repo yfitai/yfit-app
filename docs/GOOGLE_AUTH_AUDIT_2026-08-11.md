@@ -42,3 +42,17 @@ The Google Cloud Verification Center now reports that YFIT AI branding is **unde
 The verification questionnaire was submitted with **No** answers for personal-only, internal-only, development/testing-only, and WordPress Gmail SMTP plugin-only use. This correctly describes the public production YFIT AI application.
 
 Next checks: wait for the branding decision, verify that the Google account-selection screen no longer says “ROGA Drone Website,” and complete one real Google-account login through the deployed `https://app.yfitai.com/login` flow.
+
+## Approval and callback fix — August 12, 2026
+
+Google approved the YFIT AI OAuth brand verification for project `southern-flash-298120` (project number `668225302369`). A subsequent real Google sign-in then exposed a separate Supabase post-authentication error: `{"error":"requested path is invalid"}`.
+
+The cause was Supabase **Authentication → URL Configuration** still using the retired `yfit-deploy.vercel.app` deployment as its Site URL and lacking the active custom-domain redirect allow-list entry. The configuration was corrected in the Supabase dashboard:
+
+| Setting | Final value |
+|---|---|
+| Site URL | `https://app.yfitai.com` |
+| New Redirect URL | `https://app.yfitai.com/**` |
+| Existing entries | Retained: `https://yfit-ai.vercel.app/**`, `http://localhost:3000/**`, and `https://yfit-deploy.vercel.app/**` |
+
+The user immediately retested and confirmed that the invalid-path error was resolved. The remaining follow-up is a routine user-flow check to confirm the branded Google account-selection screen and dashboard arrival after a complete production login.

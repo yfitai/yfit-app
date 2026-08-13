@@ -283,6 +283,20 @@ When starting a new session, always:
 - The support email shown on the public consent details remains `don@rogadrone.com` because it is the only eligible User support email in the Cloud project. `support@yfitai.com` is set as the developer contact. Do not change the User support email unless the Workspace account is added to the Cloud project and becomes available in the selector.
 - Pending: Google review approval; confirm the live Google consent screen reads **YFIT AI**; complete a real account login and confirm return to `/dashboard`.
 
+**Google OAuth Callback Fix — August 12, 2026:**
+- Google’s branding review was approved for Google Cloud project `southern-flash-298120` (project number `668225302369`).
+- A real sign-in then returned `{"error":"requested path is invalid"}`. Root cause: Supabase Auth → URL Configuration was still set to the retired Vercel address and did not allow the active custom domain.
+- Corrected Supabase Auth URL Configuration manually in the dashboard:
+  - **Site URL:** `https://app.yfitai.com`
+  - **Redirect URLs:** added `https://app.yfitai.com/**`
+  - Retained the existing old Vercel and localhost redirect entries for backwards compatibility.
+- User retested after saving and confirmed the error was resolved. Google-first sign-in is now functional through the current app domain.
+
+**Supabase Usage Status — August 12, 2026:**
+- The post-grace-period banner is informational: it means free-plan quotas are now enforced, not that YFIT is currently over quota.
+- Current billing cycle usage was healthy: **Storage 0.145 / 1 GB (14%)**, **Database 0.061 / 0.5 GB (12%)**, **Egress 0.009 / 5 GB (<1%)**, and **Edge Function invocations 4,294 / 500,000 (<1%)**.
+- The prior emergency storage deletion and daily `storage-cleanup` Edge Function are working. Do not delete further data or upgrade solely because of the generic grace-period banner.
+
 ---
 
 ### July 27–28, 2026

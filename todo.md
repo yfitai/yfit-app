@@ -699,17 +699,19 @@
 ---
 
 ## Google Sign-In — August 2026
+- [x] Diagnose and fix deployed Google OAuth error: `{"error":"requested path is invalid"}` after Google account selection — added `https://app.yfitai.com/**` to Supabase Redirect URLs and set Site URL to `https://app.yfitai.com`; user confirmed error resolved
+- [x] Check the current Supabase usage category behind the post-grace-period warning: storage 14%, database 12%, and all other shown categories below 1%; no action required
 - [x] Run start-work validation and read the current master references before changing authentication
 - [x] Verify the deployed authentication UI and existing OAuth implementation: provider configuration is documented as active, Google OAuth works in GuestSignUpModal, but the main Auth page has no Google entry point
 - [x] Add Google-first entry points to both tabs in `src/components/Auth.jsx`; production build and local visual verification passed
 - [x] Retain email/password as a clearly labeled fallback for existing users and account recovery
 - [x] Verify in an unauthenticated browser that the Google button reaches Google’s account-selection screen and uses the expected Supabase callback URL
-- [ ] Monitor Google’s branding review until the live consent screen identifies the app as YFIT AI and links to `yfitai.com` policies
+- [x] Monitor Google’s branding review: Google approved YFIT AI OAuth brand verification for project `southern-flash-298120`
 - [ ] Add `support@yfitai.com` to the Google Cloud project with an appropriate role if it should become selectable as the consent-screen User support email; it is already the developer contact
 - [x] Update the active OAuth client’s YFIT branding, policies, authorized domains, and developer contact email
 - [x] Ownership verification was completed through Google Search Console; duplicate checklist item retained as history
 - [x] Verify `yfitai.com` ownership in the Google account used by the active OAuth project through Google Search Console
 - [x] Submit the manual YFIT AI branding appeal; Google Verification Center status is now “under review” and confirms no sensitive/restricted scope review is required
-- [ ] Confirm Google’s unauthenticated homepage review accepts YFIT AI’s purpose after manual review
+- [x] Confirm Google’s unauthenticated homepage review accepts YFIT AI’s purpose after manual review; branding approval received
 - [ ] Perform an end-to-end Google account test on the deployed app and confirm the callback reaches the dashboard
 - [x] Document the current Google OAuth configuration, verification submission, and pending test result in `YFIT_MASTER_REFERENCE.md`
