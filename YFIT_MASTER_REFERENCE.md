@@ -274,14 +274,14 @@ When starting a new session, always:
 
 **Next action:** after Vercel deployment completes, open `https://app.yfitai.com/login`, select **Continue with Google**, and complete the Google account selection. Confirm the browser returns to the YFIT dashboard.
 
-**Google Branding Verification — Submitted:**
+**Google Branding Verification — Approved:**
 - The unauthenticated OAuth redirect test reached Google successfully using the expected YFIT OAuth client and Supabase callback. It exposed stale published branding: **ROGA Drone Website** and `rogadrone.com` policy links.
 - In the existing Google Cloud project (internally still named **ROGA Drone application**, project number prefix `668225302369`), the active OAuth branding was updated to YFIT AI. App homepage, Privacy Policy, Terms, authorized domains, logo, and developer contact now use YFIT assets and `yfitai.com`.
 - Verified `yfitai.com` ownership in Google Search Console with a new GoDaddy DNS TXT record. **Do not remove this TXT record.** No existing DNS or Google Workspace SPF settings were altered.
-- Submitted a manual Google branding appeal after the automatic check referenced the pre-verification state. Verification Center now shows **branding under review** and confirms no sensitive/restricted scopes require data-access verification. Google indicated 2–3 business days for review.
+- Submitted a manual Google branding appeal after the automatic check referenced the pre-verification state. Google subsequently **approved** YFIT AI OAuth brand verification for project `southern-flash-298120`; no sensitive/restricted scope review is required.
 - Final verification questionnaire answers: **No** for personal-only, internal-only, development/testing-only, and WordPress Gmail SMTP plugin-only usage. The app is a public production YFIT AI service using standard Google identity scopes only.
-- The support email shown on the public consent details remains `don@rogadrone.com` because it is the only eligible User support email in the Cloud project. `support@yfitai.com` is set as the developer contact. Do not change the User support email unless the Workspace account is added to the Cloud project and becomes available in the selector.
-- Pending: Google review approval; confirm the live Google consent screen reads **YFIT AI**; complete a real account login and confirm return to `/dashboard`.
+- `support@yfitai.com` was added to the Google Cloud project as a least-privilege **Viewer** and remains the developer contact. Viewer access did not make it selectable as the consent-screen User support email, so the approved public support-email field remains `don@rogadrone.com`. Do not escalate the shared account merely to change this field.
+- The user confirmed the former callback error was resolved after the Site URL and redirect allow-list correction. A routine end-to-end dashboard landing check remains advisable after a normal Google account sign-in.
 
 **Google OAuth Callback Fix — August 12, 2026:**
 - Google’s branding review was approved for Google Cloud project `southern-flash-298120` (project number `668225302369`).
@@ -302,10 +302,11 @@ When starting a new session, always:
 - Created a draft internal report at `yfit-admin/reports/YFIT_QUARTERLY_ACCOUNTING_Q2_2025_TO_Q2_2026.md` for calendar quarters **Q2 2025 through Q2 2026**.
 - CIBC expense data is sufficient from the stated June 2, 2025 start of business activity. The uploaded June 2026 CIBC file was checked but **not imported** because its two expense rows were already present and its June 30 entry was a card payment, preventing duplicate expenses.
 - Historical Stripe sync (April 2025–June 2026) found two March 2026 charges: one fully refunded $13.64 USD charge and one retained $104.99 USD charge. The report reflects $165.25 CAD gross, $19.00 CAD refunds, $5.63 CAD estimated Stripe fees, and $140.62 CAD net Stripe revenue in Q1 2026.
-- Five-quarter imported CIBC expenses total **$11,743.21 CAD**. Provisional GST ITCs total **$559.33 CAD**; these are not filing-ready because the importer assumes embedded 5% GST for transactions marked eligible and **64** transactions remain unreviewed.
-- Before tax filing or CPA reliance: review the 64 flagged transactions, remove ineligible/non-Canadian GST claims, confirm Stripe’s transaction-date FX and actual fees, and confirm any GST collected outside the current Stripe Tax import.
+- Five-quarter imported CIBC expenses total **$11,743.21 CAD**. Provisional GST ITCs total **$559.33 CAD**; these remain subject to professional tax validation because the importer assumes embedded 5% GST for records marked eligible.
+- Before tax filing or CPA reliance: retain supporting statements and invoices, confirm ineligible/non-Canadian GST claims are excluded, confirm Stripe’s transaction-date FX and actual fees, and confirm any GST collected outside the current Stripe Tax import.
 - Produced and visually verified the internal PDF record at `yfit-admin/reports/YFIT_QUARTERLY_ACCOUNTING_Q2_2025_TO_Q2_2026.pdf`. The PDF is a draft accounting record and retains the provisional GST/ITC and review disclosures.
 - Subsequent review update: the user confirmed all imported CIBC transactions had been reviewed and accepted. Database review-status flags were aligned without changing financial values: **101 of 101** expenses are now marked reviewed. Q4 2025 was independently reconciled to **$5,565.96 CAD** in expenses and **$265.08 CAD** in provisional ITCs across 30 transactions. The accounting PDF and Markdown report were refreshed to remove the obsolete unreviewed-transaction warning while retaining professional tax-validation cautions.
+- **End-work status:** `yfit-app` and `yfit-admin` were pushed to GitHub after the accounting refresh. The current accounting-report commit is `82d5ca9`; the main-reference update should be committed before closing this session.
 
 ---
 
