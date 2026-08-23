@@ -721,3 +721,10 @@
 
 ## End-Work — August 13, 2026
 - [x] Update the Master Reference, push yfit-app and yfit-admin, and confirm both repositories are clean
+
+---
+
+## Nutrition Food Search — August 2026
+- [ ] Reproduce the deployed Nutrition food-search failure and capture the API response for a basic query
+- [ ] Trace the food-search request path and fix the minimal failing component or endpoint
+- [ ] Verify basic food-search results in the deployed app before closing
