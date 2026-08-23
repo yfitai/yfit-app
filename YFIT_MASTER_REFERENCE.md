@@ -74,15 +74,10 @@ Increment this number every time a new bundle is created.
 | Variable | Purpose | Status |
 |---|---|---|
 | `USDA_API_KEY` | Food search (USDA FoodData Central) | Managed only in Vercel `yfit-app` Environment Variables |
-| `VITE_USDA_API_KEY` | Frontend fallback (not used by serverless) | Pre-existing |
 
 **Credential rule:** Never store or record USDA API key values in source code, documentation, or chat. Create replacement keys at https://fdc.nal.usda.gov/api-key-signup.html and add them only in Vercel Environment Variables.
 
-### Vercel — yfit-marketing project
-| Variable | Purpose | Status |
-|---|---|---|
-| `USDA_API_KEY` | Food search proxy | ✅ Added May 16, 2026 |
-| `RESEND_API_KEY` | Email reports (internal) | Pre-existing, sending-only key |
+**Architecture rule:** The browser and mobile client must call the `app.yfitai.com` proxy only. Do not create a `VITE_USDA_API_KEY` frontend fallback or configure a duplicate food-search proxy in a different Vercel project.
 
 ---
 
@@ -550,6 +545,7 @@ When starting a new session, always:
 - The corrected production proxy initially returned a safe HTTP 503 because `USDA_API_KEY` was missing from the active Vercel `yfit-app` project. The key was added to Production and Preview, then redeployed.
 - Final live verification passed: `https://app.yfitai.com/api/food/search?query=apple&pageSize=5` returned HTTP 200 with USDA food results.
 - All historical USDA key values were removed from this reference. Use only Vercel Environment Variables for future changes.
+- Final source and documentation cleanup was committed to `yfit-app` as `1ed18fd` after the functional proxy fix `62bcb0b`; no mobile live-update bundle was required because the operational repair was server-side.
 
 ---
 
