@@ -1,6 +1,6 @@
 # YFIT Master Project Reference
 
-**Last Updated:** August 11, 2026
+**Last Updated:** August 23, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
@@ -73,11 +73,10 @@ Increment this number every time a new bundle is created.
 ### Vercel — yfit-app project
 | Variable | Purpose | Status |
 |---|---|---|
-| `USDA_API_KEY` | Food search (USDA FoodData Central) | ✅ Added May 16, 2026 |
+| `USDA_API_KEY` | Food search (USDA FoodData Central) | Managed only in Vercel `yfit-app` Environment Variables |
 | `VITE_USDA_API_KEY` | Frontend fallback (not used by serverless) | Pre-existing |
 
-**USDA API Key added May 16, 2026:** `P7iVKpg1LFn7gjY8j6AGcZGr3HgxTqpeQeefX9Xy`
-Get new keys free at: https://fdc.nal.usda.gov/api-key-signup.html
+**Credential rule:** Never store or record USDA API key values in source code, documentation, or chat. Create replacement keys at https://fdc.nal.usda.gov/api-key-signup.html and add them only in Vercel Environment Variables.
 
 ### Vercel — yfit-marketing project
 | Variable | Purpose | Status |
@@ -523,7 +522,7 @@ When starting a new session, always:
 - Removed `Accept: application/json` header from `api/food/search.js` (caused intermittent 400s)
 - Added 3-attempt retry logic to both `search.js` files
 - Added `https://*.yfitai.com` to CSP `connect-src` in `index.html`
-- Added `USDA_API_KEY` env var to both Vercel projects (key: `P7iVKpg1...`)
+- Added `USDA_API_KEY` env var to the active Vercel project
 - Built and deployed live update bundles 93, 94, 95, 96
 
 **Translation Fixes:**
@@ -542,6 +541,16 @@ When starting a new session, always:
 - Fixed date picker truncation on Android
 - Created AUTOMATION_REFERENCE.md
 
+### August 23, 2026
+
+**Nutrition Food Search — Restored:**
+- Reproduced the live failure at `/api/food/search?query=apple`: the endpoint returned USDA HTTP 400 responses with no food results.
+- Root cause: the proxy used repeated GET `dataType` query parameters for a multi-dataset USDA search. USDA’s documented request shape uses POST with a JSON `dataType` array.
+- Updated `api/food/search.js` to use POST, removed the insecure hardcoded key fallback, and added focused mock plus live USDA proxy tests.
+- The corrected production proxy initially returned a safe HTTP 503 because `USDA_API_KEY` was missing from the active Vercel `yfit-app` project. The key was added to Production and Preview, then redeployed.
+- Final live verification passed: `https://app.yfitai.com/api/food/search?query=apple&pageSize=5` returned HTTP 200 with USDA food results.
+- All historical USDA key values were removed from this reference. Use only Vercel Environment Variables for future changes.
+
 ---
 
 ## 🚨 Known Issues / Watch List
@@ -551,10 +560,10 @@ When starting a new session, always:
 | Social media monitoring — verify all 6 platforms posting | ✅ Done | v3.7.0 deployed May 18, 2026 — 6 platform CTAs + first_comment |
 | Multilingual social media captions | Pending decision | Plan documented above |
 | `yfit-deploy.vercel.app` still active | Intentional | Live update bundles served from here |
-| USDA rate limiting from Vercel shared IPs | Mitigated | Dedicated API key added + retry logic |
+| USDA food search | ✅ Restored Aug 23 | POST request shape + Vercel `USDA_API_KEY` configured; live `apple` endpoint test returned HTTP 200 |
 | **Supabase storage overage** | ✅ Resolved | Emergency cleanup (158 files / 271 MB deleted July 27). Edge Function + pg_cron now auto-cleans daily at 3 AM UTC. Actual live files ~88 MB. Billing meter may show elevated for 24-48h. Grace period until Aug 7, 2026. |
-| **Google OAuth branding re-verification** | ⏳ Pending | Updated app name/logo/domains on July 19, 2026. Google review in progress. Login still works. |
-| **Full Google sign-in flow end-to-end test** | ⏳ Verify | Test complete sign-in with real Google account to confirm callback + user creation works |
+| **Google OAuth branding re-verification** | ✅ Approved | Google approved YFIT AI brand verification for project `southern-flash-298120`. |
+| **Full Google sign-in flow end-to-end test** | ✅ Redirect fixed | Supabase Site URL and allow list now use `https://app.yfitai.com`; prior invalid-path error resolved. |
 | **n8n storage cleanup workflow** | ✅ Deprecated | Replaced by Supabase Edge Function `storage-cleanup` (July 27, 2026). n8n workflow at https://n8n-railway-production-fbfd.up.railway.app can be disabled. |
 
 ---

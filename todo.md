@@ -727,4 +727,5 @@
 ## Nutrition Food Search — August 2026
 - [x] Reproduce the deployed Nutrition food-search failure: `apple` returned USDA proxy HTTP 400
 - [x] Trace and fix the USDA request: replaced repeated GET `dataType` parameters with the official POST JSON array format; focused mock and live proxy tests passed
-- [ ] Verify basic food-search results in the deployed app before closing
+- [x] Add `USDA_API_KEY` to the active Vercel `yfit-app` Production and Preview environments and redeploy
+- [x] Verify basic food-search results in the deployed app: `apple` returned HTTP 200 and USDA results

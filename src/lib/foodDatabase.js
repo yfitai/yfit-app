@@ -16,12 +16,6 @@
 import { supabase } from './supabase'
 import { CapacitorHttp } from '@capacitor/core'
 
-// API Configuration
-const USDA_API_BASE = 'https://api.nal.usda.gov/fdc/v1'
-
-// Get USDA API key from environment variable
-const USDA_API_KEY = import.meta.env.VITE_USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m'
-
 /**
  * Search for foods across databases
  * @param {string} query - Search query

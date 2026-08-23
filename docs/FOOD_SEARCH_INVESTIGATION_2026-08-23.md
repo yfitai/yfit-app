@@ -21,4 +21,10 @@ Sources:
 
 ## Next diagnostic step
 
-Inspect the active Vercel `USDA_API_KEY` configuration and test the documented POST request shape before replacing the deployed GET proxy implementation. Do not expose keys in logs or documentation.
+The active Vercel `yfit-app` project initially had no `USDA_API_KEY`, which was confirmed by the corrected proxy returning a controlled HTTP 503 response. A new key was added in Vercel for Production and Preview, and the resulting deployment was tested successfully:
+
+```text
+GET /api/food/search?query=apple&pageSize=5 → HTTP 200
+```
+
+The response included five USDA food results. The fixed proxy uses the official POST request body with a JSON `dataType` array. No API key is stored in source code or this report.
