@@ -2,7 +2,8 @@
  * Vercel Serverless Function - USDA Food Search Proxy
  *
  * Proxies requests to USDA FoodData Central API to avoid CORS issues.
- * Uses GET (not POST) — the USDA /foods/search endpoint only supports GET.
+ * Uses the documented POST request shape so multiple USDA data types are sent
+ * as a JSON array rather than repeated query-string parameters.
  *
  * Endpoint: /api/food/search?query=chicken&pageSize=25
  * Method: GET
@@ -34,23 +35,22 @@ export default async function handler(req, res) {
 
     console.log(`[API] Searching USDA for: ${query}`);
 
-    const usdaApiKey = process.env.USDA_API_KEY || 'K0bD3QgyBqLrG7hXy4RgKkFFvNAmHnCXdWBet22m';
+    const usdaApiKey = process.env.USDA_API_KEY;
+    if (!usdaApiKey) {
+      console.error('[API] USDA_API_KEY is not configured');
+      return res.status(503).json({ error: 'Food search is temporarily unavailable' });
+    }
 
-    // Build GET query string — USDA /foods/search uses GET, not POST
-    const params = new URLSearchParams({
-      api_key: usdaApiKey,
-      query: query,
-      pageSize: parseInt(pageSize),
+    const parsedPageSize = Number.parseInt(pageSize, 10);
+    const criteria = {
+      query: String(query),
+      pageSize: Number.isFinite(parsedPageSize) ? Math.min(Math.max(parsedPageSize, 1), 50) : 25,
       pageNumber: 1,
       sortBy: 'score',
       sortOrder: 'desc',
-    });
-    // Append multiple dataType values (URLSearchParams.append keeps duplicates)
-    ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'].forEach(dt =>
-      params.append('dataType', dt)
-    );
-
-    const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?${params.toString()}`;
+      dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'],
+    };
+    const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(usdaApiKey)}`;
 
     // Retry up to 3 times with short backoff to handle intermittent USDA rate limits
     // Note: Do NOT send Accept: application/json — USDA ignores it and it can cause issues
@@ -59,10 +59,12 @@ export default async function handler(req, res) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         response = await fetch(usdaUrl, {
-          method: 'GET',
+          method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'User-Agent': 'YFIT-App/1.0 (https://app.yfitai.com)',
           },
+          body: JSON.stringify(criteria),
         });
         if (response.ok) break; // success — exit retry loop
         lastStatus = response.status;

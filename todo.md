@@ -725,6 +725,6 @@
 ---
 
 ## Nutrition Food Search — August 2026
-- [ ] Reproduce the deployed Nutrition food-search failure and capture the API response for a basic query
-- [ ] Trace the food-search request path and fix the minimal failing component or endpoint
+- [x] Reproduce the deployed Nutrition food-search failure: `apple` returned USDA proxy HTTP 400
+- [x] Trace and fix the USDA request: replaced repeated GET `dataType` parameters with the official POST JSON array format; focused mock and live proxy tests passed
 - [ ] Verify basic food-search results in the deployed app before closing
