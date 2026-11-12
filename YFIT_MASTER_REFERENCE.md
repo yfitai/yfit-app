@@ -1,7 +1,27 @@
 # YFIT Master Project Reference
 
-**Last Updated:** August 23, 2026
+**Last Updated:** November 12, 2026
 **Read this at the start of every session before making any changes.**
+
+---
+
+## Current Session Workflow — November 12, 2026
+
+The sandbox was reset, but the canonical main-app source and private documentation hub were restored from GitHub. The admin workspace was restored from its managed origin and confirmed against GitHub. The user authorized the Manus Connector for the four active repositories. No repository was recreated, consolidated, deleted, or moved; the retired marketing repository remains untouched.
+
+Both `start-work.sh` and `end-work.sh` now use the authorized GitHub CLI connection without a PAT prompt, plaintext credential files, or credentials embedded in remote URLs. Repository-local Git identity is used instead of changing global Git settings. The startup authentication change was saved as `33748df`; the companion end-work change is saved with this session's documentation.
+
+End-work checks canonical repository identity and the `main` branch before saving, commits/pushes the app, admin and private documentation hub, rejects recognizable credential values in newly staged lines, and confirms all three working trees are clean and match GitHub. Failed checks or pushes must stop the workflow rather than report success. The admin managed S3 `origin` is retained; GitHub backup uses the separate `github` remote. If admin source changes, its managed workspace checkpoint must also be saved through Manus, not by a terminal S3 push. Older absolute prohibitions on checkpoints in historical notes must not override this managed-origin synchronization requirement.
+
+**Current mapping overrides historical marketing references below:** `/home/ubuntu/yfit-app-full` is `yfitai/yfit-app` and includes the live app, current marketing homepage (`src/pages/LandingPage.tsx`), `/go` page (`src/pages/GoPage.tsx`), and translations (`src/lib/i18nResources.js`). `/home/ubuntu/yfit-marketing` is actually `yfitai/yfit-admin`. `/home/ubuntu/yfit-ai` is the private documentation hub. `yfitai/yfitai-yfit-video-service` remains the separate Railway service. `yfitai/yfit-marketing` is retired and must not be used for current website changes.
+
+The six rules remain mandatory: read this reference; verify the repository; check the bundle number; never add `outputDirectory` to `vercel.json`; test food search around API changes; edit translations only in `src/lib/i18nResources.js`. Food API checks must be sequential, not parallel. Build metadata remains **108 (August 11, 2026)**; local compilation must bypass the version-bumping `prebuild` lifecycle when no new bundle is authorized.
+
+Copyable prompts are in `docs/SESSION_PROMPTS.md`. Restart verification evidence and explicitly untested items are recorded in `docs/RESTART_VERIFICATION_2026-11-12.md`. Passing build/endpoint checks is not equivalent to signed-in mobile, financial, report-delivery, or social-posting verification. Historical documentation inconsistencies and any tracked legacy credentials require a separate approved cleanup; never use, repeat, or copy old credential values into current work.
+
+**Restart checks completed:** the main Vite compilation and focused food-proxy contract tests passed; production app, marketing and `/go` rendered; sequential apple/chicken food requests returned HTTP 200. Admin synthetic/mocked tests (21), type-check, build, sandbox database constant SELECT, committed accounting artifacts and public health checks passed. Video source matched GitHub, syntax passed and Railway `/health` returned HTTP 200. The private hub's accessible Git history was verified. Both session scripts passed syntax checks and eight mocked save-safety scenarios. End-work also verifies the optional video-service checkout when present.
+
+**Do not claim the entire app is cleared:** unresolved findings include raw app-tour translation keys, direct signup opening the Sign In tab, marketing signup-domain and policy/Terms navigation inconsistencies, and source-level admin report-endpoint authorization concerns. Real Google sign-in/callback, authenticated feature persistence, mobile devices, production financial/report delivery and social automation were not exercised. Historical docs contain credential candidates: treat exposed tokens as compromised and arrange rotation/redaction through the appropriate dashboards under separate authorization, without displaying or reusing values. No fixes to app behavior or historical credentials were made in this restart task.
 
 ---
 
