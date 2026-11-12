@@ -7,24 +7,29 @@
 
 set -e
 
-# ── GitHub credentials ──────────────────────────────────────
-GITHUB_USER="yfitai"
+# ── Authorized GitHub connection (no PAT storage) ────────────
 GITHUB_EMAIL="don@yfitai.com"
 GITHUB_NAME="YFIT AI"
-CREDS_FILE="$HOME/.yfit-credentials"
-
-if [ -f "$CREDS_FILE" ]; then
-  GITHUB_TOKEN=$(cat "$CREDS_FILE")
-else
-  echo ""
-  echo "  First-time setup: enter the GitHub PAT for the yfitai account."
-  echo "  (Get from: https://github.com/settings/tokens)"
-  read -rsp "  GitHub PAT (ghp_...): " GITHUB_TOKEN
-  echo ""
-  echo "$GITHUB_TOKEN" > "$CREDS_FILE"
-  chmod 600 "$CREDS_FILE"
-  echo "  ✅ Token saved to $CREDS_FILE for future sessions"
+GITHUB_CLI="gh"
+if [ -n "${MANUS_CONFIG_HOME:-}" ] && [ -x "$MANUS_CONFIG_HOME/connectors/github/gh" ]; then
+  GITHUB_CLI="$MANUS_CONFIG_HOME/connectors/github/gh"
 fi
+
+if ! command -v "$GITHUB_CLI" >/dev/null 2>&1; then
+  echo "  GitHub CLI is unavailable. Enable the authorized GitHub connection before startup."
+  exit 1
+fi
+if ! "$GITHUB_CLI" api user >/dev/null; then
+  echo "  GitHub authorization is unavailable. Enable or reconnect GitHub in Manus, then rerun."
+  exit 1
+fi
+
+# Use the authorized connection for this command only; never write a token,
+# alter global Git credential settings, or place credentials in remote URLs.
+export GIT_TERMINAL_PROMPT=0
+github_git() {
+  git -c credential.helper= -c "credential.helper=!\"$GITHUB_CLI\" auth git-credential" "$@"
+}
 
 echo ""
 echo "============================================================"
@@ -35,24 +40,23 @@ echo ""
 
 # ── 1. Configure git ────────────────────────────────────────
 echo "▶ [1/7] Configuring git..."
-git config --global user.name "$GITHUB_NAME"
-git config --global user.email "$GITHUB_EMAIL"
-git config --global credential.helper store
-echo "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-echo "  ✅ Git: $GITHUB_NAME <$GITHUB_EMAIL>"
+echo "  ✅ Authorized GitHub connection (no PAT prompt or credential file)"
+echo "  ✅ Git identity will be configured for yfit-app only: $GITHUB_NAME <$GITHUB_EMAIL>"
 echo ""
 
 # ── 2. Clone or pull yfit-app (main app + marketing site) ───
 echo "▶ [2/7] Setting up yfit-app (main app + www.yfitai.com)..."
 if [ -d "/home/ubuntu/yfit-app-full/.git" ]; then
   cd /home/ubuntu/yfit-app-full
-  git pull origin main --quiet
+  github_git pull origin main --quiet
   echo "  ✅ yfit-app up to date: $(git log --oneline -1)"
 else
   cd /home/ubuntu
-  git clone "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-app.git" yfit-app-full
+  "$GITHUB_CLI" repo clone yfitai/yfit-app yfit-app-full
   echo "  ✅ yfit-app cloned: $(cd yfit-app-full && git log --oneline -1)"
 fi
+git -C /home/ubuntu/yfit-app-full config user.name "$GITHUB_NAME"
+git -C /home/ubuntu/yfit-app-full config user.email "$GITHUB_EMAIL"
 echo "  ⚠️  Marketing site (www.yfitai.com) is INSIDE this repo:"
 echo "     src/pages/LandingPage.tsx  ← marketing homepage"
 echo "     src/pages/GoPage.tsx       ← social funnel /go page"
@@ -116,11 +120,11 @@ echo ""
 echo "▶ [6/7] Setting up yfit-ai monopro hub (docs)..."
 if [ -d "/home/ubuntu/yfit-ai/.git" ]; then
   cd /home/ubuntu/yfit-ai
-  git pull origin main --quiet 2>/dev/null || true
+  github_git pull origin main --quiet
   echo "  ✅ yfit-ai hub up to date: $(git log --oneline -1)"
 else
   cd /home/ubuntu
-  git clone "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/yfitai/yfit-ai.git" yfit-ai --quiet 2>/dev/null
+  "$GITHUB_CLI" repo clone yfitai/yfit-ai yfit-ai -- --quiet
   echo "  ✅ yfit-ai hub cloned: $(cd yfit-ai && git log --oneline -1)"
 fi
 echo "  📖 Docs: /home/ubuntu/yfit-ai/docs/MASTER_REFERENCE.md"
