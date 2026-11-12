@@ -23,6 +23,18 @@ Copyable prompts are in `docs/SESSION_PROMPTS.md`. Restart verification evidence
 
 **Do not claim the entire app is cleared:** unresolved findings include raw app-tour translation keys, direct signup opening the Sign In tab, marketing signup-domain and policy/Terms navigation inconsistencies, and source-level admin report-endpoint authorization concerns. Real Google sign-in/callback, authenticated feature persistence, mobile devices, production financial/report delivery and social automation were not exercised. Historical docs contain credential candidates: treat exposed tokens as compromised and arrange rotation/redaction through the appropriate dashboards under separate authorization, without displaying or reusing values. No fixes to app behavior or historical credentials were made in this restart task.
 
+### Processing Tests — November 12, 2026 (Later Follow-up)
+
+The user requested sign-in, payments, report displays/delivery and six-platform posting tests before marketing diagnosis, and reported a possible November 5 signup with most other accounts likely setup tests. That account classification/date/attribution remains unverified. Google-first initiation reached correctly branded YFIT AI Google login with the expected callback; no real account login was completed. The user prefers read-only Supabase account metadata. Direct authorization did not complete, and account-detail evidence was requested without changing or impersonating users.
+
+**New confirmed production display failure:** `admin.yfitai.com/accounting` renders `TypeError: Invalid URL`. The compiled login-URL helper has undefined build-time OAuth configuration; local admin `getLoginUrl` depends on `VITE_OAUTH_PORTAL_URL`/`VITE_APP_ID` and is eagerly evaluated by `useAuth`. Do not treat admin health 200 as a working report UI, or change deployment/auth settings without approval.
+
+Read-only Stripe evidence found zero charges/refunds since August 1; catalog/subscription/webhook reads were denied by the available restricted key. Isolated source fixtures reproduced material payment-entitlement/checkout/webhook risks; deployed policy/config parity and a real sandbox checkout remain unverified. Report tests found incomplete annual cache aggregation, misleading zero-visitor fallbacks, ignored social date windows and PDF pagination issues. Existing financial/tax reports remain internal and unchanged; no re-sync/import/regeneration/send was performed.
+
+Read-only Upload-Post history confirmed six current platforms and 18 published URLs dated October 29–31, but no November 1–11 publication records in the inspected range. This is missing daily-publication evidence, not proof of 66 failed jobs. TikTok's latest status warns its first comment was skipped and requires reconnection. Live n8n/Supabase scheduler execution history was not accessible; inspect existing logs before retrying or altering any automation.
+
+**Marketing/measurement caution:** website-stat failures become fresh-looking zeroes, and no GA4/GTM installation was observed in the reviewed app assets/source. The user's Google report type is not identified. Do not conclude zero human visits or marketing failure from these reports. Fix/test processing first, then establish consent-aware pageview/click/signup attribution with isolated test traffic and verified exclusions. See `docs/PROCESSING_TESTS_2026-11-12.md` for sanitized evidence, limitations and safe next steps. No production charges, public posts, database/user changes, application fixes or service configuration changes were made in this follow-up.
+
 ---
 
 ## 🗂️ Repository Structure (Confirmed May 16, 2026)
