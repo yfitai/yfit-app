@@ -1,5 +1,7 @@
 # Scraper duplicate handling — November 13, 2026
 
+**Current status:** At15:37 EST on November13, the owner reported using Deploy Updates on the existing function and receiving “Successfully completed.” Deployment acceptance is owner-confirmed. The next normal scheduled execution and downstream publication outcomes remain unverified; no manual invocation/retry was performed.
+
 The user approved a narrow duplicate-safe repair and deployment to the existing Supabase `scrape-fitness-articles` Edge Function, with the unique URL constraint and existing articles preserved. No schedule changes, database cleanup, retries or public backfill are authorized.
 
 ## What runs where
@@ -35,3 +37,11 @@ Because management access is not authenticated in the agent browser, the remaini
 ## Final offline regression result
 
 The final gate passes11/11 synthetic checks. The additional check reverts only the article-write semantics to the owner-supplied plain-insert pattern and reproduces the exact named duplicate-key failure with HTTP500; the same existing-URL fixture passes with conflict-ignore handling and preserves its row. This is a mocked contract reproduction, not a live insertion or PostgreSQL test. The complete tested canonical `.ts` file is the deployment replacement; its before-code snapshot is preserved for rollback.
+
+## Owner-confirmed deployment and remaining gates
+
+The owner reported deployment success at15:37 EST after the replacement instructions. The saved replacement is the canonical source in commit `6cc8a2a`; the before-code snapshot remains available privately. No function name, gateway setting, secret or URL constraint change was requested, and no such change was reported. This is user-reported dashboard confirmation, not an authenticated deployment API read or a live function execution test.
+
+Inspect the next existing scheduled n8n execution without pressing Execute/Retry: confirm Call Supabase — Scrape Articles completes, inspect `success` and `articles_saved` (zero can legitimately mean all selected URLs already exist), then check the next generation/assembly/provider nodes and six terminal publication outcomes. If another node fails, record its sanitized error/status rather than assuming the entire pipeline is restored or retrying posts. Do not infer that a successful deployment or scraper node means all six posts were published.
+
+The source/deployment mismatch also exposes a release-process gap: ordinary GitHub/Vercel web deployment does not publish Supabase Edge Function code. The previously committed guard remained absent in the active scraper. A future approved automated Edge release step should be scoped to the canonical repo, existing project and changed functions, with validation and rollback; no new automation or credential setup was created in this repair.
