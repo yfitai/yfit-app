@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import fs from 'fs'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -16,10 +17,12 @@ export default defineConfig(({ mode }) => ({
       transformIndexHtml(html) {
         const buildTime = Date.now()
         const buildDate = new Date().toISOString()
+        const buildNumber = JSON.parse(fs.readFileSync(new URL('./public/version.json', import.meta.url), 'utf8')).buildNumber
         
         return html.replace(
           '</head>',
           `  <!-- Build: ${buildDate} (${buildTime}) -->
+  <meta name="yfit-build-number" content="${buildNumber}" />
   <meta name="build-time" content="${buildTime}" />
   <meta name="build-date" content="${buildDate}" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />

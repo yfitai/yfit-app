@@ -5,6 +5,16 @@
 
 ---
 
+## Current Android Release — Build 109, November 13, 2026
+
+The owner explicitly approved publishing Android live-update Build 109 at 17:29 EST. Build 109 has been built and validated; publication and actual installed-phone execution are pending until verified. Current local metadata and archive root identify 109, superseding older Build108 statements as current release state. Read `docs/ANDROID_BUILD_109_2026-11-13.md` and the medication feature report. Use only the existing main app/GitHub/Vercel/legacy update URL; no APK, ADB, Android Studio, reinstall, app-data clearing or provider/native configuration change was authorized/performed.
+
+Release preparation found two actual updater defects: the active108 ZIP uses constant `production` and expects an ID from the void Android LiveUpdate7.4 download API, so it never stages; the packager includes the prior ZIP and updates an existing archive with stale files. The corrected service validates read-only release metadata, uses unique build IDs, reuses verified listed downloads, explicitly stages after void success, guards downgrade/concurrent checks and never deletes user/bundle data. The native banner waits for real staging/reload and displays an executing-HTML build badge, not remote/pending metadata. Browser update behavior is preserved. SHA256 uses the inspected Android7.4 hexadecimal comparison; no iOS checksum/native signing change. Mutable update URLs have no-store headers.
+
+38 isolated updater/service/banner/packaging regressions,75 medication regressions,11 doctor-print/form/PDF groups,8 auth-entry checks and scoped lint passed. Final native/web builds passed. Fresh109 ZIP has4,669,200bytes, SHA256 `56e835d94229b4d41efc507fd656f935852d54564f02ed29e87b934dd5bce0c9`, no nested ZIPs and no recognizable private credentials in checked text. Build incremented108→109 exactly once; a guarded rebuild-current109 refreshed the same number. Vercel build:web does not bump it.108 remains in Git at pre-release`b3946dc` and private rollback copy.
+
+An archive cannot repair older executing broken JS. The existing legacy-host web deployment provides a possible no-reinstall bootstrap only if the installed binary actually uses the repository's remote server.url. Installed configuration/state is not verified. Do not treat upload/badge/remote manifest as proof of native ZIP installation; owner must open on Wi-Fi, allow download, close/reopen and check109 badge plus weekday controls. If still old, request screenshot/client identity, not uninstall/data clearing. Native Google/session transfer, authenticated medication persistence, report delivery, payment and normal six-platform execution remain separate unverified gates.
+
 ## Current Session Workflow — November 12, 2026
 
 The sandbox was reset, but the canonical main-app source and private documentation hub were restored from GitHub. The admin workspace was restored from its managed origin and confirmed against GitHub. The user authorized the Manus Connector for the four active repositories. No repository was recreated, consolidated, deleted, or moved; the retired marketing repository remains untouched.

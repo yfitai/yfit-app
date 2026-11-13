@@ -1,102 +1,94 @@
 import { Capacitor } from '@capacitor/core';
+import { readReleaseManifest, stageNativeRelease } from './liveUpdateCore.js';
 
-// LiveUpdate plugin loaded lazily - only on native
-let LiveUpdate = null;
+let pluginPromise = null;
+let checkPromise = null;
+let initializationPromise = null;
 
-const UPDATE_URL = 'https://yfit-deploy.vercel.app/updates/bundle.zip';
-const BUNDLE_ID = 'production';
+async function loadPlugin() {
+  if (!Capacitor.isNativePlatform()) return null;
+  if (!pluginPromise) {
+    pluginPromise = import('@capawesome/capacitor-live-update')
+      .then(mod => mod.LiveUpdate)
+      .catch(error => { pluginPromise = null; throw error; });
+  }
+  return pluginPromise;
+}
+
+function getLoadedBuildNumber() {
+  const value = Number(globalThis.document?.querySelector('meta[name="yfit-build-number"]')?.content);
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
+}
 
 export class LiveUpdateService {
   static async initialize() {
-    // Never run on web - no plugin available
-    if (!Capacitor.isNativePlatform()) {
-      console.log('LiveUpdate: Skipping - running in browser');
-      return;
+    if (!Capacitor.isNativePlatform()) return;
+    if (!initializationPromise) {
+      initializationPromise = this._doInitialize().catch(error => {
+        initializationPromise = null;
+        console.warn('LiveUpdate: Initialization skipped:', error.message);
+      });
     }
-
-    // Lazily import plugin so web bundle doesn't fail
+    let timer;
     try {
-      const mod = await import('@capawesome/capacitor-live-update');
-      LiveUpdate = mod.LiveUpdate;
-    } catch (err) {
-      console.log('LiveUpdate: Plugin not available:', err.message);
-      return;
+      await Promise.race([
+        initializationPromise,
+        new Promise(resolve => { timer = setTimeout(resolve, 5000); }),
+      ]);
+    } finally {
+      clearTimeout(timer);
     }
-
-    // Wrap entire init in a 5-second timeout so a failed/slow
-    // update check NEVER blocks app startup (no more spinning disk)
-    await Promise.race([
-      this._doInitialize(),
-      new Promise((resolve) =>
-        setTimeout(() => {
-          console.warn('LiveUpdate: Timed out after 5s - continuing without update');
-          resolve();
-        }, 5000)
-      ),
-    ]).catch((err) => {
-      console.error('LiveUpdate: Init error (non-blocking):', err.message);
-    });
   }
 
   static async _doInitialize() {
-    if (!LiveUpdate) return;
-
-    // Mark app as ready first (rollback protection) - must run even if update fails
-    try {
-      await LiveUpdate.ready();
-      console.log('LiveUpdate: App marked as ready');
-    } catch (e) {
-      console.log('LiveUpdate: ready() skipped:', e.message);
-    }
-
-    // Run update check in background - does NOT block app startup
+    const plugin = await loadPlugin();
+    if (!plugin) return;
+    // Retain ready()/rollback acknowledgement. No bundle or app data is deleted.
+    await plugin.ready();
     this._checkForUpdatesBackground();
   }
 
   static async _checkForUpdatesBackground() {
-    if (!LiveUpdate) return;
     try {
-      const currentBundle = await LiveUpdate.getCurrentBundle();
-      console.log('LiveUpdate: Current bundle:', currentBundle);
-
-      // Quick HEAD check before attempting full download
-      // Avoids long hang when bundle.zip doesn't exist yet
-      const headCheck = await fetch(UPDATE_URL, { method: 'HEAD' }).catch(() => null);
-      if (!headCheck || !headCheck.ok) {
-        console.log('LiveUpdate: No bundle available at update URL - skipping download');
-        return;
-      }
-
-      const result = await LiveUpdate.downloadBundle({
-        url: UPDATE_URL,
-        bundleId: BUNDLE_ID,
-      });
-
-      if (result.bundleId) {
-        await LiveUpdate.setNextBundle({ bundleId: result.bundleId });
-        console.log('LiveUpdate: Update downloaded - will apply on next restart');
+      const result = await this.checkForUpdates();
+      if (result.status === 'staged') {
+        console.log(`LiveUpdate: Build ${result.buildNumber} staged for next restart.`);
       }
     } catch (error) {
-      console.log('LiveUpdate: Background check failed (non-blocking):', error.message);
+      console.warn('LiveUpdate: Background check skipped:', error.message);
     }
+  }
+
+  static async checkForUpdates() {
+    if (!Capacitor.isNativePlatform()) return { status: 'web' };
+    if (!checkPromise) {
+      checkPromise = (async () => {
+        const plugin = await loadPlugin();
+        if (!plugin) return { status: 'web' };
+        const release = await readReleaseManifest();
+        return stageNativeRelease(plugin, release, {
+          platform: Capacitor.getPlatform(),
+          loadedBuildNumber: getLoadedBuildNumber(),
+        });
+      })().finally(() => { checkPromise = null; });
+    }
+    return checkPromise;
+  }
+
+  static async applyUpdate() {
+    const result = await this.checkForUpdates();
+    if (result.status !== 'staged') return false;
+    const plugin = await loadPlugin();
+    await plugin.reload();
+    return true;
   }
 
   static async reload() {
-    if (!LiveUpdate) return;
-    try {
-      await LiveUpdate.reload();
-    } catch (error) {
-      console.error('LiveUpdate: Reload error:', error);
-    }
+    return this.applyUpdate();
   }
 
   static async getCurrentVersion() {
-    if (!LiveUpdate) return null;
-    try {
-      return await LiveUpdate.getCurrentBundle();
-    } catch (error) {
-      console.error('LiveUpdate: Get version error:', error);
-      return null;
-    }
+    const plugin = await loadPlugin();
+    return plugin ? plugin.getCurrentBundle() : null;
   }
 }
