@@ -47,6 +47,14 @@ The user requested investigation, not production repairs. See `docs/ROOT_CAUSE_F
 
 No fixes, account changes, production charges, sends, posts, retries or new mobile bundle were authorized/performed. Only diagnostics and docs are saved; admin diagnostics also require a managed checkpoint after GitHub backup. Recommended next approval: tightly scoped web callback/signup repair and admin render/config validation, preserving current repo/deployment mapping; then payment protection and reporting integrity with safe preview/fixture validation before production changes.
 
+### Approved Authentication Entry Repairs — November 13, 2026 (Later)
+
+The user approved the first batch: web callback/signup and admin accounting crash, plus investigation of web/phone differences. Main functional commit `4787b67` uses root web assets and explicit relative Capacitor mode, route-specific Auth initial tabs and a `build:web` deployment command that does not bump phone metadata. Its automatic Vercel deployment is live; both app/www callback modules are JavaScript at root paths, and live app signup displays Create Account with Google first. Eight regression checks and separate web/Capacitor asset compiles passed. Existing Android/OTA executable build entrypoints explicitly select native mode, with rebuild preparing assets before sync. No new phone archive or native build was produced; Build108 remains unchanged. Read `docs/AUTH_ENTRY_REPAIRS_2026-11-13.md`.
+
+Admin source repair lazily starts login, validates missing/invalid configuration safely and preserves its existing OAuth/backend protocol. Thirty-three mocked tests, type-check and build passed. Actual `admin.yfitai.com` serving host is Railway, not Manus hosting or main-app Vercel. Working login requires the serving build to contain its authoritative OAuth inputs; GitHub/managed backup alone is not proof of Railway deployment. No accounting calculations, DB records, report sends or admin OAuth protocol migration were changed. Finish verifying the existing Railway service, not a duplicate project.
+
+Web/phone current source and retained OTA archive use one Supabase account project, but origins/devices/PWA/APK have independent sessions. Current Capacitor remote URL is the legacy Vercel hostname; active source lacks native Google callback/session-transfer plumbing. This is a concrete native integration risk, not proof of the installed device behavior or two customer registries. Read `docs/WEB_PHONE_AUTH_2026-11-13.md`; identify phone install/version/origin and test a designated identity before native/provider/deep-link changes. User screenshot identified published n8n YFIT Social Media Automation v2 with daily schedule label 6 AM CDT; execution outcomes and effective timezone remain unverified. Do not execute/retry from the editor. Full sanitized repair evidence is retained in private hub `docs/evidence/2026-11-13-repairs/`.
+
 ---
 
 ## 🗂️ Repository Structure (Confirmed May 16, 2026)

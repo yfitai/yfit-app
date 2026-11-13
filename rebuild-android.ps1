@@ -6,6 +6,14 @@ Write-Host "YFIT Android Rebuild Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Prepare relative native assets before sync; this does not create an OTA archive.
+Write-Host "Preparing Capacitor web assets..." -ForegroundColor Yellow
+npx vite build --mode capacitor
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERROR: Failed to build Capacitor assets" -ForegroundColor Red
+    exit 1
+}
+
 # Step 1: Sync web code to Android
 Write-Host "[1/3] Syncing web code to Android..." -ForegroundColor Yellow
 npx cap sync android

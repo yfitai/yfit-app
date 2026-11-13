@@ -219,7 +219,7 @@ function Build-AndroidAPK {
     
     if (Test-Command "npx") {
         Write-Host "Step 1: Building web assets..." -ForegroundColor Yellow
-        npm run build
+        npm run build -- --mode capacitor
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host ""

@@ -20,7 +20,7 @@ if ($devices -match "device$") {
 
 Write-Host ""
 Write-Host "Step 1/4: Building web assets..." -ForegroundColor Yellow
-npm run build
+npm run build -- --mode capacitor
 
 Write-Host ""
 Write-Host "Step 2/4: Syncing to Android..." -ForegroundColor Yellow

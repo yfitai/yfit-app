@@ -109,9 +109,14 @@ check('web deploy bypasses native metadata bump and retains serverless configura
   assert.ok(!pkg.scripts['prebuild:web'])
 })
 check('existing native build entrypoints explicitly use the Capacitor target', () => {
-  for (const relative of ['scripts/create-update-bundle.sh', '.github/workflows/android-build.yml']) {
+  for (const relative of ['scripts/create-update-bundle.sh', '.github/workflows/android-build.yml', 'deploy-android.ps1', 'deploy.bat']) {
     assert.match(fs.readFileSync(path.join(root, relative), 'utf8'), /npm run build -- --mode capacitor/)
   }
+  const deploymentMenu = fs.readFileSync(path.join(root, 'deploy.ps1'), 'utf8')
+  assert.match(deploymentMenu, /Step 1: Building web assets[^]*?npm run build -- --mode capacitor/)
+  const rebuild = fs.readFileSync(path.join(root, 'rebuild-android.ps1'), 'utf8')
+  assert.ok(rebuild.indexOf('npx vite build --mode capacitor') >= 0)
+  assert.ok(rebuild.indexOf('npx vite build --mode capacitor') < rebuild.indexOf('npx cap sync android'))
 })
 
 console.log(`All ${checks} auth-entry regression checks passed. No provider, database, email or browser calls occurred.`)
