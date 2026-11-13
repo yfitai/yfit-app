@@ -27,3 +27,7 @@ The existing PWA or a phone shell loading the updated hosted website may receive
 First determine whether the phone icon opens a browser PWA or an installed APK, record its version and loaded hostname, and compare its public asset/bundle version—without exposing tokens or storage contents. Then use one designated existing test identity to compare website and phone email login, Google consent/return and dashboard arrival. Record whether they share the same user identity, without resetting or impersonating a customer. No native rebuild, provider configuration change or new phone bundle is authorized merely by this investigation.
 
 Detailed source references are preserved in the private hub's `docs/evidence/2026-11-13-repairs/web-mobile-auth.md`. The first web repair and live-check record is `docs/AUTH_ENTRY_REPAIRS_2026-11-13.md`.
+
+## Later hostname comparison
+
+A GET-only check at approximately 15:14 EST found both the configured legacy Vercel host and primary app serving HTTP200 with the same repaired entry asset `index-6OQdqWdw.js`. The older hostname does not currently prove the phone points at stale website code. They remain different origins with independent session storage and potentially different provider redirect allow-list behavior. Native browser-to-WebView return and the actual installed phone runtime remain untested.

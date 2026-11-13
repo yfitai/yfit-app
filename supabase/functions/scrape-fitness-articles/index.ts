@@ -343,10 +343,17 @@ Deno.serve(async (_req) => {
       scoredArticles = scoredArticles.concat(scored);
     }
 
-    // Keep only articles with relevance score >= 0.5 (lowered from 0.6 for better coverage)
+    // Keep the highest-ranked candidate for each exact URL. Do not canonicalize
+    // feed URLs: query strings, fragments, and other variations may be meaningful.
+    const seenUrls = new Set<string>();
     const relevantArticles = scoredArticles
       .filter((a) => a.relevance_score >= 0.5)
       .sort((a, b) => b.relevance_score - a.relevance_score)
+      .filter((a) => {
+        if (seenUrls.has(a.url)) return false;
+        seenUrls.add(a.url);
+        return true;
+      })
       .slice(0, 10); // Top 10 per day
 
     console.log(`Relevant articles (score >= 0.5): ${relevantArticles.length}`);
@@ -389,9 +396,10 @@ Deno.serve(async (_req) => {
       );
     }
 
-    // Upsert new articles — ON CONFLICT (url) DO NOTHING prevents duplicate key errors
-    // (Session 23 fix: changed from .insert() to .upsert() with ignoreDuplicates)
-    const { error: insertError } = await supabase
+    // Database-level ON CONFLICT (url) DO NOTHING is the concurrency/replay guard.
+    // Never merge duplicates: preserve existing content and is_processed state.
+    // Return only newly inserted URLs so conflicts do not inflate saved counts.
+    const { data: insertedArticles, error: insertError } = await supabase
       .from("scraped_articles")
       .upsert(
         newArticles.map((a) => ({
@@ -406,26 +414,29 @@ Deno.serve(async (_req) => {
           is_processed: false,
         })),
         { onConflict: 'url', ignoreDuplicates: true }
-      );
+      )
+      .select("url");
 
     if (insertError) {
       throw new Error(`Failed to insert articles: ${insertError.message}`);
     }
+
+    const articlesSaved = insertedArticles?.length ?? 0;
 
     // Update log with correct field name
     await supabase
       .from("automation_logs")
       .update({
         status: "completed",
-        articles_processed: newArticles.length,  // correct column name
+        articles_processed: articlesSaved,
         duration_ms: Date.now() - startTime,
       })
       .eq("id", logEntry?.id);
 
-    console.log(`Successfully saved ${newArticles.length} articles`);
+    console.log(`Successfully saved ${articlesSaved} articles`);
 
     return new Response(
-      JSON.stringify({ success: true, articles_saved: newArticles.length }),
+      JSON.stringify({ success: true, articles_saved: articlesSaved }),
       { headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
