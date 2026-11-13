@@ -6,9 +6,11 @@ The trigger screenshot shows the generic six-field format hint, but n8n explicit
 
 The owner is correct that Manitoba switched to year-roundUTC−5, legally Manitoba Standard Time/MBT, effectiveOctober31,2026. [2] [3] That creates a one-hour Chicago–Manitoba difference in winter, not the five-hour node-label gap. The label and actual trigger settings are mismatched; a stale Manitoba timezone database is not needed to explain the observed11AMChicago/noonManitoba run. Whether the original11 was entered intending UTC is unknown.
 
-## Proposed correction — approval pending, not applied
+## Approved correction — saved/published verification pending
 
 For a stable6AMManitoba start independent of the n8n container's Winnipeg timezone database update, set this existing workflow's timezone to UTC (`Etc/UTC` in the selector) and retain the complete current cron field `0 11 * * *`.11UTC equals6AMManitoba at permanentUTC−5. Rename the clock node to `Daily Schedule Trigger (6 AM Manitoba / MBT)` so its label matches intent. No instance/server timezone, other workflow, platform account, credential or VPN change is needed. This workflow-scoped timezone change can also affect timezone-aware expressions in this same workflow; verify the proposed change and preserve unrelated settings before publishing.
+
+At16:19 the owner explicitly approved correcting the existing schedule to6AMManitoba. This authorizes the exact workflow-scoped timezone/label correction and save/publish, not a manual execution, backfill, additional trigger or downstream test. Guide the owner's signed-in tab; the automation browser does not share that login. Do not claim applied until the selected timezone and saved/published state have been confirmed. Earlier pending-approval wording below is historical.
 
 n8n restored missing UTC/GMT workflow choices in release1.85.0; its source discussion confirms the earlier selector issue and released correction. [4] [5] If the installed selector does not offer the UTC choice, stop and inspect the available values rather than guessing an offset or updating the server. An alternative fixedUTC−5 timezone can be evaluated, but was not selected or applied.
 
