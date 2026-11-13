@@ -621,6 +621,18 @@ When starting a new session, always:
 - All historical USDA key values were removed from this reference. Use only Vercel Environment Variables for future changes.
 - Final source and documentation cleanup was committed to `yfit-app` as `1ed18fd` after the functional proxy fix `62bcb0b`; no mobile live-update bundle was required because the operational repair was server-side.
 
+### November 13, 2026 — Medication Weekdays and Combination Ingredients
+
+The user approved one chosen weekday for once-weekly medication and two distinct weekdays for twice weekly, with no off-day scheduled checkbox and no guessed weekday for existing medications. The user also approved separately entered ingredient names and exact strengths under one compound/combination parent, ingredient-level conflict comparisons, and grouped physician print/PDF output. No prescribed strength is inferred, summed or changed; a combination remains one parent schedule.
+
+Implemented and backed up in the canonical `yfitai/yfit-app` branch `fix/medication-schedules-combinations-2026-11-13`, commit `87bd824a5fa0d979de111faaa243f79c53775ce8`. Production `main` intentionally does not contain the feature code until the additive database fields are applied and verified. It contains the durable handoff report and combined SQL. Do not lose or merge the feature branch prematurely.
+
+`docs/MEDICATION_SCHEDULING_AND_COMBINATIONS_2026-11-13.md` records behavior and limits. Owner handoff: run the complete `database/add_medication_scheduling_and_ingredients.sql` in the existing YFIT Supabase SQL Editor. It adds nullable `scheduled_weekdays smallint[]` and `combination_ingredients jsonb`, type guards, structural constraints and schema-cache notification, without backfill, patient/dose updates, log deletion, RLS changes or function invocation. Both fields were absent in zero-row API checks. After owner success, repeat a zero-row verification before merging and deploying through the existing app GitHub/Vercel pipeline.
+
+75 automated regressions and 11 additional fictional form/list/doctor-print/PDF assertion groups passed. Both final web and Capacitor-target builds passed, with root/relative assets preserved. Build 108 and the existing phone archive remain unchanged; no installed-phone or real-patient end-to-end test is claimed. No production medical data was read or changed. Catalog projections passed zero-row checks; a zero-row type probe confirmed catalog UUID identifiers.
+
+The former daily log mismatch path deleted today's records before rebuilding them. The new feature instead inserts only missing records and preserves taken/off-day/inactive/excess history. Current weekday choices are not applied retroactively to adherence; earlier wrongly generated logs can still bias historical summaries/Predictions. Cross-device insert concurrency is not solved by this feature. The current conflict table and unsaved comparison form warn about unresolved ingredients, duplicates, query failure, and limited non-dose-specific catalog coverage; they never establish medication safety. New scheduling labels cover all eight existing locales; new combination wording uses canonical English fallbacks. Other planned morning checks remain: normal six-platform execution outcomes, actual sign-in and report delivery.
+
 ---
 
 ## 🚨 Known Issues / Watch List
