@@ -1,6 +1,8 @@
 # n8n daily posting schedule — November 13, 2026
 
-**The owner-supplied settings explain the discrepancy.** The existing YFIT Social Media Automation v2 Schedule Trigger contains five-field cron `0 11 * * *`, and its explicit workflow timezone is `America/Chicago`. That means11AM Chicago daily, not the6AM stated in the node name. On November13,2026 that is noon Manitoba because Chicago isUTC−6 while Manitoba staysUTC−5. In Chicago's summer offset, the same configuration becomes11AM Manitoba, so merely retaining Chicago with a different fixed hour would not maintain6AM Manitoba year-round.
+**Current status16:25:** the owner reports Saved and supplies screenshots showing `Etc/UTC` selected and cron `0 11 * * *` unchanged. Those settings mean6AMManitoba year-round. This is owner-save confirmation plus visible selected values, not an independent API read or proof that the corrected version is published. Clock label still says6AMCDT. Remaining approved steps: rename it6AMManitoba/MBT and verify the current version is saved/published; no manual execution/backfill.
+
+**Original configuration, before the approved correction:** the owner-supplied settings explain the discrepancy. The existing YFIT Social Media Automation v2 Schedule Trigger contained five-field cron `0 11 * * *`, and its explicit workflow timezone was `America/Chicago`. That meant11AM Chicago daily, not the6AM stated in the node name. On November13,2026 that was noon Manitoba because Chicago isUTC−6 while Manitoba staysUTC−5. In Chicago's summer offset, the same configuration would become11AM Manitoba, so merely retaining Chicago with a different fixed hour would not maintain6AM Manitoba year-round.
 
 The trigger screenshot shows the generic six-field format hint, but n8n explicitly makes the seconds field optional and documents five-field daily examples such as `0 6 * * *`. The current expression is therefore a valid11AM cron, not a malformed6-field schedule. Workflow timezone takes precedence over the instance default. [1]
 
@@ -14,7 +16,7 @@ At16:19 the owner explicitly approved correcting the existing schedule to6AMMani
 
 n8n restored missing UTC/GMT workflow choices in release1.85.0; its source discussion confirms the earlier selector issue and released correction. [4] [5] If the installed selector does not offer the UTC choice, stop and inspect the available values rather than guessing an offset or updating the server. An alternative fixedUTC−5 timezone can be evaluated, but was not selected or applied.
 
-The workflow must be saved and published for the corrected schedule to take effect. Do not manually Execute step/Test trigger/Execute workflow or add another schedule; this is a correction to the existing daily trigger, not a backfill. [1] Owner approval is required before changing or publishing anything. No timing, workflow configuration or publication was changed in this investigation.
+The workflow must be saved and published for the corrected schedule to take effect. Do not manually Execute step/Test trigger/Execute workflow or add another schedule; this is a correction to the existing daily trigger, not a backfill. [1] The owner has approved the exact correction and reports saving the UTC selection. The assistant has not mutated the live workflow, and corrected-version publication remains unverified. Do not infer publication merely from an older Published indicator visible behind the settings dialog.
 
 The same settings screenshot also shows YFIT Error Notification Handler selected and saving enabled for failed production, successful production and manual executions. That establishes configuration intent, not notification delivery or retention proof. Those settings must be preserved.
 
