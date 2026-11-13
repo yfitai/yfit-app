@@ -4,7 +4,7 @@
 
 **Canonical app:** `yfitai/yfit-app` — `/home/ubuntu/yfit-app-full`
 
-**Current release status:** implemented and tested locally; production database migration and app deployment pending. Never push these feature changes to production `main` before both new fields are verified. Preserve the completed code on a GitHub feature branch while the owner applies the schema update.
+**Current release status:** owner-applied schema verified; feature merged to production `main` and the new web code is live. Functional merge commit: `f0ae36b1c298369f15ba554c64b5b5b0b9b537c3`. The original feature backup branch is retained. Installed-phone live-update archive remains Build 108; a separate phone release is not yet authorized or performed.
 
 ## Authorized behavior
 
@@ -28,11 +28,11 @@ The current provider report retains medication name, dosage, frequency, start da
 
 ## Database prerequisite
 
-A bounded, zero-row REST check confirmed that `user_medications.scheduled_weekdays` and `user_medications.combination_ingredients` are absent in the active YFIT Supabase project. No medication/patient records were retrieved. The required catalog and interaction column projections returned HTTP 200 with zero rows. An invalid-value, zero-row validation probe confirmed the catalog ID column is PostgreSQL UUID. OpenAPI metadata was unavailable (401); no repeated authorization retry was made.
+A bounded pre-migration, zero-row REST check showed that `user_medications.scheduled_weekdays` and `user_medications.combination_ingredients` were absent. The owner subsequently reported SQL success/no rows returned and saved. A fresh combined projection of both fields returned HTTP 200 with zero rows, confirming the fields are now available in the active YFIT Supabase project. No medication/patient records were retrieved. Catalog and interaction column projections returned HTTP 200 with zero rows; a zero-row validation probe confirmed catalog UUID IDs. OpenAPI metadata was unavailable (401); no repeated authorization retry was made.
 
-Run the complete `database/add_medication_scheduling_and_ingredients.sql` in the existing YFIT Supabase SQL Editor. It is a single transaction adding nullable `scheduled_weekdays smallint[]` and `combination_ingredients jsonb` columns, with type guards, structural constraints and schema-cache notification. It does not backfill, change medication dosage/frequency, delete logs, change RLS or invoke functions. Existing rows remain unspecified/NULL. The two standalone migrations are also retained for review, but the combined script is the owner handoff.
+The owner ran `database/add_medication_scheduling_and_ingredients.sql` in the existing YFIT Supabase SQL Editor. No further SQL run is required. This single transaction adds nullable `scheduled_weekdays smallint[]` and `combination_ingredients jsonb` fields, type guards, structural constraints and schema-cache notification. It does not backfill, change medication dosage/frequency, delete logs, change RLS or invoke functions. Existing rows remain unspecified/NULL. The standalone and combined migrations remain as release documentation.
 
-Do not deploy app writes to missing columns. After the owner reports success, verify both columns with another zero-row read, then merge the saved feature branch to the existing app `main` and use its existing GitHub/Vercel pipeline. No duplicate project or Supabase Edge function is needed. Schema rollback must not drop columns after user choices have been entered; reverting app code while retaining nullable fields preserves those choices.
+The field gate passed before merging/pushing the saved feature into the existing app `main`. The existing GitHub/Vercel pipeline served the new medication module at `https://app.yfitai.com/assets/Medications-CGFic8Ve.js`, with weekday and ingredient code present and a JavaScript MIME type. The public signup page returned HTTP 200. The logged-out medication route returned the landing page; an authenticated save/reload was not attempted. Sequential live food search returned HTTP 200 with five apple results. No duplicate project or Edge function was created. Schema rollback must retain user choices; reverting app code while retaining nullable fields preserves them.
 
 ## Verification evidence
 
@@ -41,6 +41,8 @@ Do not deploy app writes to missing columns. After the owner reports success, ve
 - Web and Capacitor-target production compilations passed; final integration compiles are recorded in private evidence. Web assets remain root-based; native package assets remain relative.
 - All scheduling labels were added in the existing eight-language `src/lib/i18nResources.js`. New combination/comparison wording has canonical English resources/fallbacks; it is not represented as fully localized into every language. Existing translations were not overwritten.
 - No actual medication/dose records, reminders, public posts, payments, financial reports, production database changes, or account changes were made by the assistant. No new phone archive was created; Build 108 (August 11, 2026) remains unchanged.
+
+**Web versus installed phone:** `src/App.jsx` actively initializes the native-only `src/services/liveUpdate.js`, which downloads `https://yfit-deploy.vercel.app/updates/bundle.zip`. That unchanged archive is still Build 108 and does not contain this medication feature. A web deployment must not be represented as a completed installed-Android release. A separately approved new archive/build and restart/update validation are needed for that client; browser/PWA behavior and service-worker caching also need owner verification.
 
 Test commands from the canonical app root:
 
