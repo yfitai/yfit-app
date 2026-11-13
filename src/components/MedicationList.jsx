@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { Pill, Edit, Trash2, AlertCircle, Calendar, Leaf } from 'lucide-react'
+import MedicationWeekdayPicker from './MedicationWeekdayPicker'
+import { getWeeklyDoseCount, validateScheduledWeekdays, normalizeScheduledWeekdays, formatScheduledWeekdays, isWeeklyScheduleUnspecified } from '../lib/medicationSchedule'
+import MedicationIngredientEditor from './MedicationIngredientEditor'
+import { getMedicationIngredients, getMedicationIngredientLines, normalizeMedicationIngredients } from '../lib/medicationIngredients'
 
 // Map stored English values to translation keys for display
 // Build case-insensitive lookup helpers
@@ -51,7 +55,7 @@ const ROUTE_KEY_MAP = new Proxy(_ROUTE_KEY_MAP, {
 })
 
 export default function MedicationList({ user, onAddMedication }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [loading, setLoading] = useState(true)
@@ -116,16 +120,35 @@ export default function MedicationList({ user, onAddMedication }) {
     setEditForm({
       dosage: item.dosage,
       frequency: item.frequency,
+      scheduled_weekdays: item.scheduled_weekdays || [],
+      combination_ingredients: getMedicationIngredients(item).map(ingredient => ({ ...ingredient })),
       route: item.route || 'Oral',
       notes: item.notes || ''
     })
   }
 
   const handleSaveEdit = async () => {
+    if (!validateScheduledWeekdays(editForm.frequency, editForm.scheduled_weekdays)) {
+      alert(t(getWeeklyDoseCount(editForm.frequency) === 1 ? 'medications.chooseOneDay' : 'medications.chooseTwoDays'))
+      return
+    }
+
+    let combinationIngredients
+    try {
+      combinationIngredients = normalizeMedicationIngredients(editForm.combination_ingredients)
+    } catch (error) {
+      alert(t('medications.ingredientRequired', 'Each ingredient needs a name and prescribed strength. Choose a valid catalog match or leave it unmatched.'))
+      return
+    }
+
     try {
       const { error } = await supabase
         .from('user_medications')
-        .update(editForm)
+        .update({
+          ...editForm,
+          scheduled_weekdays: normalizeScheduledWeekdays(editForm.frequency, editForm.scheduled_weekdays),
+          combination_ingredients: combinationIngredients
+        })
         .eq('id', editingId)
         .eq('user_id', user.id)
 
@@ -160,6 +183,7 @@ export default function MedicationList({ user, onAddMedication }) {
 
   const renderItem = (item, isSupplement = false) => {
     const isEditing = editingId === item.id;
+    const ingredientLines = getMedicationIngredientLines(item)
 
     return (
       <div
@@ -186,7 +210,7 @@ export default function MedicationList({ user, onAddMedication }) {
               </label>
               <select
                 value={editForm.frequency}
-                onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
+                onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value, scheduled_weekdays: [] })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="Once daily">{t('medications.onceDaily')}</option>
@@ -199,6 +223,15 @@ export default function MedicationList({ user, onAddMedication }) {
                 <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
             </div>
+            <MedicationWeekdayPicker
+              frequency={editForm.frequency}
+              days={editForm.scheduled_weekdays}
+              onChange={(days) => setEditForm({ ...editForm, scheduled_weekdays: days })}
+            />
+            <MedicationIngredientEditor
+              value={editForm.combination_ingredients}
+              onChange={(ingredients) => setEditForm({ ...editForm, combination_ingredients: ingredients })}
+            />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('medications.route')}
@@ -260,6 +293,11 @@ export default function MedicationList({ user, onAddMedication }) {
                   <h3 className="text-lg font-semibold text-gray-800">
                     {item.medication?.name || item.custom_name}
                   </h3>
+                  {ingredientLines.length > 0 && (
+                    <ul className="mt-1 pl-5 list-disc space-y-1 text-sm text-gray-700" aria-label={t('medications.ingredients', 'Ingredients')}>
+                      {ingredientLines.map((line, index) => <li key={index} className="break-words">{line}</li>)}
+                    </ul>
+                  )}
                   {item.medication?.generic_name && item.medication.name !== item.medication.generic_name && (
                     <p className="text-sm text-gray-500">
                       {t('medications.generic', 'Generic')}: {item.medication.generic_name}
@@ -299,6 +337,14 @@ export default function MedicationList({ user, onAddMedication }) {
                 )}
               </div>
               
+              {getWeeklyDoseCount(item.frequency) > 0 && (
+                <p className={`text-sm ${isWeeklyScheduleUnspecified(item) ? 'text-amber-700' : 'text-blue-800'}`}>
+                  {isWeeklyScheduleUnspecified(item)
+                    ? t('medications.scheduleNeeded')
+                    : `${t('medications.dosingDays')}: ${formatScheduledWeekdays(item, i18n.resolvedLanguage || i18n.language)}`}
+                </p>
+              )}
+
               {item.start_date && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Calendar className="w-4 h-4" />
