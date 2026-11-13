@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
-import { Search, Plus, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Search, Plus, AlertTriangle } from 'lucide-react'
+import MedicationWeekdayPicker from './MedicationWeekdayPicker'
+import { getWeeklyDoseCount, validateScheduledWeekdays, normalizeScheduledWeekdays } from '../lib/medicationSchedule'
+import MedicationIngredientEditor from './MedicationIngredientEditor'
+import { normalizeMedicationIngredients, checkMedicationInteractions } from '../lib/medicationIngredients'
 
 export default function MedicationSearch({ user }) {
   const { t } = useTranslation()
@@ -10,12 +14,15 @@ export default function MedicationSearch({ user }) {
   const [searching, setSearching] = useState(false)
   const [selectedMed, setSelectedMed] = useState(null)
   const [providers, setProviders] = useState([])
-  const [safetyAlerts, setSafetyAlerts] = useState([])
+  const [safetyCheck, setSafetyCheck] = useState(null)
+  const checkRequest = useRef(0)
   const [showCustomForm, setShowCustomForm] = useState(false)
 
   const [form, setForm] = useState({
     dosage: '',
     frequency: '',
+    scheduled_weekdays: [],
+    combination_ingredients: [],
     route: 'Oral',
     start_date: new Date().toISOString().split('T')[0],
     prescriber_id: '',
@@ -30,10 +37,17 @@ export default function MedicationSearch({ user }) {
     is_supplement: false,
     dosage: '',
     frequency: '',
+    scheduled_weekdays: [],
+    combination_ingredients: [],
     route: 'Oral',
     start_date: new Date().toISOString().split('T')[0],
     notes: ''
   })
+
+  // A result only applies to the exact draft and user that were checked.
+  const draftKey = JSON.stringify([user.id, showCustomForm, selectedMed?.id, showCustomForm ? customForm : form])
+  const currentSafetyCheck = safetyCheck?.draftKey === draftKey ? safetyCheck : null
+  const safetyAlerts = currentSafetyCheck?.status === 'complete' ? currentSafetyCheck.interactions : []
 
   useEffect(() => {
     loadProviders()
@@ -80,54 +94,75 @@ export default function MedicationSearch({ user }) {
     }
   }
 
-  const handleSelectMedication = async (medication) => {
+  const handleSelectMedication = (medication) => {
     setSelectedMed(medication)
     setSearchTerm('')
     setSearchResults([])
-    
-    // Check for potential interactions
-    await checkInteractions(medication.id)
+    setSafetyCheck(null)
   }
 
-  const checkInteractions = async (medicationId) => {
+  const checkInteractions = async () => {
+    const request = ++checkRequest.current
+    if (!showCustomForm && !selectedMed) return
+    if (showCustomForm && !customForm.custom_name.trim()) {
+      setSafetyCheck({ draftKey, status: 'invalid', message: t('medications.parentNameRequired', 'Enter the medication or supplement name before checking ingredients.') })
+      return
+    }
+
+    let combinationIngredients
     try {
-      // Get user's current medications
+      combinationIngredients = normalizeMedicationIngredients((showCustomForm ? customForm : form).combination_ingredients)
+    } catch (error) {
+      setSafetyCheck({ draftKey, status: 'invalid', message: t('medications.ingredientRequired', 'Each ingredient needs a name and prescribed strength. Choose a valid catalog match or leave it unmatched.') })
+      return
+    }
+
+    const checkedDraftKey = draftKey
+    const proposed = showCustomForm
+      ? { ...customForm, medication_id: null, combination_ingredients: combinationIngredients }
+      : { ...form, medication_id: selectedMed.id, medication: selectedMed, combination_ingredients: combinationIngredients }
+    setSafetyCheck({ draftKey: checkedDraftKey, status: 'checking' })
+
+    try {
+      // Include custom entries, supplements, and legacy NULL supplement flags.
+      // Checking is read-only and does not add or update a patient record.
       const { data: userMeds, error: medsError } = await supabase
         .from('user_medications')
-        .select('medication_id')
+        .select('*, medication:medications(*)')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .not('medication_id', 'is', null)
 
       if (medsError) throw medsError
+      if (!Array.isArray(userMeds)) throw new Error('Current medication lookup returned an invalid response.')
 
-      if (!userMeds || userMeds.length === 0) {
-        setSafetyAlerts([])
-        return
+      const result = await checkMedicationInteractions(supabase, userMeds, proposed)
+      if (request === checkRequest.current) {
+        setSafetyCheck({ ...result, draftKey: checkedDraftKey, status: 'complete' })
       }
-
-      const currentMedIds = userMeds.map(m => m.medication_id)
-
-      // Check for interactions
-      const { data: interactions, error: intError } = await supabase
-        .from('drug_interactions')
-        .select(`
-          *,
-          drug_a:medications!drug_interactions_drug_a_id_fkey(name),
-          drug_b:medications!drug_interactions_drug_b_id_fkey(name)
-        `)
-        .or(`and(drug_a_id.in.(${currentMedIds.join(',')}),drug_b_id.eq.${medicationId}),and(drug_b_id.in.(${currentMedIds.join(',')}),drug_a_id.eq.${medicationId})`)
-
-      if (intError) throw intError
-      setSafetyAlerts(interactions || [])
     } catch (error) {
       console.error('Error checking interactions:', error)
+      if (request === checkRequest.current) {
+        setSafetyCheck({ draftKey: checkedDraftKey, status: 'error' })
+      }
     }
   }
 
   const handleAddMedication = async () => {
     if (!selectedMed || !form.dosage || !form.frequency) {
       alert('Please fill in all required fields')
+      return
+    }
+
+    if (!validateScheduledWeekdays(form.frequency, form.scheduled_weekdays)) {
+      alert(t(getWeeklyDoseCount(form.frequency) === 1 ? 'medications.chooseOneDay' : 'medications.chooseTwoDays'))
+      return
+    }
+
+    let combinationIngredients
+    try {
+      combinationIngredients = normalizeMedicationIngredients(form.combination_ingredients)
+    } catch (error) {
+      alert(t('medications.ingredientRequired', 'Each ingredient needs a name and prescribed strength. Choose a valid catalog match or leave it unmatched.'))
       return
     }
 
@@ -139,6 +174,8 @@ export default function MedicationSearch({ user }) {
           medication_id: selectedMed.id,
           dosage: form.dosage,
           frequency: form.frequency,
+          scheduled_weekdays: normalizeScheduledWeekdays(form.frequency, form.scheduled_weekdays),
+          combination_ingredients: combinationIngredients,
           route: form.route,
           start_date: form.start_date,
           prescriber_id: form.prescriber_id || null,
@@ -156,6 +193,8 @@ export default function MedicationSearch({ user }) {
       setForm({
         dosage: '',
         frequency: '',
+        scheduled_weekdays: [],
+        combination_ingredients: [],
         route: 'Oral',
         start_date: new Date().toISOString().split('T')[0],
         prescriber_id: '',
@@ -163,7 +202,7 @@ export default function MedicationSearch({ user }) {
         refills_remaining: '',
         notes: ''
       })
-      setSafetyAlerts([])
+      setSafetyCheck(null)
     } catch (error) {
       console.error('Error adding medication:', error)
       alert('Failed to add medication')
@@ -173,6 +212,19 @@ export default function MedicationSearch({ user }) {
   const handleAddCustomMedication = async () => {
     if (!customForm.custom_name || !customForm.dosage || !customForm.frequency) {
       alert('Please fill in all required fields')
+      return
+    }
+
+    if (!validateScheduledWeekdays(customForm.frequency, customForm.scheduled_weekdays)) {
+      alert(t(getWeeklyDoseCount(customForm.frequency) === 1 ? 'medications.chooseOneDay' : 'medications.chooseTwoDays'))
+      return
+    }
+
+    let combinationIngredients
+    try {
+      combinationIngredients = normalizeMedicationIngredients(customForm.combination_ingredients)
+    } catch (error) {
+      alert(t('medications.ingredientRequired', 'Each ingredient needs a name and prescribed strength. Choose a valid catalog match or leave it unmatched.'))
       return
     }
 
@@ -186,6 +238,8 @@ export default function MedicationSearch({ user }) {
           is_supplement: customForm.is_supplement,
           dosage: customForm.dosage,
           frequency: customForm.frequency,
+          scheduled_weekdays: normalizeScheduledWeekdays(customForm.frequency, customForm.scheduled_weekdays),
+          combination_ingredients: combinationIngredients,
           route: customForm.route,
           start_date: customForm.start_date,
           notes: customForm.notes || null,
@@ -203,10 +257,13 @@ export default function MedicationSearch({ user }) {
         is_supplement: false,
         dosage: '',
         frequency: '',
+        scheduled_weekdays: [],
+        combination_ingredients: [],
         route: 'Oral',
         start_date: new Date().toISOString().split('T')[0],
         notes: ''
       })
+      setSafetyCheck(null)
     } catch (error) {
       console.error('Error adding custom medication:', error)
       alert('Failed to add custom medication')
@@ -226,6 +283,90 @@ export default function MedicationSearch({ user }) {
         return 'bg-gray-50 border-gray-400 text-gray-800'
     }
   }
+
+  const renderIngredientCheck = () => (
+    <div className="mt-4 space-y-3" aria-live="polite">
+      <button
+        type="button"
+        onClick={checkInteractions}
+        disabled={currentSafetyCheck?.status === 'checking'}
+        className="px-4 py-2 border border-blue-600 text-blue-700 rounded-lg hover:bg-blue-50 disabled:opacity-60"
+      >
+        {currentSafetyCheck?.status === 'checking'
+          ? t('medications.checkingIngredients', 'Checking ingredients…')
+          : t('medications.checkIngredients', 'Check ingredients against my medications')}
+      </button>
+      <p className="text-sm text-amber-800">
+        {t('medications.ingredientCheckBeforeTaking', 'Use this check before taking a medication or supplement. Limited catalog coverage is not medical clearance; review all ingredients with your pharmacist or prescriber.')}
+      </p>
+      {!currentSafetyCheck && safetyCheck && (
+        <p className="text-sm text-amber-800">{t('medications.ingredientCheckChanged', 'The entry has changed. Check again to compare the current ingredients.')}</p>
+      )}
+      {currentSafetyCheck?.status === 'invalid' && (
+        <p role="alert" className="text-sm text-red-800">{currentSafetyCheck.message}</p>
+      )}
+      {currentSafetyCheck?.status === 'error' && (
+        <p role="alert" className="text-sm text-red-800">
+          {t('medications.ingredientCheckFailed', 'The ingredient check failed. No safety result is available. Try again and consult your pharmacist or prescriber.')}
+        </p>
+      )}
+      {currentSafetyCheck?.status === 'complete' && (
+        <div className="space-y-3">
+          <p className="text-sm text-amber-800">
+            {t('medications.ingredientCoverageLimited', 'Coverage is limited: only explicitly matched catalog ingredients can be compared. No listed interaction does not mean the combination is safe.')}
+          </p>
+          {currentSafetyCheck.unresolved?.length > 0 && (
+            <div className="border-l-4 border-amber-400 bg-amber-50 p-4 text-amber-900">
+              <p className="font-medium">{t('medications.unresolvedIngredients', 'Unmatched ingredients or medications — not checked')}</p>
+              <ul className="mt-1 pl-5 list-disc text-sm">
+                {currentSafetyCheck.unresolved.map((entry, index) => (
+                  <li key={index}>
+                    {typeof entry === 'string' ? entry : entry.name || t('medications.unmatchedIngredient', 'Unmatched ingredient')}
+                    {entry.parent_name && entry.parent_name !== entry.name && ` — ${entry.parent_name}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {currentSafetyCheck.duplicates?.length > 0 && (
+            <div className="border-l-4 border-amber-400 bg-amber-50 p-4 text-amber-900">
+              <p className="font-medium">{t('medications.duplicateIngredients', 'Potential duplicate ingredients — review with your pharmacist')}</p>
+              <ul className="mt-1 pl-5 list-disc text-sm">
+                {currentSafetyCheck.duplicates.map((entry, index) => (
+                  <li key={index}>
+                    {typeof entry === 'string' ? entry : entry.name || t('medications.duplicateIngredient', 'Potential duplicate ingredient')}
+                    {entry.parent_name && ` — ${entry.parent_name}`}
+                    {entry.other_parent_name && ` / ${entry.other_parent_name}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {safetyAlerts.map((interaction, index) => (
+            <div key={index} className={`border-l-4 p-4 rounded-r-lg ${getSeverityColor(interaction.severity)}`}>
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">
+                    {(interaction.severity || '').toUpperCase()} {t('medications.interactionDetected', 'Interaction Detected')}
+                  </p>
+                  {(interaction.drug_a_name || interaction.drug_b_name) && (
+                    <p className="text-sm mt-1">{[interaction.drug_a_name, interaction.drug_b_name].filter(Boolean).join(' — ')}</p>
+                  )}
+                  <p className="text-sm mt-1">{interaction.description}</p>
+                  {interaction.management && (
+                    <p className="text-sm mt-2">
+                      <span className="font-medium">{t('medications.management', 'Management')}:</span> {interaction.management}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div>
@@ -306,33 +447,6 @@ export default function MedicationSearch({ user }) {
                 Add {selectedMed.name}
               </h3>
 
-              {/* Safety Alerts */}
-              {safetyAlerts.length > 0 && (
-                <div className="mb-6 space-y-3">
-                  {safetyAlerts.map((alert, index) => (
-                    <div
-                      key={index}
-                      className={`border-l-4 p-4 rounded-r-lg ${getSeverityColor(alert.severity)}`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-medium">
-                            {alert.severity.toUpperCase()} {t('medications.interactionDetected', 'Interaction Detected')}
-                          </p>
-                          <p className="text-sm mt-1">{alert.description}</p>
-                          {alert.management && (
-                            <p className="text-sm mt-2">
-                              <span className="font-medium">{t('medications.management', 'Management')}:</span> {alert.management}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -354,7 +468,7 @@ export default function MedicationSearch({ user }) {
                   </label>
                   <select
                     value={form.frequency}
-                    onChange={(e) => setForm({ ...form, frequency: e.target.value })}
+                    onChange={(e) => setForm({ ...form, frequency: e.target.value, scheduled_weekdays: [] })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   >
@@ -368,6 +482,20 @@ export default function MedicationSearch({ user }) {
                     <option value="Twice weekly">{t('medications.twiceWeekly')}</option>
                     <option value="As needed">{t('medications.asNeeded')}</option>
                   </select>
+                </div>
+
+                <MedicationWeekdayPicker
+                  frequency={form.frequency}
+                  days={form.scheduled_weekdays}
+                  onChange={(days) => setForm({ ...form, scheduled_weekdays: days })}
+                />
+
+                <div className="md:col-span-2">
+                  <MedicationIngredientEditor
+                    value={form.combination_ingredients}
+                    onChange={(ingredients) => setForm({ ...form, combination_ingredients: ingredients })}
+                  />
+                  {renderIngredientCheck()}
                 </div>
 
                 <div>
@@ -469,7 +597,7 @@ export default function MedicationSearch({ user }) {
                 <button
                   onClick={() => {
                     setSelectedMed(null)
-                    setSafetyAlerts([])
+                    setSafetyCheck(null)
                   }}
                   className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
                 >
@@ -551,7 +679,7 @@ export default function MedicationSearch({ user }) {
               </label>
               <select
                 value={customForm.frequency}
-                onChange={(e) => setCustomForm({ ...customForm, frequency: e.target.value })}
+                onChange={(e) => setCustomForm({ ...customForm, frequency: e.target.value, scheduled_weekdays: [] })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -565,6 +693,20 @@ export default function MedicationSearch({ user }) {
                 <option value="Twice weekly">{t('medications.twiceWeekly')}</option>
                 <option value="As needed">{t('medications.asNeeded')}</option>
               </select>
+            </div>
+
+            <MedicationWeekdayPicker
+              frequency={customForm.frequency}
+              days={customForm.scheduled_weekdays}
+              onChange={(days) => setCustomForm({ ...customForm, scheduled_weekdays: days })}
+            />
+
+            <div className="md:col-span-2">
+              <MedicationIngredientEditor
+                value={customForm.combination_ingredients}
+                onChange={(ingredients) => setCustomForm({ ...customForm, combination_ingredients: ingredients })}
+              />
+              {renderIngredientCheck()}
             </div>
 
             <div>

@@ -14,7 +14,7 @@ export default function Medications({ user }) {
   const tabs = [
     { id: 'my-medications', label: t('medications.myMedications'), icon: Pill },
     { id: 'add-medication', label: t('medications.addMedication'), icon: Pill },
-    { id: 'interactions', label: t('medications.taken'), icon: AlertTriangle },
+    { id: 'interactions', label: t('medications.safetyCheck'), icon: AlertTriangle },
     { id: 'adherence', label: t('medications.logDose'), icon: Activity },
     { id: 'providers', label: t('medications.providerReport'), icon: FileText },
   ]

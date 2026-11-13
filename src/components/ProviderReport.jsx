@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { supabase, getUserProfile } from '../lib/supabase'
 import { FileText, Printer, Download, Plus, User, Trash2 } from 'lucide-react'
 import { jsPDF } from 'jspdf'
+import { getMedicationIngredientLines } from '../lib/medicationIngredients'
+import { formatScheduledWeekdays, isWeeklyScheduleUnspecified } from '../lib/medicationSchedule'
 
 export default function ProviderReport({ user }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [medications, setMedications] = useState([])
   const [supplements, setSupplements] = useState([])
   const [allergies, setAllergies] = useState([])
@@ -262,6 +264,20 @@ export default function ProviderReport({ user }) {
         }
       }
 
+      const writeWrappedLines = (lines, x, lineHeight = 4) => {
+        lines.forEach(line => {
+          checkPage(lineHeight + 1)
+          doc.text(line, x, y)
+          y += lineHeight
+        })
+      }
+
+      const reserveParentGroup = (needed) => {
+        // Keep ordinary compound products together. Oversized user-entered
+        // groups still paginate line-by-line instead of running off the page.
+        checkPage(needed <= pageH - margin - 15 ? needed : 20)
+      }
+
       const sectionHeader = (title, r, g, b) => {
         checkPage(14)
         doc.setFillColor(r, g, b)
@@ -312,38 +328,57 @@ export default function ProviderReport({ user }) {
             ? new Date(med.start_date).toLocaleDateString()
             : 'N/A'
 
-          checkPage(20)
-          // Left accent bar
-          doc.setFillColor(37, 99, 235)
-          doc.rect(margin, y - 3, 2, 14, 'F')
-
           doc.setFontSize(11)
           doc.setFont(undefined, 'bold')
-          doc.text(`${i + 1}. ${medName}`, margin + 6, y)
-          y += 5
-
-          if (med.medication?.generic_name && med.medication.name !== med.medication.generic_name) {
-            doc.setFontSize(9)
-            doc.setFont(undefined, 'italic')
-            doc.setTextColor(107, 114, 128)
-            doc.text(`Generic: ${med.medication.generic_name}`, margin + 6, y)
-            doc.setFont(undefined, 'normal')
-            doc.setTextColor(17, 24, 39)
-            y += 4
-          }
-
+          const nameLines = doc.splitTextToSize(`${i + 1}. ${medName}`, contentW - 12)
           doc.setFontSize(9)
           doc.setFont(undefined, 'normal')
-          doc.setTextColor(75, 85, 99)
+          const ingredientLines = getMedicationIngredientLines(med)
+            .flatMap(line => doc.splitTextToSize(`- ${line}`, contentW - 18))
+          const genericLines = med.medication?.generic_name && med.medication.name !== med.medication.generic_name
+            ? doc.splitTextToSize(`Generic: ${med.medication.generic_name}`, contentW - 12)
+            : []
           const details = [
             `Dosage: ${dosage}`,
             route ? `Route: ${route}` : null,
             `Frequency: ${frequency}`,
             `Started: ${started}`,
           ].filter(Boolean).join('   |   ')
-          doc.text(details, margin + 6, y)
+          const detailLines = doc.splitTextToSize(details, contentW - 12)
+          const weekdays = formatScheduledWeekdays(med, 'en')
+          const weekdayLines = weekdays || isWeeklyScheduleUnspecified(med)
+            ? doc.splitTextToSize(`Dosing days: ${weekdays || 'Not specified — choose dosing days'}`, contentW - 12)
+            : []
+          reserveParentGroup(nameLines.length * 5 + (ingredientLines.length + genericLines.length + detailLines.length + weekdayLines.length) * 4 + 5)
+          // Left accent bar
+          doc.setFillColor(37, 99, 235)
+          doc.rect(margin, y - 3, 2, 14, 'F')
+
+          doc.setFontSize(11)
+          doc.setFont(undefined, 'bold')
+          writeWrappedLines(nameLines, margin + 6, 5)
+
+          doc.setFontSize(9)
+          doc.setFont(undefined, 'normal')
+          doc.setTextColor(75, 85, 99)
+          writeWrappedLines(ingredientLines, margin + 12)
+
+          if (genericLines.length > 0) {
+            doc.setFontSize(9)
+            doc.setFont(undefined, 'italic')
+            doc.setTextColor(107, 114, 128)
+            writeWrappedLines(genericLines, margin + 6)
+            doc.setFont(undefined, 'normal')
+            doc.setTextColor(17, 24, 39)
+          }
+
+          doc.setFontSize(9)
+          doc.setFont(undefined, 'normal')
+          doc.setTextColor(75, 85, 99)
+          writeWrappedLines(detailLines, margin + 6)
+          writeWrappedLines(weekdayLines, margin + 6)
           doc.setTextColor(17, 24, 39)
-          y += 5
+          y += 1
 
           if (med.prescriber_name) {
             checkPage(6)
@@ -389,26 +424,38 @@ export default function ProviderReport({ user }) {
             ? new Date(sup.start_date).toLocaleDateString()
             : 'N/A'
 
-          checkPage(16)
+          doc.setFontSize(11)
+          doc.setFont(undefined, 'bold')
+          const nameLines = doc.splitTextToSize(`${i + 1}. ${supName}`, contentW - 12)
+          doc.setFontSize(9)
+          doc.setFont(undefined, 'normal')
+          const ingredientLines = getMedicationIngredientLines(sup)
+            .flatMap(line => doc.splitTextToSize(`- ${line}`, contentW - 18))
+          const detailLines = doc.splitTextToSize(
+            `Dosage: ${dosage}   |   Frequency: ${frequency}   |   Started: ${started}`,
+            contentW - 12
+          )
+          const weekdays = formatScheduledWeekdays(sup, 'en')
+          const weekdayLines = weekdays || isWeeklyScheduleUnspecified(sup)
+            ? doc.splitTextToSize(`Dosing days: ${weekdays || 'Not specified — choose dosing days'}`, contentW - 12)
+            : []
+          reserveParentGroup(nameLines.length * 5 + (ingredientLines.length + detailLines.length + weekdayLines.length) * 4 + 5)
           doc.setFillColor(5, 150, 105)
           doc.rect(margin, y - 3, 2, 10, 'F')
 
           doc.setFontSize(11)
           doc.setFont(undefined, 'bold')
           doc.setTextColor(17, 24, 39)
-          doc.text(`${i + 1}. ${supName}`, margin + 6, y)
-          y += 5
+          writeWrappedLines(nameLines, margin + 6, 5)
 
           doc.setFontSize(9)
           doc.setFont(undefined, 'normal')
           doc.setTextColor(75, 85, 99)
-          doc.text(
-            `Dosage: ${dosage}   |   Frequency: ${frequency}   |   Started: ${started}`,
-            margin + 6,
-            y
-          )
+          writeWrappedLines(ingredientLines, margin + 12)
+          writeWrappedLines(detailLines, margin + 6)
+          writeWrappedLines(weekdayLines, margin + 6)
           doc.setTextColor(17, 24, 39)
-          y += 7
+          y += 3
         })
       }
 
@@ -581,10 +628,17 @@ export default function ProviderReport({ user }) {
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('medications.currentMedications')}</h2>
             <div className="space-y-4">
               {medications.map((med, index) => (
-                <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                <div key={index} className="border-l-4 border-blue-500 pl-4 py-2" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <h3 className="font-semibold text-gray-900 text-lg">
                     {med.medication?.name || med.custom_name}
                   </h3>
+                  {getMedicationIngredientLines(med).length > 0 && (
+                    <ul className="mt-1 pl-5 list-disc space-y-1 text-sm text-gray-700" aria-label={t('medications.ingredients', 'Ingredients')}>
+                      {getMedicationIngredientLines(med).map((line, ingredientIndex) => (
+                        <li key={ingredientIndex} className="break-words">{line}</li>
+                      ))}
+                    </ul>
+                  )}
                   {med.medication?.generic_name &&
                     med.medication.name !== med.medication.generic_name && (
                     <p className="text-sm text-gray-600 italic">
@@ -600,6 +654,14 @@ export default function ProviderReport({ user }) {
                       <span className="text-gray-600">{t('medications.frequency')}:</span>
                       <span className="font-medium break-words">{med.frequency}</span>
                     </div>
+                    {(formatScheduledWeekdays(med, i18n.resolvedLanguage || i18n.language) || isWeeklyScheduleUnspecified(med)) && (
+                      <div className="flex flex-col">
+                        <span className="text-gray-600">{t('medications.dosingDays', 'Dosing days')}:</span>
+                        <span className="font-medium break-words">
+                          {formatScheduledWeekdays(med, i18n.resolvedLanguage || i18n.language) || t('medications.scheduleNeeded', 'Choose dosing days')}
+                        </span>
+                      </div>
+                    )}
                     {med.route && (
                       <div className="flex flex-col">
                         <span className="text-gray-600">{t('medications.route')}:</span>
@@ -642,10 +704,17 @@ export default function ProviderReport({ user }) {
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('medications.supplementsVitamins')}</h2>
             <div className="space-y-3">
               {supplements.map((supp, index) => (
-                <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
+                <div key={index} className="border-l-4 border-green-500 pl-4 py-2" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <h3 className="font-semibold text-gray-900">
                     {supp.supplement?.name || supp.custom_name}
                   </h3>
+                  {getMedicationIngredientLines(supp).length > 0 && (
+                    <ul className="mt-1 pl-5 list-disc space-y-1 text-sm text-gray-700" aria-label={t('medications.ingredients', 'Ingredients')}>
+                      {getMedicationIngredientLines(supp).map((line, ingredientIndex) => (
+                        <li key={ingredientIndex} className="break-words">{line}</li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div className="flex flex-col">
                       <span className="text-gray-600">{t('medications.dosage')}:</span>
@@ -655,6 +724,14 @@ export default function ProviderReport({ user }) {
                       <span className="text-gray-600">{t('medications.frequency')}:</span>
                       <span className="font-medium break-words">{supp.frequency}</span>
                     </div>
+                    {(formatScheduledWeekdays(supp, i18n.resolvedLanguage || i18n.language) || isWeeklyScheduleUnspecified(supp)) && (
+                      <div className="flex flex-col">
+                        <span className="text-gray-600">{t('medications.dosingDays', 'Dosing days')}:</span>
+                        <span className="font-medium break-words">
+                          {formatScheduledWeekdays(supp, i18n.resolvedLanguage || i18n.language) || t('medications.scheduleNeeded', 'Choose dosing days')}
+                        </span>
+                      </div>
+                    )}
                     {supp.start_date && (
                       <div className="flex flex-col">
                         <span className="text-gray-600">{t('medications.started')}:</span>
