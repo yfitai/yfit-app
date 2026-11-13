@@ -1,6 +1,6 @@
 # n8n daily posting schedule — November 13, 2026
 
-**Current status16:25:** the owner reports Saved and supplies screenshots showing `Etc/UTC` selected and cron `0 11 * * *` unchanged. Those settings mean6AMManitoba year-round. This is owner-save confirmation plus visible selected values, not an independent API read or proof that the corrected version is published. Clock label still says6AMCDT. Remaining approved steps: rename it6AMManitoba/MBT and verify the current version is saved/published; no manual execution/backfill.
+**Current status16:29: owner-confirmed published.** The owner reports Published and supplies the editor screenshot showing a Published indicator and the renamed `Daily Schedule Trigger (6 AM Manitoba / MBT)` clock node. Earlier screenshots show `Etc/UTC` selected and cron `0 11 * * *` unchanged; owner confirmed Save. Together these verify the owner-controlled configuration/publication correction, not an API-read or actual scheduled-run result. Next expected start is November14,2026 at11:00UTC /6:00Manitoba. Do not repeat publication or manually run/backfill posts. Generation, assembly and six terminal provider outcomes remain the next normal-run gate.
 
 **Original configuration, before the approved correction:** the owner-supplied settings explain the discrepancy. The existing YFIT Social Media Automation v2 Schedule Trigger contained five-field cron `0 11 * * *`, and its explicit workflow timezone was `America/Chicago`. That meant11AM Chicago daily, not the6AM stated in the node name. On November13,2026 that was noon Manitoba because Chicago isUTC−6 while Manitoba staysUTC−5. In Chicago's summer offset, the same configuration would become11AM Manitoba, so merely retaining Chicago with a different fixed hour would not maintain6AM Manitoba year-round.
 
@@ -8,7 +8,7 @@ The trigger screenshot shows the generic six-field format hint, but n8n explicit
 
 The owner is correct that Manitoba switched to year-roundUTC−5, legally Manitoba Standard Time/MBT, effectiveOctober31,2026. [2] [3] That creates a one-hour Chicago–Manitoba difference in winter, not the five-hour node-label gap. The label and actual trigger settings are mismatched; a stale Manitoba timezone database is not needed to explain the observed11AMChicago/noonManitoba run. Whether the original11 was entered intending UTC is unknown.
 
-## Approved correction — saved/published verification pending
+## Approved correction — owner saved and published, scheduled run pending
 
 For a stable6AMManitoba start independent of the n8n container's Winnipeg timezone database update, set this existing workflow's timezone to UTC (`Etc/UTC` in the selector) and retain the complete current cron field `0 11 * * *`.11UTC equals6AMManitoba at permanentUTC−5. Rename the clock node to `Daily Schedule Trigger (6 AM Manitoba / MBT)` so its label matches intent. No instance/server timezone, other workflow, platform account, credential or VPN change is needed. This workflow-scoped timezone change can also affect timezone-aware expressions in this same workflow; verify the proposed change and preserve unrelated settings before publishing.
 
@@ -16,11 +16,15 @@ At16:19 the owner explicitly approved correcting the existing schedule to6AMMani
 
 n8n restored missing UTC/GMT workflow choices in release1.85.0; its source discussion confirms the earlier selector issue and released correction. [4] [5] If the installed selector does not offer the UTC choice, stop and inspect the available values rather than guessing an offset or updating the server. An alternative fixedUTC−5 timezone can be evaluated, but was not selected or applied.
 
-The workflow must be saved and published for the corrected schedule to take effect. Do not manually Execute step/Test trigger/Execute workflow or add another schedule; this is a correction to the existing daily trigger, not a backfill. [1] The owner has approved the exact correction and reports saving the UTC selection. The assistant has not mutated the live workflow, and corrected-version publication remains unverified. Do not infer publication merely from an older Published indicator visible behind the settings dialog.
+The workflow must be saved and published for the corrected schedule to take effect. [1] Owner approval16:19, saved UTC screenshots16:25 and explicit Published report/renamed-node editor screenshot16:29 now establish that handoff. The assistant did not mutate the live workflow or invoke it, and no backfill was performed. Do not manually Execute step/Test trigger/Execute workflow or add another schedule. The Published indicator is configuration evidence, not evidence that any social post was delivered.
 
 The same settings screenshot also shows YFIT Error Notification Handler selected and saving enabled for failed production, successful production and manual executions. That establishes configuration intent, not notification delivery or retention proof. Those settings must be preserved.
 
 The independent scraper-only test already passedHTTP200/success:true/10saved in5.376seconds, with no generation/n8n invocation or observed Upload-Post publication during the inspected test window. Downstream generation, assembly and six-platform outcomes remain open. Keep the tested scraper deployed; do not repeat it to investigate timezone settings.
+
+## Next normal-run verification
+
+After the next normal scheduled execution finishes, inspect its timestamp and the first failing node if any. Confirm scraper response, generation persistence/count, voiceover/assembly and each platform's terminal Upload-Post outcome/public URL. A green workflow, generic success:true, webhook acceptance or assembled-video response alone is not proof of six publications; existing source-level false-success risks remain recorded. No reminder/monitor or unattended verification task was configured. The user can supply the next Executions result; do not promise automatic follow-up unless separately configured.
 
 ## References
 
