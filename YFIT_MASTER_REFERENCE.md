@@ -1,6 +1,6 @@
 # YFIT Master Project Reference
 
-**Last Updated:** November 12, 2026
+**Last Updated:** November 13, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
@@ -34,6 +34,18 @@ Read-only Stripe evidence found zero charges/refunds since August 1; catalog/sub
 Read-only Upload-Post history confirmed six current platforms and 18 published URLs dated October 29–31, but no November 1–11 publication records in the inspected range. This is missing daily-publication evidence, not proof of 66 failed jobs. TikTok's latest status warns its first comment was skipped and requires reconnection. Live n8n/Supabase scheduler execution history was not accessible; inspect existing logs before retrying or altering any automation.
 
 **Marketing/measurement caution:** website-stat failures become fresh-looking zeroes, and no GA4/GTM installation was observed in the reviewed app assets/source. The user's Google report type is not identified. Do not conclude zero human visits or marketing failure from these reports. Fix/test processing first, then establish consent-aware pageview/click/signup attribution with isolated test traffic and verified exclusions. See `docs/PROCESSING_TESTS_2026-11-12.md` for sanitized evidence, limitations and safe next steps. No production charges, public posts, database/user changes, application fixes or service configuration changes were made in this follow-up.
+
+### Root-Cause Investigation — November 13, 2026
+
+The user requested investigation, not production repairs. See `docs/ROOT_CAUSE_FINDINGS_2026-11-13.md`. New diagnostics reproduce defects without changing application behavior: app authentication (18 assertions), payments (10 defect scenarios), social helpers (3 scenarios), served-admin asset isolation and bounded read-only report aggregates. Passing reproduction tests mean the bug is demonstrated, not repaired. Full sanitized evidence is backed up in the private hub under `docs/evidence/2026-11-13-rootcause/`.
+
+**Deployment-evidenced bugs:** the email confirmation destination `/auth/callback` is blank because relative Vite entry assets resolve under `/auth/assets/`, where Vercel serves HTML rather than JavaScript. The eventual web fix must retain separate relative asset behavior for Capacitor, not indiscriminately change both targets. `/signup` opens the login tab. Active deployed entitlement logic retains Pro on expired trial/grace; active checkout returns to missing `/payment-success`. The served admin OAuth helper has undefined build-time portal/app inputs and eagerly throws Invalid URL, although local managed environment declares the names; the serving build/checkpoint still needs identification.
+
+**Source-confirmed, production parity unresolved:** profile error/onboarding handling, webhook paid/status/identity/receipt gates and subscription ownership policies, cache-only annual reports without populated-month completeness, analytics outage-to-zero fallbacks, and generation persistence/validation/HTTP-only-success handling. The prior claim about a misleading payment success component is narrowed: that component is dormant; the confirmed active problem is the missing destination route. Do not change live RLS, subscriptions, reports or user records on this evidence alone.
+
+**Operational/access findings:** validated account-wide/date-filtered Upload-Post reads through November 13 found 18 October 29–31 publication records and no November entries. Missing daily evidence is not a count of failed jobs. TikTok's optional first-comment permission issue is separate from successful video publishing. Newly enabled n8n access required in-memory API-root normalization from an editor URL, then returned 401; a documented token-replacement correction and single retest still returned 401. Existing API-key validity/expiry/instance pairing must be verified securely before live workflow/scheduler conclusions. Supabase and Stripe production configuration/policies remain access-limited; no charges since August does not itself prove a payment bug.
+
+No fixes, account changes, production charges, sends, posts, retries or new mobile bundle were authorized/performed. Only diagnostics and docs are saved; admin diagnostics also require a managed checkpoint after GitHub backup. Recommended next approval: tightly scoped web callback/signup repair and admin render/config validation, preserving current repo/deployment mapping; then payment protection and reporting integrity with safe preview/fixture validation before production changes.
 
 ---
 
