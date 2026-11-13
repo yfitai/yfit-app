@@ -331,8 +331,8 @@ function App() {
               <Route path="/go" element={<GoPage />} />
               {/* /demo = direct entry to guest mode */}
               <Route path="/demo" element={<Navigate to="/go?mode=guest" replace />} />
-              <Route path="/login" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-              <Route path="/signup" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/login" element={<Auth key="login" initialTab="login" onAuthSuccess={handleAuthSuccess} />} />
+              <Route path="/signup" element={<Auth key="signup" initialTab="signup" onAuthSuccess={handleAuthSuccess} />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/legal" element={<Legal />} />
               <Route path="/faq" element={<FAQ />} />

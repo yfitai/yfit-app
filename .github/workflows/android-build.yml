@@ -26,7 +26,7 @@ jobs:
         run: npm install
       
       - name: Build web app
-        run: npm run build
+        run: npm run build -- --mode capacitor
       
       - name: Remove bundled files (force server URL loading)
         run: rm -rf dist/*

@@ -4,7 +4,7 @@
 # This bundle will be hosted on Vercel and downloaded by the app
 
 echo "🔨 Building app..."
-npm run build
+npm run build -- --mode capacitor
 
 echo "📦 Creating update bundle..."
 cd dist

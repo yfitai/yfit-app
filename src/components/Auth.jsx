@@ -47,7 +47,7 @@ function EmailDivider({ label }) {
   )
 }
 
-export default function Auth({ onAuthSuccess }) {
+export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
 const { t } = useTranslation()
 const [isLoading, setIsLoading] = useState(false)
 const [showLoginPassword, setShowLoginPassword] = useState(false)
@@ -429,7 +429,7 @@ const [showSignupPassword, setShowSignupPassword] = useState(false)
 
 
         {/* Auth Tabs */}
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue={initialTab === 'signup' ? 'signup' : 'login'} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="login">{t('auth.signIn')}</TabsTrigger>
             <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>

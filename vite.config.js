@@ -4,9 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 // https://vite.dev/config/
-export default defineConfig({
-  // Use relative base path for Capacitor mobile apps
-  base: './',
+export default defineConfig(({ mode }) => ({
+  // Nested web routes must load /assets; packaged Capacitor builds stay relative.
+  base: mode === 'capacitor' ? './' : '/',
   plugins: [
     react(),
     tailwindcss(),
@@ -78,4 +78,4 @@ export default defineConfig({
       'localhost'
     ]
   }
-})
+}))

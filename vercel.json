@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node update-version.js && CI=false npm run build",
+  "buildCommand": "CI=false npm run build:web",
   "framework": "vite",
   "installCommand": "npm install",
   "headers": [
