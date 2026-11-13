@@ -2,7 +2,7 @@
 
 **Date:** November 13, 2026
 
-**Status:** built, tested and ready for the existing GitHub/Vercel release. Publication and actual phone execution are not yet verified.
+**Status:** published and independently verified through the existing GitHub/Vercel pipeline. Release commit `c3458d9a235bd8766e1a37ffe6f63a450261d296`; live verification at 22:49:04 UTC. Actual installed-phone execution remains unverified.
 
 ## Authorization and scope
 
@@ -41,6 +41,12 @@ The normal packaging command remains `bash scripts/create-update-bundle.sh`. For
 All 75 medication regressions, 11 form/list/provider-print/PDF assertion groups and eight auth-entry regressions also passed. Scoped updater/banner ESLint passed. Final native-target and web compilations passed. Neither compilation nor a mocked plugin test is a completed installed-phone test. Sequential production food search is checked after deployment, separately from these fixtures.
 
 Sanitized evidence lives in the private monopro hub at `docs/evidence/2026-11-13-build109/`.
+
+## Live publication verified
+
+The actual legacy-host manifest and ZIP returned HTTP 200. The downloaded ZIP was 4,669,200 bytes, matched the expected SHA-256, passed CRC validation and contained native-relative HTML plus root Build 109 metadata. Both mutable endpoints served `no-cache, no-store, must-revalidate` headers; the archive MIME was `application/zip`.
+
+Both `yfit-deploy.vercel.app` and `app.yfitai.com` served executing-HTML build marker 109 and repaired update-core entry `assets/index-Dhz1AcCw.js` as JavaScript. This verifies the identified legacy-origin web bootstrap is available, not that the owner's installed binary is using it. Sequential production apple food search returned HTTP 200 with five results. The live evidence JSON records `actual_phone_tested: false` explicitly.
 
 ## Existing-phone bootstrap limitation
 

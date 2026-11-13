@@ -4,7 +4,7 @@
 
 **Canonical app:** `yfitai/yfit-app` — `/home/ubuntu/yfit-app-full`
 
-**Current release status:** owner-applied schema verified; feature merged to production `main` and the new web code is live. Functional merge commit: `f0ae36b1c298369f15ba554c64b5b5b0b9b537c3`. The original feature backup branch is retained. Installed-phone live-update archive remains Build 108; a separate phone release is not yet authorized or performed.
+**Current release status:** owner-applied schema verified; feature merged to production `main` and the web code is live. Functional merge commit: `f0ae36b1c298369f15ba554c64b5b5b0b9b537c3`; feature backup retained. The owner subsequently approved Android Build 109, published in `c3458d9` with downloaded-archive/checksum and legacy web-bootstrap verification. Actual phone installation/save/reload remains unverified. See `ANDROID_BUILD_109_2026-11-13.md` for the current release and phone steps.
 
 ## Authorized behavior
 
@@ -40,9 +40,9 @@ The field gate passed before merging/pushing the saved feature into the existing
 - 11 additional fictional form/list/provider-print/PDF assertion groups passed. Four separate strengths remained grouped under the parent on the tested PDF pages. No real patient PDF was generated or delivered.
 - Web and Capacitor-target production compilations passed; final integration compiles are recorded in private evidence. Web assets remain root-based; native package assets remain relative.
 - All scheduling labels were added in the existing eight-language `src/lib/i18nResources.js`. New combination/comparison wording has canonical English resources/fallbacks; it is not represented as fully localized into every language. Existing translations were not overwritten.
-- No actual medication/dose records, reminders, public posts, payments, financial reports, production database changes, or account changes were made by the assistant. No new phone archive was created; Build 108 (August 11, 2026) remains unchanged.
+- No actual medication/dose records, reminders, public posts, payments, financial reports, production database changes, or account changes were made by the assistant. The initial medication web release left the phone archive at 108; the later separately approved Build 109 was built/published, not installed or validated on a real device.
 
-**Web versus installed phone:** `src/App.jsx` actively initializes the native-only `src/services/liveUpdate.js`, which downloads `https://yfit-deploy.vercel.app/updates/bundle.zip`. That unchanged archive is still Build 108 and does not contain this medication feature. A web deployment must not be represented as a completed installed-Android release. A separately approved new archive/build and restart/update validation are needed for that client; browser/PWA behavior and service-worker caching also need owner verification.
+**Web versus installed phone:** `src/App.jsx` actively initializes the native-only update service. The later Build 109 release repairs void-download/fixed-ID staging defects and packages this feature at the same legacy ZIP URL with validated versioned metadata. Downloaded archive/checksum and new legacy-origin web code are verified. A web deployment or published archive must not be represented as a completed installed-Android test; older executing local updater code cannot be repaired by a ZIP alone. Owner restart/build-marker/control checks remain needed; browser/PWA caching and native Google/session behavior remain separate.
 
 Test commands from the canonical app root:
 
