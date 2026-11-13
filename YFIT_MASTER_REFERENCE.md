@@ -65,6 +65,12 @@ Web/phone current source and retained OTA archive use one Supabase account proje
 
 **Release-process decision:** GitHub→Vercel web auto-deploy is verified and retained. Supabase Edge Functions require their own release step; storing a fix in GitHub did not deploy the old URL guard. The user prefers automated deployment. Record this gap for a separately approved, safely scoped automatic Edge release workflow to the existing project/functions with tests/rollback and secure credentials; do not assume Vercel or an unrelated admin checkpoint deploys Edge code. No new release automation, credential change or mobile bundle was created here.
 
+### Scraper-Only Test Authorization and Manitoba Time — November 13, 2026 (15:45 onward)
+
+The owner approved one live scraper-only test, explicitly no generation/n8n/public posts. This later approval permits one isolated invocation, superseding the prior no-manual-scraper boundary only for that test. Source has no direct publisher call, but its three write tables must have live hooks/publication consumers checked before invocation. No request or retry has occurred. The connected My Browser tab redirects to Supabase sign-in while the owner's Work-profile screenshot is healthy; do not repeatedly ask for login or infer backend outage. Provide the read-only `docs/testing/SCRAPER_ONLY_TRIGGER_CHECK.sql` through the healthy owner tab, review results, then invoke once only if isolation is established. GET is not a safe probe because scraper ignores method. Read `docs/SCRAPER_ONLY_TEST_2026-11-13.md`.
+
+Official Manitoba sources confirm permanent UTC−5 effective October31,2026, now Manitoba Standard Time/MBT; the owner is correct and Manitoba did not fall back November1. Chicago is UTC−6. Observed11AMChicago equals noonManitoba; old DST data may cause one-hour error, not the five-hour Chicago label gap. VPN exit does not set servercron. Actual trigger/cron and workflow/instance timezone need read-only inspection before timing edits; label6AMCDT is not configuration. No schedule changes authorized/performed. Full sourced notes are in private hub `docs/evidence/2026-11-13-scraper-only/`; Build108 unchanged.
+
 ---
 
 ## 🗂️ Repository Structure (Confirmed May 16, 2026)
