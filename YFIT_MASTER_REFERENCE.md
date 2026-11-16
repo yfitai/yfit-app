@@ -1,9 +1,19 @@
 # YFIT Master Project Reference
 
-**Last Updated:** November 13, 2026
+**Last Updated:** November 16, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
+
+## Current Social Posting Blocker — November 16, 2026
+
+The user rechecked all six social platforms and reports last posts October 31, including no recovery after November 13. Fresh bounded Upload-Post reads agree: eighteen October 29–31 publication-evidence rows, no November records through November 16 at22:30:59UTC, all six accounts connected with reauth_required false. TikTok optional first-comment capability remains a separate issue, not a six-platform publication failure. Read `docs/SOCIAL_POSTING_STOPPAGE_2026-11-16.md`; sanitized evidence is in private hub `docs/evidence/2026-11-16-social/`.
+
+Owner-supplied n8n execution1203 screenshot establishes the current cause: November16 displayed06:00 run completes the scraper and fails at Call Supabase — Generate Content with OpenAI429, type insufficient_quota, code credit_balance_exhausted, and no credits remaining. The shared generator precedes saving and voiceover/assembly/provider posting, so this billing obstruction stops all six. November14–16 starts are displayed06:00, supporting the corrected schedule; exact November14/15 errors and the initial November1 cause remain unverified. Do not retroactively classify every missing day as exhausted credits. Earlier duplicate-URL scraper failure and this downstream quota failure are separate blockers.
+
+Next check is read-only OpenAI API billing for the organization owning the existing Supabase generator key: balance, credit/usage history and auto-recharge. No purchase amount, payment, recharge/spend setting, key change, model switch, retry, manual generation, public post or backfill was authorized/performed. Billing is not temporary rate limiting; retries do not restore credits. Actual balance-dashboard details, reason for depletion and error-notification delivery remain unverified. Reports are deferred until posting is restored and six terminal outcomes are verified. Existing source-level generator observability defects remain separately recorded; funding alone does not clear downstream processing.
+
+Canonical startup completed; main/admin/hub/video identities, clean trees and HEAD=GitHubmain verified. Local/live manifest/app metadata identify109; release archive checksum matches manifest. n8n API made one GET and returned401; browser remained at sign-in, so do not claim authenticated execution export. Screenshot evidence is sufficient for the selected current failure. This investigation changes docs/evidence only; Build109 and all app/admin/workflow/deployment settings remain unchanged.
 
 ## End-Session Handoff — November 13, 2026, 17:57 EST
 
