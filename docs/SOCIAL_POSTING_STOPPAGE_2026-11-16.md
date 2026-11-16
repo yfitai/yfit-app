@@ -1,8 +1,12 @@
 # Why YFIT social posts are currently stopped
 
+**Latest status, 17:49 EST:** the owner reports the manual payment succeeded and the API credit balance now shows **$10.00**. Billing restoration is owner-confirmed; no post-payment generation or public-post test has been performed. The earlier exhausted-credit failure remains the diagnosed cause of the selected failed execution, not proof that the pipeline is still failing after the top-up. Next inspect a normal run, or obtain separate approval for one isolated paid generator test only after verifying the deployed dry-run guards prevent writes and downstream handoff.
+
+Owner billing screenshots before purchase show the YFIT AI organization at $0, auto-reload ON with a $5 trigger and $10 target and no monthly reload limit, one paid $10.50 invoice dated October 6, 2025, and one inactive $10 grant received September 30, 2025 with $0 remaining and a blank expiration column. They also show November 1–16 spend $0 against a $120 monthly spend limit, and October 16–31 usage of 92,383 tokens/89 requests in the selected view. These do not prove credit expiration, when auto-reload was enabled, why recharge did not happen, or which failure first stopped November posting. The owner says the saved card details look correct. No card data, key or payment reference is recorded.
+
 **November 16, 2026:** the selected scheduled execution fails at content generation because the OpenAI API organization has no prepaid credits remaining. The owner-provided n8n screenshot shows execution **1203**, started at **06:00** in the displayed timezone, with `OpenAI error: 429`, type `insufficient_quota` and code **`credit_balance_exhausted`**. Its scraper node is green; **Call Supabase — Generate Content** is red. This establishes the current blocker without executing or retrying the workflow.
 
-OpenAI explicitly distinguishes this error from temporary request rate limits. The remedy is restoring the correct API organization's credit balance; retrying, changing the posting clock or changing models does not restore an exhausted balance. The billing dashboard has not been inspected, so whether credits were consumed, expired, or an automatic recharge failed remains unknown. [1] [2]
+OpenAI explicitly distinguishes this error from temporary request rate limits. The remedy is restoring the correct API organization's credit balance; retrying, changing the posting clock or changing models does not restore an exhausted balance. Owner screenshots now establish the pre-purchase zero balance and configured auto-reload; why the balance depleted or auto-reload did not replenish it remains unknown. [1] [2]
 
 ## Why all six platforms stop together
 
@@ -30,7 +34,7 @@ https://platform.openai.com/settings/organization/billing/overview
 
 Check organization identity, current balance, credit/usage history and auto-recharge status. Do not copy any key, payment details or account secrets into chat. If the displayed balance is positive, verify the correct organization/project before changing anything; do not blindly replace keys or fund an unrelated account. ChatGPT and API billing are separate, even when an eligible subscription offers credits to a linked API organization. [3]
 
-If the correct organization has no credits, the owner can choose a credit purchase and whether to enable bounded automatic recharge. No amount, payment method, purchase, auto-recharge or spend limit was selected or changed during this investigation. OpenAI notes that a successful purchase may take a few minutes to appear and purchased credits have an expiration policy. [2]
+The owner has now completed a manual purchase and reports a $10 credit balance. A second purchase is not the next step. Auto-reload was already enabled in the supplied overview; no setting change was reported. The assistant made no purchase or payment-method/recharge/spend-limit change. OpenAI notes that a successful purchase may take a few minutes to appear and purchased credits have an expiration policy; the supplied blank expiry does not establish that expiration caused this outage. [2]
 
 Once billing is resolved, either inspect the next normal scheduled run or obtain separate approval for a specifically isolated generator test. Even generator `dry_run` invokes a paid model before skipping persistence/webhook calls. Do not press Execute/Retry on the whole workflow to test billing: that can produce public posts. No catch-up/backfill is authorized. A successful generator alone still does not establish six terminal publication URLs.
 
