@@ -1,5 +1,15 @@
 # YFIT platform-to-Go link checks — November 17, 2026
 
+## Profile link clarification — 17:52–17:54 EST
+
+The owner found a clickable **Pinterest profile** link and reported it opened the app while already signed in. This is a different field from the confirmed empty Website on individual Pin1089730441275778376. Public profile extraction independently shows its website href is **`http://www.yfitai.com/`**, with no `/go`. It is a valid root link, but bypasses the intended initial Go step. No profile edit is approved or made.
+
+Fresh cookie-free HTTP reads showed root `https://yfitai.com/` →308→`https://www.yfitai.com/`→200; root-domain `/go` →308→www `/go`→200; `https://app.yfitai.com/go`→200 without an HTTP redirect. At22:53–22:54UTC isolated-browser direct navigation to the actual profile root href rendered the public **marketing landing page** with Sign In/Get Started, while `https://app.yfitai.com/go` rendered the public feature-exploration **Go page**, no login required. These are assistant direct-destination checks, not clicks through Pinterest, nor proof of a measured referral. They may contribute test traffic; no optional consent accepted, synthetic custom events, forms or account logout performed.
+
+Canonical `src/App.jsx` routes logged-out `/` to LandingPage and logged-in `/` to Goals/Dashboard. Both authenticated and unauthenticated route sets explicitly retain `/go` as GoPage. Thus the owner's already-signed-in app landing is consistent with **root URL routing**, not evidence that new users must sign in or that `/go` automatically skips to the dashboard. The precise owner browser redirect chain wasn't captured. An existing guest/demo session is a separate route context and not covered by these two direct checks.
+
+For the agreed social→Go flow, the Pinterest **profile Website** would also need an explicit Go URL, preferably the canonical `https://app.yfitai.com/go` with Pinterest attribution. That is an additional public-profile change, outside the current Pin/future-post repair approval; ask before changing it. The current Pin save and live automatic destination mapping are still blocked by authenticated browser/n8n access. The local-browser route was marked skipped when the isolated public check began; do not switch back without an explicit user request. Current owner screenshot was not reopened.
+
 The owner approved repairing the current Pinterest Pin's missing Website and future automatic Pinterest destinations at **17:39 EST**. At **17:41 EST**, the owner also authorized checking the six platforms **one at a time, after Pinterest is repaired**, to see whether their actual link surfaces open the Go page. Do not run those platform tests concurrently or claim they are complete from earlier profile screenshots.
 
 ## Pinterest comes first
