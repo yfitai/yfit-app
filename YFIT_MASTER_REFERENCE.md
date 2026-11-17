@@ -3,6 +3,8 @@
 **Last Updated:** November 17, 2026
 **Read this at the start of every session before making any changes.**
 
+**Latest confirmed issue, 17:36 EST:** owner editor screenshots for Pinterest Pin1089730441275778376 “Overcoming QL Pain: My Fix” visibly show an empty **Website** input; Go URL exists only in Description. Current Pin destination is therefore confirmed absent in this editor, no longer merely suspected. Two images not reopened; private evidence `pinterest-empty-website-confirmation.json`, updated native comparison. Exact recurring live n8n cause and older Pin scope remain unverified. No repair saved. Await approval to fix this Pin Website and/or current automatic `pinterest_link` using existing description URL `https://yfitai.com/go?utm_source=pinterest&utm_medium=social&utm_campaign=organic#quick-setup`. Inspect current deployed workflow, not old exports; preserve all other settings/platforms/schedule. No mass backfill/delete/duplicate public test posts. No app/admin/deployment changes; Build109 unchanged. Latest note supersedes earlier pending-Link-inspection instructions below.
+
 ---
 
 ## Current Analytics Audit — November 17, 2026
