@@ -1,5 +1,15 @@
 # YFIT platform-to-Go link checks — November 17, 2026
 
+## Individual Pin saved; live publishing node identified — 18:16 EST
+
+The owner confirms **Website updated and saved** on Pin1089730441275778376. The screenshot shows the field populated with the beginning of the approved full Go URL; the input is visually truncated, so the image alone does not certify the full persisted value. Public read-only extraction now shows a **Visit** control and yfitai.com label; its extracted HTML did not expose a usable website anchor, so the exact persisted destination/actual click-through still needs viewer verification. No outbound click was made for this check, and no new Pin was created. Current evidence is **owner-confirmed save**, not assistant-performed save or fully verified end-to-end click.
+
+The live n8n screenshot identifies node **Upload-Post — Post Video**, ID/address suffix **upload-post-v**, in existing workflow **h7bRds9UOUfmP36F**, using **POST `https://api.upload-post.com/api/upload`**. Its visible input comes from **Is Dry Run?**, with fields including platform, video_url, caption, hashtags, title, first_comment, srt_url, run_date and content_angle. The shown pane stops in Headers; **Body Parameters have not yet been displayed**, so do not claim the current live node omits `pinterest_link` until those fields are inspected. No current input/output execution was triggered; the left panel warns its preview fields are from a prior successful execution.
+
+Official Upload-Post documentation for this exact video endpoint defines **`pinterest_link`** as the destination, separately from description. [4] The next step is to scroll only the central Parameters pane to **Send Body → Body Content Type → Body Parameters**, hiding/skipping all authorization/header values. Inspect the full list and whether an existing destination parameter is present before adding a single field. Preserve video/title/caption/user/board mappings, current form format, dry-run guard, other platforms, connection settings and daily schedule. Do not click **Execute step**, Execute workflow or Retry as a mapping test: this node can publish real posts. Future automatic links remain **unrepaired/unpublished**, and the verified profile root link remains unchanged/claimed.
+
+[4]: https://docs.upload-post.com/api/upload-video/ "Upload-Post video API: pinterest_link is the video Pin destination"
+
 ## Claimed profile Website lock — 18:04–18:06 EST
 
 At17:57EST the owner explicitly approved changing the Pinterest profile Website to **`https://app.yfitai.com/go`**, with no added parameters. No change was saved. Subsequent owner screenshots show Edit profile Website locked at **`www.yfitai.com`**, a green verification mark and a message directing website changes to Link to Pinterest. The claim page then shows **`yfitai.com` already claimed**, with Claim and Unclaim buttons, not a Go-path input. The five unique screenshots from these two messages were read only as displayed, not reopened. The claimed-domain lock is a confirmed platform restriction; it is separate from the prior browser authentication mismatch.
