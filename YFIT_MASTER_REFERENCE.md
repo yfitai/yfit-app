@@ -1,9 +1,21 @@
 # YFIT Master Project Reference
 
-**Last Updated:** November 16, 2026
+**Last Updated:** November 17, 2026
 **Read this at the start of every session before making any changes.**
 
 ---
+
+## Current Analytics Audit — November 17, 2026
+
+Canonical startup verified app/admin/private hub identities, clean trees and GitHub main agreement; Build109 remains current. Owner reports all six platforms posted today. Six successful provider publication rows and independently readable public posts corroborate November17 recovery (approximately11:02–11:05UTC). This does not certify every internal pipeline stage or all-system readiness. Do not repeat the scraper/generator tests, manually post/backfill, alter the published UTC schedule, or investigate video format/screenshots yet; the owner expressly deferred content.
+
+Read `docs/ANALYTICS_COMPARISON_2026-11-17.md`. Live social requests for7days and30days returned identical figures and entire series because the selected window is not applied. Account/profile totals are not today's post insights or weekly deltas. The mapper discards metric labels, missing/unsupported/stale flags and native click fields. YouTube returns stale/quota-limited data; Pinterest account snapshot has105Pin clicks and0outbound clicks, not105website visitors, while its115native-definition engagements become10generic report actions. Missing/unsupported fields must not be presented as observed zeros.
+
+The owner supplied screenshots of the received report headed **November9–16**, not today's posts. Its575reach/48engagement/11followers/approximately6.6Kimpressions totals add up, but the selected-period provenance remains unreliable. AI twice calls TikTok engagement0 despite its row22, calls total followers new growth, and equates engagement with clicks. No new posts during that week does not preclude views on old posts. Current REST versus tRPC prompts differ; actual original PDF/email/execution/input correlation is needed before claiming stale deployment or reused reports. Owner receipt screenshots establish receipt of the shown report, not a complete delivery ledger.
+
+Direct website stats reads returned401; the user's browser dashboard returned a separate company-ipgroup denial. The live admin wrapper returns fresh-looking zeros with no availability/error signal, and source fixtures demonstrate denied reads can cause this. The particular live upstream branch and real visitor totals are unverified. Fresh direct /go/signup/login entrants lack a consent prompt there and cannot initialize tracking without prior origin-local acceptance. The one-shot Go custom event can also be lost before tracker readiness. Preserve declined-consent behavior. Bare full-site/demo/guest/OAuth navigation loses incoming query attribution; the direct Go signup five-UTM path and corrected signup tab remain intact. Google opened older Roga Drone property, not verified YFIT, so its zeros are not YFIT evidence. **Actual outbound clicks, /go arrivals and signup conversions remain unknown—not zero.**
+
+Next: owner will send native screenshots one platform at a time. Capture exact November17post/account identity, metric labels, lifetime/selected window and capture time; website/outbound clicks separately where offered. For historical report reconciliation request native account November9–16 and original received PDF/email, not regenerate. Pinterest Pin clicks versus Outbound clicks are especially useful. Need authorized read access to existing correctly scoped website data and identification of the actual Google report/property. All six native private-performance comparisons remain access-limited; public follower matches/YouTube71public views are not private insight clearance. Repairs, production test events, account reconnects, changes to consent/access policies/credentials, report sends or workflows require separate approval. This audit changed documentation/evidence only; preserve existing main/admin/hub remotes and admin managed S3 origin. Private evidence: hub `docs/evidence/2026-11-17-analytics/`.
 
 ## End-Session Handoff — November 16, 2026, 18:18 EST
 
