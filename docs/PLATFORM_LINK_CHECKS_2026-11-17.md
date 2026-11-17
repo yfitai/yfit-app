@@ -1,5 +1,19 @@
 # YFIT platform-to-Go link checks — November 17, 2026
 
+## Claimed profile Website lock — 18:04–18:06 EST
+
+At17:57EST the owner explicitly approved changing the Pinterest profile Website to **`https://app.yfitai.com/go`**, with no added parameters. No change was saved. Subsequent owner screenshots show Edit profile Website locked at **`www.yfitai.com`**, a green verification mark and a message directing website changes to Link to Pinterest. The claim page then shows **`yfitai.com` already claimed**, with Claim and Unclaim buttons, not a Go-path input. The five unique screenshots from these two messages were read only as displayed, not reopened. The claimed-domain lock is a confirmed platform restriction; it is separate from the prior browser authentication mismatch.
+
+A January2025 Pinterest Business Community response says the existing website must be unclaimed to unlock the profile URL. Pinterest's official website-claim documentation warns that once a claim is removed, associated Pins are no longer connected to the Pinterest account. [1] [2] The ordinary Add your website guide does not document a claim-preserving locked-field edit. [3] We have not established a supported way to change this particular profile's displayed URL without unclaiming. Do not bypass the disabled field through DOM/API manipulation, claim another domain experimentally, delete verification tags, change DNS, redirect the whole marketing root or remove the existing claim.
+
+**Approval boundary:** changing the profile destination is approved; removing domain verification/claim and its existing Pin association is not. Preserve the existing claim and root profile link unless the owner separately approves that consequence after review. Recommended near-term route is to finish the already approved **individual Pin Website and future-upload destination repairs**, which are separate from the locked profile field. If retaining verification and changing the profile link are both required, ask Pinterest Support for a supported procedure. No support request was submitted, no claimed-domain change made, and no individual Pin or workflow save is complete.
+
+## References
+
+[1]: https://community.pinterest.biz/t/why-cant-i-change-the-website-in-my-pinterest-profile/24595 "Pinterest Business Community: locked profile Website change requires unclaiming"
+[2]: https://help.pinterest.com/en/business/article/claim-your-website "Pinterest official website claims and consequences of removing a claim"
+[3]: https://help.pinterest.com/en/article/add-your-website "Pinterest official profile Website editing instructions"
+
 ## Profile link clarification — 17:52–17:54 EST
 
 The owner found a clickable **Pinterest profile** link and reported it opened the app while already signed in. This is a different field from the confirmed empty Website on individual Pin1089730441275778376. Public profile extraction independently shows its website href is **`http://www.yfitai.com/`**, with no `/go`. It is a valid root link, but bypasses the intended initial Go step. No profile edit is approved or made.
