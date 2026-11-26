@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "prepared_at_utc": "2026-11-26T23:02:45.147090+00:00",
+  "state": "prepared_not_uploaded",
+  "project_ref": "mxggxpoxgqubojvumjlt",
+  "bucket": "yfit-videos",
+  "video_source_revision": "dc56fac4f734bc100c8b94fba3d1e505aeca4cf7",
+  "app_source_revision": "0724d1962147075bd9211a8351c50b3758b2ac1a",
+  "upload_authorized": false,
+  "owner_visual_approval": false,
+  "restore_policy_after_separate_approval": "create-only exact keys; stop on existing object or policy mismatch; no overwrite, delete, bucket, workflow, deployment or schedule change",
+  "unchecked_catalog_images": 7,
+  "assets": [
+    {
+      "key": "dashboard",
+      "route": "/dashboard",
+      "object_path": "assets/app-screens/screen_01_dashboard.png",
+      "local_file": "candidates/screen_01_dashboard.png",
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "bytes": 455345,
+      "width": 1080,
+      "height": 1920,
+      "mime_type": "image/png",
+      "fictional_data": true,
+      "original_recovered": false
+    },
+    {
+      "key": "fitness",
+      "route": "/fitness",
+      "object_path": "assets/app-screens/screen_05_fitness.png",
+      "local_file": "candidates/screen_05_fitness.png",
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "bytes": 139584,
+      "width": 1080,
+      "height": 1920,
+      "mime_type": "image/png",
+      "fictional_data": true,
+      "original_recovered": false
+    },
+    {
+      "key": "aiCoach",
+      "route": "/ai-coach-faq",
+      "object_path": "assets/app-screens/screen_10_aiCoach.png",
+      "local_file": "candidates/screen_10_aiCoach.png",
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "bytes": 239573,
+      "width": 1080,
+      "height": 1920,
+      "mime_type": "image/png",
+      "fictional_data": true,
+      "original_recovered": false
+    },
+    {
+      "key": "medications",
+      "route": "/medications",
+      "object_path": "assets/app-screens/screen_06_medications.png",
+      "local_file": "candidates/screen_06_medications.png",
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "bytes": 491752,
+      "width": 1080,
+      "height": 1920,
+      "mime_type": "image/png",
+      "fictional_data": true,
+      "original_recovered": false
+    }
+  ]
+}

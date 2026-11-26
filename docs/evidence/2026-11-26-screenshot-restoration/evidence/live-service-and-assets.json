@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-26T22:47:49.594715+00:00",
+  "readOnly": true,
+  "assemblyCalled": false,
+  "debugScreensCalled": false,
+  "health": {
+    "url": "https://yfitai-yfit-video-service-production.up.railway.app/health",
+    "httpStatus": 200,
+    "response": {
+      "status": "ok",
+      "version": "4.1.0",
+      "timestamp": "2026-11-26T22:47:51.318Z"
+    }
+  },
+  "representativeAssets": [
+    {
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/app-screens/screen_01_dashboard.png",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88"
+    },
+    {
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/app-screens/screen_06_medications.png",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88"
+    }
+  ]
+}

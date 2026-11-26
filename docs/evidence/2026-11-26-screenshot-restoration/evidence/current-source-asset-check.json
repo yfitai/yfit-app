@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-11-26T22:50:36.822536+00:00",
+  "readOnly": true,
+  "pathCorrection": "Current source uses yfit-videos/assets/app-screens/; July notes used yfit-videos/app-screens/. Prior missing-object evidence applies only to old path.",
+  "assets": [
+    {
+      "screen": "dashboard",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_01_dashboard.png",
+      "method": "GET",
+      "purpose": "Verify exact current source asset URL, not historical documented URL",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88",
+      "storageError": {
+        "statusCode": "404",
+        "error": "not_found",
+        "message": "Object not found"
+      }
+    },
+    {
+      "screen": "fitness",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_05_fitness.png",
+      "method": "GET",
+      "purpose": "Verify exact current source asset URL, not historical documented URL",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88",
+      "storageError": {
+        "statusCode": "404",
+        "error": "not_found",
+        "message": "Object not found"
+      }
+    },
+    {
+      "screen": "aiCoach",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_10_aiCoach.png",
+      "method": "GET",
+      "purpose": "Verify exact current source asset URL, not historical documented URL",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88",
+      "storageError": {
+        "statusCode": "404",
+        "error": "not_found",
+        "message": "Object not found"
+      }
+    },
+    {
+      "screen": "medications",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_06_medications.png",
+      "method": "GET",
+      "purpose": "Verify exact current source asset URL, not historical documented URL",
+      "httpStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": "88",
+      "storageError": {
+        "statusCode": "404",
+        "error": "not_found",
+        "message": "Object not found"
+      }
+    }
+  ]
+}

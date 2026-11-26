@@ -1,0 +1,9 @@
+{
+  "state": "prepared_not_uploaded",
+  "assets_validated": 4,
+  "offline_checks_passed": 10,
+  "network_requests": 0,
+  "uploads": 0,
+  "generator_or_assembly_calls": 0,
+  "posts": 0
+}

@@ -1,0 +1,359 @@
+{
+  "capture_type": "actual app UI with fictional offline fixtures",
+  "build_directory": "/home/ubuntu/.manus/yfit-go-nov26/web-build",
+  "app_revision": "0724d1962147075bd9211a8351c50b3758b2ac1a",
+  "live_network_requests_allowed": 0,
+  "uploads": 0,
+  "model_calls": 0,
+  "external_interceptions": [
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/daily_logs",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/meals",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/workout_sessions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_goals",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/calculated_metrics",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/daily_logs",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/exercises",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/ai_conversations",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/ai_messages",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_medications",
+      "method": "GET"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_medications",
+      "method": "GET"
+    }
+  ],
+  "blocked_write_attempts": [
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics",
+      "method": "POST"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics",
+      "method": "POST"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics",
+      "method": "POST"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics",
+      "method": "POST"
+    },
+    {
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics",
+      "method": "POST"
+    }
+  ],
+  "page_errors": [],
+  "screens": [
+    {
+      "key": "dashboard",
+      "route": "/dashboard",
+      "filename": "screen_01_dashboard.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "bytes": 455345,
+      "contains_fictional_data": true,
+      "source": "actual authenticated-page component, offline preview"
+    },
+    {
+      "key": "fitness",
+      "route": "/fitness",
+      "filename": "screen_05_fitness.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "bytes": 139584,
+      "contains_fictional_data": true,
+      "source": "actual authenticated-page component, offline preview"
+    },
+    {
+      "key": "aiCoach",
+      "route": "/ai-coach-faq",
+      "filename": "screen_10_aiCoach.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "bytes": 239573,
+      "contains_fictional_data": true,
+      "source": "actual authenticated-page component, offline preview"
+    },
+    {
+      "key": "medications",
+      "route": "/medications",
+      "filename": "screen_06_medications.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "bytes": 491752,
+      "contains_fictional_data": true,
+      "source": "actual authenticated-page component, offline preview"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-11-26T22:47:15.543778+00:00",
+  "operation": "GET existing workflow at normalized API origin",
+  "workflowId": "h7bRds9UOUfmP36F",
+  "readOnly": true,
+  "executionOrRetry": false,
+  "priorProbe": "Configured URL included UI path; HTTP200 there was not workflow JSON.",
+  "httpStatus": 401,
+  "contentType": "application/json",
+  "status": "current workflow API unavailable; no retry, no response body retained"
+}
