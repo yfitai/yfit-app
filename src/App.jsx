@@ -5,7 +5,7 @@ import { UnitPreferenceProvider } from './contexts/UnitPreferenceContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { LiveUpdateService } from './services/liveUpdate'
 import { setAnalyticsUser, Analytics } from './lib/analytics'
-import { initAnalyticsFromConsent } from './components/CookieConsent'
+import PublicAnalyticsBoundary from './components/PublicAnalyticsBoundary'
 import './App.css'
 
 // Guest mode utilities
@@ -21,9 +21,6 @@ import GuestProgressPage from './components/GuestProgressPage'
 import GuestAICoachPage from './components/GuestAICoachPage'
 import GuestPredictionsPage from './components/GuestPredictionsPage'
 import GuestFormAnalysisPage from './components/GuestFormAnalysisPage'
-
-// GDPR/PIPEDA: inject Umami analytics only if user previously accepted cookies
-initAnalyticsFromConsent()
 
 // Always-needed components loaded eagerly (small, needed immediately)
 import Navigation from './components/Navigation'
@@ -309,6 +306,7 @@ function App() {
       <BrowserRouter>
         {/* Detects ?mode=guest in URL and activates guest mode */}
         <GuestModeDetector onGuestDetected={handleGuestDetected} />
+        <PublicAnalyticsBoundary active={!needsOnboarding && !showInstallGuide && !isGuestMode && (!user || window.location.pathname === '/go')} />
 
         {needsOnboarding && user ? (
           // New user onboarding — full-screen wizard, no nav

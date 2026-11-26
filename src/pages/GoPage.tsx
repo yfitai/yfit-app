@@ -5,12 +5,13 @@
  * before directing visitors to sign up or the full marketing site.
  *
  * Flow: Social post → /go → see all features → CTA (free trial / full site)
- * UTM parameters are preserved from the incoming URL so Umami can attribute signups.
+ * Safe campaign classifications are retained on public links; this does not count registrations.
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { buildPublicLink, trackPublicGoEvent } from "@/lib/publicAnalytics";
 
 const SIGNUP_URL = "https://app.yfitai.com/signup";
 const DEMO_URL = "https://app.yfitai.com/go?mode=guest";
@@ -19,23 +20,14 @@ const MARKETING_URL = "https://yfitai.com";
 // Preserve UTM params when redirecting to signup
 function buildSignupUrl(): string {
   if (typeof window === "undefined") return SIGNUP_URL;
-  const params = new URLSearchParams(window.location.search);
-  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
-  const out = new URLSearchParams();
-  utmKeys.forEach(k => { if (params.has(k)) out.set(k, params.get(k)!); });
-  const qs = out.toString();
-  return qs ? `${SIGNUP_URL}?${qs}` : SIGNUP_URL;
+  return buildPublicLink(SIGNUP_URL, window.location.search);
 }
 
 function track(event: string, extra?: Record<string, string>) {
-  if (typeof window !== "undefined" && (window as any).umami) {
-    const params = new URLSearchParams(window.location.search);
-    (window as any).umami.track(event, {
-      source: params.get("utm_source") || "direct",
-      campaign: params.get("utm_campaign") || "none",
-      ...extra,
-    });
-  }
+  trackPublicGoEvent(event, extra);
+}
+function publicLink(destination: string): string {
+  return buildPublicLink(destination, typeof window === "undefined" ? "" : window.location.search);
 }
 
 // ─── Feature data ─────────────────────────────────────────────────────────────
@@ -502,7 +494,7 @@ function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label
 
       {/* Explore first — PRIMARY option, top of stack */}
       <a
-        href={DEMO_URL}
+        href={publicLink(DEMO_URL)}
         onClick={() => track(`go_cta_demo_${label}`)}
         className="flex items-center justify-between w-full px-6 py-5 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
       >
@@ -533,7 +525,7 @@ function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label
           <span aria-hidden="true">→</span>
         </a>
         <a
-          href={MARKETING_URL}
+          href={publicLink(MARKETING_URL)}
           onClick={() => track(`go_cta_marketing_${label}`)}
           className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 text-base font-semibold hover:border-teal-400 hover:text-teal-700 transition-all"
         >
@@ -551,10 +543,6 @@ function CTASection({ signupUrl, label = "primary" }: { signupUrl: string; label
 export default function GoPage() {
   const { t } = useTranslation();
   const signupUrl = buildSignupUrl();
-
-  useEffect(() => {
-    track("go_page_view_v2");
-  }, []);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">

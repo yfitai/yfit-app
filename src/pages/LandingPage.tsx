@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import CookieConsent from "@/components/CookieConsent";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -905,7 +904,6 @@ export default function LandingPage() {
           </div>
         </div>
       )}
-      <CookieConsent />
     </div>
   );
 }

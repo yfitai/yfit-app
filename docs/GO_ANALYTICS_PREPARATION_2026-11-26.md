@@ -1,0 +1,31 @@
+# Go analytics preparation — November 26, 2026
+
+The owner approved preparation and offline testing only at16:34EST. This is not installed live. Canonical app is yfitai/yfit-app in /home/ubuntu/yfit-app-full; admin reporting is yfitai/yfit-admin in the misleading yfit-marketing folder. Repair branches are fix/go-analytics-2026-11-26. Current website design, navigation destinations, auth/registration logic, phone Build109, posting automation and provider connections are unchanged.
+
+## Collection repaired in prepared source
+
+A shared public entry boundary mounts the analytics choice on the current marketing landing, Go and public signup/login routes. An authenticated root redirect, private route, guest/demo shell, noncanonical hostname, localhost preview or Capacitor protocol cannot start marketing tracking. Consent remains origin-local; root acceptance is never silently treated as app-host acceptance.
+
+The existing tracker is loaded only after acceptance, with automatic tracking disabled. One sanitized manual pageview replaces the one-shot Go custom visit. The page currently displayed after acceptance can be counted; pre-consent pages/interactions are not replayed. A bounded queue handles script readiness, expires after10seconds, cancels on navigation/withdrawal and deduplicates React StrictMode page entries. No unbounded retry is made for unknown collection outcomes. Explicit consent withdrawal is available through Analytics privacy. Storage failures default to no collection but permit a same-tab explicit choice.
+
+Public data excludes account IDs, emails, names, auth tokens, calculator/body/medication values, arbitrary query/hash data and raw referrer URLs. Fixed social-source classifications are retained, along with a small allowlist of campaign classifications. Unknown or absent tags are not called direct. Existing intentional Go CTA/preview events use fixed names and no sensitive data. An automatic tour is not counted as interest. Safe campaign classifications are preserved through the existing Go signup/marketing/demo links; this is not a completed-registration or OAuth-attribution implementation.
+
+Owner/test browsers can be excluded on each origin using the local browser setting yfit_analytics_excluded=true, or existing umami.disabled=1. No setting was changed on a real browser. Browser Do Not Track/global privacy signals are honored; no user identification, replay, performance or error collection is enabled. Infrastructure request logs and an IP/browser-derived native visitor estimate are not individual-person identification.
+
+## Offline validation
+
+Run node --test scripts/tests/public-analytics.test.mjs: final56cases passed, including directGoaccept/decline, loading delay/failure/timeouts, StrictMode versus genuine back-navigation, withdrawal/storagechange, queuebounds, no pre-consent replay, known/unknownsources, PII/health URL/referrer removal, sixpublicentryroutes, eightexcludedroute/host/protocolcases, separatehostnameconsent and no duplicatevisit. Three tests execute the actual existing managed tracker snapshot in a fully mocked VM; only sanitized manualpayloads reach the fakeendpoint, with no automaticpageview/init or identify calls. Static GET of script.js returned200/2,618bytes/SHA256 7eba89b02651cb67beefeb8aed5d39402f7994b226114c2c639ae354dc1a94f2; the downloaded script was never executed in a real browser and no realpageview was sent.
+
+Run node scripts/test-public-consent-ui.mjs:13renderedchecks of the actual consent component/publicboundary passed with mocked effects and no provider/browser calls. Public Go/signup/login/landing display the choice; private/demo/native routes do not. Targeted ESLint passed for the new JS/JSX modules; TSX is not configured in this repository's ESLint and was ignored with a warning, not falsely claimed linted. The Vite build parses the actual TSX and the offline rendering checks exercise its markup.
+
+Run node scripts/test-auth-entry.mjs: eight existing isolated auth-entry checks passed, with provider/database/email/browser calls prohibited. The web build was run directly through Vite with modeproduction to /home/ubuntu/.manus/yfit-go-nov26/web-build, bypassing npm prebuild/phoneversionbump. Build passed and public/version.json plus public/manifest.json hashes remained identical to baseline; buildNumber109. Existing release dist/phone archive was not overwritten. These are offline code/fixture checks, not real browser analytics ingestion, dashboard parity or confirmed production visitor counts.
+
+## Remaining gates
+
+Read-only ENV inspection confirms the public app's existing Umami website ID matches the admin's configured ID and endpoint hostmanus-analytics.com. Existing generic service key is present; a dedicated Umami reporting key is absent. Matching IDs are not permission/filter support proof. Prior denied reads remain unresolved; no new upstream stats read, auth bypass, key replacement or connection was made. Google Analytics cloudbrowser opens GoogleSignIn; no YFIT property/data stream/tag/history was inspected or created. MyBrowser remains skipped by owner preference.
+
+Before production, establish legitimate owner-readable analytics access and verify the actual tracker/APIversion, exacthost/path/eventType1/date filters and native visitor grain against the dashboard. The prepared admin report must keep unverified data partial/null and show perhostnativevisitors instead of summing uniquepeople. A separately authorized small labelled journey can then test directsocialGo arrival, consentaccept/decline, loading, correct source and exclusions. Production deployment, newservice/nativeauthorization, liveevents/testsignup or reportemail require owner approval. No postingschedule/Execute/Retry/backfill is included.
+
+## Official contracts
+
+https://docs.umami.is/docs/tracker-functions supports explicit manual payloads fromv2. https://docs.umami.is/docs/tracker-configuration documents data-auto-track=false fromv2; newerdata-auto-pageview is not the sole safeguard on unknownmanagedversion. https://docs.umami.is/docs/api-reference/get-website-utm-metrics documents sourcegroupedpageviews via /utm/metrics and typeutm_source, not uniquepeople or nativeoutboundclicks. No copied secret appears here.
