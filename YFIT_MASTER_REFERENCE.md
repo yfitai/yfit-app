@@ -3,6 +3,12 @@
 **Last Updated:** November 26, 2026
 **Read this at the start of every session before making any changes.**
 
+## Go Deployment Authorization — November 26, 2026, 17:04 EST
+
+Owner now explicitly approves verifying existing YFIT analytics access, followed by deployment of the tested Go-only repair to the current web app/admin **only once measurements can be verified**. Preserve phone Build109, current posting automation and canonical organization. One labelled Go consent/source test is approved after the access/deployment gate; no signup or manual report email. Ask separately for any new analytics authorization or credentials. This supersedes the earlier preparation-only/no-deployment scope below; it does not authorize bypassing the measurement gate or creating a different tracker/service.
+
+Current17:06 verification: one bounded existing-credential read for app.yfitai.com /go, November19–25 completed UTC-5 days, returned401. Dedicated Umami read key remains absent. Cloud dashboard displays company-ipgroup IP-access denial, not a solved login. No credential/settings changes, auth fallback/retry, main merge, deployment or labelled live journey performed. Prepared app/admin branches remain clean and Build109 release fingerprints unchanged. Supported existing read access is the blocker; deployment approval is retained but conditional, not withdrawn or executed. Evidence: `/home/ubuntu/.manus/yfit-go-nov26/current-access-verification.json`. Private hub notes remain locally preserved due to the historical credential-entry backup blocker.
+
 ## Go Analytics Preparation — November 26, 2026, final offline validation
 
 Owner explicitly approved **prepare and offline-test Go-analytics-only repair** at16:34, superseding the earlier no-Go-source-change scope below. NO production deployment, new analytics authorization/service, live tracking event/report email, signup/account/schema change, page redesign, posting/workflow alteration or phone release is approved. Canonical identities and clean app/admin plus remoteHEAD baselines were verified first; existing hub local notes were preserved. App/admin work is isolated on `fix/go-analytics-2026-11-26`, not main. Current live app remains Build109 and admin remains deployed9625740c until separately approved.
