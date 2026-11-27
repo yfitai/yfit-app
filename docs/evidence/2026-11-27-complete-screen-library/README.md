@@ -1,5 +1,13 @@
 # YFIT actual-app screen library — November 27, 2026
 
+## Current status: all 11 restored and verified, 17:54 EST
+
+The owner completed the seven missing uploads. Independent public GET/hash/dimension checks passed for **all eleven exact PNG paths**, and the original four are unchanged. No further upload is needed. Daily posting remains owner-confirmed **unpublished**, with review and approval required before republishing; the weekly report and published posts were not changed.
+
+Use [the current restoration confirmation](README-live-verified.md), [the current visual index](screen-index-live-verified.md), `manifest-live-verified.json`, `notes/live-restoration-verification.json` and the new `YFIT_All_11_App_Screens_Live_Verified_2026-11-27.zip`. The older manifest, index, ZIP and SDK receipt are preserved preparation evidence. The sections below describe the earlier **17:12 incomplete state**, not the current state; do not repeat their completed upload instructions. See the Master for the next-session review-before-republish checklist.
+
+## Historical preparation snapshot — superseded by the current verification above
+
 All **11 configured screen assets** are saved here at their exact renderer filenames, each 1080 × 1920 PNG. These are actual authenticated-app components with fictional demonstration data, not guest mockups, generated interfaces or customer records. Original app colors and controls are unchanged. The four previously restored images are preserved byte-for-byte; seven missing views have been prepared locally.
 
 ## Online restoration is not complete

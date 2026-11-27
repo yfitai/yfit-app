@@ -25,6 +25,6 @@
   "owner_confirmation": "Unpublish successful",
   "pause_applied_by": "owner-existing-signed-in-n8n-dashboard",
   "in_flight_execution_or_provider_queue_checked": false,
-  "next_session_todo": "Remind owner posting is unpublished; review support/analytics, seven-image upload verification and format decision; obtain approval before publishing intended existing workflow version again",
+  "next_session_todo": "Remind owner posting is unpublished; review support/analytics, completed 11-image restoration and format decision; obtain approval before publishing intended existing workflow version again. Seven owner uploads passed exact public GET/hash/dimension verification at 17:54 EST; no further upload needed.",
   "proactive_reminder_created": false
 }

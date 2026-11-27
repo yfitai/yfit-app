@@ -1,0 +1,242 @@
+{
+  "verification_started_at_utc": "2026-11-27T22:54:26.361768+00:00",
+  "verified_at_utc": "2026-11-27T22:54:28.056577+00:00",
+  "project": "mxggxpoxgqubojvumjlt",
+  "bucket": "yfit-videos",
+  "prefix": "assets/app-screens/",
+  "http_method": "GET",
+  "authenticated_requests": false,
+  "writes_or_uploads": false,
+  "n8n_or_generation_or_posting_requests": false,
+  "owner_upload_evidence_time": "2026-11-27T17:53:46-05:00",
+  "owner_screenshot_observation": "Eleven exact PNG filenames visible in correct assets/app-screens folder; inline image not reopened",
+  "all_eleven_passed": true,
+  "passed_count": 11,
+  "four_approved_originals_unchanged": true,
+  "assets": [
+    {
+      "filename": "screen_01_dashboard.png",
+      "label": "Dashboard",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_01_dashboard.png",
+      "expected_sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "preserved_approved_original": true,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 455345,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_02_goals.png",
+      "label": "Goals",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_02_goals.png",
+      "expected_sha256": "5d4ae70f678129d437b3b4ce508b0d37595724ddc5b004bee95efb4ece33e74e",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 206297,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "5d4ae70f678129d437b3b4ce508b0d37595724ddc5b004bee95efb4ece33e74e",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_03_nutrition.png",
+      "label": "Nutrition",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_03_nutrition.png",
+      "expected_sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 347264,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_04_dailyTracker.png",
+      "label": "Daily Tracker",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_04_dailyTracker.png",
+      "expected_sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 400651,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_05_fitness.png",
+      "label": "Fitness",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_05_fitness.png",
+      "expected_sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "preserved_approved_original": true,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 139584,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_06_medications.png",
+      "label": "Medications",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_06_medications.png",
+      "expected_sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "preserved_approved_original": true,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 491752,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_07_progress.png",
+      "label": "Progress",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_07_progress.png",
+      "expected_sha256": "9fe67a213643cb8314ca810c6b6c8d98977a336cf7c1ffd2ecf559d615a8a4ba",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 235767,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "9fe67a213643cb8314ca810c6b6c8d98977a336cf7c1ffd2ecf559d615a8a4ba",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_08_predictions.png",
+      "label": "Predictions",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_08_predictions.png",
+      "expected_sha256": "0c2a270adb2090c9a6827b44a164fb738824dc0a9f96391e87e3f5e7037fb8dc",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 572127,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "0c2a270adb2090c9a6827b44a164fb738824dc0a9f96391e87e3f5e7037fb8dc",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_09_recomp.png",
+      "label": "Recomp",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_09_recomp.png",
+      "expected_sha256": "3862452db418c442a7047a20eb9d6ab62e84f79ba77ea3f8df060656cb0831b7",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 469920,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "3862452db418c442a7047a20eb9d6ab62e84f79ba77ea3f8df060656cb0831b7",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_10_aiCoach.png",
+      "label": "AI Coach",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_10_aiCoach.png",
+      "expected_sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "preserved_approved_original": true,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 239573,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    },
+    {
+      "filename": "screen_11_language.png",
+      "label": "Language menu",
+      "url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_11_language.png",
+      "expected_sha256": "7a9f3a8bab3aa0091bcb85cadb4a4da3923fd5d47883a1fb4f5549566164c7e7",
+      "preserved_approved_original": false,
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 405933,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "7a9f3a8bab3aa0091bcb85cadb4a4da3923fd5d47883a1fb4f5549566164c7e7",
+      "image_valid": true,
+      "hash_matches": true,
+      "dimensions_match": true,
+      "bytes_match": true,
+      "passed": true
+    }
+  ],
+  "daily_posting_remains_owner_confirmed_unpublished": true,
+  "automatic_resume": false,
+  "actual_video_overlay_rendering_or_publication_tested": false,
+  "accidental_zip_object_deleted": false
+}
