@@ -10,12 +10,21 @@
   "existing_posts_change_authorized": false,
   "api_read_http_status": 401,
   "cloud_browser_result": "No usable authenticated editor; follow-up view about:blank",
-  "pause_applied": false,
-  "pause_verification": "pending-owner-dashboard-action",
+  "pause_applied": true,
+  "pause_verification": "owner-confirmed-not-independently-API-verified",
   "mutation_requests_sent": 0,
   "execution_retry_backfill_performed": false,
   "official_docs": [
     "https://docs.n8n.io/build/understand-workflows/save-and-publish-workflows",
     "https://docs.n8n.io/connect/n8n-api/build-and-run/workflows"
-  ]
+  ],
+  "observed_workflow_name_from_owner_screenshot": "YFIT Social Media Automation v2",
+  "owner_screenshot_time": "2026-11-27T17:37:04-05:00",
+  "owner_screenshot_state_before_action": "Published; Unpublish menu open",
+  "owner_confirmation_time": "2026-11-27T17:39:28-05:00",
+  "owner_confirmation": "Unpublish successful",
+  "pause_applied_by": "owner-existing-signed-in-n8n-dashboard",
+  "in_flight_execution_or_provider_queue_checked": false,
+  "next_session_todo": "Remind owner posting is unpublished; review support/analytics, seven-image upload verification and format decision; obtain approval before publishing intended existing workflow version again",
+  "proactive_reminder_created": false
 }
