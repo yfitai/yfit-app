@@ -1,0 +1,84 @@
+[
+  {
+    "filename": "screen_01_dashboard.png",
+    "status": 200,
+    "content_type": "image/png",
+    "bytes": 455345,
+    "dimensions": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "filename": "screen_02_goals.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_03_nutrition.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_04_dailyTracker.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_05_fitness.png",
+    "status": 200,
+    "content_type": "image/png",
+    "bytes": 139584,
+    "dimensions": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "filename": "screen_06_medications.png",
+    "status": 200,
+    "content_type": "image/png",
+    "bytes": 491752,
+    "dimensions": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "filename": "screen_07_progress.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_08_predictions.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_09_recomp.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  },
+  {
+    "filename": "screen_10_aiCoach.png",
+    "status": 200,
+    "content_type": "image/png",
+    "bytes": 239573,
+    "dimensions": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "filename": "screen_11_language.png",
+    "status": 400,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 88
+  }
+]

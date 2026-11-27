@@ -1,0 +1,139 @@
+{
+  "user_profiles": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "first_name": "Demo",
+      "last_name": "User",
+      "full_name": "Demo User",
+      "onboarding_completed": true,
+      "install_guide_shown": true,
+      "age": 35,
+      "gender": "male",
+      "height_cm": 175,
+      "weight_kg": 80,
+      "target_calories": 2200,
+      "activity_level": "moderately_active"
+    }
+  ],
+  "user_preferences": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "preferred_unit_system": "metric",
+      "preferred_distance_unit": "metric",
+      "use_custom_macros": true,
+      "protein_grams": 150,
+      "carb_grams": 265,
+      "fat_grams": 60,
+      "protein_percent": 27,
+      "carb_percent": 48,
+      "fat_percent": 25
+    }
+  ],
+  "user_goals": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "steps_goal": 10000,
+      "water_goal_ml": 2000,
+      "sleep_hours_goal": 8,
+      "goal_type": "maintain",
+      "fiber_goal_g": 25,
+      "sugar_goal_g": 50,
+      "sodium_goal_mg": 2300,
+      "target_weight": 80,
+      "current_weight": 80,
+      "fitness_goal": "general_fitness",
+      "created_at": "2026-11-27T00:00:00Z"
+    }
+  ],
+  "calculated_metrics": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "adjusted_calories": 2200,
+      "tdee": 2400,
+      "lean_body_mass_kg": 64,
+      "calculated_at": "2026-11-27T00:00:00Z"
+    }
+  ],
+  "meals": [
+    {
+      "id": "fictional-meal-1",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "meal_date": "2026-11-27",
+      "meal_type": "breakfast",
+      "food_name": "Greek yogurt, oats & berries",
+      "calories": 450,
+      "protein_g": 25,
+      "carbs_g": 55,
+      "fat_g": 14,
+      "fiber": 7,
+      "sugar": 16,
+      "sodium": 160,
+      "serving_quantity": 1,
+      "serving_unit": "serving",
+      "created_at": "2026-11-27T08:00:00Z"
+    },
+    {
+      "id": "fictional-meal-2",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "meal_date": "2026-11-27",
+      "meal_type": "lunch",
+      "food_name": "Chicken, quinoa & vegetables",
+      "calories": 600,
+      "protein_g": 40,
+      "carbs_g": 65,
+      "fat_g": 20,
+      "fiber": 9,
+      "sugar": 7,
+      "sodium": 650,
+      "serving_quantity": 1,
+      "serving_unit": "serving",
+      "created_at": "2026-11-27T13:00:00Z"
+    },
+    {
+      "id": "fictional-meal-3",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "meal_date": "2026-11-27",
+      "meal_type": "dinner",
+      "food_name": "Salmon, rice & broccoli",
+      "calories": 400,
+      "protein_g": 25,
+      "carbs_g": 40,
+      "fat_g": 16,
+      "fiber": 6,
+      "sugar": 4,
+      "sodium": 520,
+      "serving_quantity": 1,
+      "serving_unit": "serving",
+      "created_at": "2026-11-27T18:00:00Z"
+    }
+  ],
+  "daily_logs": [
+    {
+      "id": "fictional-daily-log",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "logged_at": "2026-11-27T17:00:00Z",
+      "date": "2026-11-27",
+      "sleep_hours": 7.5,
+      "sleep_quality": "good",
+      "water_ml": 1800,
+      "steps": 6400,
+      "bp_systolic": 118,
+      "bp_diastolic": 76,
+      "glucose_mg_dl": 92,
+      "weight_kg": 80,
+      "body_fat_percent": 20,
+      "notes": ""
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "fictional-subscription",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "plan_type": "pro_monthly",
+      "status": "active",
+      "trial_end": null
+    }
+  ],
+  "progress_measurements": []
+}

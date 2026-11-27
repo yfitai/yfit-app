@@ -1,0 +1,69 @@
+{
+  "output": "YFIT_Article_Nutrition_DailyTracker_Review.mp4",
+  "duration_seconds": 26.28,
+  "size": [
+    1080,
+    1920
+  ],
+  "fps": 25,
+  "voice": {
+    "name": "Achird",
+    "gender": "male",
+    "locale": "en-US",
+    "style": "casual, friendly",
+    "source_duration_seconds": 21.88,
+    "time_stretch": false,
+    "inserted_silence": [
+      {
+        "source_time": 8.86,
+        "length": 1
+      },
+      {
+        "source_time": 10.55,
+        "length": 1
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "start": 0,
+      "end": 5.84,
+      "source": "meal-topic-ron-lach-8455765.mp4",
+      "source_range": [
+        0,
+        5.84
+      ]
+    },
+    {
+      "start": 5.84,
+      "end": 9.88,
+      "source": "01-nutrition-overview.png",
+      "actual_ui": true
+    },
+    {
+      "start": 9.88,
+      "end": 12.72,
+      "source": "02-nutrition-logged-meals.png",
+      "actual_ui": true
+    },
+    {
+      "start": 12.72,
+      "end": 17.8,
+      "source": "05-tracker-water-steps.png",
+      "actual_ui": true
+    },
+    {
+      "start": 17.8,
+      "end": 26.28,
+      "source": "go-explore-current-control.png",
+      "actual_go_control": true
+    }
+  ],
+  "review_only": true,
+  "public_post": false,
+  "live_workflow_changed": false,
+  "all_app_records_fictional": true,
+  "screen_recording_or_saved_action_claim": false,
+  "app_color_changes": false,
+  "music": null
+}

@@ -1,0 +1,29 @@
+{
+  "output": "YFIT_Article_Nutrition_DailyTracker_Review.mp4",
+  "duration_seconds": 26.28,
+  "bytes": 2523842,
+  "sha256": "0952034fd374485a113917cff295773ace6bea288c67115a84988b2b527b33f5",
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "dimensions": [
+    1080,
+    1920
+  ],
+  "frame_rate": "25/1",
+  "full_decode_pass": true,
+  "representative_frames_inspected": [
+    0.5,
+    7.9,
+    10.7,
+    15.75,
+    20.8,
+    25.5
+  ],
+  "visual_findings": "Actual teal/light/blue-green UI; calorie/macronutrient bars, Breakfast/Lunch records and water/step counts visible. Captions separated from proof; genuine current Go control. Clinical cards excluded from video crop. No guest/mockup/recolored UI or fake save actions.",
+  "audio_mean_db": -20.9,
+  "audio_peak_db": -0.4,
+  "whole_source_voice_transcription_checked": true,
+  "normal_speed_subjective_audition": false,
+  "review_only": true,
+  "public_post_or_deployment": false
+}

@@ -1,0 +1,128 @@
+[
+  {
+    "start": 0.34,
+    "end": 1.03,
+    "text": "Training hard?",
+    "source_word_range": [
+      0,
+      2
+    ]
+  },
+  {
+    "start": 1.34,
+    "end": 2.33,
+    "text": "Your meals matter too.",
+    "source_word_range": [
+      2,
+      6
+    ]
+  },
+  {
+    "start": 2.7,
+    "end": 3.66,
+    "text": "A Women's Health article",
+    "source_word_range": [
+      6,
+      10
+    ]
+  },
+  {
+    "start": 3.7,
+    "end": 5.71,
+    "text": "highlights nutrition\nalongside workouts.",
+    "source_word_range": [
+      10,
+      14
+    ]
+  },
+  {
+    "start": 6.16,
+    "end": 7.32,
+    "text": "In YFIT, check your",
+    "source_word_range": [
+      14,
+      19
+    ]
+  },
+  {
+    "start": 7.36,
+    "end": 8.89,
+    "text": "calorie and macro progress,",
+    "source_word_range": [
+      19,
+      23
+    ]
+  },
+  {
+    "start": 9.92,
+    "end": 11.31,
+    "text": "then review the meals\nyou've logged.",
+    "source_word_range": [
+      23,
+      29
+    ]
+  },
+  {
+    "start": 12.76,
+    "end": 14.100000000000001,
+    "text": "Daily Tracker lets you review",
+    "source_word_range": [
+      29,
+      34
+    ]
+  },
+  {
+    "start": 14.14,
+    "end": 16.55,
+    "text": "your daily entries,\nincluding steps and water.",
+    "source_word_range": [
+      34,
+      41
+    ]
+  },
+  {
+    "start": 16.98,
+    "end": 17.77,
+    "text": "Want to look around?",
+    "source_word_range": [
+      41,
+      44
+    ]
+  },
+  {
+    "start": 17.98,
+    "end": 18.86,
+    "text": "Use the profile link",
+    "source_word_range": [
+      44,
+      48
+    ]
+  },
+  {
+    "start": 18.9,
+    "end": 20.79,
+    "text": "and choose\nExplore the app first.",
+    "source_word_range": [
+      48,
+      54
+    ]
+  },
+  {
+    "start": 21.1,
+    "end": 22.25,
+    "text": "These are sample records.",
+    "source_word_range": [
+      54,
+      58
+    ]
+  },
+  {
+    "start": 22.36,
+    "end": 23.73,
+    "text": "Saving your own needs an account.",
+    "source_word_range": [
+      58,
+      64
+    ]
+  }
+]

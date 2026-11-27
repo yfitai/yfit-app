@@ -1,0 +1,374 @@
+{
+  "duration": 21.88,
+  "language": "eng",
+  "segments": [
+    {
+      "start": 0.34,
+      "end": 0.9,
+      "text": "Training hard?"
+    },
+    {
+      "start": 0.9,
+      "end": 2.2,
+      "text": "Your meals matter too."
+    },
+    {
+      "start": 2.2,
+      "end": 5.58,
+      "text": "A Women's Health article highlights nutrition alongside workouts."
+    },
+    {
+      "start": 5.58,
+      "end": 10.18,
+      "text": "In Y Fit, check your calorie and macro progress, then review the meals you've logged."
+    },
+    {
+      "start": 10.18,
+      "end": 14.42,
+      "text": "Daily Tracker lets you review your daily entries, including steps and water."
+    },
+    {
+      "start": 14.42,
+      "end": 15.64,
+      "text": "Wanna look around?"
+    },
+    {
+      "start": 15.64,
+      "end": 18.66,
+      "text": "Use the profile link and choose Explore the App First."
+    },
+    {
+      "start": 18.66,
+      "end": 20.12,
+      "text": "These are sample records."
+    },
+    {
+      "start": 20.12,
+      "end": 21.6,
+      "text": "Saving your own needs an account."
+    }
+  ],
+  "full_text": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In Y Fit, check your calorie and macro progress, then review the meals you've logged. Daily Tracker lets you review your daily entries, including steps and water. Wanna look around? Use the profile link and choose Explore the App First. These are sample records. Saving your own needs an account.",
+  "words": [
+    {
+      "start": 0.34,
+      "end": 0.62,
+      "text": "Training"
+    },
+    {
+      "start": 0.68,
+      "end": 0.9,
+      "text": "hard?"
+    },
+    {
+      "start": 1.34,
+      "end": 1.42,
+      "text": "Your"
+    },
+    {
+      "start": 1.46,
+      "end": 1.68,
+      "text": "meals"
+    },
+    {
+      "start": 1.74,
+      "end": 1.96,
+      "text": "matter"
+    },
+    {
+      "start": 2.02,
+      "end": 2.2,
+      "text": "too."
+    },
+    {
+      "start": 2.7,
+      "end": 2.76,
+      "text": "A"
+    },
+    {
+      "start": 2.8,
+      "end": 3.08,
+      "text": "Women's"
+    },
+    {
+      "start": 3.1,
+      "end": 3.3,
+      "text": "Health"
+    },
+    {
+      "start": 3.34,
+      "end": 3.64,
+      "text": "article"
+    },
+    {
+      "start": 3.7,
+      "end": 4.1,
+      "text": "highlights"
+    },
+    {
+      "start": 4.16,
+      "end": 4.62,
+      "text": "nutrition"
+    },
+    {
+      "start": 4.68,
+      "end": 5.14,
+      "text": "alongside"
+    },
+    {
+      "start": 5.18,
+      "end": 5.58,
+      "text": "workouts."
+    },
+    {
+      "start": 6.16,
+      "end": 6.3,
+      "text": "In"
+    },
+    {
+      "start": 6.44,
+      "end": 6.56,
+      "text": "Y"
+    },
+    {
+      "start": 6.64,
+      "end": 6.8,
+      "text": "Fit,"
+    },
+    {
+      "start": 6.96,
+      "end": 7.14,
+      "text": "check"
+    },
+    {
+      "start": 7.18,
+      "end": 7.28,
+      "text": "your"
+    },
+    {
+      "start": 7.36,
+      "end": 7.78,
+      "text": "calorie"
+    },
+    {
+      "start": 7.8,
+      "end": 7.9,
+      "text": "and"
+    },
+    {
+      "start": 7.96,
+      "end": 8.26,
+      "text": "macro"
+    },
+    {
+      "start": 8.32,
+      "end": 8.76,
+      "text": "progress,"
+    },
+    {
+      "start": 8.92,
+      "end": 9.14,
+      "text": "then"
+    },
+    {
+      "start": 9.2,
+      "end": 9.42,
+      "text": "review"
+    },
+    {
+      "start": 9.46,
+      "end": 9.54,
+      "text": "the"
+    },
+    {
+      "start": 9.58,
+      "end": 9.78,
+      "text": "meals"
+    },
+    {
+      "start": 9.82,
+      "end": 9.92,
+      "text": "you've"
+    },
+    {
+      "start": 9.96,
+      "end": 10.18,
+      "text": "logged."
+    },
+    {
+      "start": 10.76,
+      "end": 11.02,
+      "text": "Daily"
+    },
+    {
+      "start": 11.1,
+      "end": 11.44,
+      "text": "Tracker"
+    },
+    {
+      "start": 11.5,
+      "end": 11.66,
+      "text": "lets"
+    },
+    {
+      "start": 11.7,
+      "end": 11.78,
+      "text": "you"
+    },
+    {
+      "start": 11.82,
+      "end": 12.1,
+      "text": "review"
+    },
+    {
+      "start": 12.14,
+      "end": 12.24,
+      "text": "your"
+    },
+    {
+      "start": 12.28,
+      "end": 12.54,
+      "text": "daily"
+    },
+    {
+      "start": 12.62,
+      "end": 13.06,
+      "text": "entries,"
+    },
+    {
+      "start": 13.14,
+      "end": 13.62,
+      "text": "including"
+    },
+    {
+      "start": 13.7,
+      "end": 13.94,
+      "text": "steps"
+    },
+    {
+      "start": 13.98,
+      "end": 14.08,
+      "text": "and"
+    },
+    {
+      "start": 14.14,
+      "end": 14.42,
+      "text": "water."
+    },
+    {
+      "start": 14.98,
+      "end": 15.14,
+      "text": "Wanna"
+    },
+    {
+      "start": 15.16,
+      "end": 15.28,
+      "text": "look"
+    },
+    {
+      "start": 15.34,
+      "end": 15.64,
+      "text": "around?"
+    },
+    {
+      "start": 15.98,
+      "end": 16.079,
+      "text": "Use"
+    },
+    {
+      "start": 16.12,
+      "end": 16.219,
+      "text": "the"
+    },
+    {
+      "start": 16.26,
+      "end": 16.6,
+      "text": "profile"
+    },
+    {
+      "start": 16.64,
+      "end": 16.86,
+      "text": "link"
+    },
+    {
+      "start": 16.9,
+      "end": 17.04,
+      "text": "and"
+    },
+    {
+      "start": 17.1,
+      "end": 17.42,
+      "text": "choose"
+    },
+    {
+      "start": 17.5,
+      "end": 17.92,
+      "text": "Explore"
+    },
+    {
+      "start": 17.96,
+      "end": 18.04,
+      "text": "the"
+    },
+    {
+      "start": 18.12,
+      "end": 18.28,
+      "text": "App"
+    },
+    {
+      "start": 18.36,
+      "end": 18.66,
+      "text": "First."
+    },
+    {
+      "start": 19.1,
+      "end": 19.24,
+      "text": "These"
+    },
+    {
+      "start": 19.28,
+      "end": 19.38,
+      "text": "are"
+    },
+    {
+      "start": 19.46,
+      "end": 19.7,
+      "text": "sample"
+    },
+    {
+      "start": 19.76,
+      "end": 20.12,
+      "text": "records."
+    },
+    {
+      "start": 20.36,
+      "end": 20.64,
+      "text": "Saving"
+    },
+    {
+      "start": 20.68,
+      "end": 20.76,
+      "text": "your"
+    },
+    {
+      "start": 20.82,
+      "end": 20.96,
+      "text": "own"
+    },
+    {
+      "start": 21,
+      "end": 21.16,
+      "text": "needs"
+    },
+    {
+      "start": 21.2,
+      "end": 21.26,
+      "text": "an"
+    },
+    {
+      "start": 21.3,
+      "end": 21.6,
+      "text": "account."
+    }
+  ]
+}

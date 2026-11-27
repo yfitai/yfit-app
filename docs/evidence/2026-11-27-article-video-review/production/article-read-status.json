@@ -1,0 +1,9 @@
+{
+  "operation": "read existing scraped_articles",
+  "method": "GET",
+  "http_status": 200,
+  "writes": 0,
+  "generator_calls": 0,
+  "n8n_calls": 0,
+  "credentials_saved": false
+}

@@ -1,0 +1,1960 @@
+{
+  "capture_type": "real authenticated components, synthetic offline session and fictional GET fixtures",
+  "declared_source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "canonical_head_observed": "4180dfb496bc746c82228e2d515b959d4b1a357e",
+  "build_directory": "/home/ubuntu/yfit-article-demo-2026-11-27/offline-web",
+  "original_compiled_build": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/offline-web",
+  "compile_reused": true,
+  "source_checks": [
+    {
+      "path": "src/App.css",
+      "sha256": "c2b6a805ee62737de775936c73e11a4701aa0506c7f1be356882e59510292141",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/App.jsx",
+      "sha256": "b3f119dae1f3b867c9fa2ae500d94093e34e177e3ba3de4512b88293161f0561",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/assets/logo.png",
+      "sha256": "09a3e182fa88ee06e39c59674c7e48133f8c6d4ca3dfd3f0c7cbc3c363d909da",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/assets/logo.svg",
+      "sha256": "22e08a92dfe7274178062f54c70d7863a1b16949a6bd1409a1a723fe4f08f634",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/assets/react.svg",
+      "sha256": "35ef61ed53b323ae94a16a8ec659b3d0af3880698791133f23b084085ab1c2e5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/AICoach.jsx",
+      "sha256": "45b18979c94db245885e72a81a76c97d495467e78135aedd50e6fe430324d274",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/AICoachFAQ.jsx",
+      "sha256": "551f0725b15269f674478eefecd7d937493363b301745842acbfd84581c51c51",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/AppTourMockups.tsx",
+      "sha256": "6a22cbfd28aa94c78a62a66632048d5b36107fb50845b1440ded041175f8c282",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/AppTourSection.tsx",
+      "sha256": "0c1743566cf26974a395e4f1647f1742f485ec5d72942fc23055f70899ca31cb",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Auth.jsx",
+      "sha256": "495e5be9c010de824410c0836a3610466f1ac60c32e123e38a73336c8331b368",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/BarcodeScannerSelfContained.jsx",
+      "sha256": "5c9cd6b3eb829a2fe7dc0fbfb4ea5efe3a3aa912c1355d7243990e4785d140f4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/BarcodeScanner_working.jsx",
+      "sha256": "69d91b433fe19d2a206aa1b079d093da8bcd8d4991a4db5717fbb6b1e6325427",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/BodyRecomp.jsx",
+      "sha256": "089f7504dbde9d219ccf9a1a2fa9d0500d9be87eba92464c51ba14413ac0679d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ChartSettings.jsx",
+      "sha256": "6b6018026909353ee2619cc20701f8b7500334b4043c2d676c52aab4b287079f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ContactSupportModal.jsx",
+      "sha256": "50c7baf1a50632b1b844a6478e69e94733bf5695e48b96461001e63c0ba19f7a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/CookieConsent.tsx",
+      "sha256": "0fb3f234d96627d7a8f8ecd16bdf19af632b3b629a3f7362972395d0d7878fed",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/CustomFoodModal.jsx",
+      "sha256": "5d2bf0dac3982ce5467a9ad1802c12aa87d2beb4c687f7764fdb7ea65d70e7db",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/DailyInsight.jsx",
+      "sha256": "9ec174ae1c471e949d5d03723d567777e534478e12b36f8eca9d71ea6a4ac06e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/DailyMacrosChart.jsx",
+      "sha256": "0ae90861c46b5de2531200704458fc0ea86427b51df5a75d0dd571ada165ebb0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/DailyTracker.jsx",
+      "sha256": "ba591500c94b2b476538aa0834de93b6b4f56538eda07e90baed077141517e12",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Dashboard.jsx",
+      "sha256": "378e8d9a16216949953fa6db960eee3d43b0675f327fa92a6614a4a2bd21c9d8",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ErrorBoundary.jsx",
+      "sha256": "74a11ed1da86c196586ea35da5d35c1b274c29f0713366092ce5999d136c070e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ExerciseLibrary.jsx",
+      "sha256": "2eba22dcf073052347e4c4502a83ce121073ce081bdcd3009280dcc691fd9ce6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ExerciseLibrary.jsx.api-backup",
+      "sha256": "576d663028cc5d393516af489acc988a708ff0f612cc12bbd4f7f886f4219e53",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ExerciseLibrary.jsx.backup",
+      "sha256": "5e4fb675fe59fb6166e486fad8919d6f1fd5bea1d25c20add749ad1b13b916de",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FAQBrowser.jsx",
+      "sha256": "046dea00fa6d5f233ee3705762f09165c2a63997534b288fb032c201eca3ca67",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FAQSection.tsx",
+      "sha256": "7bbca049319183cccf4420e446895f44ae22b4262534cafd8f397235cb016e70",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FeedbackButton.jsx",
+      "sha256": "ab361fce1ecdb32ffaee3f25ac67d0e67b487eb10e0ae078ed60aab2ee733be1",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Fitness.jsx",
+      "sha256": "e7d5fe46e278592ffc2d7eb78c8dbf724c01baa89d9f3046183b2592e3285e77",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FitnessProgress.jsx",
+      "sha256": "95235267ee1090a516c51c90d33213b9095e08eb206aa067fc47f30bea974194",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FoodSearch.jsx",
+      "sha256": "5865bde53697720ec19bf8354d131e03b6f2c744fe9100c6408bd568dbb60d0e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Footer - Copy.jsx",
+      "sha256": "2a3a9aabc1b2dc5543a9b22ee67c97e3de89f1b7f6e933f8a825ac080cdba88c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Footer.jsx",
+      "sha256": "c7425b79720ba482c5dc751ceb4bac016613d3f28dfb9728c48dc0d5d60678b5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysis.jsx",
+      "sha256": "d0f5b7ca96169e532c2e0da1d3522a7a0126e898ae0d6c2cd0a67a3b278485b3",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysisHistory.jsx",
+      "sha256": "12679cbb3553d2389fa6612066d222aa88b53b05dd41ac495422d292a83a75c4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysisHistory.jsx.old",
+      "sha256": "fed6ca7ab01b50492459eb586fed3dad10cbda939f05a92587f8f154c04f5f9e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysisLive.jsx",
+      "sha256": "41e041e3fd98cd568dadc5db91d4f6e7f3d3a445bc153f2396fe5cd92bdfd882",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysisResults.jsx",
+      "sha256": "32e97c19ebc49156a1d20536baec0828d3e6a031e5e007f8abfef30ddefbbbb1",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/FormAnalysisShowcase.tsx",
+      "sha256": "c5a3708e8cad1ed1a100d96f799429dfb071518bf2f19448c9e94faae4d3799f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Goals.jsx",
+      "sha256": "40f2c60acc87e1a4ceaf2ef89479152310af1ead00a006e2e0e4f30cd84ec33f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Goals.jsx.backup",
+      "sha256": "3ff9c28c4ef6744b2176cc2188a4f5fdecadef9482e2e7e42b8fc93d2061131a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GoalsEnhancement.jsx",
+      "sha256": "67608a523b07ab546b1e2581da1b87c7a5179cc54dfcdb3e565aa41a90c62c24",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GoalsResults.jsx",
+      "sha256": "ffd7245df3743eb49b91321a4f64851a60a2d5deabc46ad0eea48c397c14c99b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestAICoachPage.jsx",
+      "sha256": "48f1741a75f92c83328b7ba94a0f13462e4fa113934bb18f400ad328afe40d88",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestBanner.jsx",
+      "sha256": "bb2c533f18fb4c917e80a631af7bc9eb1f6b1e5a4a0ba4126769378df1b67c60",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestDailyTrackerPage.jsx",
+      "sha256": "83a890bf7c7a9770375d4b43f50f40dd0c156c4697b75d2022c58e69a3e67ea0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestDashboard.jsx",
+      "sha256": "38a822c2b01fc3742f5c8ba33ace33bc1caef29479ecf7e58718904d9b0460f6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestFitnessPage.jsx",
+      "sha256": "07b9efb248f4ea10604e224fb7ee1d23ae4e14074a3479a87c26352c4df5a16d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestFormAnalysisPage.jsx",
+      "sha256": "fd18c1406093fbc59519a9c4278f7c463a8424886e4b2ef2b7bcc2654a7b5fa6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestMedicationsPage.jsx",
+      "sha256": "17c0f74f3f57e69b5f2c29e9be012cf65ace2ff6f234ad0ce26ef03d1a320e30",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestNutritionPage.jsx",
+      "sha256": "303651a6cfec809f931ff80310cd88768d398095349775f422ffb074cd7216e4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestPredictionsPage.jsx",
+      "sha256": "155637c413908df1b80e0f084a1b23073f7753eccef54e7e9cce2acfa3dc4b21",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestProgressPage.jsx",
+      "sha256": "acfcea5c60705eb9d1def9b48995e40c761e832c3b4b3714fc221bbead03068a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/GuestSignUpModal.jsx",
+      "sha256": "4a716065b88e522f1d6d5b50546b3084d8bc00dd214d337c752e36b496f39e7d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/InstallBanner.jsx",
+      "sha256": "9a1e0a323a77775165d73a5bb1a6050e398dd78e2c5e1bf629a3c17a709bb0b0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/InstallGuide.jsx",
+      "sha256": "14d8a6ea5701325dc8bbd274254125057f33fc7ee7a923f753ed907a466541eb",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/InteractionChecker.jsx",
+      "sha256": "190561e974a86ef2382ce4d5213939ad850c85fc9406f42b1f928bbad0a12364",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/LanguageSwitcher.jsx",
+      "sha256": "af21ac5dbc1b480fddbb0618b58f3e2d13379e2412c42788097b372696b0e6a4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MacroSettings.jsx",
+      "sha256": "3d17e0efab9ce0d8c85360d19ea0d3f4b107820ccc2c81399e7a5e188dd19dc1",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner.jsx",
+      "sha256": "258d0f37e7f16ccd9ad0647abfcd3c4ae200603188476f65eb14c317057d17dd",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/AddMealModal.jsx",
+      "sha256": "1304f0309abe63d0e81fc9b508f8ea226c7b3e6ce20518a5be493f68598b610b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/ApplyTemplateModal.jsx",
+      "sha256": "a656c07868251a1c64acb7aa265dc27481244f18c736444812d1844338a6c124",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/CreateTemplateModal.jsx",
+      "sha256": "f3c8731da615e2b5e0ce5a06b1fc415f184b9d0638ea7b749aff06c60ca8d20e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/DayColumn.jsx",
+      "sha256": "43bada21ccedddbf987fd4a65d2c9effd8e9cf01050b546427d5bd8224a34813",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/GroceryListModal.jsx",
+      "sha256": "264dfb5dadf30f7b58ce4d60111cc957a4ea479b6324af995efb52692cd6c0c0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/MealCard.jsx",
+      "sha256": "72e45977dc927425e8e6727c6eafd1486c475830f9a4f02237f528a424ee9398",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/MealSlot.jsx",
+      "sha256": "6de7dd35c6136f882719e2444b35ecc1de046d215d8f0ef94563a77063a82ef9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/MealTemplates.jsx",
+      "sha256": "551d429b7fdaed79de0f29dba4344190787d56bc179d5e59fbabb12e3237e1fb",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/SaveTemplateModal.jsx",
+      "sha256": "4a584dba6e0fe7e964416d721a9c2b6cd76e1e36d19fbcc4ac9326432fc8499e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MealPlanner/WeeklyGrid.jsx",
+      "sha256": "3f9a2e7114022c2fa9c8234b2271f10edd114e3ef4e4244b1db8e5f91f1648dc",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationIngredientEditor.jsx",
+      "sha256": "07f78e6ac88a7f8ce9b4d50917368cb2de977df9526a64b9e0e37c71fcb0fe24",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationList.jsx",
+      "sha256": "be95233bedd1ded032f9135595590393a6608b3aabd024d437435f3b7b785be0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationLog.jsx",
+      "sha256": "7e8635af890c34aa27aeea315282d4bc8a0406ca8b64c3e5305b75e142c85dd0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationSearch.jsx",
+      "sha256": "7b210addd1f1e57beb3a8eabc53e5e2b9b395407c3b27aeabd0e5b7393c580e6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationShowcase.tsx",
+      "sha256": "2da5b8209d9327b846de0fc6040932d66e79acc0063848e0dfec5e0e3f4d6a77",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/MedicationWeekdayPicker.jsx",
+      "sha256": "26a6d098444109daf5735548b5fd2cf963e18d22045156bd0b0adc1c16e25af9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Medications.jsx",
+      "sha256": "868917f069cd7334a4064135991115de89d7981e21c4ef30d6a6d4e31e66605b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Navigation.jsx",
+      "sha256": "9b1190638efbfb18e38a3df007e2052cf89215f0e4cf34f9ccce508658c9a833",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/NutrientProgressCard.jsx",
+      "sha256": "b55e4fd3ec77cb32ab5eea850267da51242a05443830ab16eaf2c494ed7fcdf5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Nutrition.jsx",
+      "sha256": "f5efef369a0c39c0c23953a841f73f77f223ad54bac7fce889acb9e4bdaa049e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Nutrition/NutritionTemplateModal.jsx",
+      "sha256": "08233034b464f41c3497285b930830c04aea21745c2fc6fbe46b3c257f656fb2",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Nutrition/SaveNutritionTemplateModal.jsx",
+      "sha256": "e241812c5b8a1d82c9f4456df2ce2d641ad4a55cd714a01f6add6078ef182dab",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/NutritionEnhanced.jsx",
+      "sha256": "d411d4d7ee15bcda26f17a5416aed12c9352896cefb9d676abf835298d67f3d5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/NutritionProgressCharts.jsx",
+      "sha256": "b4bb8746f177e6c3b1ae73d986d2f34f4b5b1de47ba0c207f9a1c55874cb61cc",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/NutritionUnified.jsx",
+      "sha256": "4e814d21387bf771d062037509d8a197e66197da0a93da688208d07a37ebf3ba",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/OnboardingWizard.jsx",
+      "sha256": "b1f18957ac0f6c0e44dd58311e269bbdbdafe097f817400566304fa68620f6f0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/PlateScan.jsx",
+      "sha256": "ec81b51d8945f2b8062e64e306cc9123adb0eacd1240df0197ee33d214e7b8e4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/PredictionsDashboard.jsx",
+      "sha256": "e459c8f336692feb7950a66fab4aaf27c6ab74f7aef70934354943dcc8b0738d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/PredictionsUnified.jsx",
+      "sha256": "e0432a076555037d9a79e981f5fd65200577d4346ec235ce9c8d026cf17eac07",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/PredictionsUnified.jsx.backup",
+      "sha256": "9a1f498dda0bc6c9b7b754610c4e1f80d877c4ddce89ac1e6cae96e3b6d714a8",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProRoute.jsx",
+      "sha256": "2a3330d58a261585d60e38e7161ef2709c36c4d063506d1db948c6693f1e3271",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Progress.jsx",
+      "sha256": "4c2c66d8bcbb7a0a30b8258b49742b258a83ea9179dfa861a03032eb1d1b13ea",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Progress/Progress.jsx",
+      "sha256": "56c0f67de5d86501dd92aca4d4124ae45d24f88e2912e065000fb0a8b3341157",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Progress/ProgressPhotos.jsx",
+      "sha256": "0c8d1063b7903ac7ca1503aab350940aadc9d2e582e97280618bd4688f827874",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProgressSimple.jsx",
+      "sha256": "b29cd212d8b9bd2d801ec60428fcc4a6ce13f99ac6ffafd936c6ca8a431527c4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProgressiveOverloadTracker.jsx",
+      "sha256": "ec948ba72216699b9a4c253db6c4c02be316f8186c1627f081b824530487957d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProviderReport.jsx",
+      "sha256": "8e036c834472211a33cf17c336abcdaa7b05762d1e6ada1ebc217099c05113b1",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProviderReport.jsx.backup",
+      "sha256": "a9b3d166fae57c6c5ebf3a30d3dbab1c4c96c8de54917ca7784fd72716c2a15e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ProviderReport.jsx.before_demo_fix",
+      "sha256": "5477eb7ee1d7cc45ca800c86fdcb633b8e010d9affd5e798785da4a9cf09f2af",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/QuickSetupCalculator.tsx",
+      "sha256": "a1fe4e885884c8e550ae8ec288e261bdd25f93170572ef7ca8cabd3759da16cb",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ResetPassword.jsx",
+      "sha256": "3a2f0bb06fe61747d1e94a300527bb6e9f4399147216830cd81797aab725991b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/UnitToggle.jsx",
+      "sha256": "2b82b4ce3f02a661614520676fa6a9dd0b994792b439f2842386953a5f201c8f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/UpgradeModal.jsx",
+      "sha256": "3765b63ee194a5a787741141363cfc1e4beeaa7a44d5a1659bf50231b2fdd007",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/VideoFormAnalysis.jsx",
+      "sha256": "e0031f77e55c04a838581d0c1c20b9f3644d41cd944a64a6edd3aad09b7dfc0c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WaterTracker.jsx",
+      "sha256": "c9f225655c37e63fd6b6a73bb742e5464f3753aefd72a0ad3a4b439049508bd4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WearablesSync.css",
+      "sha256": "d287d0f0855980c9d617e80eb3908e6c3f9dc6e5ec51a1465d4ac97b48d077dc",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WearablesSync.jsx",
+      "sha256": "f2a33ec3ea66a1a1af4adce6b1cceb41a1a6549f420b81ec82285cd579de254f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WorkoutAnalyticsDashboard.jsx",
+      "sha256": "e7c6f84a1e8655708e9c179ea62e487cda2fc7adc4a341c50664adfce53ebed6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WorkoutBuilder.jsx",
+      "sha256": "9b6f8a5aa9a00c7f98779007781a208a8bdef2922eb7214b047868e168c4f1de",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WorkoutLogger.jsx",
+      "sha256": "adb827ba4f8de3cb4f53dbb249f7185b067104a3c904d07331274262c36a4c33",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/WorkoutSessionTracker.jsx",
+      "sha256": "5be53d59fdc5e2934020c970559e9f4d9ea60fed07e8af3b92e6e1fbe42f5c23",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/accordion.jsx",
+      "sha256": "3287cd5adf90b410fb2e9ededbbd63cb7c24cc53eaa69ea74d204d400b6b09e4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/alert-dialog.jsx",
+      "sha256": "03b655bb4fe07eac24698b2d9444c1a913b2e1365b35164de9ed091bebaf35b7",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/alert.jsx",
+      "sha256": "aa4484f45e248ea72c802462d0081d48273a7123b8216fad62ec6ccad32ac87d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/aspect-ratio.jsx",
+      "sha256": "2d40e632fdc2a43f9df16afc9303e11e4881bb1ae40f3999a2e9b9201dc28764",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/avatar.jsx",
+      "sha256": "41cf7aeb62bb654b097a9e3945b63e601098fa97bf5ba0cc738be39f0b393e96",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/badge.jsx",
+      "sha256": "56d18720f9da705aeb69be9cc66e48f90fc9ed63ec17f00f32128f1d3483d550",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/breadcrumb.jsx",
+      "sha256": "78dc851fa7868e5ee36768b685ad5a545df822a0c6f30533a8055c71ba8669ac",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/button.jsx",
+      "sha256": "f563be0ffc2d8738166980ea82beb2460674a101af9d836e91a38c9b77716fcd",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/calendar.jsx",
+      "sha256": "7a0f7e0ae6d09b5652e63d542ebb1cf10a6f6ffa9da0340c6fee1eb3f5ef34b3",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/card.jsx",
+      "sha256": "cf91b883b2c81f00e616575a4fff762bccfa37004bdf373f8d04abdd5bf3abe9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/carousel.jsx",
+      "sha256": "ddfa2120beaf7e6c839bd2829278b68a927b7929d2f62707cf9f770e926b5c53",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/chart.jsx",
+      "sha256": "d751b4d561f1f77d35c757bb602d969cbc6cc8ffe163f1b1a1c24d65ceb941dc",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/checkbox.jsx",
+      "sha256": "547b05fc151d956ba118e1074541082c4e6c9ee53edaf8ae9d92acb52fc55cbc",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/collapsible.jsx",
+      "sha256": "13a83238d8735df615dfd0ef8c7bb614d3fa3faa704ac10e304be54d04bc53c2",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/command.jsx",
+      "sha256": "6839f5121800f9f908fe848673325004ccf4c95218aabe133a3c7dbbb8b54399",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/context-menu.jsx",
+      "sha256": "3a599aa363b878cde2bd8ba7e5df4d19b9a72ffb22355a359b818a65e4e0e98a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/dialog.jsx",
+      "sha256": "d1e8b6437c6c3efe309d54a5d75d4064e990a0dc92e19993d1743a02a511c749",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/drawer.jsx",
+      "sha256": "804db56d642fe821267e703bb16c0c8c53d5fbc199d230e7d4ea4ffd14f2db9c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/dropdown-menu.jsx",
+      "sha256": "0c9e1c00faf4b5d17a9a5ebbbda73d292ae74980b9c196b0471e3bbb312a5ec7",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/form.jsx",
+      "sha256": "0b63e046cacfdf3691d0ca8417dac3de465e964ce4327b61b5d13a7dd60f83a9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/hover-card.jsx",
+      "sha256": "ba4d6aa96570236598fd9fa716321df74f6b251d5696ceec939ffa1c01dbceb7",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/input-otp.jsx",
+      "sha256": "2c5d2ebce10dd1832d084b2c0c94dcaad05d2ea7368852d1a027dc22df1ec166",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/input.jsx",
+      "sha256": "db9bce3d4d4fd44b1b7967482196512964c7bde47ecd63eec20fc4937b5f0713",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/label.jsx",
+      "sha256": "cde3ed4e7cd2348a9f8554e64d406199f12c7f75003e580a23189388a6d8e246",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/menubar.jsx",
+      "sha256": "3349e2d5bd079ed25cec60dd9445ccafadcb305a54a583ce01ef63e01f5aa259",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/navigation-menu.jsx",
+      "sha256": "61c4e993164740fd34b5c9fac098baffcf62ad32d29a79495d45aa63db2a50dd",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/pagination.jsx",
+      "sha256": "453cda20e8a985b1fecc756f7d218b82c36e314117accfdc181bdb8850baa95b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/popover.jsx",
+      "sha256": "003fdc3a666af8fbf6b61c6095084d3894091ced97ab603edde7c4fd4e356373",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/progress.jsx",
+      "sha256": "422b79420dc3d8169a9b474d592be71219da5975ae1e9f79c6307ea6c56c9e33",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/radio-group.jsx",
+      "sha256": "cbf122a1af775ac41faed06538f39b0ecef1f95ba60fdb4828b55e05244aa545",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/resizable.jsx",
+      "sha256": "4f42a96b8488954c5b657c927a915eb6335c0f1d23105fc007cd40d6c98731b3",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/scroll-area.jsx",
+      "sha256": "218df39e0d511fe0534994c8fc36c758e93c0d98f2aef364f4dac0c22c7372f9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/select.jsx",
+      "sha256": "fc53d8d23449a9c365b36971a2b51af250488314555756bb17f5a33a82a864d3",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/separator.jsx",
+      "sha256": "5343973911eba76e82ca3d2b8db0375573d9f04a9421e598eff1ed951b5d92f0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/sheet.jsx",
+      "sha256": "59f371d3f5be7335a05e90f4b9a299aeef911ebb5a061f1d3a1270b2e80e182f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/sidebar.jsx",
+      "sha256": "51b02ae4726ad9c07985c9b7deb3ac6dfec31cd759d3adcefa34f9c6dcea9277",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/skeleton.jsx",
+      "sha256": "d16b9485fefd8c630c3beed7426ece82c11e5de455af06bc49070afe4b504f14",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/slider.jsx",
+      "sha256": "3f6abcd570d61aa43c6e635da7eb2892f14625848fa210e652fc2a222d0588c9",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/sonner.jsx",
+      "sha256": "8efe128ada06468a852421d15706b2ea6efd4f2ebdf6735526cc9f0bec2f814a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/switch.jsx",
+      "sha256": "98a722ce0f616f8999e715ebd98cc429a19e7fe35add959b0466d51f3b771ee6",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/table.jsx",
+      "sha256": "232de092d1764eae1c7e338b7919c4543b03568f632a2ffe82092411726fbc7c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/tabs.jsx",
+      "sha256": "ec55d0c1d7b4c3e308dc38376f1c8771876f9afd3082e98561a74c2a9e004525",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/textarea.jsx",
+      "sha256": "476c651fb26138250343d29733826fd9a884e0e6d79c9f9e3e2d3413e6425d46",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/toggle-group.jsx",
+      "sha256": "cd3635c739e434dae7d2db820e083461c4e3741e0ef093f75839844fa6b99cb4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/toggle.jsx",
+      "sha256": "b9874d282d4a77f31c52fa9cf0f9624da7809140b65e71078b1288e0e603444f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/ui/tooltip.jsx",
+      "sha256": "aafdaaccaf082f3b5eabd62a0f8242b1578ed238e9229c1b55eb1b2c6f7b34e4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/config/supabase.js",
+      "sha256": "5195441e4a074db58d1c58ebf0118aff82f48515e2cd745924e276aa02703e8d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/contexts/SubscriptionContext.jsx",
+      "sha256": "53b94334a47e4bfdbced6ca25a017bad8bd60b5870d9b878810191f0af45103e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/contexts/UnitPreferenceContext.jsx",
+      "sha256": "ce1737e7d6cd735cff184962056ffea7d5a536a15c21f15a721e8f2d022b37f8",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/data/demoData.js",
+      "sha256": "1b3d6bfd329920c63804f9434b90cbcf2376737c849e0b335dd8fdf109faef33",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/hooks/use-mobile.js",
+      "sha256": "9fd3494dc4aa77485dbc48f083832b3e673038abf1a9294bbad02a8442294b2f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/hooks/useGuestAction.js",
+      "sha256": "3112351c8f3e52db785a7d406866ded8fa0cb5fab8015af2fc3dbab3ce15eb94",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/hooks/useStripeCheckout.ts",
+      "sha256": "9d8624c1c4a79eeeea4f351ac06ef121ba980b731e0d25287b06e446add25be4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/index.css",
+      "sha256": "be5b145b20035714ad8403e04aae00f7bc7750a956e5e8a153794da5a1f1917b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/analytics.js",
+      "sha256": "2a5552519d6a56a42d20edcdbdf48ebee999887f1c717779e8d508cb9ffe2cc0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/barcode-scanner-stub.js",
+      "sha256": "b3dd7b7b12f81d514cbd5403f070f3d12dcd0c312caaccc2fa135d3502cb3578",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/calculations.js",
+      "sha256": "1fbf859af01c5f53477a4440b287fb1fc7350be2ea19708251ea655290e7b3c8",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/faqSlugMap.js",
+      "sha256": "343995c5b1d5a4063a1734e8d8f985f8367f7cd6dc6bb68e889e1af1cd27dc97",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/foodDatabase.js",
+      "sha256": "0b2673c5071fe258a90c8859a6c7a4f8b4ef3a96962d739f23a820c58c657eac",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/googleFit.js",
+      "sha256": "5b190441e3179c670c4fe3f92c649bf91cba6bb0289633f5e8bb020e0caa53d3",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/guestSession.js",
+      "sha256": "ce8155927fe0d474df781c7b551980a54866a5e6131542da3a1fbec47266c042",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/i18n.js",
+      "sha256": "610c4030804ee11065d4a0a735da4a5b59aaa25df2377e4f4335387f652f9a61",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/i18nResources.js",
+      "sha256": "f9f743969eabbde0132514f541c04b18b14fc7f669288bd68f65f58da70cfd94",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/macroCalculations.js",
+      "sha256": "e076cfd8e3e419a27bd6c54118d038b4f5dde83124bd8965732dc451383ed11a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/medicationIngredients.js",
+      "sha256": "4e72444d461d3a0d89378f0dd18e78e576cbc3f9ee6bba18d48ffd4b72407409",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/medicationLogService.js",
+      "sha256": "0dcc3ddad845ce2b2bf03b1707ee38b89ffca45db46e89ce0a2a8a0acb974866",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/medicationSchedule.js",
+      "sha256": "d0b5b27b9c586c7a4de98d2c1caf9f2c7a16c8dbf2a4cbb88efa21ab9bae5ef2",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/supabase.js",
+      "sha256": "08a909f9840ab9a93a3d094845ed78e5e6785461b9cc843f0a205ccca1b95356",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/testHelpers.js",
+      "sha256": "fd2607c68e1a7c02b056478df04e07e1461de1693164698e5b14905845e6452b",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/unitConversions.js",
+      "sha256": "d45fc0f087deab69934baf44d6d917c0999469a4c807bf5859039e640a4c40a5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/usdaApi.js",
+      "sha256": "91e091c0ebf5e2aa23110d669e77a0f9485b726330b270f97c7bd46f1e11dade",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/utils.js",
+      "sha256": "71e5eb171ba405e04c5e900c390ebd13b9070e2e0ccc1e57487ac0e64626556d",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/main.jsx",
+      "sha256": "139326322c03d375b053766ef6475f3a833a53e0b71393988948f8d289a09578",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/Contact.tsx",
+      "sha256": "1b62496b7e14cf9ba9965bd502ab3c06e1de794e1dbff8711b86fcced9bb5d36",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/FAQ.tsx",
+      "sha256": "00eef1aaf0cf4e6e9a0effa883833cbfc11699f2a000b5af2fe08099de7eacc2",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/FormAnalysis.jsx",
+      "sha256": "e4d2485bc631d268400ddb73387dd7c1ba7a14804dead16e8affd54985e27c7f",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/GoPage.tsx",
+      "sha256": "27610d70ce96729ce82996ee9f5f7591a911eb4e9072f5d154f41557fc498b68",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/LandingPage.css",
+      "sha256": "ccf416dff3fd5e3276be051d3f0699e647c87efa3e3846696e23941d1fce145a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/LandingPage.jsx",
+      "sha256": "2ef0009bb015e1ef633b327e76a6f8904e41a57a93a5f2db990e3cc70d0ed777",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/LandingPage.jsx.bak",
+      "sha256": "b006a21457e9c04ec456b3b95a588dbfbf8e30eac13e9a78ee68a1679f5b252c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/LandingPage.tsx",
+      "sha256": "31ba15bbfd9216f57fcda7503324ea75f080faeb46653a8d53214b1d5cf16c1a",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/LandingPage.tsx.bak",
+      "sha256": "d922cf7307f57d336ea93df2d2693123e0008202e551aca73bc1f8deb8f694c5",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/Legal.jsx",
+      "sha256": "419ec9f0d316db19cec0d0a3420c2aab15af557660adcccc433c4125991aa1d0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/ManualCleanup.jsx",
+      "sha256": "ed26845b53e0da8aeabc0666314097e4757b7ca547d5ea5d5f172089039e257c",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/PaymentSuccess.tsx",
+      "sha256": "0d1dac2e592b13cb2be743392968681c40f120bc1063e3f0b668074cd1d07dc1",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/Privacy.tsx",
+      "sha256": "e74e858a9e1463a1152caad7749c101d9f379305bd7089e75f8e47e44ee3cb34",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/SubscriptionPage.jsx",
+      "sha256": "9bbf8cf60b8dacd2bd2ac07545101a7ed2f9ba3a3b2788291c07f4336a3b4f7e",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/pages/Terms.tsx",
+      "sha256": "b8062d82440f4fbac418acc89a73e799b885e9fbae2b65347952e5bdd177eaeb",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/services/exerciseDBService.js",
+      "sha256": "b7fca43422bc165405ef8f5c618d0ad27132d61cbe6c9685b3b44afb2dd28c57",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/services/liveUpdate.js",
+      "sha256": "77fbf1732e64aa0acb110426b876e601131bbf273c040b87aa9c45fa1b14d2f0",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/services/liveUpdateCore.js",
+      "sha256": "529c71316a3734fe82b3ed7dad846a2e5af1490bc41dc877b5eff54e9fb82c82",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/utils/VersionChecker.jsx",
+      "sha256": "4f23f68ea5870a8f4c1a8580b5cc940c123305fb34c899c666c1c9c096adc812",
+      "matches_declared_revision": true
+    }
+  ],
+  "allowed_external_requests": 0,
+  "live_auth_calls": 0,
+  "model_calls": 0,
+  "uploads": 0,
+  "allowed_non_get_requests": 0,
+  "external_interceptions": [
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user"
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user"
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/meals",
+      "table": "meals",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "meal_date": [
+          "eq.2026-11-27"
+        ],
+        "order": [
+          "created_at.asc"
+        ]
+      },
+      "fixture_rows": 3
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "table": "user_preferences",
+      "query_fields": {
+        "select": [
+          "preferred_unit_system,preferred_distance_unit"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "table": "subscriptions",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "table": "feature_usage",
+      "query_fields": {
+        "select": [
+          "feature,usage_count"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "month_year": [
+          "eq.2026-11"
+        ]
+      },
+      "fixture_rows": 0
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "table": "subscriptions",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "table": "feature_usage",
+      "query_fields": {
+        "select": [
+          "feature,usage_count"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "month_year": [
+          "eq.2026-11"
+        ]
+      },
+      "fixture_rows": 0
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/calculated_metrics",
+      "table": "calculated_metrics",
+      "query_fields": {
+        "select": [
+          "tdee,adjusted_calories,lean_body_mass_kg"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "order": [
+          "calculated_at.desc"
+        ],
+        "limit": [
+          "1"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_goals",
+      "table": "user_goals",
+      "query_fields": {
+        "select": [
+          "goal_type,fiber_goal_g,sugar_goal_g,sodium_goal_mg"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "order": [
+          "created_at.desc"
+        ],
+        "limit": [
+          "1"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/meals",
+      "table": "meals",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "meal_date": [
+          "eq.undefined"
+        ],
+        "order": [
+          "created_at.asc"
+        ]
+      },
+      "fixture_rows": 3
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "table": "user_preferences",
+      "query_fields": {
+        "select": [
+          "use_custom_macros,protein_percent,carb_percent,fat_percent,protein_grams,carb_grams,fat_grams"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user"
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/auth/v1/user"
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_profiles",
+      "table": "user_profiles",
+      "query_fields": {
+        "select": [
+          "onboarding_completed,install_guide_shown"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/daily_logs",
+      "table": "daily_logs",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "logged_at": [
+          "gte.2026-11-26T15:00:00.000Z",
+          "lte.2026-11-28T18:59:59.000Z"
+        ],
+        "order": [
+          "logged_at.desc"
+        ],
+        "limit": [
+          "1"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/daily_logs",
+      "table": "daily_logs",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "logged_at": [
+          "gte.2026-11-20T21:36:11.458Z"
+        ],
+        "order": [
+          "logged_at.asc"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_goals",
+      "table": "user_goals",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/progress_measurements",
+      "table": "progress_measurements",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "measurement_type": [
+          "in.(neck,shoulders,chest,waist,hips,biceps,forearms,thighs,calves)"
+        ],
+        "order": [
+          "measured_at.desc"
+        ],
+        "limit": [
+          "9"
+        ]
+      },
+      "fixture_rows": 0
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/user_preferences",
+      "table": "user_preferences",
+      "query_fields": {
+        "select": [
+          "preferred_unit_system,preferred_distance_unit"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "table": "subscriptions",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "table": "feature_usage",
+      "query_fields": {
+        "select": [
+          "feature,usage_count"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "month_year": [
+          "eq.2026-11"
+        ]
+      },
+      "fixture_rows": 0
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/subscriptions",
+      "table": "subscriptions",
+      "query_fields": {
+        "select": [
+          "*"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "fixture_rows": 1
+    },
+    {
+      "method": "GET",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_usage",
+      "table": "feature_usage",
+      "query_fields": {
+        "select": [
+          "feature,usage_count"
+        ],
+        "user_id": [
+          "eq.00000000-0000-4000-8000-000000000001"
+        ],
+        "month_year": [
+          "eq.2026-11"
+        ]
+      },
+      "fixture_rows": 0
+    }
+  ],
+  "blocked_write_attempts": [
+    {
+      "method": "POST",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics"
+    },
+    {
+      "method": "POST",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics"
+    }
+  ],
+  "blocked_external_gets": [],
+  "websockets_closed": [],
+  "service_workers": "blocked",
+  "page_errors": [],
+  "screens": [
+    {
+      "path": "/home/ubuntu/yfit-article-demo-2026-11-27/png/01-nutrition-overview.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual NutritionUnified/NutritionEnhanced daily summary: 1450/2200 kcal, 750 remaining, protein 90/150 g, carbs 160/265 g and fat 50/60 g; original teal/light app colors.",
+      "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+      "route": "/nutrition",
+      "scroll_y": 225,
+      "actual_component": true,
+      "fictional_data": true
+    },
+    {
+      "path": "/home/ubuntu/yfit-article-demo-2026-11-27/png/02-nutrition-logged-meals.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual already-expanded breakfast/lunch/dinner meal sections with fictional balanced meal names and macros; no fabricated meals tab.",
+      "sha256": "30970e82335e6e590879193a1c9cf265c83d67625f2c480c75f64bf42ada0594",
+      "route": "/nutrition",
+      "scroll_y": 2155,
+      "actual_component": true,
+      "fictional_data": true
+    },
+    {
+      "path": "/home/ubuntu/yfit-article-demo-2026-11-27/png/03-daily-tracker-overview.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual DailyTracker progress overview: sleep 7.5h/8h, water 1800ml/2000ml (1.8L), steps 6400/10000; fictional rows only, no save/add actions.",
+      "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+      "route": "/daily-tracker",
+      "scroll_y": 0,
+      "actual_component": true,
+      "fictional_data": true
+    }
+  ],
+  "ui_actions": [
+    {
+      "action": "scroll",
+      "view": "real expanded meal groups; no separate meals tab in source"
+    }
+  ],
+  "server_stopped": true,
+  "production_modified": false,
+  "canonical_source_modified": false,
+  "canonical_git_modified": false,
+  "real_records_modified": false,
+  "analytics_allowed": false,
+  "source_modules_verified": 203,
+  "build_files": [
+    {
+      "path": "_headers.txt",
+      "sha256": "10d7f356bee2dd5e221f3fe05536e2e211e7ca97de64f54e5653891532451bad"
+    },
+    {
+      "path": "apple-touch-icon.png",
+      "sha256": "6df2fc017c26467deba077f2548dd2cf0432f66cf49ae740dd3c6d2cbe09762d"
+    },
+    {
+      "path": "assets/AICoachFAQ-CXwj_31p.js",
+      "sha256": "d8d43bf8f66ab840c0655a440f6b8b43b91000f798a77c66f8f8932d1dcb7006"
+    },
+    {
+      "path": "assets/BarChart-t52dvoIs.js",
+      "sha256": "8fcd3f2a898c39446dd3b8b4db79a5d33376a5c0f730906a31d67fe72ba332f7"
+    },
+    {
+      "path": "assets/BodyRecomp-2_69cELG.js",
+      "sha256": "0d93fecd5a73d39fac4f02e1c99d2d6b45535e0d79fc49aaa31d07617a482de8"
+    },
+    {
+      "path": "assets/Contact-wrRIM4q7.js",
+      "sha256": "00f4566bc80743e65159c19289b7bd166672ee5747f5333b45aab6887bf7b369"
+    },
+    {
+      "path": "assets/DailyTracker-CRvREaV9.js",
+      "sha256": "0c9e8332dc802d61f6852871bc5c1e81a7dcc47d421dab14b3f19caf7a31642e"
+    },
+    {
+      "path": "assets/Dashboard-BuaAxXUO.js",
+      "sha256": "b310e3b24042636c4803cee6f1409e685f09ebf677fd2b58b602c61907b4040e"
+    },
+    {
+      "path": "assets/FAQ-Bmrn0lrd.js",
+      "sha256": "ed58efb9c977ce4a45f9612a18cff65f3a19799454f704e60d2f62144e73cf6e"
+    },
+    {
+      "path": "assets/Fitness-BXqhY0MX.js",
+      "sha256": "00316e5c6837767af85d8fa3488a8ea8aaa809d43add34b1e98e0fefceff6538"
+    },
+    {
+      "path": "assets/FormAnalysis-D9u84svJ.js",
+      "sha256": "09603b86ea76bdb05acba5c3143d797d6db7be714a917082c9e7327b23800709"
+    },
+    {
+      "path": "assets/FormAnalysisLive-BdPgUSCa.js",
+      "sha256": "19d77ff24730c411e9e7a423ac3d5c0d128a4dc423bfddfa707e201fba9330ea"
+    },
+    {
+      "path": "assets/GoPage-PSkmP6xj.js",
+      "sha256": "c125ddd5aa6003246eb75aaf5cae9dde217a2b650ae2f13c6d54120f93c31802"
+    },
+    {
+      "path": "assets/Goals-6d7Lmp_F.js",
+      "sha256": "6d54b4deb691dbcdf9d1e58e08dc125887ede170b4dac7e31afb60a48b4ff7f5"
+    },
+    {
+      "path": "assets/LandingPage-BqAMhph_.css",
+      "sha256": "9e3547e9c472f8449fcd5295ab80c081b27d1d5abd32199fbd2389f3fbbac921"
+    },
+    {
+      "path": "assets/LandingPage-CBFKL_tf.js",
+      "sha256": "f3b690f322506f408a4dc4fef782c786f6ecdaf800829f08ad9ba234e3b1ac7f"
+    },
+    {
+      "path": "assets/Legal-qX6L7rBX.js",
+      "sha256": "f73150501c5b195373e5517d08c56c8ebd736a60e7f76175fb26d47e5b68f166"
+    },
+    {
+      "path": "assets/LineChart-7dI6fkGM.js",
+      "sha256": "ed1cb373f47ab515c462a912d11a6b8d3ddf684f60487238b7ffcc243814e3bc"
+    },
+    {
+      "path": "assets/ManualCleanup-3ENAxIjJ.js",
+      "sha256": "6af6f0812eeff888f984e65d8a944b18700128e1cc976baa091b828859142897"
+    },
+    {
+      "path": "assets/Medications-B2kcMKVi.js",
+      "sha256": "2e8d2c7937c24b8cfb30ef6f56af40ae95f41598ae17b63fc6eb6392ac92eeac"
+    },
+    {
+      "path": "assets/NutritionUnified-DheUdTJa.js",
+      "sha256": "396ee419487a79aa5570c1ae42f29a9ba7c4ba3037aa4256f5e06201cfe04a02"
+    },
+    {
+      "path": "assets/PredictionsUnified-CsZOgbPC.js",
+      "sha256": "3e9e7bfde8c81cebab6b0713176eaece0600f39841440b39acff4f42a18450c9"
+    },
+    {
+      "path": "assets/Progress-DtkrYaRd.js",
+      "sha256": "6ef775b1ffef1444fedcda7624c9377d3f9bc344600de3a365e7d8dfd7364215"
+    },
+    {
+      "path": "assets/ResetPassword-i54PVIFG.js",
+      "sha256": "412bc5e353ba8ec36b270d681283db4a7f9cb50a6f8683f52d24d2cb4edcf40b"
+    },
+    {
+      "path": "assets/SubscriptionPage-DhUkHH16.js",
+      "sha256": "12aabaa851f50155f637bbdd9aae087fa6daa76c81158dea2b730c867d2bceb6"
+    },
+    {
+      "path": "assets/UnitToggle-aSt1PNqx.js",
+      "sha256": "f4d6c49182e0a8196720fefa7851d497c943234f9d28bad1bf667236e73599eb"
+    },
+    {
+      "path": "assets/WorkoutSessionTracker-Cc6vy9Zu.js",
+      "sha256": "ed85731aa08282e3c7a401293156f3fcab065a4778300b32a078ae9483a163e0"
+    },
+    {
+      "path": "assets/arrow-left-Ds9k7TI4.js",
+      "sha256": "a24bc312109eac2d6272193fff5879d49609495a493f5742144cd647f5541a05"
+    },
+    {
+      "path": "assets/award-7QvscLwM.js",
+      "sha256": "47d537a0f1d22a42d0d5b00e92c65625f4980f85d1d15cf8c488a7e3320cbfc2"
+    },
+    {
+      "path": "assets/circle-check-CWzPF3jR.js",
+      "sha256": "a758cc94f49ae520bf082031483acf69159401850873f90ae93a69dd9d2c6765"
+    },
+    {
+      "path": "assets/cookie-3WC5HXYr.js",
+      "sha256": "4ee8e2cacd61b245fb8aaf48d7c722677470eb92713bfaadb42e08df616cfd28"
+    },
+    {
+      "path": "assets/html2canvas.esm-QH1iLAAe.js",
+      "sha256": "061c08e50c0dc57b8d5e6531f0b8237a52a68b233260d49ab2f2c2906ad112c4"
+    },
+    {
+      "path": "assets/index-BGO4s_SE.css",
+      "sha256": "02c2c8529fe7e6cddd83f3c5493b804417b6a88dc55d6b9b294153e2d310c825"
+    },
+    {
+      "path": "assets/index-BjhzK8rv.js",
+      "sha256": "ed2f24bf8543134481d1e99e0bfce019db476a9b170d53ef8fd92d9f77e03fba"
+    },
+    {
+      "path": "assets/index-D_kDiObV.js",
+      "sha256": "8aba0c4b6481487bd23044fc6e0152b8454b42a16008a35d029026b6b44e4d5a"
+    },
+    {
+      "path": "assets/index-DzUaa3wN.js",
+      "sha256": "0d7e818339001174ea814b2c5e400c748dd095dcd222f4718928bc82e5cc1a25"
+    },
+    {
+      "path": "assets/index.es-5mSdWUbq.js",
+      "sha256": "24870825afb5b3ce4c9fc3bf102e7470f04ff2f6c66ded52c51cfe7929215762"
+    },
+    {
+      "path": "assets/minus-BSyHd2fg.js",
+      "sha256": "df303ce9926f72bfaaa8b571c2718592d278d2531b8773ce5f746facbba090a1"
+    },
+    {
+      "path": "assets/play-BIuZ-zXg.js",
+      "sha256": "ebc705e7e645029d59019ab458f970313b4d460db90686ee67a71b1f035867d1"
+    },
+    {
+      "path": "assets/plus-D-giau0l.js",
+      "sha256": "844cde36cec2d0b619f02c5fad1437784b6d285fea0229610265bf05ed0bc7fe"
+    },
+    {
+      "path": "assets/printer-B4nYG__R.js",
+      "sha256": "f462ce93f8a6353de2cf25a5909729d0b20a124304db757b4700b3001b1750d4"
+    },
+    {
+      "path": "assets/purify.es-B9ZVCkUG.js",
+      "sha256": "8f994fedccc1596fbf513fa2242f1c6e86b7a530310614dfe5b3b28d637df46e"
+    },
+    {
+      "path": "assets/react-webcam-CtnDojl_.js",
+      "sha256": "0700291cc5fb2dbc49f5fc8b71a4b07d2cce894aa523e8e39b6668c9b4fb293d"
+    },
+    {
+      "path": "assets/save-CMW6IE7e.js",
+      "sha256": "5f45851ebf57834cb1a216fb3f0c28ebc74c6bdbf6a2bddf6f876278be5e1f8c"
+    },
+    {
+      "path": "assets/scale-tFPZy8du.js",
+      "sha256": "3ab7dedb43f91c64cdcebea168d9b8b98394d7c49effbd6c726190ea599af562"
+    },
+    {
+      "path": "assets/scan-DmysTjJ2.js",
+      "sha256": "570e9bfee84e5348e8e05faaad8387ea5bfd70a5c1a08dc476eaafe833aed30c"
+    },
+    {
+      "path": "assets/search-Cl4GsKmy.js",
+      "sha256": "2b553b0bc05d0e5e59dd5e8f136950eb0eb421ba5bc862eb0c2883a2e45de2b7"
+    },
+    {
+      "path": "assets/shield-BDSReQlS.js",
+      "sha256": "66fd7953de3f7bdd7d8e70757defbbc8f7133750ad03827649d15cbecc865ecd"
+    },
+    {
+      "path": "assets/timer-nlRQfKvx.js",
+      "sha256": "5c1b38fcfd7cd37d8b8b974482e0f12c105bf8f75efd8c129cccd4775f284d45"
+    },
+    {
+      "path": "assets/trash-2-FW8klg6L.js",
+      "sha256": "8043c646caccf2b8b97f1c2c923b23ae4b11299b4722050834e1f9ed45902802"
+    },
+    {
+      "path": "assets/trending-down-p74NcATn.js",
+      "sha256": "44967ea1a757dafef51d465e9eb5925c3cbb7c5968971217c0a34607d62a3774"
+    },
+    {
+      "path": "assets/web-CWEO5jOV.js",
+      "sha256": "a6aecdc46cac11116af5472c6e399694be7fa17970b4170b70fbf1667a31ac2f"
+    },
+    {
+      "path": "assets/web-DKBm0Y6F.js",
+      "sha256": "5cedc223bdcd2f18953d980872efa3625cea9432173101a8c00374dff9762eee"
+    },
+    {
+      "path": "assets/yfit-logo.png",
+      "sha256": "4acf6b7065da71d07f220eb939fb0393e8a208b7f479d7da8d6c56d249c27789"
+    },
+    {
+      "path": "favicon.ico.txt",
+      "sha256": "2bd70e4d392664f32da7eccc72a66d26e2a800e23fb7ee78c031a7026a12f888"
+    },
+    {
+      "path": "icon-120x120.png",
+      "sha256": "31e973b616d753bb063f85fefe745fb4ac6e31043407c1f8b4367f304626772b"
+    },
+    {
+      "path": "icon-152x152.png",
+      "sha256": "1908eae2d23def483257c55cf02c039d8b8ec13a164863ce400a38e494ca3f63"
+    },
+    {
+      "path": "icon-180x180.png",
+      "sha256": "6df2fc017c26467deba077f2548dd2cf0432f66cf49ae740dd3c6d2cbe09762d"
+    },
+    {
+      "path": "icon-192x192.png",
+      "sha256": "24e354708cbf072ca4e26ec3a20040ee088fe8c0895e006d7e9b09c7fb6526a7"
+    },
+    {
+      "path": "icon-512x512-original.png",
+      "sha256": "bc31163956cbca285bd031741bc36a85510cb85d74b2d37c83b49405fb05a524"
+    },
+    {
+      "path": "icon-512x512.png",
+      "sha256": "6f56a4c84e305d338df8298eee24dded618dc27381234107764c0d7f5c8d2eff"
+    },
+    {
+      "path": "icon-76x76.png",
+      "sha256": "0efc62c53287342119f1dcab80784b4cfb3722697c375f1ac9bfa1ef87b380fa"
+    },
+    {
+      "path": "icon-maskable-512x512.png",
+      "sha256": "7030308a54f84e411b8deeb0f056e75a7a1999a0ee67a5adc12e45d308608cda"
+    },
+    {
+      "path": "index.html",
+      "sha256": "3a0faf31a3317a5155c2301b610c551922857eae4211b037cd6fc36d354a3750"
+    },
+    {
+      "path": "logo.png",
+      "sha256": "4acf6b7065da71d07f220eb939fb0393e8a208b7f479d7da8d6c56d249c27789"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "7778a33deb62cb12a84f5bb1392f63898717656127ffcd64b081b7db5763ad95"
+    },
+    {
+      "path": "sw.js",
+      "sha256": "a0131348ef00a27e7403f5f903f622bdace2aaac61e7a42e79a12a72f6ca4b59"
+    },
+    {
+      "path": "sw.js.txt",
+      "sha256": "936986e26fc133f70fa8cf02471d93893342361a395e1e33138620f883bd6bb4"
+    },
+    {
+      "path": "updates/bundle.json",
+      "sha256": "e14253bc52223b6678f35b94de23c60355ede7b7039cffae1d3c1bfd88e26d72"
+    },
+    {
+      "path": "updates/bundle.zip",
+      "sha256": "56e835d94229b4d41efc507fd656f935852d54564f02ed29e87b934dd5bce0c9"
+    },
+    {
+      "path": "version.json",
+      "sha256": "3ef866e63807493e9991217916f175a6b45979dc95d42300ce7985d5f83d1791"
+    }
+  ],
+  "fixture_field_names": {
+    "user_profiles": [
+      "activity_level",
+      "age",
+      "first_name",
+      "full_name",
+      "gender",
+      "height_cm",
+      "id",
+      "install_guide_shown",
+      "last_name",
+      "onboarding_completed",
+      "target_calories",
+      "user_id",
+      "weight_kg"
+    ],
+    "user_preferences": [
+      "carb_grams",
+      "carb_percent",
+      "fat_grams",
+      "fat_percent",
+      "preferred_distance_unit",
+      "preferred_unit_system",
+      "protein_grams",
+      "protein_percent",
+      "use_custom_macros",
+      "user_id"
+    ],
+    "user_goals": [
+      "created_at",
+      "current_weight",
+      "fiber_goal_g",
+      "fitness_goal",
+      "goal_type",
+      "sleep_hours_goal",
+      "sodium_goal_mg",
+      "steps_goal",
+      "sugar_goal_g",
+      "target_weight",
+      "user_id",
+      "water_goal_ml"
+    ],
+    "calculated_metrics": [
+      "adjusted_calories",
+      "calculated_at",
+      "lean_body_mass_kg",
+      "tdee",
+      "user_id"
+    ],
+    "meals": [
+      "calories",
+      "carbs_g",
+      "created_at",
+      "fat_g",
+      "fiber",
+      "food_name",
+      "id",
+      "meal_date",
+      "meal_type",
+      "protein_g",
+      "serving_quantity",
+      "serving_unit",
+      "sodium",
+      "sugar",
+      "user_id"
+    ],
+    "daily_logs": [
+      "body_fat_percent",
+      "bp_diastolic",
+      "bp_systolic",
+      "date",
+      "glucose_mg_dl",
+      "id",
+      "logged_at",
+      "notes",
+      "sleep_hours",
+      "sleep_quality",
+      "steps",
+      "user_id",
+      "water_ml",
+      "weight_kg"
+    ],
+    "subscriptions": [
+      "id",
+      "plan_type",
+      "status",
+      "trial_end",
+      "user_id"
+    ],
+    "progress_measurements": []
+  },
+  "nutrition_totals": {
+    "calories": 1450,
+    "protein_g": 90,
+    "carbs_g": 160,
+    "fat_g": 50,
+    "fiber": 22,
+    "sugar": 27,
+    "sodium": 1330
+  },
+  "limitations": [
+    "Synthetic authenticated session, never a live sign-in. Data fictional, not account data or recommendations.",
+    "Nutrition has Daily Tracker, Weekly Planner, Templates; meals are sections, not a separate tab.",
+    "Canonical checkout HEAD differs from requested main commit; exact requested archive modules were all verified byte-for-byte.",
+    "Already-compiled static build was reused unchanged; no canonical npm build, prebuild or git changes.",
+    "No recording created; clean accurate PNGs prioritized."
+  ]
+}
