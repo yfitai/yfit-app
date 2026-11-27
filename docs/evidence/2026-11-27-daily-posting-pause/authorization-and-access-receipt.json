@@ -1,0 +1,21 @@
+{
+  "owner_authorization_time": "2026-11-27T17:32:50-05:00",
+  "authorized_action": "Pause daily social posting now; review Monday before resuming",
+  "workflow_id": "h7bRds9UOUfmP36F",
+  "expected_workflow_name": "Social Media Automation v2",
+  "workflow_url": "https://n8n-railway-production-fbfd.up.railway.app/workflow/h7bRds9UOUfmP36F",
+  "review_date": "2026-11-30",
+  "automatic_resume": false,
+  "separate_weekly_report_change_authorized": false,
+  "existing_posts_change_authorized": false,
+  "api_read_http_status": 401,
+  "cloud_browser_result": "No usable authenticated editor; follow-up view about:blank",
+  "pause_applied": false,
+  "pause_verification": "pending-owner-dashboard-action",
+  "mutation_requests_sent": 0,
+  "execution_retry_backfill_performed": false,
+  "official_docs": [
+    "https://docs.n8n.io/build/understand-workflows/save-and-publish-workflows",
+    "https://docs.n8n.io/connect/n8n-api/build-and-run/workflows"
+  ]
+}

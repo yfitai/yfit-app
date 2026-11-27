@@ -3,6 +3,14 @@
 **Last Updated:** November 27, 2026
 **Read this at the start of every session before making any changes.**
 
+## Daily Social Posting Pause APPROVED, NOT YET APPLIED — November 27, 2026, 17:32 EST
+
+Owner explicitly selects **“Pause daily posts now; review Monday before resuming.”** Scope is the existing n8n **Social Media Automation v2**, workflow `h7bRds9UOUfmP36F`, only. Do not change the separate weekly report, delete published posts, edit saved nodes/cron/timezone, Execute/Retry/backfill or automatically resume. Monday review is November30, not a scheduled reactivation; resume requires owner decision after review. Existing no-n8n-change scope is superseded only for this authorized pause.
+
+**Pause NOT yet applied/verified.** Current bounded workflow-read API request17:33EST returns401; enabled n8n API already has token replacement off, so no retry/credential bypass. Cloud navigation to exact existing workflow gives no usable editor; next view is about:blank. No mutation or run request sent. Receipt: `docs/evidence/2026-11-27-daily-posting-pause/authorization-and-access-receipt.json`. Never state tomorrow's posts are stopped until owner-dashboard action is confirmed. Owner can open the already signed-in exact workflow, verify its title, choose Publish/Published dropdown→Unpublish (older version Active toggle off), and retain saved workflow. Request fresh header/status evidence; do not reopen prior supplied screenshots. Weekly report stays untouched. No new monitor/reminder or auto-resume created.
+
+Official current n8n save/publish docs confirm unpublishing removes the workflow from production while saving the workflow; newer UI has the dropdown next to Publish and older UI uses deactivation. Official API reference reviewed, but no unpublish/deactivate POST sent after401. Read docs URLs in receipt; no API key or other credentials copied/exposed. Persist this pending pause and all prior saved screen/video work; app docs-only backup remains on existing feature branch, no main merge/deployment/all-main end-work. Hub safe top notes remain local under existing historical credential blocker.
+
 ## Corrected Review v2 and Complete Screen Library — November 27, 2026, owner request 17:00 EST
 
 Owner requests adding “data” to the last sentence, restoring/saving all eleven screen assets for future posts, thoughts on exercise-only opening clips, and acknowledges the existing Manus support thread has gone over two hours without attention. The corrected wording is **“Saving your own data needs an account.”** This expands restoration authorization to bounded create-only addition of the seven missing configured files; an older assistant-proposed separate-review gate is not an immutable restriction. No permission to overwrite existing images, change bucket/policies, modify n8n/templates or publish extra posts is inferred.
