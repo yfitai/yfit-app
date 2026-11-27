@@ -1,7 +1,15 @@
 # YFIT Master Project Reference
 
-**Last Updated:** November 26, 2026
+**Last Updated:** November 27, 2026
 **Read this at the start of every session before making any changes.**
+
+## Screenshot Restoration LIVE — November 27, 2026
+
+Owner approved the exact four prepared PNGs at13:24EST: “Let's use these four for now and deploy them for the next run at 6 am tommorrpw”. This supersedes preparation-only authorization below. The cloud Supabase browser remained signed out; owner used their already authenticated correct YFIT project dashboard with guidance. Owner's13:32 screenshot showed only captions/videos in existing yfit-videos root,13:34 showed newly created assets/app-screens empty, and13:43 showed all four exact filenames uploaded there. Supplied screenshots were not reopened. No bucket/policy change, overwrite/delete, extra image, source/runtime deployment or service restart was requested or performed by the assistant. Dashboard upload internals were not independently observed.
+
+Independent public GET verification13:44EST returned **HTTP200/image/png for all four**, decoded1080×1920, correct byte sizes and **SHA256-identical to the owner-approved candidates**: Dashboard screen_01_dashboard.png, Fitness screen_05_fitness.png, AI Coach screen_10_aiCoach.png and Medications screen_06_medications.png. Exact prefix is `yfit-videos/assets/app-screens/`; old July paths remain obsolete. Read `docs/evidence/2026-11-27-screenshot-restoration/README.md` and `live-restoration-verification.json`; the new read-only verifier has no upload/generation/assembly/post mode. November26 manifest false flags remain an intentional historical preparation snapshot, not current authorization/upload state. Seven other catalog assets remain unchecked/unprepared.
+
+Assets are ready for the existing Saturday **November28 normal6AM fixedUTC-5 /11UTC** posting run. The existing cron/timezone/workflow, Build109 release fingerprints, app/admin/video functional source and Go analytics access/deployment gate remain unchanged. No generator/assembler request, paid generation, Execute/Retry/backfill/extra public post, new monitor or reminder was made. Missing images can be fetched by the renderer on the next normal uncached request, so no restart is required solely for restoration. Cache contents and encode fallback remain unobserved; actual tomorrow video overlay rendering/six-platform publication must be checked from the normal run, not inferred from PNG readiness. App receipt/Master notes are backed up only on the existing isolated feature branch; no main merge or Go deployment is authorized by this restoration. Hub current notes remain LOCAL due to the preexisting historical credential backup blocker; no canonical all-main end-work claim.
 
 ## Screenshot Restoration Preparation — November 26, 2026, owner approval17:53EST
 

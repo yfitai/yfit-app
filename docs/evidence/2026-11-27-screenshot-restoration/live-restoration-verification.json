@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "verified_at_utc": "2026-11-27T18:44:39.497542+00:00",
+  "state": "restored_public_pngs_verified",
+  "project_ref": "mxggxpoxgqubojvumjlt",
+  "bucket": "yfit-videos",
+  "authorization": {
+    "owner_approved_at": "2026-11-27T13:24:00-05:00",
+    "owner_message": "Let's use these four for now and deploy them for the next run at 6 am tommorrpw",
+    "scope": "Only the four previously prepared and delivered PNGs at their exact existing renderer keys."
+  },
+  "upload_actor": "owner, guided through the already signed-in Supabase dashboard",
+  "owner_evidence": {
+    "2026-11-27T13:32:06-05:00": "Existing authenticated yfit-videos bucket root showed captions and videos, no assets folder; search field empty.",
+    "2026-11-27T13:34:35-05:00": "Owner-created assets/app-screens path visible and empty before upload.",
+    "2026-11-27T13:43:51-05:00": "Owner screenshot shows the exact four filenames in assets/app-screens.",
+    "images_reopened": false,
+    "authenticated_api_inventory_or_upload_options_independently_observed": false
+  },
+  "read_only_public_gets": 4,
+  "assistant_uploads": 0,
+  "generator_or_assembly_calls": 0,
+  "manual_posts_or_retries": 0,
+  "workflow_or_schedule_edits": 0,
+  "app_or_admin_or_renderer_functional_source_changes": 0,
+  "phone_build": 109,
+  "other_catalog_assets": "Seven remain unchecked/unprepared; not restored by this task.",
+  "next_normal_run": "2026-11-28T11:00:00Z (6 AM at the owner's agreed fixed UTC-5 schedule)",
+  "future_overlay_rendering_verified": false,
+  "limitations": "Public PNG readiness is verified separately from a future video. Live runtime cache and encode fallback remain unobserved; no restart or extra execution was requested.",
+  "assets": [
+    {
+      "object_path": "assets/app-screens/screen_01_dashboard.png",
+      "public_url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_01_dashboard.png",
+      "expected_sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "checked_at_utc": "2026-11-27T18:44:37.398480+00:00",
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 455345,
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "image_format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "verified": true
+    },
+    {
+      "object_path": "assets/app-screens/screen_05_fitness.png",
+      "public_url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_05_fitness.png",
+      "expected_sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "checked_at_utc": "2026-11-27T18:44:38.047579+00:00",
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 139584,
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "image_format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "verified": true
+    },
+    {
+      "object_path": "assets/app-screens/screen_10_aiCoach.png",
+      "public_url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_10_aiCoach.png",
+      "expected_sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "checked_at_utc": "2026-11-27T18:44:38.528419+00:00",
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 239573,
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "image_format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "verified": true
+    },
+    {
+      "object_path": "assets/app-screens/screen_06_medications.png",
+      "public_url": "https://mxggxpoxgqubojvumjlt.supabase.co/storage/v1/object/public/yfit-videos/assets/app-screens/screen_06_medications.png",
+      "expected_sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "checked_at_utc": "2026-11-27T18:44:39.086431+00:00",
+      "http_status": 200,
+      "content_type": "image/png",
+      "bytes": 491752,
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "image_format": "PNG",
+      "width": 1080,
+      "height": 1920,
+      "verified": true
+    }
+  ]
+}
