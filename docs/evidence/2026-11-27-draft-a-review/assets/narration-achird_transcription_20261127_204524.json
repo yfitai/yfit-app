@@ -1,0 +1,314 @@
+{
+  "duration": 18.72,
+  "language": "eng",
+  "segments": [
+    {
+      "start": 0.36,
+      "end": 2.18,
+      "text": "Still hunting through notes for your last workout?"
+    },
+    {
+      "start": 2.18,
+      "end": 4.28,
+      "text": "Here's a sample workout in Y Fit."
+    },
+    {
+      "start": 4.28,
+      "end": 10.12,
+      "text": "Open Fitness, choose History, and tap the workout to see its exercises, weights, and reps."
+    },
+    {
+      "start": 10.12,
+      "end": 11.56,
+      "text": "Wanna look around first?"
+    },
+    {
+      "start": 11.56,
+      "end": 14.9,
+      "text": "Use the profile link and choose Explore the App First."
+    },
+    {
+      "start": 14.9,
+      "end": 16.16,
+      "text": "These are examples."
+    },
+    {
+      "start": 16.16,
+      "end": 18.22,
+      "text": "Your own saved workouts need an account."
+    }
+  ],
+  "full_text": "Still hunting through notes for your last workout? Here's a sample workout in Y Fit. Open Fitness, choose History, and tap the workout to see its exercises, weights, and reps. Wanna look around first? Use the profile link and choose Explore the App First. These are examples. Your own saved workouts need an account.",
+  "words": [
+    {
+      "start": 0.36,
+      "end": 0.54,
+      "text": "Still"
+    },
+    {
+      "start": 0.6,
+      "end": 0.86,
+      "text": "hunting"
+    },
+    {
+      "start": 0.88,
+      "end": 1.06,
+      "text": "through"
+    },
+    {
+      "start": 1.12,
+      "end": 1.36,
+      "text": "notes"
+    },
+    {
+      "start": 1.38,
+      "end": 1.46,
+      "text": "for"
+    },
+    {
+      "start": 1.48,
+      "end": 1.54,
+      "text": "your"
+    },
+    {
+      "start": 1.6,
+      "end": 1.76,
+      "text": "last"
+    },
+    {
+      "start": 1.82,
+      "end": 2.18,
+      "text": "workout?"
+    },
+    {
+      "start": 2.58,
+      "end": 2.78,
+      "text": "Here's"
+    },
+    {
+      "start": 2.84,
+      "end": 2.9,
+      "text": "a"
+    },
+    {
+      "start": 2.98,
+      "end": 3.26,
+      "text": "sample"
+    },
+    {
+      "start": 3.3,
+      "end": 3.66,
+      "text": "workout"
+    },
+    {
+      "start": 3.7,
+      "end": 3.8,
+      "text": "in"
+    },
+    {
+      "start": 3.92,
+      "end": 4.019,
+      "text": "Y"
+    },
+    {
+      "start": 4.08,
+      "end": 4.28,
+      "text": "Fit."
+    },
+    {
+      "start": 4.72,
+      "end": 4.92,
+      "text": "Open"
+    },
+    {
+      "start": 4.96,
+      "end": 5.3,
+      "text": "Fitness,"
+    },
+    {
+      "start": 5.82,
+      "end": 6,
+      "text": "choose"
+    },
+    {
+      "start": 6.04,
+      "end": 6.46,
+      "text": "History,"
+    },
+    {
+      "start": 6.94,
+      "end": 7.08,
+      "text": "and"
+    },
+    {
+      "start": 7.16,
+      "end": 7.32,
+      "text": "tap"
+    },
+    {
+      "start": 7.38,
+      "end": 7.44,
+      "text": "the"
+    },
+    {
+      "start": 7.48,
+      "end": 7.82,
+      "text": "workout"
+    },
+    {
+      "start": 7.86,
+      "end": 7.94,
+      "text": "to"
+    },
+    {
+      "start": 8,
+      "end": 8.1,
+      "text": "see"
+    },
+    {
+      "start": 8.14,
+      "end": 8.26,
+      "text": "its"
+    },
+    {
+      "start": 8.34,
+      "end": 9.02,
+      "text": "exercises,"
+    },
+    {
+      "start": 9.24,
+      "end": 9.6,
+      "text": "weights,"
+    },
+    {
+      "start": 9.66,
+      "end": 9.76,
+      "text": "and"
+    },
+    {
+      "start": 9.82,
+      "end": 10.12,
+      "text": "reps."
+    },
+    {
+      "start": 10.72,
+      "end": 10.88,
+      "text": "Wanna"
+    },
+    {
+      "start": 10.9,
+      "end": 11.04,
+      "text": "look"
+    },
+    {
+      "start": 11.06,
+      "end": 11.24,
+      "text": "around"
+    },
+    {
+      "start": 11.3,
+      "end": 11.56,
+      "text": "first?"
+    },
+    {
+      "start": 12.08,
+      "end": 12.18,
+      "text": "Use"
+    },
+    {
+      "start": 12.22,
+      "end": 12.32,
+      "text": "the"
+    },
+    {
+      "start": 12.36,
+      "end": 12.78,
+      "text": "profile"
+    },
+    {
+      "start": 12.82,
+      "end": 13.06,
+      "text": "link"
+    },
+    {
+      "start": 13.1,
+      "end": 13.22,
+      "text": "and"
+    },
+    {
+      "start": 13.28,
+      "end": 13.56,
+      "text": "choose"
+    },
+    {
+      "start": 13.64,
+      "end": 14.18,
+      "text": "Explore"
+    },
+    {
+      "start": 14.22,
+      "end": 14.32,
+      "text": "the"
+    },
+    {
+      "start": 14.38,
+      "end": 14.54,
+      "text": "App"
+    },
+    {
+      "start": 14.6,
+      "end": 14.9,
+      "text": "First."
+    },
+    {
+      "start": 15.34,
+      "end": 15.46,
+      "text": "These"
+    },
+    {
+      "start": 15.5,
+      "end": 15.58,
+      "text": "are"
+    },
+    {
+      "start": 15.62,
+      "end": 16.16,
+      "text": "examples."
+    },
+    {
+      "start": 16.379,
+      "end": 16.52,
+      "text": "Your"
+    },
+    {
+      "start": 16.6,
+      "end": 16.82,
+      "text": "own"
+    },
+    {
+      "start": 16.9,
+      "end": 17.14,
+      "text": "saved"
+    },
+    {
+      "start": 17.18,
+      "end": 17.6,
+      "text": "workouts"
+    },
+    {
+      "start": 17.64,
+      "end": 17.76,
+      "text": "need"
+    },
+    {
+      "start": 17.78,
+      "end": 17.84,
+      "text": "an"
+    },
+    {
+      "start": 17.9,
+      "end": 18.22,
+      "text": "account."
+    }
+  ]
+}

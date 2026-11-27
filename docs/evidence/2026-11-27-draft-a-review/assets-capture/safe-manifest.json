@@ -1,0 +1,191 @@
+{
+  "purpose": "Draft A review-only vertical edit source assets; not published/uploaded",
+  "source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "source_type": "actual current guest/sample app components, untouched archived app source; built-in fictional demoData.js values; not private-account UI",
+  "clean_stills": [
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/01-history-context-clean.png",
+      "width": 1080,
+      "height": 1328,
+      "description": "Actual guest Fitness title, selected History tab, navigation and sample label; phone preview excluded by faithful crop.",
+      "sha256": "f497acb2f86bba6f85e140ad24b7c0c4a87a4c3d8100857471de6da023499dd1"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/02-history-collapsed-clean.png",
+      "width": 1080,
+      "height": 444,
+      "description": "Faithful crop retaining sample-data label and actual collapsed Push Day A heading only.",
+      "sha256": "0773e839e75253b11760a475d19ce9c12c2152f75dd661b164519015f238c0cf"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-clean.png",
+      "width": 1080,
+      "height": 1204,
+      "description": "Actual interactive guest card expanded: Bench Press, Incline Dumbbell Press, Lateral Raises, Tricep Pushdowns, all twelve weights/reps, sample banner, log button; no phone mockup.",
+      "sha256": "f34fd5c8cb18ccf37591bcad6ad56c7997332fc71d0b173fd90ad5796e47fd9b"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/04-go-current-explore-cta.png",
+      "width": 1000,
+      "height": 160,
+      "description": "Genuine current Go top CTA: Explore the app first / No sign-up needed \u2014 browse all features now. Cropped to the actual CTA only, excluding hero claims and blocked external logo.",
+      "sha256": "319358975d5b5bc60ba692ef90f8d131992e2619252f7409a86a4102106e5252"
+    }
+  ],
+  "evidence_only_stills": [
+    "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/01-history-context.png",
+    "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/02-history-collapsed-full.png",
+    "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-full.png",
+    "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/04-go-current-full.png"
+  ],
+  "raw_video": {
+    "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/video/history-click-raw.webm",
+    "media": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "vp9",
+          "width": 1080,
+          "height": 1920,
+          "avg_frame_rate": "25/1"
+        }
+      ],
+      "format": {
+        "duration": "5.400000"
+      }
+    },
+    "silent": true,
+    "native_ui_region": {
+      "x": 0,
+      "y": 0,
+      "width": 540,
+      "height": 960
+    },
+    "limitations": "1080x1920 recorder canvas has 540x960 native UI in upper-left and grey padding. Setup contains marketing previews and may briefly contain My Plan text; use only documented cropped click strip for final edit."
+  },
+  "click_segment": {
+    "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/video/history-click-clean.mp4",
+    "source_range_seconds": [
+      2.6,
+      3.7
+    ],
+    "duration_seconds": 1.12,
+    "crop_raw_pixels": {
+      "x": 0,
+      "y": 0,
+      "width": 540,
+      "height": 222
+    },
+    "media": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 540,
+          "height": 222,
+          "avg_frame_rate": "25/1"
+        }
+      ],
+      "format": {
+        "duration": "1.120000"
+      }
+    },
+    "content": "Built-in demo label and actual Push Day A heading; real click rotates chevron, no phone mockup or medical text. Exercise rows require explanatory cut to clean expanded still."
+  },
+  "active_ui_segment_evidence": {
+    "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/video/history-click-active-ui.mp4",
+    "source_range_seconds": [
+      2.6,
+      3.7
+    ],
+    "crop_raw_pixels": {
+      "x": 0,
+      "y": 0,
+      "width": 540,
+      "height": 960
+    },
+    "warning": "Includes marketing phone mockup below heading before click; evidence only."
+  },
+  "action_timing": {
+    "clock": "Python time.monotonic; relative to new_page() returned; recorder first-frame origin differs by approximately 0.1 sec",
+    "monotonic_events": [
+      {
+        "event": "collapsed_ready",
+        "monotonic": 86965.298230874,
+        "relative_page_creation": 1.7120584860094823
+      },
+      {
+        "event": "click_begin",
+        "monotonic": 86966.700229484,
+        "relative_page_creation": 3.1140570640127407
+      },
+      {
+        "event": "click_returned",
+        "monotonic": 86966.737401676,
+        "relative_page_creation": 3.1512293130072067
+      },
+      {
+        "event": "expanded_confirmed",
+        "monotonic": 86966.750281251,
+        "relative_page_creation": 3.164108856013627
+      },
+      {
+        "event": "end_hold",
+        "monotonic": 86969.051052269,
+        "relative_page_creation": 5.464879898005165
+      }
+    ],
+    "video_observed_transition": {
+      "last_collapsed_frame_seconds": 3.0,
+      "first_expanded_frame_seconds": 3.04,
+      "fps": 25,
+      "uncertainty_seconds": 0.04
+    }
+  },
+  "authenticity": {
+    "genuine": "History tab, clickable Push Day A heading, chevron state and actual mapped exercise rows/sets from GuestFitnessPage.jsx",
+    "mockup": "FitnessMockup embedded above every History card is static marketing App Preview; excluded from recommended clean assets",
+    "data": "Fictional sample source values, not invented offline records and no real personal data. Built-in DEMO MODE / exploring with sample data label retained in Fitness assets."
+  },
+  "safety": {
+    "external_requests_allowed": 0,
+    "non_get_allowed": 0,
+    "uploads": 0,
+    "analytics_consent": "declined in fresh isolated browser; no umami loaded",
+    "blocked_requests": [
+      {
+        "method": "GET",
+        "host": "files.manuscdn.com",
+        "path": "/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png"
+      },
+      {
+        "method": "GET",
+        "host": "files.manuscdn.com",
+        "path": "/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png"
+      }
+    ],
+    "websocket_policy": "route_web_socket closes every attempted socket; final static capture attempted none",
+    "service_workers": "blocked",
+    "page_errors": [],
+    "server_stopped": true,
+    "production_modified": false,
+    "canonical_source_modified": false,
+    "canonical_git_modified": false,
+    "accounts_or_records_modified": false
+  },
+  "limitations": [
+    "Uncropped viewport images contain marketing phone previews or Go hero marketing/health/AI claims: evidence only.",
+    "Go logo is external and was blocked; recommended CTA crop excludes the failed logo and hero claims.",
+    "Direct /fitness?mode=guest has an existing logged-out redirect race; genuine /go?mode=guest entry then real Fitness navigation was used.",
+    "Clean assets are honest source-region crops, not 9:16 full-frame UI; parent may frame them without distorting.",
+    "Recorder pointer is not burned in. Chevron changes and revealed rows verify click action."
+  ],
+  "reproduction": {
+    "capture_script": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/capture_assets.py",
+    "server_launcher": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/local-vite.mjs",
+    "crop_script": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/finish_assets.py",
+    "command": "python3 capture_assets.py && python3 finish_assets.py",
+    "no_cloud_browser": true,
+    "local_compilation": "Direct Vite API, no npm build/prebuild, archived app source unchanged, output offline-web in this workspace only, symlink read-only dependencies and local cacheDir."
+  }
+}

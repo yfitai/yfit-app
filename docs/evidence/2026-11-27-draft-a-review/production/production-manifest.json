@@ -1,0 +1,102 @@
+{
+  "purpose": "Owner-requested offline finished Draft A sample for review only; not approved for public posting",
+  "source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "voice": {
+    "name": "Achird",
+    "gender": "male",
+    "language_code": "en-US",
+    "style": "casual, friendly",
+    "narration_duration_seconds": 18.72,
+    "spoken_brand": "Why Fit",
+    "display_brand": "YFIT"
+  },
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 25,
+    "duration_seconds": 21.12,
+    "audio_codec": "aac",
+    "video_codec": "h264"
+  },
+  "segments": [
+    {
+      "id": "01-result-hook",
+      "start": 0,
+      "end": 4.6,
+      "file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-clean.png",
+      "filter": "crop=1080:822:0:275,scale=980:-2,pad=1080:1920:(ow-iw)/2:370:color=0x0d1620",
+      "description": "Real expanded sample workout; immediate result-first opening, banner cropped but persistent video SAMPLE DATA label retained.",
+      "rendered_file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/production/01-result-hook.mp4"
+    },
+    {
+      "id": "02-navigation",
+      "start": 4.6,
+      "end": 6.72,
+      "file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/01-history-context-clean.png",
+      "filter": "crop=1080:1052:0:276,scale=980:-2,pad=1080:1920:(ow-iw)/2:310:color=0x0d1620",
+      "description": "Real Fitness navigation and selected History tab; no fabricated navigation or clinical claims.",
+      "rendered_file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/production/02-navigation.mp4"
+    },
+    {
+      "id": "03-real-click",
+      "start": 6.72,
+      "end": 7.84,
+      "file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/video/history-click-clean.mp4",
+      "filter": "crop=540:84:0:138,scale=980:-2,pad=1080:1920:(ow-iw)/2:530:color=0x0d1620",
+      "description": "Genuine workout-header click; native chevron changes at output approximately7.16sec; no fabricated cursor movement.",
+      "rendered_file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/production/03-real-click.mp4"
+    },
+    {
+      "id": "04-expanded-details",
+      "start": 7.84,
+      "end": 11.65,
+      "file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-clean.png",
+      "filter": "crop=1080:822:0:275,scale=980:-2,pad=1080:1920:(ow-iw)/2:370:color=0x0d1620",
+      "description": "Explanatory edit to actual exercise/weight/repetition rows after the real click, excluding phone mockup and log button.",
+      "rendered_file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/production/04-expanded-details.mp4"
+    },
+    {
+      "id": "05-explore-invitation",
+      "start": 11.65,
+      "end": 21.119999999999997,
+      "file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/04-go-current-explore-cta.png",
+      "filter": "scale=980:-2,pad=1080:1920:(ow-iw)/2:770:color=0x0d1620",
+      "description": "Actual current Go Explore CTA crop; clearly presented as closing invitation, not a private-account editor.",
+      "rendered_file": "/home/ubuntu/yfit-draft-a-review-2026-11-27/production/05-explore-invitation.mp4"
+    }
+  ],
+  "authenticity": "Real current guest/sample app source and its fictional demo data. Native click footage plus explanatory crops/holds, not continuous private-account footage. No invented UI, moving-tap AI simulation or clinical results.",
+  "external_calls": "One authorized speech generation and one speech transcription. App capture allowed zero external requests; no n8n/generator/assembler/live app call.",
+  "unchanged": [
+    "production app",
+    "Go page",
+    "analytics tracker/property",
+    "pricing/offers",
+    "auth/accounts/records",
+    "Build109",
+    "n8n workflow/schedule",
+    "platform posting/report connections"
+  ],
+  "published": false,
+  "uploaded_to_supabase": false,
+  "output": "/home/ubuntu/yfit-draft-a-review-2026-11-27/YFIT_Draft_A_Friendly_Male_Review.mp4",
+  "sha256": "339fec66e69e59af92fe2b3f876b29ad79224f1988b36ac53e408842fb45f272",
+  "bytes": 860841,
+  "captions": "/home/ubuntu/yfit-draft-a-review-2026-11-27/YFIT_Draft_A_Captions.srt",
+  "notes": "No background music in this first review take so the owner can judge the male voice and app clarity. Closing instruction targets profile-link platforms; CTA would be adapted for other approved platform destinations.",
+  "qa": {
+    "full_media_decode": "passed",
+    "representative_frames_seconds": [
+      1.2,
+      5.9,
+      8.8,
+      14.0,
+      19.4
+    ],
+    "visual_inspection": "readable sample UI and captions, no mockup panels or clinical claims used, no subtitle clipping seen",
+    "narration_transcription": "complete",
+    "max_volume_db": -1.4,
+    "mean_volume_db": -17.7,
+    "normal_speed_full_playback": "not separately auditioned; owner review of the finished voice is requested"
+  }
+}

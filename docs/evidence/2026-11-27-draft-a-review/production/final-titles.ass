@@ -1,0 +1,36 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,DejaVu Sans,54,&H00FFFFFF,&H00FFFFFF,&H0020160D,&H0020160D,-1,0,0,0,100,100,0,0,1,2,0,2,70,70,260,1
+Style: Heading,DejaVu Sans,58,&H00FFFFFF,&H00FFFFFF,&H0020160D,&H0020160D,-1,0,0,0,100,100,0,0,1,0,0,8,70,70,145,1
+Style: Small,DejaVu Sans,30,&H00BFD5ED,&H00BFD5ED,&H0020160D,&H0020160D,0,0,0,0,100,100,1,0,1,0,0,8,70,70,75,1
+Style: Footer,DejaVu Sans,32,&H00BFD5ED,&H00BFD5ED,&H0020160D,&H0020160D,0,0,0,0,100,100,0,0,1,0,0,2,70,70,160,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 2,0:00:00.36,0:00:02.34,Caption,,0,0,0,,Still hunting through notes\Nfor your last workout?
+Dialogue: 2,0:00:02.58,0:00:04.44,Caption,,0,0,0,,Here’s a sample workout\Nin YFIT.
+Dialogue: 2,0:00:04.72,0:00:06.62,Caption,,0,0,0,,Open Fitness,\Nchoose History.
+Dialogue: 2,0:00:06.94,0:00:09.18,Caption,,0,0,0,,Tap the workout\Nto see its exercises,
+Dialogue: 2,0:00:09.24,0:00:10.28,Caption,,0,0,0,,weights and reps.
+Dialogue: 2,0:00:10.72,0:00:11.72,Caption,,0,0,0,,Want to look around first?
+Dialogue: 2,0:00:12.08,0:00:13.07,Caption,,0,0,0,,Use the profile link
+Dialogue: 2,0:00:13.10,0:00:15.06,Caption,,0,0,0,,and choose\NExplore the app first.
+Dialogue: 2,0:00:15.34,0:00:16.32,Caption,,0,0,0,,These are examples.
+Dialogue: 2,0:00:16.38,0:00:18.72,Caption,,0,0,0,,Your own saved workouts\Nneed an account.
+Dialogue: 1,0:00:00.00,0:00:04.60,Heading,,0,0,0,,Where are my workout notes?
+Dialogue: 1,0:00:04.60,0:00:07.20,Heading,,0,0,0,,Fitness → History
+Dialogue: 1,0:00:07.20,0:00:11.65,Heading,,0,0,0,,Exercises. Weights. Reps.
+Dialogue: 1,0:00:11.65,0:00:21.12,Heading,,0,0,0,,Explore before signing up
+Dialogue: 1,0:00:00.00,0:00:21.12,Small,,0,0,0,,YFIT AI  /  SAMPLE DATA
+Dialogue: 1,0:00:00.00,0:00:11.65,Footer,,0,0,0,,Sample workout · fictional records
+Dialogue: 1,0:00:11.65,0:00:21.12,Footer,,0,0,0,,Profile link → Explore the app first
+Dialogue: 1,0:00:11.65,0:00:21.12,Heading,,0,0,0,,{\an8\pos(540,430)\fs52}Take a look around.
+Dialogue: 1,0:00:11.65,0:00:21.12,Footer,,0,0,0,,{\an8\pos(540,1000)\fs42}app.yfitai.com/go
+Dialogue: 1,0:00:18.72,0:00:21.12,Caption,,0,0,0,,Sample app first.\NYour own records need an account.

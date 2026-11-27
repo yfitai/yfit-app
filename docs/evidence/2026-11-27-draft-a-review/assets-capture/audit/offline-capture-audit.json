@@ -1,0 +1,115 @@
+{
+  "revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "network_policy": "only GET to exact loopback origin; all other requests aborted; all websockets closed; service workers blocked; external DNS disabled",
+  "allowed_external_requests": 0,
+  "allowed_non_get_requests": 0,
+  "uploads": 0,
+  "auth_sessions": 0,
+  "live_records": 0,
+  "model_calls": 0,
+  "blocked_requests": [
+    {
+      "method": "GET",
+      "host": "files.manuscdn.com",
+      "path": "/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png"
+    },
+    {
+      "method": "GET",
+      "host": "files.manuscdn.com",
+      "path": "/user_upload_by_module/session_file/310519663099417101/YPVUcoNPoLMtiepj.png"
+    }
+  ],
+  "websockets_closed": [],
+  "page_errors": [],
+  "local_get_count": 14,
+  "screens": [
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/01-history-context.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual guest Fitness with History selected; demo label retained; bottom includes embedded marketing phone preview, crop before it for editing.",
+      "sha256": "b79979d6940b6d0a6ebf934a91f284bc5d54a83185d80ec9c30304a3fe69473b"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/01-history-context-clean.png",
+      "width": 1080,
+      "height": 1328,
+      "description": "Actual guest Fitness title, selected History tab, navigation and sample label; phone preview excluded by faithful crop.",
+      "sha256": "f497acb2f86bba6f85e140ad24b7c0c4a87a4c3d8100857471de6da023499dd1"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/02-history-collapsed-full.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual collapsed Push Day A heading below demo label. Next card phone mockup dominates lower viewport: evidence only.",
+      "sha256": "0960835b8f025d66b6c1675d52a1fc789ec6653aeb04feb9b3461d1c605ae69b"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/02-history-collapsed-clean.png",
+      "width": 1080,
+      "height": 444,
+      "description": "Faithful crop retaining sample-data label and actual collapsed Push Day A heading only.",
+      "sha256": "0773e839e75253b11760a475d19ce9c12c2152f75dd661b164519015f238c0cf"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-full.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Actual expanded Push Day A exercise rows and weights/reps. Next card marketing preview at bottom: evidence only.",
+      "sha256": "743c62bb61c1fa2dd3ec56efb74422d7bd67b741ce76d20f204500f9f7106e14"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/03-history-expanded-clean.png",
+      "width": 1080,
+      "height": 1204,
+      "description": "Actual interactive guest card expanded: Bench Press, Incline Dumbbell Press, Lateral Raises, Tricep Pushdowns, all twelve weights/reps, sample banner, log button; no phone mockup.",
+      "sha256": "f34fd5c8cb18ccf37591bcad6ad56c7997332fc71d0b173fd90ad5796e47fd9b"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/04-go-current-full.png",
+      "width": 1080,
+      "height": 1920,
+      "description": "Current Go top-screen page; external logo blocked; unverified hero claims present. Evidence only, use CTA crop.",
+      "sha256": "3ab7a1eecc3d08341338de3d1aed8ed0121e19fd1563ba3a26ed7ceb5bdf9fe5"
+    },
+    {
+      "path": "/home/ubuntu/yfit-draft-a-review-2026-11-27/assets-capture/png/04-go-current-explore-cta.png",
+      "width": 1000,
+      "height": 160,
+      "description": "Genuine current Go top CTA: Explore the app first / No sign-up needed \u2014 browse all features now. Cropped to the actual CTA only, excluding hero claims and blocked external logo.",
+      "sha256": "319358975d5b5bc60ba692ef90f8d131992e2619252f7409a86a4102106e5252"
+    }
+  ],
+  "actions": [
+    {
+      "event": "collapsed_ready",
+      "monotonic": 86965.298230874,
+      "relative_page_creation": 1.7120584860094823
+    },
+    {
+      "event": "click_begin",
+      "monotonic": 86966.700229484,
+      "relative_page_creation": 3.1140570640127407
+    },
+    {
+      "event": "click_returned",
+      "monotonic": 86966.737401676,
+      "relative_page_creation": 3.1512293130072067
+    },
+    {
+      "event": "expanded_confirmed",
+      "monotonic": 86966.750281251,
+      "relative_page_creation": 3.164108856013627
+    },
+    {
+      "event": "end_hold",
+      "monotonic": 86969.051052269,
+      "relative_page_creation": 5.464879898005165
+    }
+  ],
+  "recording_page_creation_monotonic": [
+    86963.46297785,
+    86963.586172691
+  ],
+  "server_stopped": true
+}

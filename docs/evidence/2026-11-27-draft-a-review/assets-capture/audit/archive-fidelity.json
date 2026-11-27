@@ -1,0 +1,8 @@
+{
+  "src/App.jsx": true,
+  "src/components/GuestFitnessPage.jsx": true,
+  "src/data/demoData.js": true,
+  "src/pages/GoPage.tsx": true,
+  "public/version.json": true,
+  "vite.config.js": true
+}
