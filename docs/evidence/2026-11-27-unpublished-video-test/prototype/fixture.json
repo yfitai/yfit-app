@@ -1,0 +1,45 @@
+{
+  "input_kind": "local-reviewed-fixture",
+  "production_workflow_adapter_verified": false,
+  "claim_reviewed": true,
+  "claim_review_scope": "Prepared against the existing reviewed sample only; not a human certification, automated article fact-checking or medical validation",
+  "article": {
+    "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+    "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+    "summary": "Crushing your workouts is only half the equation."
+  },
+  "feature_key": "nutrition",
+  "body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+  "account_line": "Saving your own data needs an account.",
+  "voice": {
+    "name": "Achird",
+    "style": "friendly male",
+    "provider": "candidate-only-not-wired"
+  },
+  "scene_plan": [
+    {
+      "kind": "app-screen",
+      "filename": "screen_03_nutrition.png",
+      "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+      "label": "Nutrition overview; actual app with fictional data",
+      "timing": "measure-after-narration"
+    },
+    {
+      "kind": "app-screen",
+      "filename": "screen_04_dailyTracker.png",
+      "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+      "label": "Daily Tracker; actual app with fictional data",
+      "timing": "measure-after-narration"
+    }
+  ],
+  "visual_notes": {
+    "topic_opening": "Reuse the licensed food clip from the existing review; an exercise opening remains a separate comparison hypothesis",
+    "logged_meals_detail": "Use the actual expanded Breakfast/Lunch capture from the prior review evidence; overview PNG alone does not depict an expanded meal action",
+    "cta": "Use the genuine Go Explore control from the saved local review; editorial CTA text must not be drawn as invented app UI",
+    "motion": "Static screenshot illustration, not an automatic tap/save recording",
+    "caption_layout": "Captions above final overlays; no opaque full-screen PNG covering CTA or captions",
+    "length": "Aim for approximately 20–30 seconds, subject to measured voice pace and reading holds; never speed narration to force a target",
+    "account_explanation": "Spoken and on-screen account line comes before the platform-specific final instruction; final actionable instruction differs by platform",
+    "tail_variants": "One shared body, six platform-specific spoken and visible endings; no current TTS or renderer API mapping assumed"
+  }
+}

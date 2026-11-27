@@ -1,0 +1,278 @@
+[
+  {
+    "json": {
+      "platform": "tiktok",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Open this address in your browser to explore YFIT.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nOpen this address in your browser to explore YFIT.",
+      "screen_cta": "app.yfitai.com/go\nType this address in your browser",
+      "caption_instruction": "Explore YFIT at app.yfitai.com/go by typing the address in your browser. No clickable website/bio link is currently verified. Saving your own data needs an account.",
+      "cta_route_state": "manual-address-fallback",
+      "route_surface": "manual-browser-address-not-clickable",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:tiktok",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  },
+  {
+    "json": {
+      "platform": "instagram",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Tap the link in our profile to explore YFIT.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nTap the link in our profile to explore YFIT.",
+      "screen_cta": "Explore YFIT — link in our profile",
+      "caption_instruction": "Explore the sample app using the link in our profile. Saving your own data needs an account.",
+      "cta_route_state": "hold-unverified-go-profile",
+      "route_surface": "profile-website-link",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:instagram",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  },
+  {
+    "json": {
+      "platform": "youtube",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Tap our channel name, then the Go link in our profile.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nTap our channel name, then the Go link in our profile.",
+      "screen_cta": "Channel name → Go link on our channel profile",
+      "caption_instruction": "Explore YFIT using the Go link on our channel profile. The URL text in a Short's description or comments is not the clickable route. Saving your own data needs an account.",
+      "cta_route_state": "owner-verified-dated",
+      "route_surface": "channel-profile-go-link",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:youtube",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  },
+  {
+    "json": {
+      "platform": "linkedin",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Tap the YFIT link in this post to explore.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nTap the YFIT link in this post to explore.",
+      "screen_cta": "Open the post text → tap the YFIT link",
+      "caption_instruction": "Explore YFIT's sample app using the Go link in this post. Saving your own data needs an account.",
+      "cta_route_state": "owner-verified-dated",
+      "route_surface": "expanded-post-go-link",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:linkedin",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  },
+  {
+    "json": {
+      "platform": "pinterest",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Tap Visit site on this Pin to explore YFIT.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nTap Visit site on this Pin to explore YFIT.",
+      "screen_cta": "Tap Visit site to explore YFIT",
+      "caption_instruction": "Explore the sample app using this Pin's Visit site button. Saving your own data needs an account.",
+      "cta_route_state": "owner-verified-dated",
+      "route_surface": "pin-visit-site-destination",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:pinterest",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  },
+  {
+    "json": {
+      "platform": "facebook",
+      "review_only": true,
+      "publishing_allowed": false,
+      "model_calls_allowed": false,
+      "render_calls_allowed": false,
+      "database_writes_allowed": false,
+      "production_workflow_adapter_verified": false,
+      "article": {
+        "title": "Trying to Build Muscle and Lose Fat? Don’t Overlook This Part of Body Recomp",
+        "url": "https://www.womenshealthmag.com/fitness/a74478646/body-recomp-nutrition/",
+        "summary": "Crushing your workouts is only half the equation."
+      },
+      "feature_key": "nutrition",
+      "shared_body_narration": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.",
+      "account_line": "Saving your own data needs an account.",
+      "spoken_cta": "Tap the YFIT link in the first comment to explore.",
+      "voiceover_script": "Training hard? Your meals matter too. A Women's Health article highlights nutrition alongside workouts. In YFIT, review calorie and macro progress and logged meals. Daily Tracker shows daily entries, including water and steps. Explore using sample records.\n\nSaving your own data needs an account.\n\nTap the YFIT link in the first comment to explore.",
+      "screen_cta": "Explore YFIT — link in the first comment",
+      "caption_instruction": "Explore the sample app using the YFIT link in the first comment. Saving your own data needs an account.",
+      "cta_route_state": "owner-verified-dated",
+      "route_surface": "first-comment-go-link",
+      "destination": "https://app.yfitai.com/go",
+      "scene_plan": [
+        {
+          "kind": "app-screen",
+          "filename": "screen_03_nutrition.png",
+          "sha256": "01df12eaadb5bb58e25313c34eb711137fe669227feceabb1aeccb90baa83041",
+          "label": "Nutrition overview; actual app with fictional data",
+          "timing": "measure-after-narration"
+        },
+        {
+          "kind": "app-screen",
+          "filename": "screen_04_dailyTracker.png",
+          "sha256": "ca6fd75bb7192448e81a7d170f2b9a49b4ed400995df78b3d7af8e86c0898bdd",
+          "label": "Daily Tracker; actual app with fictional data",
+          "timing": "measure-after-narration"
+        }
+      ],
+      "media_variant_key": "review-only:nutrition:facebook",
+      "needs_human_review": true,
+      "requires_separate_platform_video": true,
+      "production_ready": false
+    }
+  }
+]

@@ -1,0 +1,122 @@
+[32m✔ six exact lower-case outputs share body and account line with platform-specific endings [90m(7.175969ms)[39m[39m
+[32m✔ all permissions are blocked and human review/separate variants are required [90m(1.854971ms)[39m[39m
+[32m✔ forced publish:true and permission overrides cannot unlock review output [90m(0.500887ms)[39m[39m
+[32m✔ Instagram hold and candidate wording are preserved without internal metadata in speech [90m(1.30131ms)[39m[39m
+[32m✔ TikTok manual address route keeps truthful no-bio-link disclaimer [90m(0.62456ms)[39m[39m
+[32m✔ TikTok manual-address-fallback cannot promise link in bio [90m(0.665757ms)[39m[39m
+[32m✔ TikTok hold-unverified-go-profile cannot promise link in bio [90m(0.418608ms)[39m[39m
+[32m✔ TikTok unverified screen_cta cannot promise link in bio [90m(0.305552ms)[39m[39m
+[32m✔ TikTok unverified caption_instruction cannot promise link in bio [90m(1.051372ms)[39m[39m
+[32m✔ variant keys are unique, platform-specific and deterministic regardless of route order [90m(1.619334ms)[39m[39m
+[32m✔ does not mutate inputs or alias nested output references between platforms [90m(0.630336ms)[39m[39m
+[32m✔ rejects undefined fixture [90m(0.193743ms)[39m[39m
+[32m✔ rejects null fixture [90m(0.111694ms)[39m[39m
+[32m✔ rejects empty object fixture [90m(0.129327ms)[39m[39m
+[32m✔ rejects array fixture [90m(0.105351ms)[39m[39m
+[32m✔ rejects empty string fixture [90m(0.098812ms)[39m[39m
+[32m✔ rejects missing article [90m(0.22484ms)[39m[39m
+[32m✔ rejects empty article title [90m(0.160333ms)[39m[39m
+[32m✔ rejects empty article summary [90m(0.124871ms)[39m[39m
+[32m✔ rejects empty article url [90m(0.130713ms)[39m[39m
+[32m✔ rejects empty body narration [90m(0.187713ms)[39m[39m
+[32m✔ rejects bad account line "Saving data needs an account." [90m(0.181091ms)[39m[39m
+[32m✔ rejects bad account line "Saving your own data needs an account. " [90m(0.125946ms)[39m[39m
+[32m✔ rejects bad account line "" [90m(0.117018ms)[39m[39m
+[32m✔ rejects bad account line null [90m(0.289757ms)[39m[39m
+[32m✔ rejects non-reviewed article flag false [90m(0.182002ms)[39m[39m
+[32m✔ rejects non-reviewed article flag true [90m(0.159307ms)[39m[39m
+[32m✔ rejects non-reviewed article flag 1 [90m(0.116125ms)[39m[39m
+[32m✔ rejects non-reviewed article flag undefined [90m(0.120218ms)[39m[39m
+[32m✔ manual review flag is not output as automatic clinical/factual verification [90m(0.397119ms)[39m[39m
+[32m✔ rejects unknown feature [90m(0.214378ms)[39m[39m
+[32m✔ accepts allowlisted feature nutrition without adding claims [90m(0.281044ms)[39m[39m
+[32m✔ accepts allowlisted feature daily_tracker without adding claims [90m(0.250718ms)[39m[39m
+[32m✔ accepts allowlisted feature fitness without adding claims [90m(0.22502ms)[39m[39m
+[32m✔ accepts allowlisted feature goals without adding claims [90m(0.33737ms)[39m[39m
+[32m✔ accepts allowlisted feature medications without adding claims [90m(0.309055ms)[39m[39m
+[32m✔ accepts allowlisted feature progress without adding claims [90m(0.235178ms)[39m[39m
+[32m✔ accepts allowlisted feature predictions without adding claims [90m(0.217176ms)[39m[39m
+[32m✔ accepts allowlisted feature recomp without adding claims [90m(0.214838ms)[39m[39m
+[32m✔ accepts allowlisted feature ai_coach without adding claims [90m(0.248757ms)[39m[39m
+[32m✔ accepts allowlisted feature language without adding claims [90m(0.230887ms)[39m[39m
+[32m✔ rejects nonlocal input kind [90m(0.194752ms)[39m[39m
+[32m✔ rejects claimed production export verification [90m(0.173691ms)[39m[39m
+[32m✔ rejects missing production export verification status [90m(0.205533ms)[39m[39m
+[32m✔ rejects wired voice provider [90m(0.203014ms)[39m[39m
+[32m✔ rejects wrong voice name [90m(0.197871ms)[39m[39m
+[32m✔ rejects wrong voice style [90m(0.203114ms)[39m[39m
+[32m✔ rejects unsafe article URL "http://www.yfitai.com/article" [90m(0.211392ms)[39m[39m
+[32m✔ rejects unsafe article URL "ftp://www.yfitai.com/article" [90m(0.133888ms)[39m[39m
+[32m✔ rejects unsafe article URL "javascript:alert(1)" [90m(0.122607ms)[39m[39m
+[32m✔ rejects unsafe article URL "data:text/plain,article" [90m(0.134553ms)[39m[39m
+[32m✔ rejects unsafe article URL "//www.yfitai.com/article" [90m(0.149371ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://owner:password@www.yfitai.com/article" [90m(0.134594ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com:8443/article" [90m(0.175126ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://localhost/article" [90m(0.134955ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://127.0.0.1/article" [90m(0.119234ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/article?patient_id=123" [90m(0.1155ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/article#health_id=123" [90m(0.107698ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/patients/123" [90m(0.115312ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/health_id/123" [90m(0.173124ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/records/123456789" [90m(0.158445ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/%70atient/123" [90m(0.128079ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/%" [90m(0.132238ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/a%40person.com" [90m(0.1156ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com/\narticle" [90m(0.104113ms)[39m[39m
+[32m✔ rejects unsafe article URL "https://www.yfitai.com\\article" [90m(0.095152ms)[39m[39m
+[32m✔ rejects missing routes [90m(0.221722ms)[39m[39m
+[32m✔ rejects empty routes [90m(0.149641ms)[39m[39m
+[32m✔ rejects null routes [90m(0.130221ms)[39m[39m
+[32m✔ rejects missing platform [90m(0.206083ms)[39m[39m
+[32m✔ rejects unknown platform [90m(0.290044ms)[39m[39m
+[32m✔ rejects duplicate platform [90m(0.237763ms)[39m[39m
+[32m✔ rejects uppercase platform [90m(0.198403ms)[39m[39m
+[32m✔ rejects extra seventh platform [90m(0.200365ms)[39m[39m
+[32m✔ rejects empty route spoken_cta [90m(0.207585ms)[39m[39m
+[32m✔ rejects empty route screen_cta [90m(0.155221ms)[39m[39m
+[32m✔ rejects empty route caption_instruction [90m(0.140165ms)[39m[39m
+[32m✔ rejects empty route route_surface [90m(0.14115ms)[39m[39m
+[32m✔ rejects empty route release_note [90m(0.143644ms)[39m[39m
+[32m✔ rejects unknown route state [90m(0.205312ms)[39m[39m
+[32m✔ rejects missing dated evidence [90m(0.238641ms)[39m[39m
+[32m✔ rejects wrong evidence date [90m(0.21963ms)[39m[39m
+[32m✔ rejects noncanonical destination http://app.yfitai.com/go [90m(0.278024ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/ [90m(0.172074ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/go/ [90m(0.168562ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/go?patient_id=123 [90m(0.161325ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/go#health_id=123 [90m(0.203458ms)[39m[39m
+[32m✔ rejects noncanonical destination https://other.yfitai.com/go [90m(0.165526ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/go?utm_source=tiktok [90m(0.17154ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com:443/go [90m(0.168611ms)[39m[39m
+[32m✔ rejects noncanonical destination https://app.yfitai.com/%67o [90m(0.170039ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_01_dashboard.png [90m(0.27909ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_02_goals.png [90m(0.193021ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_03_nutrition.png [90m(0.196213ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_04_dailyTracker.png [90m(0.189288ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_05_fitness.png [90m(0.195803ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_06_medications.png [90m(0.197345ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_07_progress.png [90m(0.209414ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_08_predictions.png [90m(0.182798ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_09_recomp.png [90m(0.177997ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_10_aiCoach.png [90m(0.194793ms)[39m[39m
+[32m✔ accepts exact genuine screen reference screen_11_language.png [90m(0.191594ms)[39m[39m
+[32m✔ rejects unknown screen made_up.png [90m(0.205911ms)[39m[39m
+[32m✔ rejects unknown screen screen_04_dailytracker.png [90m(0.13173ms)[39m[39m
+[32m✔ rejects unknown screen ../screen_03_nutrition.png [90m(0.11998ms)[39m[39m
+[32m✔ rejects unknown screen https://app.yfitai.com/screen_03_nutrition.png [90m(0.118135ms)[39m[39m
+[32m✔ rejects empty scene plan [90m(0.221369ms)[39m[39m
+[32m✔ rejects missing explicit filename [90m(0.209102ms)[39m[39m
+[32m✔ rejects stock scene disguised as app screenshot [90m(0.191561ms)[39m[39m
+[32m✔ rejects screenshot marked nongenuine [90m(0.197058ms)[39m[39m
+[32m✔ rejects cyclic scene metadata [90m(0.921775ms)[39m[39m
+[32m✔ keeps optional visual notes outside the static scene plan/output [90m(0.332259ms)[39m[39m
+[32m✔ planner has no runtime imports, network modules, or runtime execution calls [90m(1.025273ms)[39m[39m
+[32m✔ accepts the reviewed public publisher article URL with its numeric content ID [90m(0.337846ms)[39m[39m
+[34mℹ tests 114[39m
+[34mℹ suites 0[39m
+[34mℹ pass 114[39m
+[34mℹ fail 0[39m
+[34mℹ cancelled 0[39m
+[34mℹ skipped 0[39m
+[34mℹ todo 0[39m
+[34mℹ duration_ms 199.829779[39m

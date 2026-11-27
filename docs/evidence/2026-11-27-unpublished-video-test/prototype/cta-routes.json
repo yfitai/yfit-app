@@ -1,0 +1,122 @@
+{
+  "prepared_at": "2026-11-27",
+  "purpose": "Local unpublished review-only CTA routing; not account changes or a current-workflow export",
+  "platforms": [
+    {
+      "platform": "pinterest",
+      "spoken_cta": "Tap Visit site on this Pin to explore YFIT.",
+      "screen_cta": "Tap Visit site to explore YFIT",
+      "caption_instruction": "Explore the sample app using this Pin's Visit site button. Saving your own data needs an account.",
+      "route_surface": "pin-visit-site-destination",
+      "route_state": "owner-verified-dated",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "Saved current export confirmed literal pinterest_link: https://yfitai.com/go?utm_source=pinterest&utm_medium=social&utm_campaign=organic#quick-setup. Preserve it and its UTMs; prototype app.yfitai.com/go is a proposed destination requiring explicit reconciliation, not a live replacement. Do not alter the claimed profile root.",
+      "sources": [
+        {
+          "url": "https://help.pinterest.com/en/article/fix-a-broken-link",
+          "title": "Pinterest: Fix a broken link",
+          "supported_fact": "Pins can link to websites; use a direct, valid destination. Specific YFIT Go route is dated owner evidence, not official platform certification."
+        }
+      ]
+    },
+    {
+      "platform": "instagram",
+      "spoken_cta": "Tap the link in our profile to explore YFIT.",
+      "screen_cta": "Explore YFIT — link in our profile",
+      "caption_instruction": "Explore the sample app using the link in our profile. Saving your own data needs an account.",
+      "route_surface": "profile-website-link",
+      "route_state": "hold-unverified-go-profile",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "Candidate audience wording only. HOLD release: owner reported existing profile root opens app, not verified Go. A separately approved correct-Go profile link and verification are needed before this wording is used. No profile change is performed here.",
+      "sources": [
+        {
+          "url": "https://help.instagram.com/362497417173378/",
+          "title": "Instagram: Add a website to your profile",
+          "supported_fact": "Profile website-link support is generic; it does not verify the current YFIT destination."
+        }
+      ]
+    },
+    {
+      "platform": "facebook",
+      "spoken_cta": "Tap the YFIT link in the first comment to explore.",
+      "screen_cta": "Explore YFIT — link in the first comment",
+      "caption_instruction": "Explore the sample app using the YFIT link in the first comment. Saving your own data needs an account.",
+      "route_surface": "first-comment-go-link",
+      "route_state": "owner-verified-dated",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "Owner verified first-comment link opens Go. Current export supplies first_comment with yfitai.com/go UTMs and #quick-setup. Preserve placement/approved values; reconcile prototype app.yfitai.com/go separately. Do not guarantee comment visibility/order on every viewer surface.",
+      "sources": [
+        {
+          "url": "https://www.facebook.com/help/192946630752330",
+          "title": "Facebook: Share a link",
+          "supported_fact": "Facebook supports shared links. YFIT's first-comment route is owner-verified, not verified by generic help."
+        }
+      ]
+    },
+    {
+      "platform": "linkedin",
+      "spoken_cta": "Tap the YFIT link in this post to explore.",
+      "screen_cta": "Open the post text → tap the YFIT link",
+      "caption_instruction": "Explore YFIT's sample app using the Go link in this post. Saving your own data needs an account.",
+      "route_surface": "expanded-post-go-link",
+      "route_state": "owner-verified-dated",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "Owner verified see-more/expanded-post shortened link opens Go. This is text expansion, not the three-dot sharing menu. Do not add a distracting article-reading CTA or interpret generic Page Clicks as outbound Go arrivals.",
+      "sources": [
+        {
+          "url": "https://www.linkedin.com/help/linkedin/answer/a525301",
+          "title": "LinkedIn: Share articles or links",
+          "supported_fact": "Posts support shared URL links, sometimes automatically shortened; this does not independently verify YFIT's exact destination."
+        }
+      ]
+    },
+    {
+      "platform": "youtube",
+      "spoken_cta": "Tap our channel name, then the Go link in our profile.",
+      "screen_cta": "Channel name → Go link on our channel profile",
+      "caption_instruction": "Explore YFIT using the Go link on our channel profile. The URL text in a Short's description or comments is not the clickable route. Saving your own data needs an account.",
+      "route_surface": "channel-profile-go-link",
+      "route_state": "owner-verified-dated",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "Owner verified channel-profile link opens Go. Current format is Shorts: do not promise clickable description/comment URLs. Check actual channel presentation if format changes; do not treat channel visits as Go arrivals.",
+      "sources": [
+        {
+          "url": "https://support.google.com/youtube/answer/13748639?hl=en",
+          "title": "YouTube: Sharing links with your audiences",
+          "supported_fact": "Shorts description/comment URLs are non-clickable; channel profile links can be clickable."
+        }
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "spoken_cta": "Open this address in your browser to explore YFIT.",
+      "screen_cta": "app.yfitai.com/go\nType this address in your browser",
+      "caption_instruction": "Explore YFIT at app.yfitai.com/go by typing the address in your browser. No clickable website/bio link is currently verified. Saving your own data needs an account.",
+      "route_surface": "manual-browser-address-not-clickable",
+      "route_state": "manual-address-fallback",
+      "destination": "https://app.yfitai.com/go",
+      "evidence_date": "2026-11-26",
+      "release_note": "No Website field or clickable website link was verified on the owner account. Do not say link in bio. Hold any future profile-link variant until actual eligibility and exact Go destination are verified. Manual typing has extra friction and may lose social-source attribution; do not assign untagged arrivals to TikTok.",
+      "sources": [
+        {
+          "url": "https://support.tiktok.com/en/getting-started/setting-up-your-profile/linking-another-social-media-account",
+          "title": "TikTok: Link a website or social media account",
+          "supported_fact": "Profile website links require eligibility and may not be available everywhere; the actual YFIT Website field remains unverified."
+        }
+      ]
+    }
+  ],
+  "saved_export_link_contract": {
+    "workflow_id": "h7bRds9UOUfmP36F",
+    "version_id": "d749db3b-3b3e-4a16-968a-dcdd603b92ea",
+    "publishing_url_pattern": "https://yfitai.com/go?utm_source=<platform>&utm_medium=social&utm_campaign=organic#quick-setup",
+    "candidate_destination": "https://app.yfitai.com/go",
+    "link_reconciliation_required": true,
+    "live_link_change_performed": false
+  }
+}

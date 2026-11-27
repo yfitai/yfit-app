@@ -1,0 +1,14 @@
+{
+  "scope": "local VM evaluation only; no actual n8n import/execution",
+  "embedded_code_matches_module": true,
+  "platform_count": 6,
+  "node_type_allowlist_passed": true,
+  "network_nodes": 0,
+  "credentials": 0,
+  "automatic_triggers": 0,
+  "live_calls": 0,
+  "model_calls": 0,
+  "media_generated": false,
+  "publishing_allowed": false,
+  "current_production_workflow_adapter_verified": false
+}

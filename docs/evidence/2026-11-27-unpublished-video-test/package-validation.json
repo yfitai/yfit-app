@@ -1,0 +1,15 @@
+{
+  "scope": "local source/package inspection; no live API, generation, upload, execution or publishing",
+  "original_and_redacted_hash_checks": true,
+  "exact_node_identity_and_topology_checks": true,
+  "settings_unchanged": true,
+  "known_original_secret_values_excluded": true,
+  "recognizable_token_scan_passed": true,
+  "text_files_checked": 21,
+  "draft_manual_code_allowlist_passed": true,
+  "six_unique_review_media_keys": true,
+  "all_permissions_remain_blocked": true,
+  "embedded_code_matches_module": true,
+  "production_integration_verified": false,
+  "new_media_generated": false
+}

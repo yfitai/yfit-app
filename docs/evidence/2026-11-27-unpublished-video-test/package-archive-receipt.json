@@ -1,0 +1,12 @@
+{
+  "archive": "YFIT_Current_Workflow_Backup_and_Unpublished_Test_2026-11-27.zip",
+  "bytes": 67430,
+  "sha256": "3e02fe1166486365a37af6ed51db4c0b3f1d4124b3b6930655dd62863cd16187",
+  "archived_files": 22,
+  "every_archived_file_byte_verified": true,
+  "raw_attachment_included": false,
+  "credentials_included": false,
+  "network_calls": 0,
+  "rendered_media_created": false,
+  "installed_on_n8n": false
+}
