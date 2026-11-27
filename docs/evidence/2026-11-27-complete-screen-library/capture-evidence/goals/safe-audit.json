@@ -1,0 +1,215 @@
+{
+  "source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "actual_components": true,
+  "fictional_data": true,
+  "source_audit_reused": "/home/ubuntu/yfit-article-demo-2026-11-27/safe-audit-provenance.json",
+  "external_sent": 0,
+  "non_get_sent": 0,
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics"
+    }
+  ],
+  "blocked_external_gets": [],
+  "page_errors": [],
+  "screens": [
+    {
+      "path": "/home/ubuntu/yfit-screen-library-2026-11-27/pages/screen_02_goals.png",
+      "description": "Actual authenticated Goals.jsx Starting Point manual-entry form, fictional age 35 / height 175 cm displayed as 5 ft 9 in / weight 80 kg displayed as 176.4 lbs / light activity / maintain goal. No calculated or AI results, no save action; original app colors unchanged.",
+      "route": "/goals",
+      "sha256": "5d4ae70f678129d437b3b4ce508b0d37595724ddc5b004bee95efb4ece33e74e"
+    }
+  ],
+  "server_stopped": true,
+  "id": "goals",
+  "route": "/goals",
+  "actual_component": "src/components/Goals.jsx",
+  "source_files_inspected": [
+    "src/App.jsx",
+    "src/components/Goals.jsx",
+    "src/components/GoalsEnhancement.jsx",
+    "src/components/Navigation.jsx"
+  ],
+  "component_source_sha256": "40f2c60acc87e1a4ceaf2ef89479152310af1ead00a006e2e0e4f30cd84ec33f",
+  "compile_reused_unchanged": true,
+  "css_or_dom_content_modified": false,
+  "model_results_supplied": false,
+  "save_or_calculate_clicked": false,
+  "live_auth_used": false,
+  "production_modified": false,
+  "viewport_css_pixels": [
+    540,
+    960
+  ],
+  "device_scale_factor": 2,
+  "ui_actions": [
+    {
+      "action": "scroll",
+      "target": "actual Starting Point card",
+      "scroll_y": 1286
+    }
+  ],
+  "input_values": [
+    {
+      "value": "35",
+      "placeholder": "Enter your age"
+    },
+    {
+      "value": "5",
+      "placeholder": "Feet"
+    },
+    {
+      "value": "9",
+      "placeholder": "Inches"
+    },
+    {
+      "value": "176.4",
+      "placeholder": "e.g., 154"
+    },
+    {
+      "value": "",
+      "placeholder": "At narrowest point"
+    },
+    {
+      "value": "",
+      "placeholder": "Across shoulder blades"
+    },
+    {
+      "value": "",
+      "placeholder": "At fullest point"
+    },
+    {
+      "value": "",
+      "placeholder": "At navel"
+    },
+    {
+      "value": "",
+      "placeholder": "At widest point"
+    },
+    {
+      "value": "",
+      "placeholder": "At largest point"
+    },
+    {
+      "value": "",
+      "placeholder": "At widest point"
+    },
+    {
+      "value": "",
+      "placeholder": "At widest point"
+    },
+    {
+      "value": "",
+      "placeholder": "Widest point"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "",
+      "placeholder": "Optional"
+    },
+    {
+      "value": "on",
+      "placeholder": ""
+    },
+    {
+      "value": "on",
+      "placeholder": ""
+    },
+    {
+      "value": "176.4",
+      "placeholder": "Starting Weight (lbs)"
+    },
+    {
+      "value": "",
+      "placeholder": "Enter current body fat %"
+    },
+    {
+      "value": "",
+      "placeholder": "Target Weight (lbs)"
+    },
+    {
+      "value": "",
+      "placeholder": "Enter target body fat %"
+    },
+    {
+      "value": "",
+      "placeholder": ""
+    },
+    {
+      "value": "25",
+      "placeholder": "25\u201338g/day recommended"
+    },
+    {
+      "value": "50",
+      "placeholder": "<50g/day recommended"
+    },
+    {
+      "value": "2300",
+      "placeholder": "<2300mg/day recommended"
+    },
+    {
+      "value": "68",
+      "placeholder": "68oz recommended"
+    },
+    {
+      "value": "10000",
+      "placeholder": "10000"
+    },
+    {
+      "value": "8",
+      "placeholder": "8"
+    },
+    {
+      "value": "120",
+      "placeholder": "120"
+    },
+    {
+      "value": "80",
+      "placeholder": "80"
+    },
+    {
+      "value": "100",
+      "placeholder": "100"
+    }
+  ],
+  "form_card_bbox": {
+    "x": 8,
+    "y": 158,
+    "width": 524,
+    "height": 686
+  },
+  "navigation_height": 142
+}

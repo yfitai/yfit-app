@@ -1,0 +1,141 @@
+🇺🇸
+Lang
+Dashboard
+Goals
+Nutrition
+Daily Tracker
+Fitness
+Medications
+Progress
+Predictions
+Recomp
+AI Coach
+Account
+My Progress
+
+Progress
+
+This Week
+This Month
+3 days
+1 days
+Weight
+176.4lbs
+Daily goal: 167.6lbs
+8.8lbs Remaining
+Body Fat %
+20.0%
+Daily goal: 18.0%
+2.0% Remaining
+BMI
+26.1
+Daily goal: 24.8
+1.3 Remaining
+Goal
+Nov 27
+0
+30
+60
+90
+120
+SystolicDiastolic
+Glucose
+Nov 27
+0
+25
+50
+75
+100
+Glucose (mg/dL)
+Sleep
+Nov 27
+0
+2
+4
+6
+8
+Hours of Sleep
+Water
+Nov 27
+0
+0.45
+0.9
+1.35
+1.8
+Water (L)
+Steps
+Nov 27
+0
+2000
+4000
+6000
+8000
+Steps
+Workout Analytics
+
+Showing 1 month of data
+
+Volume Progression
+💡 Only tracks weighted exercises (bench press, squats, rows, etc.) where volume = weight × reps.
+Time-based exercises (planks, ab roller, wall sits) and cardio (walking, running) are shown in Daily Workout Summary above.
+Form Analysis History
+
+Track your form improvement over time with live analysis sessions
+
+No Form Analyses Yet
+
+Start a live form analysis session to get real-time feedback and track your progress!
+
+Go to Fitness Tab
+Nutrition
+Daily Macros
+
+No nutrition data for this period
+
+Start logging meals to see your micronutrient progress.
+
+Daily Micronutrients
+
+No nutrition data for this period
+
+Start logging meals to see your micronutrient progress.
+
+Progress Photos
+Grid
+Timeline
+Compare
+Take Front
+Upload Front
+Take Side
+Upload Side
+Take Back
+Upload Back
+
+No progress photos yet
+
+Start tracking your journey by taking your first progress photo!
+
+Upgrade to Pro
+
+Pro Feature
+
+View All →
+
+Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.
+
+Legal
+Privacy Policy
+Terms of Service
+Cookie Policy
+HIPAA Notice
+Contact
+
+Have questions or need support?
+
+Contact Support
+
+Get AI-powered responses in minutes
+
+© 2026 YFIT AI. All rights reserved.
+
+2000

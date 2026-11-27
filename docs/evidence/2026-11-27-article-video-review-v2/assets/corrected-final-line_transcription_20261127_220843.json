@@ -1,0 +1,49 @@
+{
+  "duration": 2.8,
+  "language": "eng",
+  "segments": [
+    {
+      "start": 0.28,
+      "end": 2.64,
+      "text": "Saving your own data needs an account"
+    }
+  ],
+  "full_text": "Saving your own data needs an account",
+  "words": [
+    {
+      "start": 0.28,
+      "end": 0.58,
+      "text": "Saving"
+    },
+    {
+      "start": 0.64,
+      "end": 0.74,
+      "text": "your"
+    },
+    {
+      "start": 0.84,
+      "end": 1.06,
+      "text": "own"
+    },
+    {
+      "start": 1.12,
+      "end": 1.54,
+      "text": "data"
+    },
+    {
+      "start": 1.82,
+      "end": 2.14,
+      "text": "needs"
+    },
+    {
+      "start": 2.18,
+      "end": 2.24,
+      "text": "an"
+    },
+    {
+      "start": 2.3,
+      "end": 2.64,
+      "text": "account"
+    }
+  ]
+}

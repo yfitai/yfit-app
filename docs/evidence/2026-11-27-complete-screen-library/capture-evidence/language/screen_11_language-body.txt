@@ -1,0 +1,103 @@
+🇺🇸
+Lang
+🇺🇸
+English
+✓
+🇫🇷
+Français
+🇪🇸
+Español
+🇧🇷
+Português
+🇨🇳
+中文
+🇮🇳
+हिन्दी
+🇩🇪
+Deutsch
+🇯🇵
+日本語
+Dashboard
+Goals
+Nutrition
+Daily Tracker
+Fitness
+Medications
+Progress
+Predictions
+Recomp
+AI Coach
+Account
+📊 Daily Tracker
+
+Daily Summary
+
+Sleep
+0h
+Streak: 8h
+Water
+ml
+oz
+cups
+0 ml
+Daily Goals: 2000 ml
+Steps
+0
+Daily Goals: 10000
+Blood Pressure
+--/--
+Goal: 120/80
+Monitor
+Glucose
+mg/dL
+mmol/L
+--
+Goal: 100 mg/dl
+Monitor
+➕ Log Today
+😴 Sleep Hours
+Sleep Description
+Poor
+Fair
+Good
+Excellent
+💧 Water (ml)
+Consumed:
+0 ml
++ 250ml
++ 500ml
+Reset
+🚶 Steps
+0
+Add
+Reset
+
+Treadmill steps auto-added when you log cardio. Tap Add to include any extra steps.
+
+🩺 Systolic
+Diastolic
+🩸 Glucose (mg/dl)
+⚖️ Current Weight (kg)
+💪 Body Fat %
+📝 Notes
++ Log Today
+🎯 Done
+📏 This Week Add Measurement
+Update Measurements
+
+Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.
+
+Legal
+Privacy Policy
+Terms of Service
+Cookie Policy
+HIPAA Notice
+Contact
+
+Have questions or need support?
+
+Contact Support
+
+Get AI-powered responses in minutes
+
+© 2026 YFIT AI. All rights reserved.

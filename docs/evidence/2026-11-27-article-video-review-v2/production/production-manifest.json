@@ -1,0 +1,40 @@
+{
+  "output": "YFIT_Article_Nutrition_DailyTracker_Review_v2.mp4",
+  "duration_seconds": 27.4,
+  "size": [
+    1080,
+    1920
+  ],
+  "fps": 25,
+  "sha256": "68d5c2295dab5c4dea51c239f850da202633d794e53beedebe644c3fb65a39a5",
+  "bytes": 2548176,
+  "last_line": "Saving your own data needs an account.",
+  "original_retained_audio_source_seconds": [
+    0,
+    20.2
+  ],
+  "pickup_voice": "Achird / en-US / casual-friendly male",
+  "pickup_duration_seconds": 2.8,
+  "possible_separate_take_timbre_variation": true,
+  "reading_pauses": [
+    {
+      "original_source_time": 8.86,
+      "duration": 1
+    },
+    {
+      "original_source_time": 10.55,
+      "duration": 1
+    }
+  ],
+  "caption_last_cue": [
+    22.48,
+    24.97
+  ],
+  "opening_replaced": false,
+  "first_four_scenes_reused_unchanged": true,
+  "time_stretch": false,
+  "review_only": true,
+  "public_post": false,
+  "n8n_or_app_changed": false,
+  "old_review_and_owner_notes_preserved": true
+}

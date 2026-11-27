@@ -1,0 +1,225 @@
+{
+  "project": "mxggxpoxgqubojvumjlt",
+  "bucket": "yfit-videos",
+  "prefix": "assets/app-screens/",
+  "create_only": true,
+  "upsert": false,
+  "apply_requested": true,
+  "before": [
+    {
+      "filename": "screen_01_dashboard.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_02_goals.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_03_nutrition.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_04_dailyTracker.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_05_fitness.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_06_medications.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_07_progress.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_08_predictions.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_09_recomp.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_10_aiCoach.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_11_language.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    }
+  ],
+  "created": [],
+  "preserved": [
+    "screen_01_dashboard.png"
+  ],
+  "stopped": true,
+  "error": {
+    "operation": "create-only-upload",
+    "filename": "screen_02_goals.png",
+    "exception_type": "StorageApiError",
+    "http_status": null,
+    "detail": "Storage rejected the operation or verification failed; no retry, overwrite or policy change."
+  },
+  "after": [
+    {
+      "filename": "screen_01_dashboard.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "d6816f7c1bf52b439becfbb4a5cfede0127888937e51122460af5152de290a82",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_02_goals.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_03_nutrition.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_04_dailyTracker.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_05_fitness.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "07cb51ba3f91f3862e52ba848658a76e363ae8283a419e9e8eeba1e149f53d52",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_06_medications.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "0fda0ae131f198a3b0cc45818de46ab916f252872dcd74e9f3888a7d3e455cb2",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_07_progress.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_08_predictions.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_09_recomp.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    },
+    {
+      "filename": "screen_10_aiCoach.png",
+      "http_status": 200,
+      "content_type": "image/png",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "sha256": "bdc457e66219235e8e7b10642765ac3a8d110ae1aa321405bb249e1f619a9e79",
+      "image_valid": true
+    },
+    {
+      "filename": "screen_11_language.png",
+      "http_status": 400,
+      "content_type": "application/json; charset=utf-8",
+      "image_valid": false,
+      "storage_error": "not_found",
+      "storage_message": "Object not found"
+    }
+  ],
+  "all_eleven_public_hashes_match": false
+}

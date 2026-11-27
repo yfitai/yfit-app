@@ -1,0 +1,100 @@
+{
+  "source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "actual_components": true,
+  "fictional_data": true,
+  "source_audit_reused": "/home/ubuntu/yfit-article-demo-2026-11-27/safe-audit-provenance.json",
+  "external_sent": 0,
+  "non_get_sent": 0,
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics"
+    }
+  ],
+  "blocked_external_gets": [],
+  "page_errors": [],
+  "screens": [
+    {
+      "path": "/home/ubuntu/yfit-screen-library-2026-11-27/pages/screen_11_language.png",
+      "description": "Genuine eight-language header dropdown, English selected, over real Daily Tracker empty state; original compiled styles unchanged.",
+      "route": "/daily-tracker",
+      "sha256": "7a9f3a8bab3aa0091bcb85cadb4a4da3923fd5d47883a1fb4f5549566164c7e7",
+      "local_capture_path": "/home/ubuntu/yfit-screen-library-2026-11-27/work/language/screen_11_language.png",
+      "width": 1080,
+      "height": 1920
+    }
+  ],
+  "server_stopped": true,
+  "id": "language",
+  "route": "/daily-tracker",
+  "actual_component": "LanguageSwitcher.jsx in Navigation.jsx, opened over DailyTracker.jsx",
+  "component_source_checks": [
+    {
+      "path": "src/App.jsx",
+      "sha256": "b3f119dae1f3b867c9fa2ae500d94093e34e177e3ba3de4512b88293161f0561",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/Navigation.jsx",
+      "sha256": "9b1190638efbfb18e38a3df007e2052cf89215f0e4cf34f9ccce508658c9a833",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/LanguageSwitcher.jsx",
+      "sha256": "af21ac5dbc1b480fddbb0618b58f3e2d13379e2412c42788097b372696b0e6a4",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/lib/i18n.js",
+      "sha256": "610c4030804ee11065d4a0a735da4a5b59aaa25df2377e4f4335387f652f9a61",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/components/DailyTracker.jsx",
+      "sha256": "ba591500c94b2b476538aa0834de93b6b4f56538eda07e90baed077141517e12",
+      "matches_declared_revision": true
+    },
+    {
+      "path": "src/contexts/UnitPreferenceContext.jsx",
+      "sha256": "ce1737e7d6cd735cff184962056ffea7d5a536a15c21f15a721e8f2d022b37f8",
+      "matches_declared_revision": true
+    }
+  ],
+  "compiled_build_reused_unchanged": true,
+  "dom_or_css_modified": false,
+  "canonical_source_modified": false,
+  "production_write": false,
+  "language_selection_or_save": false,
+  "ui_actions": [
+    {
+      "action": "click",
+      "target": "Change language",
+      "purpose": "Open actual language listbox only"
+    }
+  ],
+  "menu_bounding_box_css_px": {
+    "x": 324,
+    "y": 48.5,
+    "width": 180,
+    "height": 346
+  },
+  "supported_languages": [
+    "en",
+    "fr",
+    "es",
+    "pt",
+    "zh",
+    "hi",
+    "de",
+    "ja"
+  ],
+  "empty_records": [
+    "daily_logs",
+    "progress_measurements",
+    "meals",
+    "calculated_metrics",
+    "user_goals",
+    "subscriptions"
+  ]
+}

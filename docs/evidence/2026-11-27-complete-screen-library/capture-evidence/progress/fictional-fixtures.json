@@ -1,0 +1,94 @@
+{
+  "user_profiles": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "first_name": "Demo",
+      "last_name": "User",
+      "full_name": "Demo User",
+      "onboarding_completed": true,
+      "install_guide_shown": true,
+      "age": 35,
+      "gender": "male",
+      "height_cm": 175,
+      "weight_kg": 80,
+      "target_calories": 2200,
+      "activity_level": "moderately_active"
+    }
+  ],
+  "user_preferences": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "preferred_unit_system": "metric",
+      "preferred_distance_unit": "metric",
+      "use_custom_macros": true,
+      "protein_grams": 150,
+      "carb_grams": 265,
+      "fat_grams": 60,
+      "protein_percent": 27,
+      "carb_percent": 48,
+      "fat_percent": 25
+    }
+  ],
+  "user_goals": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "steps_goal": 10000,
+      "water_goal_ml": 2000,
+      "sleep_hours_goal": 8,
+      "goal_type": "lose_weight",
+      "fiber_goal_g": 25,
+      "sugar_goal_g": 50,
+      "sodium_goal_mg": 2300,
+      "target_weight": 76,
+      "current_weight": 80,
+      "fitness_goal": "general_fitness",
+      "created_at": "2026-11-27T00:00:00Z",
+      "id": "fictional-progress-goal",
+      "weight_kg": 80,
+      "starting_weight_kg": 80,
+      "height_cm": 175,
+      "target_weight_kg": 76,
+      "starting_body_fat_percentage": 20,
+      "target_body_fat_percentage": 18,
+      "updated_at": "2026-11-27T00:00:00Z"
+    }
+  ],
+  "calculated_metrics": [],
+  "meals": [],
+  "daily_logs": [
+    {
+      "id": "fictional-daily-log",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "logged_at": "2026-11-27T17:00:00Z",
+      "date": "2026-11-27",
+      "sleep_hours": 7.5,
+      "sleep_quality": "good",
+      "water_ml": 1800,
+      "steps": 6400,
+      "bp_systolic": 118,
+      "bp_diastolic": 76,
+      "glucose_mg_dl": 92,
+      "weight_kg": 80,
+      "body_fat_percent": 20,
+      "notes": ""
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "fictional-subscription",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "plan_type": "pro_monthly",
+      "status": "active",
+      "trial_end": null
+    }
+  ],
+  "progress_measurements": [],
+  "weight_logs": [],
+  "body_composition_logs": [],
+  "body_measurements_logs": [],
+  "meal_logs": [],
+  "workout_sessions": [],
+  "form_analysis_sessions": [],
+  "progress_photos": []
+}

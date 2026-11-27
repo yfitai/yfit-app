@@ -1,0 +1,82 @@
+🇺🇸
+Lang
+Dashboard
+Goals
+Nutrition
+Daily Tracker
+Fitness
+Medications
+Progress
+Predictions
+Recomp
+AI Coach
+Account
+🔮 AI Predictions
+
+Data-driven insights based on your logged activity
+
+Refresh
+Weight Loss Prediction
+
+Log weight on 2+ different days to see predictions
+
+Calorie Needs (TDEE)
+
+Log 7+ days of weight and nutrition to calculate TDEE
+
+Injury Risk Assessment
+
+Log 3+ strength sessions to assess injury risk
+
+Deload Week Predictor
+
+Log 8+ sessions over 3+ weeks to predict deload timing
+
+Medication Adherence
+
+Log at least 14 medication doses to see adherence predictions.
+
+Nutrition Pattern Analysis
+
+Log at least 7 days of data to unlock weight loss predictions.
+
+Optimal Training Time
+
+Log 10+ sessions at different times to find your optimal performance window
+
+Body Recomposition Forecast
+
+Log 7+ days of weight, 10+ sessions and nutrition to forecast body composition
+
+Habit Streak Predictions
+
+Building this week's data — log workouts to see streak predictions
+
+Blood Pressure Goal Tracking
+
+Log 7+ blood pressure readings in the Daily Tracker to track progress
+
+Blood Glucose Goal Tracking
+
+Log 7+ glucose readings in the Daily Tracker to track progress
+
+AI Predictions — Pro Feature
+
+Powered by statistical analysis and machine learning algorithms. Predictions become more accurate as you log more data.
+
+Your personal AI-powered fitness companion. Track workouts, nutrition, and health goals with intelligent insights.
+
+Legal
+Privacy Policy
+Terms of Service
+Cookie Policy
+HIPAA Notice
+Contact
+
+Have questions or need support?
+
+Contact Support
+
+Get AI-powered responses in minutes
+
+© 2026 YFIT AI. All rights reserved.

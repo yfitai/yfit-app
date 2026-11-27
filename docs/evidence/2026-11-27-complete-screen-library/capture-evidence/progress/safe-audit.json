@@ -1,0 +1,46 @@
+{
+  "source_revision": "20cae3de9b8d9160618299a1f81fa2b79021258a",
+  "actual_components": true,
+  "fictional_data": true,
+  "source_audit_reused": "/home/ubuntu/yfit-article-demo-2026-11-27/safe-audit-provenance.json",
+  "external_sent": 0,
+  "non_get_sent": 0,
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "host": "mxggxpoxgqubojvumjlt.supabase.co",
+      "path": "/rest/v1/feature_analytics"
+    }
+  ],
+  "blocked_external_gets": [],
+  "page_errors": [],
+  "screens": [
+    {
+      "path": "/home/ubuntu/yfit-screen-library-2026-11-27/work/progress/screen_07_progress.png",
+      "description": "Actual authenticated Progress overview at initial starting measurements; fictional GET records, no trend/prediction/model output, no saves; original unmodified app colors.",
+      "route": "/progress",
+      "sha256": "9fe67a213643cb8314ca810c6b6c8d98977a336cf7c1ffd2ecf559d615a8a4ba"
+    }
+  ],
+  "server_stopped": true,
+  "route": "/progress",
+  "actual_component": "src/components/Progress.jsx (OverviewCard)",
+  "production_modified": false,
+  "canonical_source_modified": false,
+  "canonical_git_modified": false,
+  "model_calls": 0,
+  "uploads": 0,
+  "analytics_allowed": false,
+  "ui_actions": [],
+  "overview_inputs": {
+    "starting_weight_kg": 80,
+    "current_weight_kg": 80,
+    "target_weight_kg": 76,
+    "height_cm": 175,
+    "starting_body_fat_percentage": 20,
+    "current_body_fat_percentage": 20,
+    "target_body_fat_percentage": 18
+  },
+  "display_calculations": "Actual component computes kg*2.20462 and BMI=kg/(height_cm/100)^2, then toFixed(1); no precomputed fixture results.",
+  "final_png_path": "/home/ubuntu/yfit-screen-library-2026-11-27/pages/screen_07_progress.png"
+}

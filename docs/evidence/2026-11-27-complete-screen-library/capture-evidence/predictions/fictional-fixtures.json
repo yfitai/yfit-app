@@ -1,0 +1,64 @@
+{
+  "user_profiles": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "first_name": "Demo",
+      "last_name": "User",
+      "full_name": "Demo User",
+      "onboarding_completed": true,
+      "install_guide_shown": true,
+      "age": 35,
+      "gender": "male",
+      "height_cm": 175,
+      "weight_kg": 80,
+      "target_calories": 2200,
+      "activity_level": "moderately_active"
+    }
+  ],
+  "user_preferences": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "preferred_unit_system": "metric",
+      "preferred_distance_unit": "metric",
+      "use_custom_macros": true,
+      "protein_grams": 150,
+      "carb_grams": 265,
+      "fat_grams": 60,
+      "protein_percent": 27,
+      "carb_percent": 48,
+      "fat_percent": 25
+    }
+  ],
+  "user_goals": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "steps_goal": 10000,
+      "water_goal_ml": 2000,
+      "sleep_hours_goal": 8,
+      "goal_type": "maintain",
+      "fiber_goal_g": 25,
+      "sugar_goal_g": 50,
+      "sodium_goal_mg": 2300,
+      "target_weight": 80,
+      "current_weight": 80,
+      "fitness_goal": "general_fitness",
+      "created_at": "2026-11-27T00:00:00Z"
+    }
+  ],
+  "calculated_metrics": [],
+  "meals": [],
+  "daily_logs": [],
+  "subscriptions": [
+    {
+      "id": "fictional-subscription",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "plan_type": "pro_monthly",
+      "status": "active",
+      "trial_end": null
+    }
+  ],
+  "progress_measurements": [],
+  "workout_sessions": [],
+  "medication_logs": []
+}

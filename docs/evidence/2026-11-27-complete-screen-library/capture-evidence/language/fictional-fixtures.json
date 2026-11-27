@@ -1,0 +1,23 @@
+{
+  "user_profiles": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "onboarding_completed": true,
+      "install_guide_shown": true
+    }
+  ],
+  "user_preferences": [
+    {
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "preferred_unit_system": "metric",
+      "preferred_distance_unit": "metric"
+    }
+  ],
+  "user_goals": [],
+  "calculated_metrics": [],
+  "meals": [],
+  "daily_logs": [],
+  "subscriptions": [],
+  "progress_measurements": []
+}

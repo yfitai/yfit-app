@@ -1,0 +1,28 @@
+[Script Info]
+Title: YFIT article-led actual-app review
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,DejaVu Sans,50,&H003D3E12,&H003D3E12,&H00FFFFFF,&H00FFFFFF,-1,0,0,0,100,100,0,0,1,0,0,5,64,64,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 10,0:00:00.34,0:00:01.03,Caption,,0,0,0,,{\pos(540,1778)}Training hard?
+Dialogue: 10,0:00:01.34,0:00:02.33,Caption,,0,0,0,,{\pos(540,1778)}Your meals matter too.
+Dialogue: 10,0:00:02.70,0:00:03.66,Caption,,0,0,0,,{\pos(540,1778)}A Women's Health article
+Dialogue: 10,0:00:03.70,0:00:05.71,Caption,,0,0,0,,{\pos(540,1778)}highlights nutrition\Nalongside workouts.
+Dialogue: 10,0:00:06.16,0:00:07.32,Caption,,0,0,0,,{\pos(540,1778)}In YFIT, check your
+Dialogue: 10,0:00:07.36,0:00:08.89,Caption,,0,0,0,,{\pos(540,1778)}calorie and macro progress,
+Dialogue: 10,0:00:09.92,0:00:11.31,Caption,,0,0,0,,{\pos(540,1778)}then review the meals\Nyou've logged.
+Dialogue: 10,0:00:12.76,0:00:14.10,Caption,,0,0,0,,{\pos(540,1778)}Daily Tracker lets you review
+Dialogue: 10,0:00:14.14,0:00:16.55,Caption,,0,0,0,,{\pos(540,1778)}your daily entries,\Nincluding steps and water.
+Dialogue: 10,0:00:16.98,0:00:17.77,Caption,,0,0,0,,{\pos(540,1778)}Want to look around?
+Dialogue: 10,0:00:17.98,0:00:18.86,Caption,,0,0,0,,{\pos(540,1778)}Use the profile link
+Dialogue: 10,0:00:18.90,0:00:20.79,Caption,,0,0,0,,{\pos(540,1778)}and choose\NExplore the app first.
+Dialogue: 10,0:00:21.10,0:00:22.25,Caption,,0,0,0,,{\pos(540,1778)}These are sample records.
+Dialogue: 10,0:00:22.48,0:00:24.97,Caption,,0,0,0,,{\pos(540,1778)}Saving your own data\Nneeds an account.
